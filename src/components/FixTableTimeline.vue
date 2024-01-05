@@ -1,24 +1,22 @@
 <template>
-  <div
-    style="
+  <div style="
       position: fixed;
       top: 0;
       bottom: 0;
       overflow: auto;
       right: 0;
       left: 0;
-    "
-  >
+    ">
     <div class="table-container">
       <table>
         <thead>
           <tr>
             <th>#</th>
-            <th  v-for="(field,key) in fields.filter(e=>!e.buildin)" :key="key" >
-              <vue-resizable :w="field.width"  :active="['r']"  @resize="handleResize(field)">
-          <div class="resize-handle"></div>
-          {{ field.name }}
-        </vue-resizable>
+            <th v-for="(col, key) in cols" :key="key">
+              <vue-resizable :w="col.width" :active="['r']" @resize="handleResize(col)">
+                <div class="resize-handle"></div>
+                <component :is="col.cp" :col="col"></component>
+              </vue-resizable>
             </th>
 
             <th :colspan="7 * weeks.length">
@@ -33,18 +31,13 @@
                     }}
                   </div>
                   <div style="display: flex; justify-content: space-between">
-                    <span
-                      style="margin: 0 10px"
-                      :style="{
-                        backgroundColor: isToday(day)
-                          ? 'red'
-                          : isWeekend(day)
+                    <span style="margin: 0 10px" :style="{
+                      backgroundColor: isToday(day)
+                        ? 'red'
+                        : isWeekend(day)
                           ? 'gray'
                           : 'none',
-                      }"
-                      v-for="day in getDatesBetween(week.start, week.end)"
-                      :key="day"
-                    >
+                    }" v-for="day in getDatesBetween(week.start, week.end)" :key="day">
                       {{ formatDate(day, { day: "2-digit" }) }}
                     </span>
                   </div>
@@ -54,52 +47,26 @@
           </tr>
         </thead>
         <tbody>
-            <template v-for="(row, index) in getAllRow()"  :key="index">
-          <tr  v-show="!isCollapsed(row)"  :draggable="true" :class="{selected:selectedIndex==index}"   @dragstart="dragstart($event,row)" @dragover="dragOver" @drop="drop($event,row,index)">
-            <th>
-              <div style="display: flex" >
-                <span
-                  style="margin-right: 5px; font-size: 90%; cursor: pointer"
-                  @click="deleteRow(row)"
-                  >x</span
-                >
-                <span
-                  style="
-                    background: #aaa;
-                    margin-right: 5px;
-                    border-radius: 5px;
-                  "
-                  >{{ index + 1 }}</span
-                >
-                <div style="margin-right:15px;" :level="row._level" :style="{paddingLeft:row._level*15+'px'}" ><span>{{ row._id }}</span><span @click="row._collapsed=!row._collapsed" :class="{arrow:row._childs&&row._childs.length,collapsed:row._childs&&row._childs.length&&row._collapsed}"></span> </div>
-                <ContentEditable @click="selectedIndex=index" ref="ids" v-model="row.title"   style="flex-grow: 1" @enter="focusNext(index)"></ContentEditable>
+          <template v-for="(row, index) in getAllRow()" :key="index">
+            <tr v-show="!isCollapsed(row)" :draggable="true" :class="{ selected: selectedIndex == index }"
+              @dragstart="dragstart($event, row)" @dragover="dragOver" @drop="drop($event, row, index)">
+              <th>
+     {{ index+1 }}
+              </th>
 
-              </div>
-            </th>
-
-            <td v-for="(field,key) in fields.filter(e=>!e.buildin)" :key="key">
-              <ContentEditable v-model="row[field.name]"  :dropdownItems="field.options"  ></ContentEditable>
-            </td>
-            <td :colspan="7 * weeks.length">
-              <div style="display: flex; flex-wrap: nowrap">
-                <div
-                  v-for="week in weeks"
-                  :key="week"
-                  class="week-slot"
-                  :style="{ width: (1 / weeks.length) * 100 + '%' }"
-                >
-                  <div
-                    style="
+              <td v-for="(col, key) in cols" :key="key">
+                <component :is="col.cp" :row="row" :col="col"></component>
+              </td>
+              <td :colspan="7 * weeks.length">
+                <div style="display: flex; flex-wrap: nowrap">
+                  <div v-for="week in weeks" :key="week" class="week-slot"
+                    :style="{ width: (1 / weeks.length) * 100 + '%' }">
+                    <div style="
                       display: flex;
                       justify-content: space-between;
                       min-height: 1em;
-                    "
-                  >
-                    <div
-                      style="flex-grow: 1"
-                      v-for="day in getDatesBetween(week.start, week.end)"
-                      :key="day"
-                      :class="{
+                    ">
+                      <div style="flex-grow: 1" v-for="day in getDatesBetween(week.start, week.end)" :key="day" :class="{
                         selected: isDateInRange(day, row._sch),
                         drag:
                           selectStart &&
@@ -115,130 +82,130 @@
                                 selectStart.end,
                                 selectStart.start
                               ))),
-                      }"
-                      @click="clickSch(row, day)"
-                      @mouseenter="enterSch(row, day)"
-                      @mousedown.left="mouseDownSch(row, day)"
-                    ></div>
+                      }" @click="clickSch(row, day)" @mouseenter="enterSch(row, day)"
+                        @mousedown.left="mouseDownSch(row, day)"></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </td>
-          </tr>
-        </template>
+              </td>
+            </tr>
+          </template>
         </tbody>
       </table>
     </div>
-    <div
-      style="
+    <div style="
         height: 30px;
         position: sticky;
         bottom: 0;
         left: 0;
         z-index: 3;
         background: white;
-      "
-    >
+      ">
       <div style="display: flex;">
-        <a @click="addRow(1)">Add Row</a> 
-        <a @click="addSubRow(1)">Add Sub Row</a> 
+        <a @click="addRow(1)">Add Row</a>
+        <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData()">Save</a>
       </div>
     </div>
   </div>
 </template>
 <script setup>
+import { ref, shallowRef } from 'vue';
 import ContentEditable from './ContentEditable.vue';
+import ColTitle from './ColTitle.vue';
+import ColDropText from './ColDropText.vue';
 import VueResizable from 'vue-resizable';
+
+
 
 </script>
 <script>
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
-const data = localStorage.getItem('data')?JSON.parse(localStorage.getItem('data')):[];
-function loopToSetDate(row){
-  if(row._sch)for(let peroid of row._sch){
+const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
+function loopToSetDate(row) {
+  if (row._sch) for (let peroid of row._sch) {
     peroid.start = new Date(peroid.start);
     peroid.end = new Date(peroid.end);
   }
-  if(row._childs){
-    for(let ch of row._childs){
+  if (row._childs) {
+    for (let ch of row._childs) {
       loopToSetDate(ch);
     }
   }
 }
-for(let d of data){
+for (let d of data) {
   loopToSetDate(d);
 }
 const fields = [
-{
-           
-           name:'_id',
-           active: 1,
-           order: 1,
-           type: "text",
-           buildin:1
-         
-       },
-       {
-           
-           name:'_sch',
-           active: 1,
-           order: 1,
-           type: "text",
-           buildin:1
-         
-       },
-       {
-           
-           name:'title',
-           active: 1,
-           order: 1,
-           type: "text",
-           buildin:1
-         
-       },
-        {
-           
-            name:'Status',
-            active: 1,
-            order: 1,
-            type: "text",
-            options:["In Progress","Done","New"]
-          
-        },
-        {
-           
-            name:'Priority',
-            active: 1,
-            order: 2,
-            type: "text",
-            options:["Low","High"]
-          
-        },
-        {
-          
-           name:'Assignee',
-            active: 1,
-            order: 2,
-            type: "text",
-        },
-        {
-          
-          name:'Start date',
-           active: 1,
-           order: 2,
-           type: "text",
-       },
-       {
-          
-          name:'Due date',
-           active: 1,
-           order: 2,
-           type: "text",
-       },
-      ];
+  {
+
+    name: '_id',
+    active: 1,
+    order: 1,
+    type: "text",
+    buildin: 1
+
+  },
+  {
+
+    name: '_sch',
+    active: 1,
+    order: 1,
+    type: "text",
+    buildin: 1
+
+  },
+  {
+
+    name: 'title',
+    active: 1,
+    order: 1,
+    type: "text",
+    buildin: 1
+
+  },
+  {
+
+    name: 'Status',
+    active: 1,
+    order: 1,
+    type: "text",
+    options: ["In Progress", "Done", "New"]
+
+  },
+  {
+
+    name: 'Priority',
+    active: 1,
+    order: 2,
+    type: "text",
+    options: ["Low", "High"]
+
+  },
+  {
+
+    name: 'Assignee',
+    active: 1,
+    order: 2,
+    type: "text",
+  },
+  {
+
+    name: 'Start date',
+    active: 1,
+    order: 2,
+    type: "text",
+  },
+  {
+
+    name: 'Due date',
+    active: 1,
+    order: 2,
+    type: "text",
+  },
+];
 
 
 export default {
@@ -247,160 +214,197 @@ export default {
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
+      cols: [
+        { cp: shallowRef(ColTitle) },
+        {
+          cp: shallowRef(ColDropText), field: {
+
+            name: 'Priority',
+            active: 1,
+            order: 2,
+            type: "text",
+            options: ["Low", "High"]
+
+          }
+        },
+        {
+          cp: shallowRef(ColDropText), field: {
+
+            name: 'Status',
+            active: 1,
+            order: 1,
+            type: "text",
+            options: ["In Progress", "Done", "New"]
+
+          }
+        },
+        {
+          cp: shallowRef(ColDropText), field: {
+
+            name: 'Assignee',
+            active: 1,
+            order: 2,
+            type: "text",
+          }
+        },
+
+      ],
       fields: fields,
-      tableData: data||[{"_id":"a","_level":0,"title":"abc",_childs:[
-      {"_id":"e","_level":0,"title":"efg"},{"_id":"f","_level":0,"title":"hil"}
-      ]},{"_id":"b","_level":0,"title":"efg"},{"_id":"c","_level":0,"title":"hil"}],
+      tableData: data || [{
+        "_id": "a", "_level": 0, "title": "abc", _childs: [
+          { "_id": "e", "_level": 0, "title": "efg" }, { "_id": "f", "_level": 0, "title": "hil" }
+        ]
+      }, { "_id": "b", "_level": 0, "title": "efg" }, { "_id": "c", "_level": 0, "title": "hil" }],
       dragRow: null,
-      selectedIndex:null
+      selectedIndex: null
     };
   },
   mounted() {
-    window.data=this.tableData;
+    window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
   },
   methods: {
-  deleteRow(row){
-  let list = row._p&&row._p._childs || this.tableData;
-    list.splice(list.indexOf(row),1);
-  },
+    deleteRow(row) {
+      let list = row._p && row._p._childs || this.tableData;
+      list.splice(list.indexOf(row), 1);
+    },
     handleResize(field, newWidth) {
       field.width = newWidth;
     },
-    getAllRow(){
-      let rows=[];
-        for(let root of this.tableData){
-          root._level=0;
-          rows.push(...this.getRootRows(root));
-        } 
-        return rows;
+    getAllRow() {
+      let rows = [];
+      for (let root of this.tableData) {
+        root._level = 0;
+        rows.push(...this.getRootRows(root));
+      }
+      return rows;
     },
-    isCollapsed(row){
-      if( row&& row._p ){
-        if(row._p._collapsed)return true;
+    isCollapsed(row) {
+      if (row && row._p) {
+        if (row._p._collapsed) return true;
         return this.isCollapsed(row._p._p)
       }
       return false;
 
     },
-    getRootRows(rootRow){
+    getRootRows(rootRow) {
 
-      let list=[];
-        list.push(rootRow);
-      if(rootRow._childs){
-        for(let row of rootRow._childs){
-          row._level=rootRow._level+1;
-          row._p=rootRow;
+      let list = [];
+      list.push(rootRow);
+      if (rootRow._childs) {
+        for (let row of rootRow._childs) {
+          row._level = rootRow._level + 1;
+          row._p = rootRow;
 
-            list.push(...this.getRootRows(row));
+          list.push(...this.getRootRows(row));
         }
-        
+
       }
       return list;
-     
+
 
     },
-    dragstart(event,row){
-      this.dragRow=row;
+    dragstart(event, row) {
+      this.dragRow = row;
       console.log(event);
-      this.dragStartClientX=event.clientX;
+      this.dragStartClientX = event.clientX;
     },
     dragOver(event) {
       event.preventDefault();
     },
-    isParentMoveToChild(fromRow,toRow){
-      if(!fromRow._childs)return false;
-      for(let row of fromRow._childs){
-        if(row==toRow)return true;
+    isParentMoveToChild(fromRow, toRow) {
+      if (!fromRow._childs) return false;
+      for (let row of fromRow._childs) {
+        if (row == toRow) return true;
 
-        if(this.isParentMoveToChild(row,toRow))return true;
+        if (this.isParentMoveToChild(row, toRow)) return true;
       }
       return false;
 
     },
-    drop(event,row) {
+    drop(event, row) {
 
       console.log(event);
-      if(this.isParentMoveToChild(this.dragRow,row)){
+      if (this.isParentMoveToChild(this.dragRow, row)) {
         console.error("not allow parent move to child.");
         return;
-      }else if(row==this.dragRow){
+      } else if (row == this.dragRow) {
         console.error('same row');
         return;
       }
-     let toChildList = row._p? row._p._childs:this.tableData;
-     console.log('drop');
+      let toChildList = row._p ? row._p._childs : this.tableData;
+      console.log('drop');
 
       if (this.dragRow !== null) {
-        
-        let fromChildList = this.dragRow._p? this.dragRow._p._childs:this.tableData;
-        let fromIndex =  fromChildList.indexOf(this.dragRow);
-        let targetIndex =  toChildList.indexOf(row);
 
-        if(event.clientX - this.dragStartClientX>50){
-            console.log('drop to child.');
-            fromChildList.splice(fromIndex, 1);
-            if(!row._childs)row._childs=[];
-            row._childs.push(this.dragRow);
-            this.dragRow._p=row;
-            this.dragRow._level=row._level+1;
+        let fromChildList = this.dragRow._p ? this.dragRow._p._childs : this.tableData;
+        let fromIndex = fromChildList.indexOf(this.dragRow);
+        let targetIndex = toChildList.indexOf(row);
+
+        if (event.clientX - this.dragStartClientX > 50) {
+          console.log('drop to child.');
+          fromChildList.splice(fromIndex, 1);
+          if (!row._childs) row._childs = [];
+          row._childs.push(this.dragRow);
+          this.dragRow._p = row;
+          this.dragRow._level = row._level + 1;
           return;
         }
 
-        if(row._p==this.dragRow._p && fromIndex-targetIndex==1){
+        if (row._p == this.dragRow._p && fromIndex - targetIndex == 1) {
           fromChildList.splice(fromIndex, 1);
-           targetIndex =  toChildList.indexOf(row);
-          fromChildList.splice(targetIndex,0,this.dragRow);
-        }else{
+          targetIndex = toChildList.indexOf(row);
+          fromChildList.splice(targetIndex, 0, this.dragRow);
+        } else {
           fromChildList.splice(fromIndex, 1);
-           targetIndex =  toChildList.indexOf(row);
-          toChildList.splice(targetIndex+1,0,this.dragRow);
-          this.dragRow._p=row._p;
-          this.dragRow._level=row._level;
+          targetIndex = toChildList.indexOf(row);
+          toChildList.splice(targetIndex + 1, 0, this.dragRow);
+          this.dragRow._p = row._p;
+          this.dragRow._level = row._level;
         }
 
         this.dragRow = null;
-        
+
       }
     },
-    addRow(num){
-      if(this.selectedIndex!=null){
-        this.tableData.splice(this.selectedIndex+1,0,{ _id: '' });
-      }else         this.tableData.push({ _id: '' })
+    addRow(num) {
+      if (this.selectedIndex != null) {
+        this.tableData.splice(this.selectedIndex + 1, 0, { _id: '' });
+      } else this.tableData.push({ _id: '' })
 
     },
-    addSubRow(num){
-      if(!this.tableData[this.selectedIndex].childs)
-      this.tableData[this.selectedIndex].childs=[];
+    addSubRow(num) {
+      if (!this.tableData[this.selectedIndex].childs)
+        this.tableData[this.selectedIndex].childs = [];
 
       this.tableData[this.selectedIndex].childs.push({ _id: '' })
 
 
     },
-    focusNext(index){
-      if(index+1<this.$refs.ids.length){
-        console.log('focus'+(index+1));
-        setTimeout(()=>{       
-           this.$refs.ids[index+1].$el.querySelector('[contenteditable=true]').focus();
-},100);
+    focusNext(index) {
+      if (index + 1 < this.$refs.ids.length) {
+        console.log('focus' + (index + 1));
+        setTimeout(() => {
+          this.$refs.ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
+        }, 100);
 
       }
-      else{
+      else {
         this.addRow(1)
-        setTimeout(()=>{
-          this.$refs.ids[index+1].$el.querySelector('[contenteditable=true]').focus();
-        },100);
+        setTimeout(() => {
+          this.$refs.ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
+        }, 100);
       }
     },
-    saveData(){
-      localStorage.setItem('data',JSON.stringify(this.tableData,function(key,value){
-        if ( key === "_p" ) {
+    saveData() {
+      localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
+        if (key === "_p") {
           console.log(value);
-            return null;
-        }else return value;
+          return null;
+        } else return value;
       }));
     },
     moveCursorToEnd(index) {
@@ -475,30 +479,30 @@ export default {
     },
     mouseDownSch(row, date) {
       console.log("moousedown");
-     
+
 
       if (
         this.selectStart &&
         this.selectStart.row == row
       ) {
-        if(        this.selectStart.type == 1){
+        if (this.selectStart.type == 1) {
           this.addDatePeriod(row._sch, this.selectStart, {
-          start: this.selectStart.orgStart,
-          end: this.selectStart.orgEnd,
-        });
-           this.selectStart = null;
+            start: this.selectStart.orgStart,
+            end: this.selectStart.orgEnd,
+          });
+          this.selectStart = null;
         }
 
         else {
-        
-        //  this.addDatePeriod(row._sch, this.selectStart);
+
+          //  this.addDatePeriod(row._sch, this.selectStart);
         }
 
-       
+
         return;
       }
 
-      if(this.selectStart)return;
+      if (this.selectStart) return;
       let startEnd = this.isDateInRange(date, row._sch);
 
       if (startEnd) {
@@ -561,13 +565,13 @@ export default {
           continue;
         if (
           updatedMerged.length === 0 ||
-          period.start.getTime() - updatedMerged[updatedMerged.length - 1].end.getTime()>24*3600*1000
+          period.start.getTime() - updatedMerged[updatedMerged.length - 1].end.getTime() > 24 * 3600 * 1000
         ) {
           // If no overlap, add the current period as a new merged period
           updatedMerged.push(period);
         } else {
           // If overlap or adjacent, update the end date of the last merged period
-          updatedMerged[updatedMerged.length - 1].end = period.end.getTime()> updatedMerged[updatedMerged.length - 1].end.getTime()?period.end:updatedMerged[updatedMerged.length - 1].end;
+          updatedMerged[updatedMerged.length - 1].end = period.end.getTime() > updatedMerged[updatedMerged.length - 1].end.getTime() ? period.end : updatedMerged[updatedMerged.length - 1].end;
         }
       }
 
@@ -708,6 +712,9 @@ td:first-child {
   position: sticky;
   left: 0;
   background-color: white;
+  width: 46px;
+  min-width: 46px;
+    text-align: center;
 }
 
 .selected {
@@ -731,9 +738,11 @@ td:first-child {
 .selectStart {
   background-color: yellow;
 }
+
 .drag {
   cursor: move;
 }
+
 .resizable {
   position: relative;
   overflow: hidden;
@@ -741,28 +750,11 @@ td:first-child {
 
 .resize-handle {
   position: absolute;
-    top: 0;
-    right: -11px;
-    bottom: 0;
-    width: 3px;
-    background-color: #eee;
-    cursor: col-resize;
+  top: 0;
+  right: -11px;
+  bottom: 0;
+  width: 3px;
+  background-color: #eee;
+  cursor: col-resize;
 }
-
-.arrow {
-  content: "";
-  width: 0;
-    height: 0;
-    border-left: 0.5em solid transparent;
-    border-right: 0.5em solid transparent;
-    border-bottom: 0.5em solid gray;
-    transform: rotate(180deg);
-    display: inline-block;
-    cursor: pointer;
-    transition: all 0.3s ease;
-
-  }
-  .collapsed{
-    transform: rotate(90deg);
-  }
 </style>
