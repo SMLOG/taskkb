@@ -9,14 +9,20 @@
     ">
     <div class="table-container">
       <table>
+        <colgroup>
+          <col width="46px">
+          <col v-for="(col, key) in cols" :key="key"
+            :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: +'var(--col-' + key + '-width)' }">
+        </colgroup>
         <thead>
           <tr>
             <th>#</th>
             <th v-for="(col, key) in cols" :key="key">
-              <vue-resizable :w="col.width" :active="['r']" @resize="handleResize(col)">
-                <div class="resize-handle"></div>
-                <component :is="col.cp" :col="col"></component>
-              </vue-resizable>
+              <div class="cell">
+                <vue-resizable :width="col.width" :active="['r']"  @resize:move="handleResize(col, key, $event)">
+                  <component :is="col.cp" :col="col"></component>
+                </vue-resizable>
+              </div>
             </th>
 
             <th :colspan="7 * weeks.length">
@@ -51,11 +57,14 @@
             <tr v-show="!isCollapsed(row)" :draggable="true" :class="{ selected: selectedIndex == index }"
               @dragstart="dragstart($event, row)" @dragover="dragOver" @drop="drop($event, row, index)">
               <th>
-     {{ index+1 }}
+                  {{ index + 1 }}
               </th>
 
-              <td v-for="(col, key) in cols" :key="key">
-                <component :is="col.cp" :row="row" :col="col"></component>
+              <td v-for="(col, key) in cols" :key="key"
+                :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: 'var(--col-' + key + '-width)' }">
+                <div class="cell">
+                  <component :is="col.cp" :row="row" :col="col"></component>
+                </div>
               </td>
               <td :colspan="7 * weeks.length">
                 <div style="display: flex; flex-wrap: nowrap">
@@ -112,8 +121,7 @@
 <script setup>
 import { ref, shallowRef } from 'vue';
 import ContentEditable from './ContentEditable.vue';
-import ColTitle from './ColTitle.vue';
-import ColDropText from './ColDropText.vue';
+
 import VueResizable from 'vue-resizable';
 
 
@@ -207,17 +215,22 @@ const fields = [
   },
 ];
 
+import ColTitle from './ColTitle.vue';
+import ColDropText from './ColDropText.vue';
+
+
 
 export default {
+  components:{ColTitle,ColDropText},
   data() {
     return {
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
-      cols: [
-        { cp: shallowRef(ColTitle) },
+      cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [
+        { cp: 'ColTitle' },
         {
-          cp: shallowRef(ColDropText), field: {
+          cp: 'ColDropText', field: {
 
             name: 'Priority',
             active: 1,
@@ -228,7 +241,7 @@ export default {
           }
         },
         {
-          cp: shallowRef(ColDropText), field: {
+          cp: 'ColDropText', field: {
 
             name: 'Status',
             active: 1,
@@ -239,7 +252,7 @@ export default {
           }
         },
         {
-          cp: shallowRef(ColDropText), field: {
+          cp: 'ColDropText', field: {
 
             name: 'Assignee',
             active: 1,
@@ -262,6 +275,11 @@ export default {
   mounted() {
     window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
+    
+    for( let i=0;i< this.cols.length;i++){
+      let col = this.cols[i];
+      document.documentElement.style.setProperty("--col-" + i + "-width", "".concat(col.width, "px"));
+    }
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
@@ -271,8 +289,10 @@ export default {
       let list = row._p && row._p._childs || this.tableData;
       list.splice(list.indexOf(row), 1);
     },
-    handleResize(field, newWidth) {
-      field.width = newWidth;
+    handleResize(col, index, event) {
+
+      col.width = event.width;
+      document.documentElement.style.setProperty("--col-" + index + "-width", "".concat(col.width, "px"));
     },
     getAllRow() {
       let rows = [];
@@ -406,6 +426,7 @@ export default {
           return null;
         } else return value;
       }));
+      localStorage.setItem('cols',JSON.stringify(this.cols));
     },
     moveCursorToEnd(index) {
       this.$nextTick(() => {
@@ -678,11 +699,16 @@ table {
   width: 100%;
   border-spacing: 0;
 }
+.cell{
+  overflow: hidden;
+  text-overflow: ellipsis;
 
+}
 th,
 td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 0;
+  min-height: 1em;
 }
 
 tbody th {
@@ -714,7 +740,7 @@ td:first-child {
   background-color: white;
   width: 46px;
   min-width: 46px;
-    text-align: center;
+  text-align: center;
 }
 
 .selected {
@@ -757,4 +783,5 @@ td:first-child {
   background-color: #eee;
   cursor: col-resize;
 }
+
 </style>
