@@ -54,20 +54,20 @@
         </thead>
         <tbody>
           <template v-for="(row, index) in getAllRow()" :key="index">
-            <tr v-show="!isCollapsed(row)" :draggable="true" :class="{ selected: selectedIndex == index }"
-              @dragstart="dragstart($event, row)" @dragover="dragOver" @drop="drop($event, row, index)">
-              <th>
+            <tr v-show="!isCollapsed(row)"  :class="{ selected: selectedIndex == index }"   @dragover="dragOver" @drop="drop($event, row, index)"
+            >
+              <th :draggable="true" @dragstart="dragstart($event, row)" @click="selectedIndex=index"  >
                   {{ index + 1 }}
               </th>
 
-              <td v-for="(col, key) in cols" :key="key"
+              <td v-for="(col, key) in cols" :key="key" @click="clickCell($event,index)"
                 :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: 'var(--col-' + key + '-width)' }">
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col"></component>
                 </div>
               </td>
               <td :colspan="7 * weeks.length">
-                <div style="display: flex; flex-wrap: nowrap">
+                <div style="display: flex; flex-wrap: nowrap" class="sch">
                   <div v-for="week in weeks" :key="week" class="week-slot"
                     :style="{ width: (1 / weeks.length) * 100 + '%' }">
                     <div style="
@@ -285,6 +285,10 @@ export default {
     document.removeEventListener("keydown", this.handleKeyDown);
   },
   methods: {
+    clickCell(event,index){
+      this.selectedIndex=index;
+
+    },
     deleteRow(row) {
       let list = row._p && row._p._childs || this.tableData;
       list.splice(list.indexOf(row), 1);
@@ -699,11 +703,7 @@ table {
   width: 100%;
   border-spacing: 0;
 }
-.cell{
-  overflow: hidden;
-  text-overflow: ellipsis;
 
-}
 th,
 td {
   border: 1px solid #ddd;
@@ -742,8 +742,8 @@ td:first-child {
   min-width: 46px;
   text-align: center;
 }
-
-.selected {
+td{vertical-align: top;}
+.selected th {
   background-color: #ddd;
 }
 
@@ -782,6 +782,12 @@ td:first-child {
   width: 3px;
   background-color: #eee;
   cursor: col-resize;
+}
+.selected{
+  background-color: #ddd;
+}
+.sch .selected{
+  background-color: lightgreen;
 }
 
 </style>

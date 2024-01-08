@@ -1,5 +1,5 @@
 <template>
-  <div class="editable-dropdown" style="width: 100%;min-width: 1em;">
+  <div class="editable-dropdown " style="width: 100%;min-width: 1em;">
     <div
  
       ref="contentEditable"
@@ -8,6 +8,7 @@
       @keydown.enter.prevent="handleEnter"
       @focus="showDropdown=1"
       v-html="modelValue"
+      class="text"
     >
      
     </div>
@@ -117,4 +118,5 @@ export default {
     border-left: 2px solid green!important;
     padding: 0 10px;
 }
+
 </style>
