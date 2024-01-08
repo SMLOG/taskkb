@@ -60,7 +60,7 @@
                   {{ index + 1 }}
               </th>
 
-              <td v-for="(col, key) in cols" :key="key" @click="clickCell($event,index)"
+              <td v-for="(col, key) in cols" :key="key" @click="clickCell($event,index,row)"
                 :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: 'var(--col-' + key + '-width)' }">
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col"></component>
@@ -112,6 +112,7 @@
       ">
       <div style="display: flex;">
         <a @click="addRow(1)">Add Row</a>
+        <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData()">Save</a>
       </div>
@@ -269,7 +270,8 @@ export default {
         ]
       }, { "_id": "b", "_level": 0, "title": "efg" }, { "_id": "c", "_level": 0, "title": "hil" }],
       dragRow: null,
-      selectedIndex: null
+      selectedIndex: null,
+      selectRow:null,
     };
   },
   mounted() {
@@ -285,8 +287,9 @@ export default {
     document.removeEventListener("keydown", this.handleKeyDown);
   },
   methods: {
-    clickCell(event,index){
+    clickCell(event,index,row){
       this.selectedIndex=index;
+      this.selectRow=row;
 
     },
     deleteRow(row) {
