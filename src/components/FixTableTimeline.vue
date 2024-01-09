@@ -7,6 +7,7 @@
       right: 0;
       left: 0;
     ">
+      <Config></Config>
     <div class="table-container">
       <table>
         <colgroup>
@@ -115,15 +116,15 @@
         <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData()">Save</a>
+        <a @click="showColumns=true">Columns</a>
       </div>
     </div>
   </div>
 </template>
 <script setup>
-import { ref, shallowRef } from 'vue';
-import ContentEditable from './ContentEditable.vue';
 
 import VueResizable from 'vue-resizable';
+import Config from './Config.vue';
 
 
 
@@ -147,74 +148,7 @@ function loopToSetDate(row) {
 for (let d of data) {
   loopToSetDate(d);
 }
-const fields = [
-  {
 
-    name: '_id',
-    active: 1,
-    order: 1,
-    type: "text",
-    buildin: 1
-
-  },
-  {
-
-    name: '_sch',
-    active: 1,
-    order: 1,
-    type: "text",
-    buildin: 1
-
-  },
-  {
-
-    name: 'title',
-    active: 1,
-    order: 1,
-    type: "text",
-    buildin: 1
-
-  },
-  {
-
-    name: 'Status',
-    active: 1,
-    order: 1,
-    type: "text",
-    options: ["In Progress", "Done", "New"]
-
-  },
-  {
-
-    name: 'Priority',
-    active: 1,
-    order: 2,
-    type: "text",
-    options: ["Low", "High"]
-
-  },
-  {
-
-    name: 'Assignee',
-    active: 1,
-    order: 2,
-    type: "text",
-  },
-  {
-
-    name: 'Start date',
-    active: 1,
-    order: 2,
-    type: "text",
-  },
-  {
-
-    name: 'Due date',
-    active: 1,
-    order: 2,
-    type: "text",
-  },
-];
 
 import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
@@ -228,47 +162,8 @@ export default {
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
-      cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [
-        { cp: 'ColTitle' },
-        {
-          cp: 'ColDropText', field: {
-
-            name: 'Priority',
-            active: 1,
-            order: 2,
-            type: "text",
-            options: ["Low", "High"]
-
-          }
-        },
-        {
-          cp: 'ColDropText', field: {
-
-            name: 'Status',
-            active: 1,
-            order: 1,
-            type: "text",
-            options: ["In Progress", "Done", "New"]
-
-          }
-        },
-        {
-          cp: 'ColDropText', field: {
-
-            name: 'Assignee',
-            active: 1,
-            order: 2,
-            type: "text",
-          }
-        },
-
-      ],
-      fields: fields,
-      tableData: data || [{
-        "_id": "a", "_level": 0, "title": "abc", _childs: [
-          { "_id": "e", "_level": 0, "title": "efg" }, { "_id": "f", "_level": 0, "title": "hil" }
-        ]
-      }, { "_id": "b", "_level": 0, "title": "efg" }, { "_id": "c", "_level": 0, "title": "hil" }],
+      cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [],
+      tableData: data ,
       dragRow: null,
       selectedIndex: null,
       selectRow:null,
