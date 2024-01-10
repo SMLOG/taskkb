@@ -13,13 +13,13 @@
                   ></span
                 >
                 <div style="margin-right:15px;" :level="row._level" :style="{paddingLeft:row._level*15+'px'}" ><span>{{ row._id }}</span><span @click="row._collapsed=!row._collapsed" :class="{arrow:row._childs&&row._childs.length,collapsed:row._childs&&row._childs.length&&row._collapsed}"></span> </div>
-                <ContentEditable v-model="row['title']"   ></ContentEditable>
+                <ContentEditable v-model="row[col.field.name]"   ></ContentEditable>
 
               </div>
 
   </div>
   <div v-else-if="col">
-       ID
+       {{ col.field.name }}
   </div>
 </template>
 
