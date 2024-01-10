@@ -28,7 +28,7 @@
 export default {
   data() {
     return {
-      cpList: ["ColTitle", "ColDropText"],
+      cpList: ["ColTitle", "ColDropText","Date","Time"],
       cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [],
       dragStartIndex:null
     }

@@ -1,18 +1,10 @@
 <template>
-  <div class="editable-dropdown " style="width: 100%;min-width: 1em;">
-    <div
- 
-      ref="contentEditable"
-      :contenteditable="true"
-      @blur="stopEditing"
-      @keydown.enter.prevent="handleEnter"
-      @focus="showDropdown=1"
-      v-html="modelValue"
-      class="text"
-    >
-     
+  <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
+    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
+      @focus="showDropdown = 1" v-html="modelValue" class="text">
+
     </div>
-    <div  v-if="showDropdown&&dropdownItems" class="dropdown">
+    <div v-if="showDropdown && dropdownItems" class="dropdown">
       <ul>
         <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
           {{ item }}
@@ -43,17 +35,38 @@ export default {
     return {
       editing: false,
       showDropdown: false,
+      editable: false,
     };
   },
   methods: {
+    moveCursorToEnd(element) {
+      element.focus(); // Set focus to the contentEditable div
+
+      var range = document.createRange();
+      range.selectNodeContents(element);
+      range.collapse(false); // Collapse the range to the end
+
+      var selection = window.getSelection();
+      selection.removeAllRanges(); // Clear any existing selection
+      selection.addRange(range); // Set the new range as the selection
+    },
+    dblclick() {
+      this.editable = true;
+      setTimeout(() => {
+        this.moveCursorToEnd(this.$refs.contentEditable);
+        //this.$refs.contentEditable.focus();
+      }, 100);
+
+    },
     startEditing() {
       this.editing = true;
     },
     stopEditing() {
       this.editing = false;
       this.$emit('update:modelValue', this.$refs.contentEditable.innerHTML);
-     console.log('stopEditing');
-      setTimeout(()=>{ this.showDropdown=false;},200);
+      console.log('stopEditing');
+      setTimeout(() => { this.showDropdown = false; }, 200);
+      this.editable = false;
 
     },
     handleInput(event) {
@@ -71,7 +84,7 @@ export default {
       if (this.$refs.contentEditable) {
         console.log(item);
         this.$refs.contentEditable.focus();
-       // document.execCommand('insertText', false, item);
+        // document.execCommand('insertText', false, item);
         this.$refs.contentEditable.innerHTML = item;
         this.showDropdown = false;
       }
@@ -112,11 +125,11 @@ export default {
   flex: 1;
   margin-right: 10px;
 }
-.dropdown{
-  position: absolute;
-    background: #ccc;
-    border-left: 2px solid green!important;
-    padding: 0 10px;
-}
 
+.dropdown {
+  position: absolute;
+  background: #ccc;
+  border-left: 2px solid green !important;
+  padding: 0 10px;
+}
 </style>
