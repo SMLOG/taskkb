@@ -4,7 +4,7 @@
       @focus="showDropdown = 1" v-html="modelValue" class="text">
 
     </div>
-    <div v-if="showDropdown && dropdownItems" class="dropdown">
+    <div v-if="showDropdown && !isText && dropdownItems" class="dropdown">
       <ul>
         <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
           {{ item }}
@@ -26,6 +26,11 @@ export default {
       type: String,
       required: false,
     },
+    isText: {
+      type: Boolean,
+      required: false,
+    },
+    
     dropdownItems: {
       type: Array,
       default: () => [],
@@ -61,9 +66,14 @@ export default {
     startEditing() {
       this.editing = true;
     },
+    getValue(){
+  return     this.isText?this.$refs.contentEditable.textContent.trim(): this.$refs.contentEditable.innerHTML
+
+    },
     stopEditing() {
       this.editing = false;
-      this.$emit('update:modelValue', this.$refs.contentEditable.innerHTML);
+      this.$emit('update:modelValue',this.getValue()
+       );
       console.log('stopEditing');
       setTimeout(() => { this.showDropdown = false; }, 200);
       this.editable = false;
@@ -131,5 +141,8 @@ export default {
   background: #ccc;
   border-left: 2px solid green !important;
   padding: 0 10px;
+}
+.text{min-height: 1em;
+word-break: break-all;
 }
 </style>

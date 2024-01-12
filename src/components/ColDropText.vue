@@ -1,10 +1,10 @@
 <template>
 
   <div v-if="row">
-    <ContentEditable v-model="row[col.field.name]"  :dropdownItems="col.field.options"  ></ContentEditable>
+    <ContentEditable v-model="row['c'+col.fn]"  :dropdownItems="col.field.options"  ></ContentEditable>
   </div>
   <div v-else-if="col">
-       {{ col.field.name }}
+    <ContentEditable v-model="col.name"   :isText="true"  ></ContentEditable>
   </div>
 </template>
 

@@ -7,7 +7,7 @@
       right: 0;
       left: 0;
     ">
-      <Config></Config>
+      <Config v-if="showColumns" :cols="cols"></Config>
     <div class="table-container">
       <table>
         <colgroup>
@@ -116,7 +116,7 @@
         <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData()">Save</a>
-        <a @click="showColumns=true">Columns</a>
+        <a @click="showColumns=!showColumns">Columns</a>
       </div>
     </div>
   </div>
@@ -159,6 +159,7 @@ export default {
   components:{ColTitle,ColDropText},
   data() {
     return {
+      showColumns:0,
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
