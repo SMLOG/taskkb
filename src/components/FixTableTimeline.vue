@@ -7,7 +7,7 @@
       right: 0;
       left: 0;
     ">
-      <Config v-if="showColumns" :cols="cols"></Config>
+    <Config v-if="showColumns" :cols="cols"></Config>
     <div class="table-container">
       <table>
         <colgroup>
@@ -20,7 +20,7 @@
             <th>#</th>
             <th v-for="(col, key) in cols" :key="key">
               <div class="cell">
-                <vue-resizable :width="col.width" :active="['r']"  @resize:move="handleResize(col, key, $event)">
+                <vue-resizable :width="col.width" :active="['r']" @resize:move="handleResize(col, key, $event)">
                   <component :is="col.cp" :col="col"></component>
                 </vue-resizable>
               </div>
@@ -55,13 +55,14 @@
         </thead>
         <tbody>
           <template v-for="(row, index) in getAllRow()" :key="index">
-            <tr v-show="!isCollapsed(row)"  :class="{ selected: selectedIndex == index }"   @dragover="dragOver" @drop="drop($event, row, index)"
-            >
-              <th :draggable="true" @dragstart="dragstart($event, row)" @click="selectedIndex=index"  >
-                  {{ index + 1 }}
+            <tr v-show="!isCollapsed(row)" :class="{ selected: selectedIndex == index }" @dragover="dragOver"
+              @drop="drop($event, row, index)">
+              <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickCell($event, index, row)"
+                @contextmenu="clickCell($event, index, row);showContextMenu($event,index)">
+                {{ index + 1 }}
               </th>
 
-              <td v-for="(col, key) in cols" :key="key" @click="clickCell($event,index,row)"
+              <td v-for="(col, key) in cols" :key="key" @click="clickCell($event, index, row)"
                 :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: 'var(--col-' + key + '-width)' }">
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col"></component>
@@ -116,9 +117,20 @@
         <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData()">Save</a>
-        <a @click="showColumns=!showColumns">Columns</a>
+        <a @click="showColumns = !showColumns">Columns</a>
       </div>
     </div>
+
+  </div>
+
+  <!-- Context menu -->
+  <div v-show="isContextMenuVisible" :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
+    class="contextmenu">
+    <ul>
+      <li @click="addRow(1)">Insert Row after {{ selectedIndex }}</li>
+      <li>Delete Row</li>
+      <li>Menu Item 3</li>
+    </ul>
   </div>
 </template>
 <script setup>
@@ -156,36 +168,40 @@ import ColDropText from './ColDropText.vue';
 
 
 export default {
-  components:{ColTitle,ColDropText},
+  components: { ColTitle, ColDropText },
   data() {
     return {
-      showColumns:0,
+      isContextMenuVisible: false,
+      contextMenuPosition: { x: 0, y: 0 },
+      showColumns: 0,
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
       cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [],
-      tableData: data ,
+      tableData: data,
       dragRow: null,
       selectedIndex: null,
-      selectRow:null,
+      selectRow: null,
     };
   },
   mounted() {
+    document.addEventListener("click", this.hideContextMenu);
     window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
-    
-    for( let i=0;i< this.cols.length;i++){
+
+    for (let i = 0; i < this.cols.length; i++) {
       let col = this.cols[i];
       document.documentElement.style.setProperty("--col-" + i + "-width", "".concat(col.width, "px"));
     }
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
+    document.removeEventListener("click", this.hideContextMenu);
   },
   methods: {
-    clickCell(event,index,row){
-      this.selectedIndex=index;
-      this.selectRow=row;
+    clickCell(event, index, row) {
+      this.selectedIndex = index;
+      this.selectRow = row;
 
     },
     deleteRow(row) {
@@ -294,8 +310,12 @@ export default {
       }
     },
     addRow(num) {
-      if (this.selectedIndex != null) {
-        this.tableData.splice(this.selectedIndex + 1, 0, { _id: '' });
+      console.log(num)
+      if (this.selectRow) {
+        let list = this.selectRow._p&&this.selectRow._p._childs||this.tableData;
+        let index = list.indexOf(this.selectRow);
+        list.splice(index + 1, 0, { _id: '',_p:this.selectRow._p });
+
       } else this.tableData.push({ _id: '' })
 
     },
@@ -329,7 +349,7 @@ export default {
           return null;
         } else return value;
       }));
-      localStorage.setItem('cols',JSON.stringify(this.cols));
+      localStorage.setItem('cols', JSON.stringify(this.cols));
     },
     moveCursorToEnd(index) {
       this.$nextTick(() => {
@@ -592,6 +612,16 @@ export default {
     formatDate(date, format) {
       return date.toLocaleDateString("en-US", { ...format });
     },
+    showContextMenu(event,index) {
+      event.preventDefault();
+      this.isContextMenuVisible = true;
+      this.contextMenuPosition.x = event.clientX;
+      this.contextMenuPosition.y = event.clientY;
+      this.selectedIndex = index; 
+    },
+    hideContextMenu() {
+      this.isContextMenuVisible = false;
+    },
   },
 };
 </script>
@@ -641,7 +671,11 @@ td:first-child {
   min-width: 46px;
   text-align: center;
 }
-td{vertical-align: top;}
+
+td {
+  vertical-align: top;
+}
+
 .selected th {
   background-color: #ddd;
 }
@@ -682,11 +716,22 @@ td{vertical-align: top;}
   background-color: #eee;
   cursor: col-resize;
 }
-.selected{
+
+.selected {
   background-color: #ddd;
 }
-.sch .selected{
+
+.sch .selected {
   background-color: lightgreen;
 }
 
+.contextmenu {
+  background: white;
+  z-index: 1;
+  position: fixed;
+  border: 2px solid gray;
+  border-radius: 5px;
+  padding: 5px;
+}
+.contextmenu ul{margin: 0;}
 </style>
