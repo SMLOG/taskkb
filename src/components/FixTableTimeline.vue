@@ -684,7 +684,7 @@ td {
 }
 
 .selected th {
-  background-color: #ddd;
+  background-color: #F0FFF0;
 }
 
 .week-slot {
@@ -725,7 +725,7 @@ td {
 }
 
 .selected {
-  background-color: #ddd;
+  background-color: #F0FFF0;
 }
 
 .sch .selected {
