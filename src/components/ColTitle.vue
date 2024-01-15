@@ -1,25 +1,25 @@
 <template>
-
   <div v-if="row">
 
-    <div style="display: flex" >
-          
-                <span
-                  style="
+    <div style="display: flex">
+
+      <span style="
                     background: #aaa;
                     margin-right: 5px;
                     border-radius: 5px;
-                  "
-                  ></span
-                >
-                <div style="margin-right:15px;" :level="row._level" :style="{paddingLeft:row._level*15+'px'}" ><span>{{ row._id }}</span><span @click="row._collapsed=!row._collapsed" :class="{arrow:row._childs&&row._childs.length,collapsed:row._childs&&row._childs.length&&row._collapsed}"></span> </div>
-                <ContentEditable v-model="row['c'+col.fn]"   ></ContentEditable>
+                  "></span>
+      <div style="margin-right:15px;" :level="row._level" :style="{ paddingLeft: row._level * 15 + 'px' }">
+        <span >{{ row._id}}</span>
+        <span @click="row._collapsed = !row._collapsed"
+          :class="{ dot:!row._childs||!row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>
+      </div>
+      <ContentEditable v-model="row['c' + col.fn]"></ContentEditable>
 
-              </div>
+    </div>
 
   </div>
   <div v-else>
-    <ContentEditable v-model="col.name" :isText="true"  ></ContentEditable>
+    <ContentEditable v-model="col.name" :isText="true"></ContentEditable>
   </div>
 </template>
 
@@ -30,8 +30,8 @@ import ContentEditable from './ContentEditable.vue';
 export default {
 
   props: {
-    col:{
-      type:Object
+    col: {
+      type: Object
     },
     row: {
       type: Object,
@@ -53,17 +53,36 @@ export default {
 .arrow {
   content: "";
   width: 0;
-    height: 0;
-    border-left: 0.5em solid transparent;
-    border-right: 0.5em solid transparent;
-    border-bottom: 0.5em solid gray;
-    transform: rotate(180deg);
-    display: inline-block;
+  height: 0;
+  border-left: 0.5em solid transparent;
+  border-right: 0.5em solid transparent;
+  border-bottom: 0.5em solid #ccc;
+  transform: rotate(180deg);
+  display: inline-block;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+}
+.dot {
+  content: "";
+  width: 0;
+  height: 0;
+  display: inline-block;
     cursor: pointer;
     transition: all 0.3s ease;
+    border: 2px solid #ddd;
+    border-radius: 2px;
+    margin-left: 3px;
 
-  }
-  .collapsed{
-    transform: rotate(90deg);
-  }
+}
+
+.collapsed {
+  transform: rotate(90deg);
+}
+.id{
+  min-width: 45px;
+    display: inline-block;
+    width: 45px;
+    overflow: hidden;
+}
 </style>

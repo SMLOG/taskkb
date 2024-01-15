@@ -7,7 +7,7 @@
       right: 0;
       left: 0;
     ">
-    <Config v-if="showColumns" :cols="cols"></Config>
+    <Config v-if="showConfig" :config="config"></Config>
     <div class="table-container">
       <table>
         <colgroup>
@@ -26,7 +26,7 @@
               </div>
             </th>
 
-            <th :colspan="7 * weeks.length">
+            <th :colspan="7 * weeks.length" v-if="config.showSch">
               <div style="display: flex; flex-wrap: nowrap">
                 <div v-for="week in weeks" :key="week" class="week-slot">
                   <div>
@@ -68,7 +68,7 @@
                   <component :is="col.cp" :row="row" :col="col"></component>
                 </div>
               </td>
-              <td :colspan="7 * weeks.length">
+              <td :colspan="7 * weeks.length" v-if="config.showSch">
                 <div style="display: flex; flex-wrap: nowrap" class="sch">
                   <div v-for="week in weeks" :key="week" class="week-slot"
                     :style="{ width: (1 / weeks.length) * 100 + '%' }">
@@ -117,7 +117,8 @@
         <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData()">Save</a>
-        <a @click="showColumns = !showColumns">Columns</a>
+        <a @click="showConfig = !showConfig">Configuration</a>
+        <a @click="showConfig = !showConfig">Team</a>
       </div>
     </div>
 
@@ -173,11 +174,11 @@ export default {
     return {
       isContextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
-      showColumns: 0,
+      showConfig: 0,
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
-      cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [],
+      config:localStorage.getItem('config')?JSON.parse(localStorage.getItem('config')):{},
       tableData: data,
       dragRow: null,
       selectedIndex: null,
@@ -197,6 +198,12 @@ export default {
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     document.removeEventListener("click", this.hideContextMenu);
+  },
+  computed:{
+    cols(){
+      if(!this.config.cols)this.config.cols=[];
+      return this.config.cols;
+    }
   },
   methods: {
     clickCell(event, index, row) {
@@ -349,7 +356,7 @@ export default {
           return null;
         } else return value;
       }));
-      localStorage.setItem('cols', JSON.stringify(this.cols));
+      localStorage.setItem('config', JSON.stringify(this.config));
     },
     moveCursorToEnd(index) {
       this.$nextTick(() => {

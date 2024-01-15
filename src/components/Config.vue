@@ -19,6 +19,9 @@
       </div>
     </div>
 
+    <div>
+      show shedule: <input type="checkbox" v-model="config.showSch" />
+    </div>
   </div>
 </template>
 
@@ -35,12 +38,18 @@ export default {
   },
 
   props: {
-    cols: {
+    config: {
       type: Object,
     }
 
   },
+  computed:{
+    cols(){
+      return this.config.cols;
+    }
+  },
   methods: {
+
     dragstart(event, row, i) {
       this.dragStartIndex = i;
     },
