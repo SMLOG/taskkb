@@ -71,12 +71,16 @@ export default {
 
     },
     stopEditing() {
-      this.editing = false;
-      this.$emit('update:modelValue',this.getValue()
-       );
+
+      this.timer=setTimeout(() => { this.showDropdown = false;
+        this.editing = false;
+      this.$emit('update:modelValue',this.getValue());
+       if(this.getValue()!==this.modelValue){
+        this.$emit('change',this.getValue());
+        console.log('changed',this.getValue());
+       }
       console.log('stopEditing');
-      setTimeout(() => { this.showDropdown = false; }, 200);
-      this.editable = false;
+      }, 200);
 
     },
     handleInput(event) {
@@ -91,6 +95,7 @@ export default {
     },
     selectItem(item) {
       console.log('selectItem');
+      clearTimeout(this.timer);
       if (this.$refs.contentEditable) {
         console.log(item);
         this.$refs.contentEditable.focus();
@@ -98,6 +103,7 @@ export default {
         this.$refs.contentEditable.innerHTML = item;
         this.showDropdown = false;
       }
+      this.stopEditing();
     },
   },
 };

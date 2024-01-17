@@ -19,8 +19,10 @@
       </div>
     </div>
 
-    <div>
-      show shedule: <input type="checkbox" v-model="config.showSch" />
+    <div style="display: flex;">
+      <div>show shedule: <input type="checkbox" v-model="config.showSch" /></div>
+      <div>Auto Save: <input type="checkbox" v-model="config.autoSave" /></div>
+      
     </div>
   </div>
 </template>

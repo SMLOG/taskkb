@@ -54,18 +54,18 @@
           </tr>
         </thead>
         <tbody>
-          <template v-for="(row, index) in getAllRow()" :key="index">
-            <tr v-show="!isCollapsed(row)" :class="{ selected: selectedIndex == index }" @dragover="dragOver"
-              @drop="drop($event, row, index)">
-              <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickCell($event, index, row)"
-                @contextmenu="clickCell($event, index, row);showContextMenu($event,index)">
-                {{ index + 1 }}
+          <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
+            <tr v-show="!isCollapsed(row)" :class="{ selected: selectedRowIndex == rowIndex }" @dragover="dragOver"
+              @drop="drop($event, row, rowIndex)">
+              <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickCell($event, rowIndex, row)"
+                @contextmenu="clickCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
+                {{ rowIndex + 1 }}
               </th>
 
-              <td v-for="(col, key) in cols" :key="key" @click="clickCell($event, index, row)"
-                :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: 'var(--col-' + key + '-width)' }">
+              <td v-for="(col, colIndex) in cols" :key="colIndex" @click="clickCell($event, rowIndex, row,colIndex,col)"
+               >
                 <div class="cell">
-                  <component :is="col.cp" :row="row" :col="col"></component>
+                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
                 </div>
               </td>
               <td :colspan="7 * weeks.length" v-if="config.showSch">
@@ -116,7 +116,7 @@
         <a @click="addRow(1)">Add Row</a>
         <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
-        <a @click="saveData()">Save</a>
+        <a @click="saveData(0)">Save</a>
         <a @click="showConfig = !showConfig">Configuration</a>
         <a @click="showConfig = !showConfig">Team</a>
       </div>
@@ -128,7 +128,7 @@
   <div v-show="isContextMenuVisible" :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
     class="contextmenu">
     <ul>
-      <li @click="addRow(1)">Insert Row after {{ selectedIndex }}</li>
+      <li @click="addRow(1)">Insert Row after {{ selectedRowIndex }}</li>
       <li>Delete Row</li>
       <li>Menu Item 3</li>
     </ul>
@@ -181,8 +181,10 @@ export default {
       config:localStorage.getItem('config')?JSON.parse(localStorage.getItem('config')):{},
       tableData: data,
       dragRow: null,
-      selectedIndex: null,
+      selectedRowIndex: null,
       selectRow: null,
+      selectedColIndex:null,
+      selectCol:null
     };
   },
   mounted() {
@@ -203,12 +205,22 @@ export default {
     cols(){
       if(!this.config.cols)this.config.cols=[];
       return this.config.cols;
+    },
+    currentCell(){
+      return this.selectRow&&this.selectCol? this.selectRow['c'+this.selectCol.fn]:null;
     }
+
+  },
+  watch: {
+
   },
   methods: {
-    clickCell(event, index, row) {
-      this.selectedIndex = index;
+
+    clickCell(event, rowIndex, row,colIndex,col) {
+      this.selectedRowIndex = rowIndex;
+      this.selectedColIndex=colIndex;
       this.selectRow = row;
+      this.selectCol = col;
 
     },
     deleteRow(row) {
@@ -327,10 +339,10 @@ export default {
 
     },
     addSubRow(num) {
-      if (!this.tableData[this.selectedIndex].childs)
-        this.tableData[this.selectedIndex].childs = [];
+      if (!this.tableData[this.selectedRowIndex].childs)
+        this.tableData[this.selectedRowIndex].childs = [];
 
-      this.tableData[this.selectedIndex].childs.push({ _id: '' })
+      this.tableData[this.selectedRowIndex].childs.push({ _id: '' })
 
 
     },
@@ -349,7 +361,11 @@ export default {
         }, 100);
       }
     },
-    saveData() {
+    saveData(bool) {
+      console.log(bool)
+      if(!bool ||this.config.autoSave ){
+       
+     
       localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
         if (key === "_p") {
           console.log(value);
@@ -357,6 +373,8 @@ export default {
         } else return value;
       }));
       localStorage.setItem('config', JSON.stringify(this.config));
+
+    }
     },
     moveCursorToEnd(index) {
       this.$nextTick(() => {
@@ -624,7 +642,7 @@ export default {
       this.isContextMenuVisible = true;
       this.contextMenuPosition.x = event.clientX;
       this.contextMenuPosition.y = event.clientY;
-      this.selectedIndex = index; 
+      this.selectedRowIndex = index; 
     },
     hideContextMenu() {
       this.isContextMenuVisible = false;

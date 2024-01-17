@@ -13,7 +13,7 @@
         <span @click="row._collapsed = !row._collapsed"
           :class="{ dot:!row._childs||!row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>
       </div>
-      <ContentEditable v-model="row['c' + col.fn]"></ContentEditable>
+      <ContentEditable v-model="row['c' + col.fn]" @change="change"></ContentEditable>
 
     </div>
 
@@ -44,7 +44,11 @@ export default {
     };
   },
   methods: {
+    change(oldVal,newVal){
+      console.log(oldVal,newVal,'...')
+      this.$emit('change',oldVal,newVal);
 
+    }
   },
 };
 </script>
