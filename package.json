@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "v-calendar": "^3.1.2",
     "vue": "^3.3.11",
     "vue-resizable": "^2.1.7",
     "vuedraggable": "^2.24.3"

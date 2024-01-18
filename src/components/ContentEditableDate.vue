@@ -1,21 +1,27 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
-    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
-      @focus="showDropdown = 1" v-html="modelValue" class="text">
+    <div ref="contentEditable" :contenteditable="editable" 
+    @blur="stopEditing($event)" @keydown.enter.prevent="handleEnter"
+    @focus="startEditing" v-html="modelValue" class="text">
 
     </div>
-    <div v-if="showDropdown && !isText && dropdownItems" class="dropdown">
-      <ul>
-        <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
-          {{ item }}
-        </li>
-      </ul>
-    </div>
+    <DatePicker locale="en"  mode="date" style="position: absolute;z-index: 1;background-color: white;" @update:modelValue="inputDate($event)" :popover="true" v-if="editing" v-model="date"  @input.stop="inputDate($event)"></DatePicker>
+
   </div>
 </template>
 
 <script>
+import { setupCalendar, Calendar, DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
+
 export default {
+  data(){
+    return {showDatePicker:0,date:new Date()}
+  },
+  components: {
+    Calendar,
+    DatePicker,
+  },
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
       this.$refs.contentEditable.focus();
@@ -44,6 +50,23 @@ export default {
     };
   },
   methods: {
+    formatDateToYYYYMMDD(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+},
+    inputDate(event){
+   
+      console.log(this.date)
+      if(event){
+        console.log(event);
+        this.$refs.contentEditable.innerText=this.formatDateToYYYYMMDD(event);
+        this.startEditing();
+      }
+      
+      
+    },
     moveCursorToEnd(element) {
       element.focus(); // Set focus to the contentEditable div
 
@@ -72,10 +95,9 @@ export default {
     },
     stopEditing() {
 
-      this.timer=setTimeout(() => { this.showDropdown = false;
+      this.timer=setTimeout(() => { 
         this.editing = false;
-        this.editable = false;
-
+        this.editable=false;
       this.$emit('update:modelValue',this.getValue());
        if(this.getValue()!==this.modelValue){
         this.$emit('change',this.getValue());

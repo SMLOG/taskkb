@@ -165,11 +165,12 @@ for (let d of data) {
 
 import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
+import ColDate from './ColDate.vue';
 
 
 
 export default {
-  components: { ColTitle, ColDropText },
+  components: { ColTitle, ColDropText,ColDate },
   data() {
     return {
       isContextMenuVisible: false,
