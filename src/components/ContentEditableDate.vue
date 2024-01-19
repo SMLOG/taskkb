@@ -1,28 +1,44 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
-    <div ref="contentEditable" :contenteditable="editable" 
-    @blur="stopEditing($event)" @keydown.enter.prevent="handleEnter"
-    @focus="startEditing" v-html="modelValue" class="text">
-
+    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing($event)"
+      @keydown.enter.prevent="handleEnter" @focus="startEditing" v-html="modelValue" class="text">
     </div>
-    <DatePicker locale="en"  mode="date" style="position: absolute;z-index: 1;background-color: white;" @update:modelValue="inputDate($event)" :popover="true" v-if="editing" v-model="date"  @input.stop="inputDate($event)"></DatePicker>
-
+    <div v-show="editing" :style="{ left: left }" :left="left"
+      style="position: absolute;z-index: 1;background-color: white;" ref="ele">
+      <VueDatePicker @update:modelValue="inputDate($event)" @input.stop="inputDate($event)" v-model="date" inline
+        text-input showToday auto-apply :teleport="true"></VueDatePicker>
+    </div>
   </div>
 </template>
 
 <script>
-import { setupCalendar, Calendar, DatePicker } from 'v-calendar';
-import 'v-calendar/style.css';
 
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
+import { format } from 'date-fns'
 export default {
-  data(){
-    return {showDatePicker:0,date:new Date()}
+  data() {
+    return {
+      showDatePicker: 0,
+      date: new Date(), left: "0",
+      editing: false,
+      showDropdown: false,
+      editable: false,
+    }
   },
   components: {
-    Calendar,
-    DatePicker,
+    VueDatePicker,
+    Popper,
   },
   mounted() {
+    try{
+      if(this.modelValue&&this.modelValue.trim()!==format(this.date, 'yyyy-MM-dd')){
+        this.date = new Date(this.modelValue.trim());
+      }
+
+    }catch(ee){
+console.error(ee)
+    }
     if (this.editing && this.$refs.contentEditable) {
       this.$refs.contentEditable.focus();
     }
@@ -36,36 +52,41 @@ export default {
       type: Boolean,
       required: false,
     },
-    
+
     dropdownItems: {
       type: Array,
       default: () => [],
     },
   },
-  data() {
-    return {
-      editing: false,
-      showDropdown: false,
-      editable: false,
-    };
-  },
+watch:{
+  modelValue(){
+    try{
+      if(this.modelValue.trim()!==format(this.date, 'yyyy-MM-dd')){
+        this.date = new Date(this.modelValue.trim());
+      }
+
+    }catch(ee){
+console.error(ee)
+    }
+  }
+},
   methods: {
     formatDateToYYYYMMDD(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-},
-    inputDate(event){
-   
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    },
+    inputDate(event) {
+
       console.log(this.date)
-      if(event){
+      if (event) {
         console.log(event);
-        this.$refs.contentEditable.innerText=this.formatDateToYYYYMMDD(event);
+        this.$refs.contentEditable.innerText = this.formatDateToYYYYMMDD(event);
         this.startEditing();
       }
-      
-      
+
+
     },
     moveCursorToEnd(element) {
       element.focus(); // Set focus to the contentEditable div
@@ -88,22 +109,33 @@ export default {
     },
     startEditing() {
       this.editing = true;
+      ;
+      setTimeout(() => {
+        let rect = this.$refs.contentEditable.getBoundingClientRect();
+        let w = rect.left + this.$refs.ele.offsetWidth;
+        console.log(w, this.$refs.ele.offsetWidth, window.innerWidth);
+        if (w > window.innerWidth)
+          this.left = `calc( -100% - ${this.$refs.contentEditable.offsetWidth}px)`;
+        else this.left = 0;
+        console.log(this.left)
+      }, 0);
+
     },
-    getValue(){
-  return     this.isText?this.$refs.contentEditable.textContent.trim(): this.$refs.contentEditable.innerHTML
+    getValue() {
+      return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML
 
     },
     stopEditing() {
 
-      this.timer=setTimeout(() => { 
+      this.timer = setTimeout(() => {
         this.editing = false;
-        this.editable=false;
-      this.$emit('update:modelValue',this.getValue());
-       if(this.getValue()!==this.modelValue){
-        this.$emit('change',this.getValue());
-        console.log('changed',this.getValue());
-       }
-      console.log('stopEditing');
+        this.editable = false;
+        this.$emit('update:modelValue', this.getValue());
+        if (this.getValue() !== this.modelValue) {
+          this.$emit('change', this.getValue());
+          console.log('changed', this.getValue());
+        }
+        console.log('stopEditing');
       }, 200);
 
     },
@@ -172,7 +204,9 @@ export default {
   border-left: 2px solid green !important;
   padding: 0 10px;
 }
-.text{min-height: 1em;
-word-break: break-all;
+
+.text {
+  min-height: 1em;
+  word-break: break-all;
 }
 </style>
