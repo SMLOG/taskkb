@@ -4,7 +4,7 @@
       @focus="showDropdown = 1" v-html="modelValue" class="text">
 
     </div>
-    <div v-if="showDropdown && !isText && dropdownItems" class="dropdown">
+    <div v-show="showDropdown && !isText && dropdownItems" class="dropdown">
       <ul>
         <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
           {{ item }}
@@ -111,7 +111,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .editable-dropdown {
   position: relative;
   display: inline-block;
@@ -119,7 +119,7 @@ export default {
 
 .editable-dropdown .dropdown {
   position: absolute;
-  z-index: 1;
+  z-index: 4;
   background-color: #f9f9f9;
   border: 1px solid #ccc;
 }

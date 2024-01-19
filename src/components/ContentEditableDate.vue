@@ -28,7 +28,6 @@ export default {
   },
   components: {
     VueDatePicker,
-    Popper,
   },
   mounted() {
     try{
