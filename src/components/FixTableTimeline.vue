@@ -8,7 +8,7 @@
       left: 0;
     ">
     <div class="table-container">
-      <table>
+      <table @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
         <colgroup>
           <col width="46px">
           <col v-for="(col, key) in cols" :key="key"
@@ -54,14 +54,14 @@
         </thead>
         <tbody>
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-            <tr v-show="!isCollapsed(row)" :class="{ selected: selectedRowIndex == rowIndex }" @dragover="dragOver"
+            <tr v-show="!isCollapsed(row)" :class="{ rowSelected: selectedRowIndex == rowIndex }" @dragover="dragOver"
               @drop="drop($event, row, rowIndex)">
               <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickCell($event, rowIndex, row)"
                 @contextmenu="clickCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
                 {{ rowIndex + 1 }}
               </th>
 
-              <td v-for="(col, colIndex) in cols" :key="colIndex" @click="clickCell($event, rowIndex, row,colIndex,col)"
+              <td v-for="(col, cellIndex) in cols" :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)"  @click="clickCell($event, rowIndex, row,cellIndex,col)"
                >
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
@@ -185,8 +185,14 @@ export default {
       dragRow: null,
       selectedRowIndex: null,
       selectRow: null,
-      selectedColIndex:null,
-      selectCol:null
+      selectedcellIndex:null,
+      selectCol:null,
+      
+      isMouseDown: false,
+      startRowIndex: null,
+      startcellIndex: null,
+      endRowIndex: null,
+      endcellIndex: null
     };
   },
   mounted() {
@@ -217,10 +223,55 @@ export default {
 
   },
   methods: {
+    cellClass(rowIndex,cellIndex){
+      const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
+      const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
+      const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
+      const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
+      let selected = this.isSelected(rowIndex, cellIndex);
+      console.log(minRowIndex,maxRowIndex,mincellIndex,maxcellIndex,rowIndex,cellIndex);
+     return { selected:selected ,
+      left:selected&&cellIndex==mincellIndex ,
+      right:selected&&cellIndex==maxcellIndex|| mincellIndex-1==cellIndex && (rowIndex>=minRowIndex&& rowIndex<=maxRowIndex),
+      top:selected&&rowIndex==minRowIndex,
+      bottom:selected&&rowIndex==maxRowIndex
+     };
+    },
+    handleMouseDown(event) {
+      console.log('mosuedown')
 
-    clickCell(event, rowIndex, row,colIndex,col) {
+      const cell = event.target.closest('td');
+      if(!cell)return null;
+      event.preventDefault();
+      this.isMouseDown = true;
+      this.startRowIndex = cell.parentNode.rowIndex;
+      this.startcellIndex = cell.cellIndex;
+      this.endRowIndex = this.startRowIndex;
+      this.endcellIndex = this.startcellIndex;
+    },
+    handleMouseMove(event) {
+      if (this.isMouseDown) {
+        const cell = event.target.closest('td');
+        this.endRowIndex = cell.parentNode.rowIndex;
+        this.endcellIndex = cell.cellIndex;
+      }
+    },
+    handleMouseUp() {
+      this.isMouseDown = false;
+    },
+    isSelected(rowIndex, cellIndex) {
+      const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
+      const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
+      const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
+      const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
+      return (
+        (rowIndex >= minRowIndex && rowIndex <= maxRowIndex) &&
+        (cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
+      );
+    },
+    clickCell(event, rowIndex, row,cellIndex,col) {
       this.selectedRowIndex = rowIndex;
-      this.selectedColIndex=colIndex;
+      this.selectedcellIndex=cellIndex;
       this.selectRow = row;
       this.selectCol = col;
 
@@ -761,4 +812,17 @@ td {
   padding: 5px;
 }
 .contextmenu ul{margin: 0;}
+
+td.left {
+  border-left: 1px darkgreen solid ;
+}
+td.right {
+  border-right: 1px darkgreen solid ;
+}
+td.top {
+  border-top: 1px darkgreen solid ;
+}
+td.bottom {
+  border-bottom: 1px darkgreen solid ;
+}
 </style>
