@@ -7,7 +7,6 @@
       right: 0;
       left: 0;
     ">
-    <Config v-if="showConfig" :config="config"></Config>
     <div class="table-container">
       <table>
         <colgroup>
@@ -105,20 +104,22 @@
       </table>
     </div>
     <div style="
-        height: 30px;
+        
         position: sticky;
         bottom: 0;
         left: 0;
         z-index: 3;
         background: white;
-      ">
-      <div style="display: flex;">
+      "><div style="display: flex;flex-direction: column;">
+      <Config v-if="showConfig" :config="config"></Config>
+      <div style="display: flex;height: 30px;">
         <a @click="addRow(1)">Add Row</a>
         <a @click="deleteRow(selectRow)">Delete Row</a>
         <a @click="addSubRow(1)">Add Sub Row</a>
         <a @click="saveData(0)">Save</a>
         <a @click="showConfig = !showConfig">Configuration</a>
         <a @click="showConfig = !showConfig">Team</a>
+      </div>
       </div>
     </div>
 
