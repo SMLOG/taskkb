@@ -229,7 +229,6 @@ export default {
       const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
       const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
       let selected = this.isSelected(rowIndex, cellIndex);
-      console.log(minRowIndex,maxRowIndex,mincellIndex,maxcellIndex,rowIndex,cellIndex);
      return { selected:selected ,
       left:selected&&cellIndex==mincellIndex ,
       right:selected&&cellIndex==maxcellIndex|| mincellIndex-1==cellIndex && (rowIndex>=minRowIndex&& rowIndex<=maxRowIndex),
@@ -242,7 +241,11 @@ export default {
 
       const cell = event.target.closest('td');
       if(!cell)return null;
-      cell.focus();
+      const activeElement = document.activeElement;
+
+      if (activeElement) {
+        activeElement.blur();
+      }
       event.preventDefault();
       this.isMouseDown = true;
       this.startRowIndex = cell.parentNode.rowIndex;
