@@ -1,13 +1,13 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
-    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing($event)"
+    <VueDatePicker  v-model="date"  @update:modelValue="inputDate($event)" placeholder="Start Typing ..." text-input auto-apply>
+      <template #trigger>
+    <div  ref="contentEditable" :contenteditable="editable" @blur="stopEditing($event)"
       @keydown.enter.prevent="handleEnter" @focus="startEditing" v-html="modelValue" class="text">
     </div>
-    <div v-if="editing" :style="{ left: left }" :left="left" @mousedown.prevent.stop
-      style="position: absolute;z-index: 1;background-color: white;" ref="ele">
-      <VueDatePicker @update:modelValue="inputDate($event)" @input.stop="inputDate($event)" v-model="date" inline
-        text-input showToday auto-apply :teleport="true"></VueDatePicker>
-    </div>
+    </template>
+    </VueDatePicker>
+
   </div>
 </template>
 
@@ -108,16 +108,8 @@ console.error(ee)
     },
     startEditing() {
       this.editing = true;
-      ;
-      setTimeout(() => {
-        let rect = this.$refs.contentEditable.getBoundingClientRect();
-        let w = rect.left + this.$refs.ele.offsetWidth;
-        console.log(w, this.$refs.ele.offsetWidth, window.innerWidth);
-        if (w > window.innerWidth)
-          this.left = `calc( -100% - ${this.$refs.contentEditable.offsetWidth}px)`;
-        else this.left = 0;
-        console.log(this.left)
-      }, 0);
+      this.$refs.contentEditable.focus();
+  
 
     },
     getValue() {
@@ -147,6 +139,7 @@ console.error(ee)
     handleEnter() {
       this.$refs.contentEditable.blur();
       this.$emit('enter');
+      this.stopEditing();
     },
     selectItem(item) {
       console.log('selectItem');
@@ -207,5 +200,8 @@ console.error(ee)
 .text {
   min-height: 1em;
   word-break: break-all;
+}
+.dp__arrow_top {
+  display: none;
 }
 </style>
