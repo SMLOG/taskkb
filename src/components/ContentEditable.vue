@@ -152,5 +152,6 @@ export default {
 }
 .text{min-height: 1em;
 word-break: break-all;
+outline: none;
 }
 </style>

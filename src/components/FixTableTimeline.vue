@@ -1,13 +1,23 @@
 <template>
+  <div style="display: flex;
+    flex-wrap: nowrap;
+    overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;">
+    <a>All</a>
+  </div>
   <div style="
       position: fixed;
-      top: 0;
+      top: 2em;
       bottom: 0;
       overflow: auto;
       right: 0;
       left: 0;
     ">
+    
     <div class="table-container">
+
       <table @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
         <colgroup>
           <col width="46px">
@@ -18,10 +28,11 @@
           <tr>
             <th>#</th>
             <th v-for="(col, key) in cols" :key="key">
-              <div class="cell">
-                <vue-resizable :width="col.width" :active="['r']" @resize:move="handleResize(col, key, $event)">
+              <div class="cell" >
+                <vue-resizable :width="col.width" :active="['r']" @resize:move="handleResize(col, key, $event)" >
                   <component :is="col.cp" :col="col"></component>
-                </vue-resizable>
+                
+                  </vue-resizable>
               </div>
             </th>
 
@@ -56,15 +67,19 @@
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <tr v-show="!isCollapsed(row)" :class="{ rowSelected: selectedRowIndex == rowIndex }" @dragover="dragOver"
               @drop="drop($event, row, rowIndex)">
-              <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickCell($event, rowIndex, row)"
-                @contextmenu="clickCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
+              <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
+                @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
                 {{ rowIndex + 1 }}
               </th>
 
-              <td v-for="(col, cellIndex) in cols" :tabindex="100*rowIndex+cellIndex" :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)"  @click="clickCell($event, rowIndex, row,cellIndex,col)"
+              <td v-for="(col, cellIndex) in cols" 
+              :tabindex="100*rowIndex+cellIndex" 
+              :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)" 
+               @click="clickSelectCell($event, rowIndex, row,cellIndex,col)"
+               @dblclick="dblclickEditCell($event)"
                >
                 <div class="cell">
-                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
+                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)" ></component>
                 </div>
               </td>
               <td :colspan="7 * weeks.length" v-if="config.showSch">
@@ -223,6 +238,10 @@ export default {
 
   },
   methods: {
+    dblclickEditCell(event){
+      let cellHeight = event.target.closest('td').offsetHeight;
+   
+    },
     cellClass(rowIndex,cellIndex){
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
       const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
@@ -273,7 +292,7 @@ export default {
         (cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
       );
     },
-    clickCell(event, rowIndex, row,cellIndex,col) {
+    clickSelectCell(event, rowIndex, row,cellIndex,col) {
       this.selectedRowIndex = rowIndex;
       this.selectedcellIndex=cellIndex;
       this.selectRow = row;
