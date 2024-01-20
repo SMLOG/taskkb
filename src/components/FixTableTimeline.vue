@@ -61,7 +61,7 @@
                 {{ rowIndex + 1 }}
               </th>
 
-              <td v-for="(col, cellIndex) in cols" :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)"  @click="clickCell($event, rowIndex, row,cellIndex,col)"
+              <td v-for="(col, cellIndex) in cols" :tabindex="100*rowIndex+cellIndex" :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)"  @click="clickCell($event, rowIndex, row,cellIndex,col)"
                >
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
@@ -242,6 +242,7 @@ export default {
 
       const cell = event.target.closest('td');
       if(!cell)return null;
+      cell.focus();
       event.preventDefault();
       this.isMouseDown = true;
       this.startRowIndex = cell.parentNode.rowIndex;

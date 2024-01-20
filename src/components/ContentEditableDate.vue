@@ -3,7 +3,7 @@
     <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing($event)"
       @keydown.enter.prevent="handleEnter" @focus="startEditing" v-html="modelValue" class="text">
     </div>
-    <div v-if="editing" :style="{ left: left }" :left="left"
+    <div v-if="editing" :style="{ left: left }" :left="left" @mousedown.prevent.stop
       style="position: absolute;z-index: 1;background-color: white;" ref="ele">
       <VueDatePicker @update:modelValue="inputDate($event)" @input.stop="inputDate($event)" v-model="date" inline
         text-input showToday auto-apply :teleport="true"></VueDatePicker>
