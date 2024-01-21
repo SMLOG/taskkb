@@ -1,28 +1,35 @@
 <template>
-  <div style="display: flex;
-    flex-wrap: nowrap;
-    overflow: hidden;
-    position: fixed;
-    top: 0;
-    left: 0; line-height: 1.5em;">
-    <a>All</a>
-    <div style="position: relative;" class="filterSearch" >
-      <input  />
-    </div>
-   
-    
-    
-  </div>
+
   <div style="
       position: fixed;
-      top: 2em;
+      top: 0;
       bottom: 0;
       overflow: auto;
       right: 0;
       left: 0;
+      display: flex;
+      flex-direction: column;
     ">
+      <div style="display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+    top: 0;
+    left: 0; line-height: 1.5em;">
+    <div style="display: flex;">
+    <a>All</a>
+    <div style="position: relative;" class="filterSearch" >
+      <input  />
+    </div>
+  </div>
+  <div>
+    <div><a>Grid</a><a>List</a><a>Card</a></div>
+  </div>
     
-    <div class="table-container">
+    
+  </div>
+    <div class="table-container" style="    flex-grow: 1;
+    overflow: auto;">
 
       <table @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
         <colgroup>
