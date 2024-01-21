@@ -31,21 +31,16 @@
     <div class="table-container" style="    flex-grow: 1;
     overflow: auto;">
 
-      <table @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-        <colgroup>
-          <col width="46px">
-          <col v-for="(col, key) in cols" :key="key"
-            :style="{ minWidth: 'var(--col-' + key + '-width)', maxWidth: +'var(--col-' + key + '-width)' }">
-        </colgroup>
+
+      <table ref="table" v-resizeTableColumns  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+  
         <thead>
           <tr>
             <th>#</th>
             <th v-for="(col, key) in cols" :key="key">
               <div class="cell" >
-                <vue-resizable :width="col.width" :active="['r']" @resize:move="handleResize(col, key, $event)" >
                   <component :is="col.cp" :col="col"></component >
                   
-                  </vue-resizable>
               </div>
             </th>
 
@@ -196,10 +191,12 @@ import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
 
-
+import resizeTableColumns from './ResizeTableColumns';
 
 export default {
   components: { ColTitle, ColDropText,ColDate },
+  directives:{resizeTableColumns},
+  
   data() {
     return {
       isContextMenuVisible: false,
@@ -228,10 +225,19 @@ export default {
     window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
 
-    for (let i = 0; i < this.cols.length; i++) {
-      let col = this.cols[i];
-      document.documentElement.style.setProperty("--col-" + i + "-width", "".concat(col.width, "px"));
-    }
+
+
+
+const table = this.$refs.table;
+const resizeObserver = new ResizeObserver(entries => {
+  for (const entry of entries) {
+    const resizedTable = entry.target;
+    console.log('Table has been resized:', resizedTable);
+
+  }
+});
+
+resizeObserver.observe(table);
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
