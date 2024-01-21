@@ -36,8 +36,8 @@
             <th v-for="(col, key) in cols" :key="key">
               <div class="cell" >
                 <vue-resizable :width="col.width" :active="['r']" @resize:move="handleResize(col, key, $event)" >
-                  <component :is="col.cp" :col="col"></component>
-                
+                  <component :is="col.cp" :col="col"></component >
+                  
                   </vue-resizable>
               </div>
             </th>

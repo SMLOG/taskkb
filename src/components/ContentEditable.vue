@@ -1,8 +1,13 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
+    <div style="display: flex;    justify-content: space-between;font-weight: bold;">
     <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
       @focus="showDropdown = 1" v-html="modelValue" class="text">
 
+    </div>
+    <div v-if="isText">
+      <span>T</span>
+    </div>
     </div>
     <div v-show="showDropdown && !isText && dropdownItems" class="dropdown">
       <ul>
