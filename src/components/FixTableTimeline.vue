@@ -4,8 +4,14 @@
     overflow: hidden;
     position: fixed;
     top: 0;
-    left: 0;">
+    left: 0; line-height: 1.5em;">
     <a>All</a>
+    <div style="position: relative;" class="filterSearch" >
+      <input  />
+    </div>
+   
+    
+    
   </div>
   <div style="
       position: fixed;
@@ -847,5 +853,20 @@ td.top {
 }
 td.bottom {
   border-bottom: 1px darkgreen solid ;
+}
+.filterSearch{
+  position: relative;
+    display: inline-block;
+    width: 200px;
+    height: 24px;
+}
+.filterSearch input{width:100%;}
+.filterSearch:after{
+  content: "T";
+    position: absolute;
+    right:3px;
+    top:0;
+    color:green;
+    font-weight: bold;
 }
 </style>
