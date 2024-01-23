@@ -160,7 +160,6 @@
 </template>
 <script setup>
 
-import VueResizable from 'vue-resizable';
 import Config from './Config.vue';
 
 

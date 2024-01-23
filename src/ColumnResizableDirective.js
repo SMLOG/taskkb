@@ -86,6 +86,7 @@ export default {
               if(th.getAttribute('freeze'))return;
               let width = cutPx(th.style.width) + e.movementX;
               th.style.width = width + 'px';
+              th.style.minWidth = width + 'px';
               const bar = bars[movingIndex];
 
               if(movingIndex + 1<ths.length){
@@ -105,8 +106,9 @@ export default {
             }
           };
 
-          resizeContainer.addEventListener('mousemove', handleResize);
-          table.addEventListener('mousemove', handleResize);
+          //resizeContainer.addEventListener('mousemove', handleResize);
+          document.body.addEventListener('mousemove', handleResize);
+          //table.addEventListener('mousemove', handleResize);
         };
 
         updateColumns();
