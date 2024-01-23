@@ -32,11 +32,11 @@
     overflow: auto;">
 
 
-      <table ref="table" v-resizeTableColumns  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+      <table ref="table" v-columns-resizable  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
   
         <thead>
           <tr>
-            <th>#</th>
+            <th freeze="1">#</th>
             <th v-for="(col, key) in cols" :key="key">
               <div class="cell" >
                   <component :is="col.cp" :col="col"></component >
@@ -191,11 +191,9 @@ import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
 
-import resizeTableColumns from './ResizeTableColumns';
 
 export default {
   components: { ColTitle, ColDropText,ColDate },
-  directives:{resizeTableColumns},
   
   data() {
     return {

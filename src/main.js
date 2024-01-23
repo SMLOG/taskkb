@@ -2,5 +2,7 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import App from './App.vue'
-
-createApp(App).mount('#app')
+import ColumnResizableDirective from './ColumnResizableDirective.js';
+const app = createApp(App);
+app.use(ColumnResizableDirective);
+app.mount('#app');
