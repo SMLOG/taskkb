@@ -35,12 +35,15 @@
       <div class="vue-columns-resizable" style="position: relative;" >
         <div class="columns-resize-bar" v-for="(col, key) in cols" :key="key" style=" position: absolute; top: 0px; height: 532px; width: 8px; cursor: col-resize; z-index: 3;"></div>
       </div>
-      <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-  
+      <table ref="table" v-columns-resizable   @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+  <colgroup v-if="false">
+    <col style="width:46px" />
+    <col  v-for="(col, key) in cols" :key="key" :width="col.width+'px'" :style="{minWidth:col.width+'px'}" />
+  </colgroup>
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <th v-for="(col, key) in cols" :key="key">
+            <th v-for="(col, key) in cols" :key="key" :style="{minWidth:col.width+'px'}" >
               <div class="cell" >
                   <component :is="col.cp" :col="col"></component >
               </div>
