@@ -64,7 +64,7 @@ export default {
       this.editable = true;
       setTimeout(() => {
         this.moveCursorToEnd(this.$refs.contentEditable);
-        //this.$refs.contentEditable.focus();
+        this.$refs.contentEditable.focus();
       }, 100);
 
     },
@@ -80,6 +80,7 @@ export default {
       this.timer=setTimeout(() => { this.showDropdown = false;
         this.editing = false;
         this.editable = false;
+        console.log('stop editing')
 
       this.$emit('update:modelValue',this.getValue());
        if(this.getValue()!==this.modelValue){

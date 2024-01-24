@@ -1,3 +1,26 @@
+function getWindowWidthWithoutScrollbar() {
+  // Create a dummy element with an oversized width
+  const outer = document.createElement('div');
+  outer.style.visibility = 'hidden';
+  outer.style.overflow = 'scroll';
+  outer.style.width = '100px';
+  outer.style.height = '100px';
+
+  // Append the dummy element to the document body
+  document.body.appendChild(outer);
+
+  // Calculate the width difference between the content width and the client width
+  const scrollbarWidth = outer.offsetWidth - outer.clientWidth;
+
+  // Remove the dummy element from the document body
+  document.body.removeChild(outer);
+
+  // Calculate the window width minus the scrollbar width
+  const windowWidthWithoutScrollbar = window.innerWidth - scrollbarWidth;
+
+  return windowWidthWithoutScrollbar;
+}
+
 export default {
   install(app) {
     app.directive('columns-resizable', {
@@ -11,6 +34,7 @@ export default {
         const resizeContainer = document.createElement('div');
         table.style.position = 'relative';
         table.style.width = 'auto';
+        table.style.minWidth=getWindowWidthWithoutScrollbar()+'px';
         resizeContainer.style.position = 'relative';
         resizeContainer.style.width = table.offsetWidth + 'px';
         resizeContainer.className = "vue-columns-resizable";
@@ -87,6 +111,7 @@ export default {
               let width = cutPx(th.style.width) + e.movementX;
               th.style.width = width + 'px';
               th.style.minWidth = width + 'px';
+              th.style.maxWidth = width + 'px';
               const bar = bars[movingIndex];
 
               if(movingIndex + 1<ths.length){

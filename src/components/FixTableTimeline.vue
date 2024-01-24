@@ -32,15 +32,17 @@
     overflow: auto;">
 
 
-      <table ref="table" v-columns-resizable  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+      <div class="vue-columns-resizable" style="position: relative;" >
+        <div class="columns-resize-bar" v-for="(col, key) in cols" :key="key" style=" position: absolute; top: 0px; height: 532px; width: 8px; cursor: col-resize; z-index: 3;"></div>
+      </div>
+      <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
   
         <thead>
           <tr>
-            <th freeze="1">#</th>
+            <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
             <th v-for="(col, key) in cols" :key="key">
               <div class="cell" >
                   <component :is="col.cp" :col="col"></component >
-                  
               </div>
             </th>
 
@@ -256,7 +258,7 @@ resizeObserver.observe(table);
   methods: {
     dblclickEditCell(event){
       let cellHeight = event.target.closest('td').offsetHeight;
-   
+  
     },
     cellClass(rowIndex,cellIndex){
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
@@ -278,6 +280,7 @@ resizeObserver.observe(table);
       if(!cell)return null;
       const activeElement = document.activeElement;
 
+      if(cell.querySelector("[contenteditable=true]"))return;
       if (activeElement) {
         activeElement.blur();
       }
