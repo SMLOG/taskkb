@@ -33,9 +33,10 @@
 
 
       <div class="vue-columns-resizable" style="position: relative;" >
-        <div class="columns-resize-bar" v-for="(col, key) in cols" :key="key" style=" position: absolute; top: 0px; height: 532px; width: 8px; cursor: col-resize; z-index: 3;"></div>
+        <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col)"  v-for="(col, key) in cols" :key="key" 
+        style=" position: absolute; top: 0px; height: 532px; width: 8px; cursor: col-resize; z-index: 3;"></div>
       </div>
-      <table ref="table" v-columns-resizable   @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+      <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
   <colgroup v-if="false">
     <col style="width:46px" />
     <col  v-for="(col, key) in cols" :key="key" :width="col.width+'px'" :style="{minWidth:col.width+'px'}" />
@@ -43,7 +44,7 @@
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <th v-for="(col, key) in cols" :key="key" :style="{minWidth:col.width+'px'}" >
+            <th v-for="(col, key) in cols" ref="th" :key="key" :style="{minWidth:col.width+'px'}" >
               <div class="cell" >
                   <component :is="col.cp" :col="col"></component >
               </div>
@@ -227,6 +228,12 @@ export default {
     window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
 
+    document.body.addEventListener('mousemove', this.handleResize);
+    document.body.addEventListener('mouseUp', this.resizeBarMouseUp);
+
+    for(let i=0;i<this.$refs.rbar.length;i++){
+      this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px'
+    }
 
 
 
@@ -259,6 +266,28 @@ resizeObserver.observe(table);
 
   },
   methods: {
+    handleResize(event){
+      console.log('handleResize')
+      if(this.resizeColumn){
+        let width = this.resizeColumn.width + event.movementX;
+        this.resizeColumn.width =width;
+      }
+
+    },
+    resizeBarMouseDown(col){
+      console.log('resizeBarMouseDown')
+        console.log(col)
+              this.resizeColumn = col;
+              document.body.style.cursor = 'col-resize';
+              document.body.style.userSelect = 'none';
+            
+    },
+    resizeBarMouseUp(){
+      console.log('resizeBarMouseUp')
+      this.resizeColumn = 0;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+},
     dblclickEditCell(event){
       let cellHeight = event.target.closest('td').offsetHeight;
   
@@ -280,7 +309,7 @@ resizeObserver.observe(table);
       console.log('mosuedown')
 
       const cell = event.target.closest('td');
-      if(!cell)return null;
+      if(!cell || this.resizeColumn)return null;
       const activeElement = document.activeElement;
 
       if(cell.querySelector("[contenteditable=true]"))return;
@@ -325,11 +354,7 @@ resizeObserver.observe(table);
       let list = row._p && row._p._childs || this.tableData;
       list.splice(list.indexOf(row), 1);
     },
-    handleResize(col, index, event) {
-
-      col.width = event.width;
-      document.documentElement.style.setProperty("--col-" + index + "-width", "".concat(col.width, "px"));
-    },
+ 
     getAllRow() {
       let rows = [];
       for (let root of this.tableData) {
