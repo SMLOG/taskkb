@@ -34,7 +34,7 @@
 
       <div class="vue-columns-resizable" style="position: relative;" >
         <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key)"  v-for="(col, key) in cols" :key="key" 
-        style=" position: absolute; top: 0px; height: 532px; width: 8px; cursor: col-resize; z-index: 3;"></div>
+        style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;" :style="{height:tableHeight+'px'}"></div>
       </div>
       <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
   <colgroup v-if="false">
@@ -49,7 +49,7 @@
                   <component :is="col.cp" :col="col"></component >
               </div>
             </th>
-
+           
             <th :colspan="7 * weeks.length" v-if="config.showSch">
               <div style="display: flex; flex-wrap: nowrap">
                 <div v-for="week in weeks" :key="week" class="week-slot">
@@ -202,6 +202,7 @@ export default {
   
   data() {
     return {
+      tableHeight:20,
       isContextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
       showConfig: 0,
@@ -236,11 +237,12 @@ export default {
     this.resize();
 
 const table = this.$refs.table;
+this.tableHeight =table.offsetHeight; 
 const resizeObserver = new ResizeObserver(entries => {
   for (const entry of entries) {
     const resizedTable = entry.target;
     console.log('Table has been resized:', resizedTable);
-
+    this.tableHeight = table.offsetHeight;
   }
 });
 
@@ -266,7 +268,8 @@ resizeObserver.observe(table);
   methods: {
     resize(){
       for(let i=0;i<this.$refs.rbar.length;i++){
-      this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px'
+      this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px';
+
     }
     },
     handleResize(event){
@@ -274,7 +277,7 @@ resizeObserver.observe(table);
       if(this.resizeColumn){
         let i = this.resizeColumnIndex;
 
-        let width = this.$refs.th[i].offsetWidth + event.movementX;
+        let width = this.$refs.th[i].offsetWidth + (i==this.cols.length-1?2:1) * event.movementX;
         console.log(width);
         this.resizeColumn.width =width;
         this.$refs.th[i].style.width=width+'px';
