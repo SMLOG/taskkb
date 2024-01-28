@@ -33,7 +33,7 @@
 
 
       <div class="vue-columns-resizable" style="position: relative;" >
-        <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col)"  v-for="(col, key) in cols" :key="key" 
+        <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key)"  v-for="(col, key) in cols" :key="key" 
         style=" position: absolute; top: 0px; height: 532px; width: 8px; cursor: col-resize; z-index: 3;"></div>
       </div>
       <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
@@ -229,13 +229,11 @@ export default {
     document.addEventListener("keydown", this.handleKeyDown);
 
     document.body.addEventListener('mousemove', this.handleResize);
-    document.body.addEventListener('mouseUp', this.resizeBarMouseUp);
-
-    for(let i=0;i<this.$refs.rbar.length;i++){
-      this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px'
-    }
+    document.body.addEventListener('mouseup', this.resizeBarMouseUp);
 
 
+
+    this.resize();
 
 const table = this.$refs.table;
 const resizeObserver = new ResizeObserver(entries => {
@@ -266,24 +264,39 @@ resizeObserver.observe(table);
 
   },
   methods: {
+    resize(){
+      for(let i=0;i<this.$refs.rbar.length;i++){
+      this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px'
+    }
+    },
     handleResize(event){
       console.log('handleResize')
       if(this.resizeColumn){
-        let width = this.resizeColumn.width + event.movementX;
+        let i = this.resizeColumnIndex;
+
+        let width = this.$refs.th[i].offsetWidth + event.movementX;
+        console.log(width);
         this.resizeColumn.width =width;
+        this.$refs.th[i].style.width=width+'px';
+        let j=i;
+        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + this.$refs.th[j].offsetWidth - 4 + 'px'
       }
 
     },
-    resizeBarMouseDown(col){
+    resizeBarMouseDown(col,colIndex){
       console.log('resizeBarMouseDown')
         console.log(col)
-              this.resizeColumn = col;
+        this.resizeColumn = col;
+        this.resizeColumnIndex = colIndex;
               document.body.style.cursor = 'col-resize';
               document.body.style.userSelect = 'none';
             
     },
     resizeBarMouseUp(){
       console.log('resizeBarMouseUp')
+      if(this.resizeColumn){
+        this.resize();
+      }
       this.resizeColumn = 0;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
