@@ -39,12 +39,12 @@
       <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
   <colgroup v-if="false">
     <col style="width:46px" />
-    <col  v-for="(col, key) in cols" :key="key" :width="col.width+'px'" :style="{minWidth:col.width+'px'}" />
+    <col  v-for="(col, key) in cols" :key="key" :width="col.width+'px'" :style="{minWidth:col.width+'px',maxWidth:col.width+'px'}" />
   </colgroup>
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <th v-for="(col, key) in cols" ref="th" :key="key" :style="{minWidth:col.width+'px'}" >
+            <th v-for="(col, key) in cols" ref="th" :key="key" :style="{minWidth:col.width+'px',width:col.width+'px',maxWidth:col.width+'px'}" >
               <div class="cell" >
                   <component :is="col.cp" :col="col"></component >
               </div>
