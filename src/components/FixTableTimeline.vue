@@ -277,7 +277,7 @@ resizeObserver.observe(table);
       if(this.resizeColumn){
         let i = this.resizeColumnIndex;
 
-        let width = this.$refs.th[i].offsetWidth + (i==this.cols.length-1?2:1) * event.movementX;
+        let width = this.$refs.th[i].offsetWidth +  event.movementX;
         console.log(width);
         this.resizeColumn.width =width;
         this.$refs.th[i].style.width=width+'px';
@@ -793,7 +793,6 @@ resizeObserver.observe(table);
 <style scoped>
 table {
   border-collapse: separate;
-  width: 100%;
   border-spacing: 0;
 }
 
