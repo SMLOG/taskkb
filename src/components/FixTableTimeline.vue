@@ -87,7 +87,6 @@
               :tabindex="100*rowIndex+cellIndex" 
               :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)" 
                @click="clickSelectCell($event, rowIndex, row,cellIndex,col)"
-               @dblclick="dblclickEditCell($event)"
                >
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col" @change="saveData(1)" ></component>
@@ -302,15 +301,13 @@ resizeObserver.observe(table);
       console.log('resizeBarMouseUp')
       if(this.resizeColumn){
         this.resize();
+        this.saveData();
       }
       this.resizeColumn = 0;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
 },
-    dblclickEditCell(event){
-      let cellHeight = event.target.closest('td').offsetHeight;
-  
-    },
+
     cellClass(rowIndex,cellIndex){
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
       const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);

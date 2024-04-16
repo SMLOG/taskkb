@@ -61,11 +61,14 @@ export default {
       selection.addRange(range); // Set the new range as the selection
     },
     dblclick() {
-      this.editable = true;
+      if(! this.editable){
+        this.editable = true;
       setTimeout(() => {
         this.moveCursorToEnd(this.$refs.contentEditable);
         this.$refs.contentEditable.focus();
       }, 100);
+      }
+
 
     },
     startEditing() {
