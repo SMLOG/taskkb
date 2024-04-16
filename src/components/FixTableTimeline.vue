@@ -33,7 +33,7 @@
 
 
       <div class="vue-columns-resizable" style="position: relative;" >
-        <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key)"  v-for="(col, key) in cols" :key="key" 
+        <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key,$event)"  v-for="(col, key) in cols" :key="key" 
         style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;" :style="{height:tableHeight+'px'}"></div>
       </div>
       <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
@@ -274,22 +274,28 @@ resizeObserver.observe(table);
       if(this.resizeColumn){
         let i = this.resizeColumnIndex;
 
-        let width = this.$refs.th[i].offsetWidth +  event.movementX;
-        console.log(width);
+        //let width = this.$refs.th[i].offsetWidth +  event.movementX;
+        let width = this.resizeColumnWidth +event.x-this.resizeX;
+        console.log(this.$refs.th[i].offsetWidth,event.movementX,width);
         this.resizeColumn.width =width;
         this.$refs.th[i].style.width=width+'px';
         let j=i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + this.$refs.th[j].offsetWidth - 4 + 'px'
+        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - 4 + 'px'
       }
 
     },
-    resizeBarMouseDown(col,colIndex){
+    resizeBarMouseDown(col,colIndex,event){
       console.log('resizeBarMouseDown')
         console.log(col)
         this.resizeColumn = col;
         this.resizeColumnIndex = colIndex;
-              document.body.style.cursor = 'col-resize';
-              document.body.style.userSelect = 'none';
+        this.resizeX = event.x;
+        this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
+
+        
+         document.body.style.cursor = 'col-resize';
+         document.body.style.userSelect = 'none';
+         console.log(event)
             
     },
     resizeBarMouseUp(){
