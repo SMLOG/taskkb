@@ -125,7 +125,7 @@ export default {
       let nextcid = this.findMissingNumber(this.cols.map(e => e.fn).sort());
       let text = "New Column";
       let width = this.calculateTextWidth(text + "  ");
-      this.cols.push({ field: {}, cp: 'ColDropText', width: width, name: text, fn: nextcid })
+      this.cols.push({ field: {}, cp: 'ColDropText', width: width, name: text, fn: nextcid,show:true })
     },
     delCol(col, i) {
       this.cols.splice(i, 1);

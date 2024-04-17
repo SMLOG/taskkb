@@ -1,7 +1,7 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
     <div style="display: flex;    justify-content: space-between;font-weight: bold;">
-    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
+    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing"  @keydown.enter.prevent="handleEnter"
       @focus="showDropdown = 1" v-html="modelValue" class="text">
 
     </div>
@@ -100,9 +100,29 @@ export default {
         this.$emit('update:modelValue', event.target.innerHTML);
       }
     },
-    handleEnter() {
-      this.$refs.contentEditable.blur();
-      this.$emit('enter');
+    insertBr(event) {
+      // Prevent the default "Enter" key behavior
+      event.preventDefault();
+
+      // Get the current selection
+      const selection = window.getSelection();
+
+      // Insert the <br /> element at the current position
+      const br = document.createElement('br');
+      selection.getRangeAt(0).insertNode(br);
+
+      // Move the cursor to the next line
+      selection.collapseToEnd();
+    },
+    handleEnter(event) {
+      if (event.key === 'Enter' && event.shiftKey) {
+        this.insertBr(event)
+        //this.$refs.contentEditable.innerHTML =  this.$refs.contentEditable.innerHTML+"<br />";
+      }else{
+        this.$refs.contentEditable.blur();
+        this.$emit('enter');
+      }
+
     },
     selectItem(item) {
       console.log('selectItem');

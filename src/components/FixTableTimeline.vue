@@ -33,20 +33,24 @@
 
 
       <div class="vue-columns-resizable" style="position: relative;" >
-        <div class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key,$event)"  v-for="(col, key) in cols" :key="key" 
+        <template v-for="(col, key) in cols" :key="key" >
+        <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key,$event)"  
         style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;" :style="{height:tableHeight+'px'}"></div>
-      </div>
+      </template>
+    </div>
+   
       <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
 
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <th v-for="(col, key) in cols" ref="th" :key="key" :style="{minWidth:col.width+'px',width:col.width+'px',maxWidth:col.width+'px'}" >
+            <template v-for="(col, key) in cols"  :key="key">
+            <th ref="th" :style="{minWidth:col.width+'px',width:col.width+'px',maxWidth:col.width+'px'}" v-if="col.show">
               <div class="cell" >
                   <component :is="col.cp" :col="col"></component >
               </div>
             </th>
-           
+          </template>
             <th :colspan="7 * weeks.length" v-if="config.showSch">
               <div style="display: flex; flex-wrap: nowrap">
                 <div v-for="week in weeks" :key="week" class="week-slot">
@@ -77,21 +81,22 @@
         <tbody>
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <tr v-show="!isCollapsed(row)" :class="{ rowSelected: selectedRowIndex == rowIndex }" @dragover="dragOver"
-              @drop="drop($event, row, rowIndex)">
+              @drop="drop($event, row, rowIndex)" >
               <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
                 @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
                 {{ row._rIndex + 1 }}
               </th>
-
-              <td v-for="(col, cellIndex) in cols" 
+              <template v-for="(col, cellIndex) in cols" :key="cellIndex"  >
+              <td 
               :tabindex="100*rowIndex+cellIndex" 
               :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)" 
-               @click="clickSelectCell($event, rowIndex, row,cellIndex,col)"
+               @click="clickSelectCell($event, rowIndex, row,cellIndex,col)" v-if="col.show"
                >
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col" @change="saveData(1)" ></component>
                 </div>
               </td>
+            </template>
               <td :colspan="7 * weeks.length" v-if="config.showSch">
                 <div style="display: flex; flex-wrap: nowrap" class="sch">
                   <div v-for="week in weeks" :key="week" class="week-slot"
@@ -263,6 +268,8 @@ resizeObserver.observe(table);
   },
   methods: {
     resize(){
+      console.log('resize')
+      console.log('resize')
       for(let i=0;i<this.$refs.rbar.length;i++){
       this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px';
 
