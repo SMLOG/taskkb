@@ -13,6 +13,7 @@
     "@vuepic/vue-datepicker": "^7.4.1",
     "date-fns": "^3.2.0",
     "jquery": "^3.7.1",
+    "marked": "^12.0.2",
     "v-calendar": "^3.1.2",
     "vue": "^3.3.11",
     "vue3-popper": "^1.5.0",

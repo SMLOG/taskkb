@@ -1,6 +1,6 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
-    <div style="display: flex;    justify-content: space-between;font-weight: bold;">
+    <div style="display: flex;    justify-content: space-between;">
       <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
         @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
 
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import {marked} from 'marked';
 export default {
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
@@ -49,13 +50,36 @@ export default {
     };
   },
   methods: {
+    convertMarkdownToHtml(markdown) {
+      var tempElement = document.createElement("div");
+  tempElement.innerHTML = marked(markdown);
+  var links = tempElement.getElementsByTagName('a');
+      for (var i = 0; i < links.length; i++) {
+        links[i].setAttribute('target', '_blank');
+      }
+  return tempElement.firstChild.innerHTML;
+
+    },
+   isHTMLSegment(string) {
+  const parser = new DOMParser();
+  const parsedDocument = parser.parseFromString(string, 'text/html');
+  
+  // Check if the parsed document has any elements
+  return parsedDocument.body.children.length > 0;
+},
     renderToHtml(modelValue) {
-      if (!this.editable && modelValue) {
-        var urlRegex = /(https?:\/\/[^\s]+)/g;
-        var replacedText = modelValue.replace(urlRegex, function (url) {
-          return '<a target="_blank" href="' + url + '">' + url + '</a>';
-        });
-        return replacedText.replace(/\n/g, '<br>');
+      if (!this.editable ) {
+        if(modelValue){
+            let replacedText = this.convertMarkdownToHtml(modelValue);
+            /*var urlRegex = /(https?:\/\/[^\s]+)/g;
+            var replacedText = str.replace(urlRegex, function (url) {
+              return '<a target="_blank" href="' + url + '">' + url + '</a>';
+            });*/
+            return replacedText.replace(/\n/g, '<br>');
+       
+
+        }
+
       }
 
       return modelValue;
@@ -194,4 +218,5 @@ export default {
   word-break: break-all;
   outline: none;
 }
+
 </style>

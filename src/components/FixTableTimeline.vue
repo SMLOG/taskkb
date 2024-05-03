@@ -339,7 +339,7 @@ resizeObserver.observe(table);
       if (activeElement) {
         activeElement.blur();
       }
-      event.preventDefault();
+     // event.preventDefault();
       this.isMouseDown = true;
       this.startRowIndex = cell.parentNode.rowIndex;
       this.startcellIndex = cell.cellIndex;
