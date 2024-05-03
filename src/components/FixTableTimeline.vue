@@ -33,7 +33,7 @@
 
 
       <div class="vue-columns-resizable" style="position: relative;" >
-        <template v-for="(col, key) in cols" :key="key" >
+        <template v-for="(col, key) in cols.filter(e=>e.show)" :key="key" >
         <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key,$event)"  
         style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;" :style="{height:tableHeight+'px'}"></div>
       </template>
@@ -374,8 +374,11 @@ resizeObserver.observe(table);
 
     },
     deleteRow(row) {
-      let list = row._p && row._p._childs || this.tableData;
-      list.splice(list.indexOf(row), 1);
+      if(confirm("Please confirm to delete it?")){
+        let list = row._p && row._p._childs || this.tableData;
+        list.splice(list.indexOf(row), 1);
+      }
+
     },
  
     getAllRow() {

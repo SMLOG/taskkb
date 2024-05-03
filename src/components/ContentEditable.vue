@@ -1,13 +1,13 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
     <div style="display: flex;    justify-content: space-between;font-weight: bold;">
-    <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing"  @keydown.enter.prevent="handleEnter"
-      @focus="showDropdown = 1" v-html="modelValue" class="text">
+      <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
+        @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
 
-    </div>
-    <div v-if="isText">
-      <span>T</span>
-    </div>
+      </div>
+      <div v-if="isText">
+        <span>T</span>
+      </div>
     </div>
     <div v-show="showDropdown && !isText && dropdownItems" class="dropdown">
       <ul>
@@ -35,7 +35,7 @@ export default {
       type: Boolean,
       required: false,
     },
-    
+
     dropdownItems: {
       type: Array,
       default: () => [],
@@ -49,6 +49,17 @@ export default {
     };
   },
   methods: {
+    renderToHtml(modelValue) {
+      if (!this.editable && modelValue) {
+        var urlRegex = /(https?:\/\/[^\s]+)/g;
+        var replacedText = modelValue.replace(urlRegex, function (url) {
+          return '<a target="_blank" href="' + url + '">' + url + '</a>';
+        });
+        return replacedText.replace(/\n/g, '<br>');
+      }
+
+      return modelValue;
+    },
     moveCursorToEnd(element) {
       element.focus(); // Set focus to the contentEditable div
 
@@ -61,12 +72,12 @@ export default {
       selection.addRange(range); // Set the new range as the selection
     },
     dblclick() {
-      if(! this.editable){
+      if (!this.editable) {
         this.editable = true;
-      setTimeout(() => {
-        this.moveCursorToEnd(this.$refs.contentEditable);
-        this.$refs.contentEditable.focus();
-      }, 100);
+        setTimeout(() => {
+          this.moveCursorToEnd(this.$refs.contentEditable);
+          this.$refs.contentEditable.focus();
+        }, 100);
       }
 
 
@@ -74,51 +85,49 @@ export default {
     startEditing() {
       this.editing = true;
     },
-    getValue(){
-  return     this.isText?this.$refs.contentEditable.textContent.trim(): this.$refs.contentEditable.innerHTML
+    getValue() {
+      return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML
 
     },
     stopEditing() {
 
-      this.timer=setTimeout(() => { this.showDropdown = false;
-        this.editing = false;
-        this.editable = false;
-        console.log('stop editing')
+      this.$nextTick(() => {
+        this.timer = setTimeout(() => {
+          this.showDropdown = false;
+          this.editing = false;
+          this.editable = false;
+          console.log('stop editing')
 
-      this.$emit('update:modelValue',this.getValue());
-       if(this.getValue()!==this.modelValue){
-        this.$emit('change',this.getValue());
-        console.log('changed',this.getValue());
-       }
-      console.log('stopEditing');
-      }, 200);
+          this.$emit('update:modelValue', this.getValue());
+          if (this.getValue() !== this.modelValue) {
+            this.$emit('change', this.getValue());
+            console.log('changed', this.getValue());
+          }
+          console.log('stopEditing');
+        }, 200);
+      });
+
 
     },
-    handleInput(event) {
-      if (event && event.target) {
-        console.log(event.target.innerHTML);
-        this.$emit('update:modelValue', event.target.innerHTML);
-      }
-    },
-    insertBr(event) {
+
+    insertNewLine(event) {
       // Prevent the default "Enter" key behavior
       event.preventDefault();
 
-      // Get the current selection
       const selection = window.getSelection();
 
-      // Insert the <br /> element at the current position
-      const br = document.createElement('br');
-      selection.getRangeAt(0).insertNode(br);
+      // Insert a new line at the current position
+      const textNode = document.createTextNode('\n');
+      selection.getRangeAt(0).insertNode(textNode);
 
       // Move the cursor to the next line
       selection.collapseToEnd();
     },
     handleEnter(event) {
       if (event.key === 'Enter' && event.shiftKey) {
-        this.insertBr(event)
+        this.insertNewLine(event)
         //this.$refs.contentEditable.innerHTML =  this.$refs.contentEditable.innerHTML+"<br />";
-      }else{
+      } else {
         this.$refs.contentEditable.blur();
         this.$emit('enter');
       }
@@ -179,8 +188,10 @@ export default {
   border-left: 2px solid green !important;
   padding: 0 10px;
 }
-.text{min-height: 1em;
-word-break: break-all;
-outline: none;
+
+.text {
+  min-height: 1em;
+  word-break: break-all;
+  outline: none;
 }
 </style>
