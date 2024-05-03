@@ -86,11 +86,11 @@
                 @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
                 {{ row._rIndex + 1 }}
               </th>
-              <template v-for="(col, cellIndex) in cols" :key="cellIndex"  >
+              <template v-for="(col, cellIndex) in cols.filter(e=>e.show)" :key="cellIndex"  >
               <td 
               :tabindex="100*rowIndex+cellIndex" 
-              :key="cellIndex" :class="cellClass(rowIndex+1,cellIndex+1)" 
-               @click="clickSelectCell($event, rowIndex, row,cellIndex,col)" v-if="col.show"
+               :class="cellClass(rowIndex+1,cellIndex+1)" 
+               @click="clickSelectCell($event, rowIndex, row,cellIndex,col)" 
                >
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col" @change="saveData(1)" ></component>
@@ -339,7 +339,7 @@ resizeObserver.observe(table);
       if (activeElement) {
         activeElement.blur();
       }
-     // event.preventDefault();
+      event.preventDefault();
       this.isMouseDown = true;
       this.startRowIndex = cell.parentNode.rowIndex;
       this.startcellIndex = cell.cellIndex;
