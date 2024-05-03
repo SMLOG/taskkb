@@ -70,7 +70,7 @@ export default {
     renderToHtml(modelValue) {
       if (!this.editable ) {
         if(modelValue){
-            let replacedText = this.convertMarkdownToHtml(modelValue);
+            let replacedText = this.convertMarkdownToHtml(modelValue.replace(/<br>/g,'\n'));
             /*var urlRegex = /(https?:\/\/[^\s]+)/g;
             var replacedText = str.replace(urlRegex, function (url) {
               return '<a target="_blank" href="' + url + '">' + url + '</a>';
@@ -141,7 +141,7 @@ export default {
       const selection = window.getSelection();
 
       // Insert a new line at the current position
-      const textNode = document.createTextNode('\n');
+      const textNode = document.createElement('br');
       selection.getRangeAt(0).insertNode(textNode);
 
       // Move the cursor to the next line
