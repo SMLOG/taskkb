@@ -1,7 +1,7 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
     <div style="display: flex;    justify-content: space-between;">
-      <div ref="contentEditable" :contenteditable="editable" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
+      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste($event)" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
         @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
 
       </div>
@@ -21,6 +21,7 @@
 
 <script>
 import {marked} from 'marked';
+
 export default {
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
@@ -50,6 +51,11 @@ export default {
     };
   },
   methods: {
+    sanitizePaste(e) {
+            e.preventDefault();
+            var text = e.clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+        },
     convertMarkdownToHtml(markdown) {
       var tempElement = document.createElement("div");
   tempElement.innerHTML = marked(markdown);
@@ -57,7 +63,7 @@ export default {
       for (var i = 0; i < links.length; i++) {
         links[i].setAttribute('target', '_blank');
       }
-  return tempElement.firstChild.innerHTML;
+  return tempElement.firstChild?tempElement.firstChild.innerHTML:tempElement.innerHTML;
 
     },
    isHTMLSegment(string) {
