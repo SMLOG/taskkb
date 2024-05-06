@@ -1,10 +1,11 @@
 <template>
   <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
     <div style="display: flex;    justify-content: space-between;">
+      <format-tool :editable="editable">
       <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste($event)" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
         @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
 
-      </div>
+      </div></format-tool>
       <div v-if="isText">
         <span>T</span>
       </div>
@@ -24,7 +25,7 @@
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
-
+import FormatTool from "./FormatTool.vue";
 const marked = new Marked(
   markedHighlight({
     langPrefix: 'hljs language-',
@@ -35,6 +36,9 @@ const marked = new Marked(
   })
 );
 export default {
+  components: {
+    FormatTool
+  },
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
       this.$refs.contentEditable.focus();
