@@ -150,7 +150,7 @@ export default {
             console.log('changed', this.getValue());
           }
           console.log('stopEditing');
-        }, 200);
+        }, 500);
       });
 
 
