@@ -20,8 +20,20 @@
 </template>
 
 <script>
-import {marked} from 'marked';
+//import {marked} from 'marked';
+import { Marked } from "marked";
+import { markedHighlight } from "marked-highlight";
+import hljs from 'highlight.js';
 
+const marked = new Marked(
+  markedHighlight({
+    langPrefix: 'hljs language-',
+    highlight(code, lang, info) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    }
+  })
+);
 export default {
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
@@ -58,7 +70,7 @@ export default {
         },
     convertMarkdownToHtml(markdown) {
       var tempElement = document.createElement("div");
-  tempElement.innerHTML = marked(markdown);
+  tempElement.innerHTML = marked.parse(markdown);
   var links = tempElement.getElementsByTagName('a');
       for (var i = 0; i < links.length; i++) {
         links[i].setAttribute('target', '_blank');
@@ -223,6 +235,7 @@ export default {
   min-height: 1em;
   word-break: break-all;
   outline: none;
+  flex-grow: 1;
 }
 
 </style>

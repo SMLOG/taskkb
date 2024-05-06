@@ -12,6 +12,7 @@
     "@popperjs/core": "^2.11.8",
     "@vuepic/vue-datepicker": "^7.4.1",
     "date-fns": "^3.2.0",
+    "highlight.js": "^11.9.0",
     "jquery": "^3.7.1",
     "marked": "^12.0.2",
     "marked-highlight": "^2.1.1",
