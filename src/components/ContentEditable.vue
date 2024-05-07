@@ -1,8 +1,8 @@
 <template>
-  <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
+  <div class="editable-dropdown " ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
     <div style="display: flex;    justify-content: space-between;">
       <format-tool :editable="editable">
-      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste($event)" @blur="stopEditing" @keydown.enter.prevent="handleEnter"
+      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste($event)"  @keydown.enter.prevent="handleEnter"
         @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
 
       </div></format-tool>
@@ -117,6 +117,13 @@ export default {
       selection.removeAllRanges(); // Clear any existing selection
       selection.addRange(range); // Set the new range as the selection
     },
+    handlerBlur(event) {
+      var isClickInsideElement = this.$refs.container.contains(event.target);
+
+      if (!isClickInsideElement) {
+        this.stopEditing();
+      }
+    },
     dblclick() {
       if (!this.editable) {
         this.editable = true;
@@ -124,6 +131,8 @@ export default {
           this.moveCursorToEnd(this.$refs.contentEditable);
           this.$refs.contentEditable.focus();
         }, 100);
+
+        document.addEventListener("click", this.handlerBlur);
       }
 
 
@@ -135,8 +144,9 @@ export default {
       return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML
 
     },
-    stopEditing() {
-
+    stopEditing(event) {
+      document.removeEventListener("click", this.handlerBlur);
+      console.log('remove evnet listener');
       this.$nextTick(() => {
         this.timer = setTimeout(() => {
           this.showDropdown = false;
@@ -144,7 +154,7 @@ export default {
           this.editable = false;
           console.log('stop editing')
 
-          this.$emit('update:modelValue', this.getValue());
+          this.$emit('update:modelValue', this.getValue().replace(/<[/]?b\s*>/ig,'**').replace(/\s*<[/]?strong.*?>/ig,'**'));
           if (this.getValue() !== this.modelValue) {
             this.$emit('change', this.getValue());
             console.log('changed', this.getValue());

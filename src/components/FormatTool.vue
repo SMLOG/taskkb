@@ -6,11 +6,12 @@
 
     <div id="formatTool" v-if="isFormatToolVisible && editable" :style="{ left: formatToolLeft, top: formatToolTop }">
       <button @click="applyBold">Bold</button>
+      
       <div>
-      <input type="color" v-model="fontColor" @click="applyFontColor" />
-      <button v-for="color in ['red','blue','yellow','black','white','green']" :key="color" @click.stop.prevent="applyFontColor($event,color);" :style="{background:color}">
-        {{ color }}
+      <button class="indicative-element" ref="indicativeElement" @click.prevent.stop="toggleColorSelect" style="color:">
+      Color
       </button>
+      <ColorSelector v-model="fontColor" @select="applyFontColor($event,fontColor)" style="user-select: none;" v-if="showColorSelect" :position="colorSelectPosition"></ColorSelector>
       <button @click="removeFontColor">remove color</button>
       </div>
       
@@ -19,7 +20,12 @@
 </template>
 
 <script>
+import ColorSelector from "./ColorSelector.vue";
+
 export default {
+  components: {
+    ColorSelector
+  },
   props: {
     editable: {
       type: Boolean,
@@ -31,10 +37,28 @@ export default {
       isFormatToolVisible: false,
       formatToolLeft: 0,
       formatToolTop: 0,
-      fontColor: "#FF0000"
+      fontColor: "#FF0000",
+      showColorSelect: false,
+      colorSelectPosition: {
+        top: 0,
+        left: 0
+      }
     };
   },
   methods: {
+    toggleColorSelect() {
+      this.showColorSelect = !this.showColorSelect;
+      if (this.showColorSelect) {
+        this.calculateColorSelectPosition();
+      }
+    },
+    calculateColorSelectPosition() {
+      const indicativeElementRect = this.$refs.indicativeElement.getBoundingClientRect();
+      this.colorSelectPosition = {
+        top: indicativeElementRect.bottom + 'px',
+        left: indicativeElementRect.left + 'px'
+      };
+    },
     applyFontColor(event,color) {
       console.log(color)
       
