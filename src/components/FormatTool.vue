@@ -5,14 +5,12 @@
     </div>
 
     <div id="formatTool" v-if="isFormatToolVisible && editable" :style="{ left: formatToolLeft, top: formatToolTop }">
-      <button @click="applyBold">Bold</button>
-      
-      <div>
+      <button @click="applyBold">{{isBoldNow?"Un":""}}Bold</button>
       <button class="indicative-element" ref="indicativeElement" @click.prevent.stop="toggleColorSelect" style="color:">
       Color
-      </button>
-      <ColorSelector v-model="fontColor" @select="applyFontColor($event,fontColor)" style="user-select: none;" v-if="showColorSelect" :position="colorSelectPosition"></ColorSelector>
-      <button @click="removeFontColor">remove color</button>
+      </button><button @click="removeFontColor">-Color</button>
+      <div>
+      <ColorSelector v-model="fontColor" @select="selectColor" style="user-select: none;" v-if="showColorSelect" :position="colorSelectPosition"></ColorSelector>
       </div>
       
     </div>
@@ -39,6 +37,7 @@ export default {
       formatToolTop: 0,
       fontColor: "#FF0000",
       showColorSelect: false,
+      isBoldNow:false,
       colorSelectPosition: {
         top: 0,
         left: 0
@@ -46,6 +45,22 @@ export default {
     };
   },
   methods: {
+    isBold() {
+      const selectedText = window.getSelection().toString();
+
+      if (selectedText.length > 0) {
+        const range = window.getSelection().getRangeAt(0);
+        const parentElement = range.commonAncestorContainer.parentElement;
+        const computedStyle = window.getComputedStyle(parentElement);
+        return computedStyle.fontWeight === "bold" || parseInt(computedStyle.fontWeight) >= 700;
+      }
+
+      return false;
+    },
+    selectColor(color){
+      this.applyFontColor(null,color)
+      this.showColorSelect=false;
+    },
     toggleColorSelect() {
       this.showColorSelect = !this.showColorSelect;
       if (this.showColorSelect) {
@@ -67,7 +82,6 @@ export default {
     },
     removeFontColor() {
       document.execCommand("removeFormat", false, "foreColor");
-      this.refocusEditor();
     },
     applyFontColor2() {
       // Get the selected text
@@ -100,33 +114,25 @@ export default {
         const boundingRect = selection.getBoundingClientRect();
         this.formatToolLeft = boundingRect.right + "px";
         this.formatToolTop = boundingRect.bottom + "px";
+        this.isBoldNow= this.isBold()
       } else {
         this.isFormatToolVisible = false;
+
       }
     }, applyBold(event) {
-      const isBold = document.queryCommandState("bold");
       event.preventDefault();
 
-      if (isBold) {
+      if (this.isBold()) {
         document.execCommand("bold");
+        this.isBoldNow=false;
       } else {
         document.execCommand("bold", false, null);
+        this.isBoldNow=true;
       }
     },
   },
   computed: {
-    isBold() {
-      const selectedText = window.getSelection().toString();
 
-      if (selectedText.length > 0) {
-        const range = window.getSelection().getRangeAt(0);
-        const parentElement = range.commonAncestorContainer.parentElement;
-        const computedStyle = window.getComputedStyle(parentElement);
-        return computedStyle.fontWeight === "bold" || parseInt(computedStyle.fontWeight) >= 700;
-      }
-
-      return false;
-    }
   }
 };
 </script>

@@ -83,7 +83,9 @@
             <tr v-show="!isCollapsed(row)" :class="{ rowSelected: selectedRowIndex == rowIndex }" @dragover="dragOver"
               @drop="drop($event, row, rowIndex)" >
               <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-                @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)">
+                @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)"
+                :class="{curRow:selectRow==row}"
+                >
                 {{ row._rIndex + 1 }}
               </th>
               <template v-for="(col, cellIndex) in cols.filter(e=>e.show)" :key="cellIndex"  >
@@ -936,4 +938,5 @@ td.bottom {
     color:green;
     font-weight: bold;
 }
+.curRow{background-color: lightgreen!important}
 </style>

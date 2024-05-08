@@ -7,16 +7,16 @@
         :style="{ backgroundColor: color }"
         @click="selectColor(color)"
       ></div>
+      <div>
       <button v-if="showMoreButton" class="more-button" @click="toggleMoreColors">
         {{ showMoreColors ? 'Less' : 'More' }}
       </button>
-      <button class="custom-button" @click="selectCustomColor">Custom</button>
       <input
-        v-if="showCustomColor"
         type="color"
         class="custom-color-input"
         @input="handleCustomColorInput"
       />
+    </div>
     </div>
   </template>
   
@@ -51,7 +51,6 @@
           '#800080', // Purple
           '#FF4500'  // Orange Red
         ],
-        showCustomColor: false,
         customColor: ''
       };
     },
@@ -83,9 +82,6 @@
       toggleMoreColors() {
         this.showMoreColors = !this.showMoreColors;
       },
-      selectCustomColor() {
-        this.showCustomColor = true;
-      },
       handleCustomColorInput(event) {
         this.selectedColor = event.target.value;
       }
@@ -100,10 +96,10 @@
   }
   
   .color-option {
-    width: 50px;
-    height: 50px;
-    margin-right: 10px;
-    margin-bottom: 10px;
+    width: 1em;
+    height: 1em;
+    margin-right: 5px;
+    margin-bottom: 5px;
     cursor: pointer;
   }
   

@@ -79,7 +79,7 @@ export default {
       for (var i = 0; i < links.length; i++) {
         links[i].setAttribute('target', '_blank');
       }
-  return tempElement.firstChild?tempElement.firstChild.innerHTML:tempElement.innerHTML;
+  return tempElement.firstChild&&tempElement.firstChild.nodeName=='P'?tempElement.firstChild.innerHTML:tempElement.innerHTML.replace(/>\n/g,'>');
 
     },
    isHTMLSegment(string) {
@@ -104,7 +104,7 @@ export default {
 
       }
 
-      return modelValue;
+      return modelValue? modelValue.replace(/\n/g,'<br>'):modelValue;
     },
     moveCursorToEnd(element) {
       element.focus(); // Set focus to the contentEditable div
@@ -141,7 +141,7 @@ export default {
       this.editing = true;
     },
     getValue() {
-      return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML
+      return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML.replace(/<[/]?div>/g,'').replace(/\r/g,'\n');
 
     },
     stopEditing(event) {
@@ -154,7 +154,7 @@ export default {
           this.editable = false;
           console.log('stop editing')
 
-          this.$emit('update:modelValue', this.getValue().replace(/<[/]?b\s*>/ig,'**').replace(/\s*<[/]?strong.*?>/ig,'**'));
+          this.$emit('update:modelValue', this.getValue());//.replace(/<[/]?b\s*>/ig,'**').replace(/\s*<[/]?strong.*?>/ig,'**'));
           if (this.getValue() !== this.modelValue) {
             this.$emit('change', this.getValue());
             console.log('changed', this.getValue());
