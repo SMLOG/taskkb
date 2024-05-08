@@ -80,7 +80,7 @@
         </thead>
         <tbody>
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-            <tr v-show="!isCollapsed(row)" :class="{ rowSelected: selectedRowIndex == rowIndex }" @dragover="dragOver"
+            <tr v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
               @drop="drop($event, row, rowIndex)" >
               <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
                 @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)"
@@ -224,7 +224,9 @@ export default {
       startRowIndex: null,
       startcellIndex: null,
       endRowIndex: null,
-      endcellIndex: null
+      endcellIndex: null,
+      wholeRowSelected:false,
+      selectWholeRowIndex:null,
     };
   },
   mounted() {
@@ -334,7 +336,13 @@ resizeObserver.observe(table);
       console.log('mosuedown')
 
       const cell = event.target.closest('td');
-      if(!cell || this.resizeColumn)return null;
+      if(!cell || this.resizeColumn){
+        this.startRowIndex = -1;
+      this.startcellIndex = -1;
+      this.endRowIndex = -1;
+      this.endcellIndex = -1;
+        return null;
+      }
       const activeElement = document.activeElement;
 
       if(cell.querySelector("[contenteditable=true]"))return;
@@ -369,10 +377,18 @@ resizeObserver.observe(table);
       );
     },
     clickSelectCell(event, rowIndex, row,cellIndex,col) {
+
       this.selectedRowIndex = rowIndex;
       this.selectedcellIndex=cellIndex;
       this.selectRow = row;
       this.selectCol = col;
+
+      if(cellIndex==undefined){
+      this.selectWholeRowIndex=rowIndex;
+      this.selectCol = null;
+    }else{
+      this.selectWholeRowIndex= false;
+    }
 
     },
     deleteRow(row) {
@@ -938,5 +954,6 @@ td.bottom {
     color:green;
     font-weight: bold;
 }
-.curRow{background-color: lightgreen!important}
+.curRow,.wholeRowSelected td{background-color: #E0EEE0!important}
+
 </style>
