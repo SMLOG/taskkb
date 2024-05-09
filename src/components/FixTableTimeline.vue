@@ -10,47 +10,49 @@
       display: flex;
       flex-direction: column;
     ">
-      <div style="display: flex;
+    <div style="display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     width: 100%;
     top: 0;
     left: 0; line-height: 1.5em;">
-    <div style="display: flex;">
-    <a>All</a>
-    <div style="position: relative;" class="filterSearch" >
-      <input  />
+      <div style="display: flex;">
+        <a>All</a>
+        <div style="position: relative;" class="filterSearch">
+          <input />
+        </div>
+      </div>
+      <div>
+        <div><a>Grid</a><a>List</a><a>Card</a></div>
+      </div>
+
+
     </div>
-  </div>
-  <div>
-    <div><a>Grid</a><a>List</a><a>Card</a></div>
-  </div>
-    
-    
-  </div>
     <div class="table-container" style="    flex-grow: 1;
     overflow: auto;">
 
 
-      <div class="vue-columns-resizable" style="position: relative;" >
-        <template v-for="(col, key) in cols.filter(e=>e.show)" :key="key" >
-        <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col,key,$event)"  
-        style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;" :style="{height:tableHeight+'px'}"></div>
-      </template>
-    </div>
-   
-      <table ref="table"    @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+      <div class="vue-columns-resizable" style="position: relative;">
+        <template v-for="(col, key) in cols.filter(e => e.show)" :key="key">
+          <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
+            style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;"
+            :style="{ height: tableHeight + 'px' }"></div>
+        </template>
+      </div>
+
+      <table ref="table" @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
 
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <template v-for="(col, key) in cols"  :key="key">
-            <th ref="th" :style="{minWidth:col.width+'px',width:col.width+'px',maxWidth:col.width+'px'}" v-if="col.show">
-              <div class="cell" >
-                  <component :is="col.cp" :col="col"></component >
-              </div>
-            </th>
-          </template>
+            <template v-for="(col, key) in cols" :key="key">
+              <th ref="th" :style="{ minWidth: col.width + 'px', width: col.width + 'px', maxWidth: col.width + 'px' }"
+                v-if="col.show">
+                <div class="cell">
+                  <component :is="col.cp" :col="col"></component>
+                </div>
+              </th>
+            </template>
             <th :colspan="7 * weeks.length" v-if="config.showSch">
               <div style="display: flex; flex-wrap: nowrap">
                 <div v-for="week in weeks" :key="week" class="week-slot">
@@ -80,25 +82,21 @@
         </thead>
         <tbody>
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-            <tr v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
-              @drop="drop($event, row, rowIndex)" >
+            <tr v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
+              @dragover="dragOver" @drop="drop($event, row, rowIndex)">
               <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-                @contextmenu="clickSelectCell($event, rowIndex, row);showContextMenu($event,rowIndex)"
-                :class="{curRow:selectRow==row}"
-                >
+                @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
+                :class="{ curRow: selectRow == row }">
                 {{ row._rIndex + 1 }}
               </th>
-              <template v-for="(col, cellIndex) in cols.filter(e=>e.show)" :key="cellIndex"  >
-              <td 
-              :tabindex="100*rowIndex+cellIndex" 
-               :class="cellClass(rowIndex+1,cellIndex+1)" 
-               @click="clickSelectCell($event, rowIndex, row,cellIndex,col)" 
-               >
-                <div class="cell">
-                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)" ></component>
-                </div>
-              </td>
-            </template>
+              <template v-for="(col, cellIndex) in cols.filter(e => e.show)" :key="cellIndex">
+                <td :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1)"
+                  @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+                  <div class="cell">
+                    <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
+                  </div>
+                </td>
+              </template>
               <td :colspan="7 * weeks.length" v-if="config.showSch">
                 <div style="display: flex; flex-wrap: nowrap" class="sch">
                   <div v-for="week in weeks" :key="week" class="week-slot"
@@ -142,16 +140,17 @@
         left: 0;
         z-index: 3;
         background: white;
-      "><div style="display: flex;flex-direction: column;">
-      <Config v-if="showConfig" :config="config"></Config>
-      <div style="display: flex;height: 30px;">
-        <a @click="addRow(1)">Add Row</a>
-        <a @click="deleteRow(selectRow)">Delete Row</a>
-        <a @click="addSubRow(1)">Add Sub Row</a>
-        <a @click="saveData(0)">Save</a>
-        <a @click="showConfig = !showConfig">Configuration</a>
-        <a @click="showConfig = !showConfig">Team</a>
-      </div>
+      ">
+      <div style="display: flex;flex-direction: column;">
+        <Config v-if="showConfig" :config="config"></Config>
+        <div style="display: flex;height: 30px;">
+          <a @click="addRow(1)">Add Row</a>
+          <a @click="deleteRow(selectRow)">Delete Row</a>
+          <a @click="addSubRow(1)">Add Sub Row</a>
+          <a @click="saveData(0)">Save</a>
+          <a @click="showConfig = !showConfig">Configuration</a>
+          <a @click="showConfig = !showConfig">Team</a>
+        </div>
       </div>
     </div>
 
@@ -201,35 +200,64 @@ import ColDate from './ColDate.vue';
 
 
 export default {
-  components: { ColTitle, ColDropText,ColDate },
-  
+  components: { ColTitle, ColDropText, ColDate },
+
   data() {
     return {
-      tableHeight:20,
+      tableHeight: 20,
       isContextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
       showConfig: 0,
       selectStart: null,
       isDrag: 0,
       weeks: this.generateWeeks(today),
-      config:localStorage.getItem('config')?JSON.parse(localStorage.getItem('config')):{},
+      config: localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {},
       tableData: data,
       dragRow: null,
       selectedRowIndex: null,
       selectRow: null,
-      selectedcellIndex:null,
-      selectCol:null,
-      
+      selectedcellIndex: null,
+      selectCol: null,
+
       isMouseDown: false,
       startRowIndex: null,
       startcellIndex: null,
       endRowIndex: null,
       endcellIndex: null,
-      wholeRowSelected:false,
-      selectWholeRowIndex:null,
+      wholeRowSelected: false,
+      selectWholeRowIndex: null,
     };
   },
   mounted() {
+    document.addEventListener('keydown', (event) => {
+      if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {
+        event.preventDefault();
+
+        const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
+        const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
+        const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
+        const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
+
+
+        let copyTblData = [];
+        const table = this.$refs.table;
+        for (let i = minRowIndex; i <= maxRowIndex; i++) {
+          let row = table.rows[i];
+          if(row.style.display === 'none')continue;
+          let rowDatas = [];
+          for (let j = mincellIndex; j <= maxcellIndex; j++) {
+            let cell = row.cells[j];
+            rowDatas.push(this.containsBlockElement(cell.querySelector("[contenteditable]"))?cell.querySelector("[contenteditable]").innerText:cell.querySelector("[contenteditable]").innerHTML);
+          }
+          copyTblData.push(rowDatas);
+        }
+
+        this.copyTableToExcel(copyTblData);
+
+
+
+      }
+    });
     document.addEventListener("click", this.hideContextMenu);
     window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
@@ -241,29 +269,29 @@ export default {
 
     this.resize();
 
-const table = this.$refs.table;
-this.tableHeight =table.offsetHeight; 
-const resizeObserver = new ResizeObserver(entries => {
-  for (const entry of entries) {
-    const resizedTable = entry.target;
-    console.log('Table has been resized:', resizedTable);
+    const table = this.$refs.table;
     this.tableHeight = table.offsetHeight;
-  }
-});
+    const resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        const resizedTable = entry.target;
+        console.log('Table has been resized:', resizedTable);
+        this.tableHeight = table.offsetHeight;
+      }
+    });
 
-resizeObserver.observe(table);
+    resizeObserver.observe(table);
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
     document.removeEventListener("click", this.hideContextMenu);
   },
-  computed:{
-    cols(){
-      if(!this.config.cols)this.config.cols=[];
+  computed: {
+    cols() {
+      if (!this.config.cols) this.config.cols = [];
       return this.config.cols;
     },
-    currentCell(){
-      return this.selectRow&&this.selectCol? this.selectRow['c'+this.selectCol.fn]:null;
+    currentCell() {
+      return this.selectRow && this.selectCol ? this.selectRow['c' + this.selectCol.fn] : null;
     }
 
   },
@@ -271,81 +299,142 @@ resizeObserver.observe(table);
 
   },
   methods: {
-    resize(){
-      console.log('resize')
-      console.log('resize')
-      for(let i=0;i<this.$refs.rbar.length;i++){
-      this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px';
+     containsBlockElement(element) {
+  // Get all child elements of the given element
+  const childElements = element.getElementsByTagName('*');
 
+  // Iterate through the child elements
+  for (let i = 0; i < childElements.length; i++) {
+    const childElement = childElements[i];
+    
+    // Check if the child element is a block-level element
+    if (getComputedStyle(childElement).display === 'block') {
+      return true;
     }
+  }
+  
+  // No block-level elements found
+  return false;
+},
+    copyTableToExcel(data) {
+
+
+      // Create the table element
+      var table = document.createElement('table');
+
+      // Iterate over the data array
+      for (var i = 0; i < data.length; i++) {
+        // Create a new row
+        var row = document.createElement('tr');
+
+        // Iterate over the inner array (cells)
+        for (var j = 0; j < data[i].length; j++) {
+          // Create a new cell
+          var cell = document.createElement('td');
+
+          // Set the cell content using innerHTML
+          cell.innerHTML = data[i][j];
+
+          // Append the cell to the row
+          row.appendChild(cell);
+        }
+
+        // Append the row to the table
+        table.appendChild(row);
+      }
+
+
+      if (navigator.clipboard) {
+
+        var tableHTML = table.outerHTML;
+        console.log(tableHTML)
+        navigator.clipboard.writeText(tableHTML)
+          .then(function () {
+            console.log('Table item copied successfully.');
+          })
+          .catch(function (error) {
+            console.error('Copy failed:', error);
+          });
+      } else {
+        console.error('Clipboard API is not supported in this browser.');
+      }
     },
-    handleResize(event){
+    resize() {
+      console.log('resize')
+      console.log('resize')
+      for (let i = 0; i < this.$refs.rbar.length; i++) {
+        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px';
+
+      }
+    },
+    handleResize(event) {
       console.log('handleResize')
-      if(this.resizeColumn){
+      if (this.resizeColumn) {
         let i = this.resizeColumnIndex;
 
         //let width = this.$refs.th[i].offsetWidth +  event.movementX;
-        let width = this.resizeColumnWidth +event.x-this.resizeX;
-        console.log(this.$refs.th[i].offsetWidth,event.movementX,width);
-        this.resizeColumn.width =width;
-        this.$refs.th[i].style.width=width+'px';
-        let j=i;
+        let width = this.resizeColumnWidth + event.x - this.resizeX;
+        console.log(this.$refs.th[i].offsetWidth, event.movementX, width);
+        this.resizeColumn.width = width;
+        this.$refs.th[i].style.width = width + 'px';
+        let j = i;
         this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - 4 + 'px'
       }
 
     },
-    resizeBarMouseDown(col,colIndex,event){
+    resizeBarMouseDown(col, colIndex, event) {
       console.log('resizeBarMouseDown')
-        console.log(col)
-        this.resizeColumn = col;
-        this.resizeColumnIndex = colIndex;
-        this.resizeX = event.x;
-        this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
+      console.log(col)
+      this.resizeColumn = col;
+      this.resizeColumnIndex = colIndex;
+      this.resizeX = event.x;
+      this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
 
-        
-         document.body.style.cursor = 'col-resize';
-         document.body.style.userSelect = 'none';
-         console.log(event)
-            
+
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      console.log(event)
+
     },
-    resizeBarMouseUp(){
+    resizeBarMouseUp() {
       console.log('resizeBarMouseUp')
-      if(this.resizeColumn){
+      if (this.resizeColumn) {
         this.resize();
         this.saveData();
       }
       this.resizeColumn = 0;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
-},
+    },
 
-    cellClass(rowIndex,cellIndex){
+    cellClass(rowIndex, cellIndex) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
       const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
       const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
       const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
       let selected = this.isSelected(rowIndex, cellIndex);
-     return { selected:selected ,
-      left:selected&&cellIndex==mincellIndex ,
-      right:selected&&cellIndex==maxcellIndex|| mincellIndex-1==cellIndex && (rowIndex>=minRowIndex&& rowIndex<=maxRowIndex),
-      top:selected&&rowIndex==minRowIndex,
-      bottom:selected&&rowIndex==maxRowIndex
-     };
+      return {
+        selected: selected,
+        left: selected && cellIndex == mincellIndex,
+        right: selected && cellIndex == maxcellIndex || mincellIndex - 1 == cellIndex && (rowIndex >= minRowIndex && rowIndex <= maxRowIndex),
+        top: selected && rowIndex == minRowIndex,
+        bottom: selected && rowIndex == maxRowIndex
+      };
     },
     handleMouseDown(event) {
       console.log('mosuedown')
 
       const cell = event.target.closest('td');
-      if(!cell || this.resizeColumn){
+      if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
-      this.startcellIndex = -1;
-      this.endRowIndex = -1;
-      this.endcellIndex = -1;
+        this.startcellIndex = -1;
+        this.endRowIndex = -1;
+        this.endcellIndex = -1;
         return null;
       }
       const activeElement = document.activeElement;
 
-      if(cell.querySelector("[contenteditable=true]"))return;
+      if (cell.querySelector("[contenteditable=true]")) return;
       if (activeElement) {
         activeElement.blur();
       }
@@ -376,32 +465,32 @@ resizeObserver.observe(table);
         (cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
       );
     },
-    clickSelectCell(event, rowIndex, row,cellIndex,col) {
+    clickSelectCell(event, rowIndex, row, cellIndex, col) {
 
       this.selectedRowIndex = rowIndex;
-      this.selectedcellIndex=cellIndex;
+      this.selectedcellIndex = cellIndex;
       this.selectRow = row;
       this.selectCol = col;
 
-      if(cellIndex==undefined){
-      this.selectWholeRowIndex=rowIndex;
-      this.selectCol = null;
-    }else{
-      this.selectWholeRowIndex= false;
-    }
+      if (cellIndex == undefined) {
+        this.selectWholeRowIndex = rowIndex;
+        this.selectCol = null;
+      } else {
+        this.selectWholeRowIndex = false;
+      }
 
     },
     deleteRow(row) {
-      if(confirm("Please confirm to delete it?")){
+      if (confirm("Please confirm to delete it?")) {
         let list = row._p && row._p._childs || this.tableData;
         list.splice(list.indexOf(row), 1);
       }
 
     },
- 
+
     getAllRow() {
       let rows = [];
-      let _rIndex=0;
+      let _rIndex = 0;
       for (let root of this.tableData) {
         root._level = 0;
         root._rIndex = _rIndex++;
@@ -480,7 +569,7 @@ resizeObserver.observe(table);
           row._childs.push(this.dragRow);
           this.dragRow._p = row;
           this.dragRow._level = row._level + 1;
-        }else if (row._p == this.dragRow._p && fromIndex - targetIndex == 1) {
+        } else if (row._p == this.dragRow._p && fromIndex - targetIndex == 1) {
           fromChildList.splice(fromIndex, 1);
           targetIndex = toChildList.indexOf(row);
           fromChildList.splice(targetIndex, 0, this.dragRow);
@@ -499,9 +588,9 @@ resizeObserver.observe(table);
     addRow(num) {
       console.log(num)
       if (this.selectRow) {
-        let list = this.selectRow._p&&this.selectRow._p._childs||this.tableData;
+        let list = this.selectRow._p && this.selectRow._p._childs || this.tableData;
         let index = list.indexOf(this.selectRow);
-        list.splice(index + 1, 0, { _id: '',_p:this.selectRow._p });
+        list.splice(index + 1, 0, { _id: '', _p: this.selectRow._p });
 
       } else this.tableData.push({ _id: '' })
 
@@ -531,18 +620,18 @@ resizeObserver.observe(table);
     },
     saveData(bool) {
       console.log(bool)
-      if(!bool ||this.config.autoSave ){
-       
-     
-      localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
-        if (key === "_p") {
-          console.log(value);
-          return null;
-        } else return value;
-      }));
-      localStorage.setItem('config', JSON.stringify(this.config));
+      if (!bool || this.config.autoSave) {
 
-    }
+
+        localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
+          if (key === "_p") {
+            console.log(value);
+            return null;
+          } else return value;
+        }));
+        localStorage.setItem('config', JSON.stringify(this.config));
+
+      }
     },
     moveCursorToEnd(index) {
       this.$nextTick(() => {
@@ -805,12 +894,12 @@ resizeObserver.observe(table);
     formatDate(date, format) {
       return date.toLocaleDateString("en-US", { ...format });
     },
-    showContextMenu(event,index) {
+    showContextMenu(event, index) {
       event.preventDefault();
       this.isContextMenuVisible = true;
       this.contextMenuPosition.x = event.clientX;
       this.contextMenuPosition.y = event.clientY;
-      this.selectedRowIndex = index; 
+      this.selectedRowIndex = index;
     },
     hideContextMenu() {
       this.isContextMenuVisible = false;
@@ -925,35 +1014,49 @@ td {
   border-radius: 5px;
   padding: 5px;
 }
-.contextmenu ul{margin: 0;}
+
+.contextmenu ul {
+  margin: 0;
+}
 
 td.left {
-  border-left: 1px darkgreen solid ;
+  border-left: 1px darkgreen solid;
 }
-td.right {
-  border-right: 1px darkgreen solid ;
-}
-td.top {
-  border-top: 1px darkgreen solid ;
-}
-td.bottom {
-  border-bottom: 1px darkgreen solid ;
-}
-.filterSearch{
-  position: relative;
-    display: inline-block;
-    width: 200px;
-    height: 24px;
-}
-.filterSearch input{width:100%;}
-.filterSearch:after{
-  content: "T";
-    position: absolute;
-    right:3px;
-    top:0;
-    color:green;
-    font-weight: bold;
-}
-.curRow,.wholeRowSelected td{background-color: #E0EEE0!important}
 
+td.right {
+  border-right: 1px darkgreen solid;
+}
+
+td.top {
+  border-top: 1px darkgreen solid;
+}
+
+td.bottom {
+  border-bottom: 1px darkgreen solid;
+}
+
+.filterSearch {
+  position: relative;
+  display: inline-block;
+  width: 200px;
+  height: 24px;
+}
+
+.filterSearch input {
+  width: 100%;
+}
+
+.filterSearch:after {
+  content: "T";
+  position: absolute;
+  right: 3px;
+  top: 0;
+  color: green;
+  font-weight: bold;
+}
+
+.curRow,
+.wholeRowSelected td {
+  background-color: #E0EEE0 !important
+}
 </style>
