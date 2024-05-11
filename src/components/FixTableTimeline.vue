@@ -302,11 +302,35 @@ export default {
 
   },
   methods: {
+     getScrollbarWidth() {
+  // Create a div element
+  var div = document.createElement('div');
+
+  // Set the styles for the div element
+  div.style.width = '100px';
+  div.style.height = '100px';
+  div.style.overflow = 'scroll';
+  div.style.position = 'absolute';
+  div.style.top = '-9999px';
+
+  // Append the div element to the document body
+  document.body.appendChild(div);
+
+  // Calculate the scrollbar width
+  var scrollbarWidth = div.offsetWidth - div.clientWidth;
+
+  // Remove the div element from the document body
+  document.body.removeChild(div);
+
+  // Return the scrollbar width
+  return scrollbarWidth;
+},
     winResize(){
       if(this.config.fix){
           let showCols = this.cols.filter(e=>e.show);
         let totalWidth = showCols.reduce((total,col)=>total+col.width,0);
-        let share = (window.innerWidth-80)/totalWidth;
+
+        let share = (window.innerWidth-46-showCols.length- 2 - this.getScrollbarWidth())/totalWidth;
         showCols.forEach((col)=>{
           col.width=col.width*share;
         });
