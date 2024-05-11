@@ -266,8 +266,11 @@ export default {
     document.body.addEventListener('mouseup', this.resizeBarMouseUp);
 
 
-
-    this.resize();
+    window.addEventListener('resize', () =>{
+      
+        this.winResize();
+    });
+    this.winResize();
 
     const table = this.$refs.table;
     this.tableHeight = table.offsetHeight;
@@ -299,6 +302,19 @@ export default {
 
   },
   methods: {
+    winResize(){
+      if(this.config.fix){
+          let showCols = this.cols.filter(e=>e.show);
+        let totalWidth = showCols.reduce((total,col)=>total+col.width,0);
+        let share = (window.innerWidth-80)/totalWidth;
+        showCols.forEach((col)=>{
+          col.width=col.width*share;
+        });
+      }
+      this.$nextTick(()=>{this.resize();});
+
+      
+    },
      containsBlockElement(element) {
   // Get all child elements of the given element
   const childElements = element.getElementsByTagName('*');
@@ -378,7 +394,14 @@ export default {
         this.resizeColumn.width = width;
         this.$refs.th[i].style.width = width + 'px';
         let j = i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - 4 + 'px'
+        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - 4 + 'px';
+        let lastColIndex = this.$refs.th.length-1;
+        if(this.config.fix&&i<lastColIndex){
+          let lastWidth = this.resizeLastColumnWidth -(event.x - this.resizeX);
+          this.cols.filter(e => e.show)[lastColIndex].width =lastWidth;
+          this.$refs.th[lastColIndex].style.width = lastWidth+'px';
+        }
+
       }
 
     },
@@ -389,6 +412,7 @@ export default {
       this.resizeColumnIndex = colIndex;
       this.resizeX = event.x;
       this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
+      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length-1].offsetWidth;
 
 
       document.body.style.cursor = 'col-resize';
@@ -625,7 +649,6 @@ export default {
 
         localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
           if (key === "_p") {
-            console.log(value);
             return null;
           } else return value;
         }));

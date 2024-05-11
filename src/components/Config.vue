@@ -28,6 +28,7 @@
     <div style="display: flex;">
       <div>show shedule: <input type="checkbox" v-model="config.showSch" /></div>
       <div>Auto Save: <input type="checkbox" v-model="config.autoSave" /></div>
+      <div>Fix: <input type="checkbox" v-model="config.fix" /></div>
       
     </div>
   </div>
