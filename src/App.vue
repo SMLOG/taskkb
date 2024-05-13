@@ -14,7 +14,7 @@ import FixTableTimeline from './components/FixTableTimeline.vue'
   </header>
 
   <main>
-    <FixTableTimeline />
+    <router-view></router-view>
   </main>
 </template>
 

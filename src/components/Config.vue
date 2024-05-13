@@ -35,6 +35,13 @@
 </template>
 
 <script setup>
+import { useCounterStore } from '@/stores/counter'
+
+// access the `store` variable anywhere in the component ✨
+const store = useCounterStore();
+setTimeout(() => {
+  store.increment()
+}, 1000)
 </script>
 <script>
 export default {
