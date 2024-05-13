@@ -6,15 +6,18 @@ import FixTableTimeline from './components/FixTableTimeline.vue'
   <header>
 
     <div class="wrapper">
-<!--       <MyCalendar  :currentDate='new Date("2023-11-01")'></MyCalendar>
-      <MyCalendar  :currentDate='new Date("2023-12-01")'></MyCalendar>
-      <MyCalendar  :currentDate='new Date("2024-01-01")'></MyCalendar> -->
-	
+      <div>
+        <router-link to="/">Table</router-link>
+        <router-link to="/timeline">Time</router-link>
+        <a>Grid</a><a>List</a><a>Card</a>
+      </div>
     </div>
   </header>
 
-  <main>
-    <router-view></router-view>
+  <main style="position: relative;
+    flex-grow: 1;">
+
+      <router-view></router-view>
   </main>
 </template>
 

@@ -1,7 +1,7 @@
 <template>
 
   <div style="
-      position: fixed;
+      position: absolute;
       top: 0;
       bottom: 0;
       overflow: auto;
@@ -22,12 +22,7 @@
           <input />
         </div>
       </div>
-      <div>
-        <div>
-          <router-link to="/">Form</router-link>
-          <router-link to="/timeline">Timeline</router-link>
-          <a>Grid</a><a>List</a><a>Card</a></div>
-      </div>
+
 
 
     </div>

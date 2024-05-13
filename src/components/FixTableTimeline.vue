@@ -1,7 +1,7 @@
 <template>
 
   <div style="
-      position: fixed;
+      position: absolute;
       top: 0;
       bottom: 0;
       overflow: auto;
@@ -22,12 +22,7 @@
           <input />
         </div>
       </div>
-      <div>
-        <div>
-          <router-link to="/">Form</router-link>
-          <router-link to="/timeline">Timeline</router-link>
-          <a>Grid</a><a>List</a><a>Card</a></div>
-      </div>
+
 
 
     </div>
@@ -39,10 +34,8 @@
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <template v-for="(col, key) in cols.filter(e=>e.show&& e.cp=='ColTitle')" :key="key">
-              <th ref="th" :style="colStyle(col,1)"
-                :class="{sticky:col.sticky}"
-                v-if="col.show">
+            <template v-for="(col, key) in cols.filter(e => e.show && e.cp == 'ColTitle')" :key="key">
+              <th ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
                 <div class="cell">
                   <component :is="col.cp" :col="col"></component>
                 </div>
@@ -84,10 +77,9 @@
                 :class="{ curRow: selectRow == row }">
                 {{ row._rIndex + 1 }}
               </th>
-              <template v-for="(col, cellIndex) in cols.filter(e => e.show&& e.cp=='ColTitle')" :key="cellIndex">
-                <td :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1,col)"
-                :style="colStyle(col)"
-                  @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+              <template v-for="(col, cellIndex) in cols.filter(e => e.show && e.cp == 'ColTitle')" :key="cellIndex">
+                <td :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
+                  :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                   <div class="cell">
                     <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
                   </div>
@@ -239,11 +231,11 @@ export default {
         const table = this.$refs.table;
         for (let i = minRowIndex; i <= maxRowIndex; i++) {
           let row = table.rows[i];
-          if(row.style.display === 'none')continue;
+          if (row.style.display === 'none') continue;
           let rowDatas = [];
           for (let j = mincellIndex; j <= maxcellIndex; j++) {
             let cell = row.cells[j];
-            rowDatas.push(this.containsBlockElement(cell.querySelector("[contenteditable]"))?cell.querySelector("[contenteditable]").innerText:cell.querySelector("[contenteditable]").innerHTML);
+            rowDatas.push(this.containsBlockElement(cell.querySelector("[contenteditable]")) ? cell.querySelector("[contenteditable]").innerText : cell.querySelector("[contenteditable]").innerHTML);
           }
           copyTblData.push(rowDatas);
         }
@@ -290,67 +282,67 @@ export default {
 
   },
   methods: {
-    colStyle(col,isH){
+    colStyle(col, isH) {
       let style = { minWidth: col.width + 'px', width: col.width + 'px', maxWidth: col.width + 'px' };;
-      if(col.sticky){
-        style.left="46px";
-        style.zIndex=isH?4:3
+      if (col.sticky) {
+        style.left = "46px";
+        style.zIndex = isH ? 4 : 3
       }
       return style;
     },
-     getScrollbarWidth() {
-  // Create a div element
-  var div = document.createElement('div');
+    getScrollbarWidth() {
+      // Create a div element
+      var div = document.createElement('div');
 
-  // Set the styles for the div element
-  div.style.width = '100px';
-  div.style.height = '100px';
-  div.style.overflow = 'scroll';
-  div.style.position = 'absolute';
-  div.style.top = '-9999px';
+      // Set the styles for the div element
+      div.style.width = '100px';
+      div.style.height = '100px';
+      div.style.overflow = 'scroll';
+      div.style.position = 'absolute';
+      div.style.top = '-9999px';
 
-  // Append the div element to the document body
-  document.body.appendChild(div);
+      // Append the div element to the document body
+      document.body.appendChild(div);
 
-  // Calculate the scrollbar width
-  var scrollbarWidth = div.offsetWidth - div.clientWidth;
+      // Calculate the scrollbar width
+      var scrollbarWidth = div.offsetWidth - div.clientWidth;
 
-  // Remove the div element from the document body
-  document.body.removeChild(div);
+      // Remove the div element from the document body
+      document.body.removeChild(div);
 
-  // Return the scrollbar width
-  return scrollbarWidth;
-},
-    winResize(){
-      if(this.config.fix){
-          let showCols = this.cols.filter(e=>e.show);
-        let totalWidth = showCols.reduce((total,col)=>total+col.width,0);
+      // Return the scrollbar width
+      return scrollbarWidth;
+    },
+    winResize() {
+      if (this.config.fix) {
+        let showCols = this.cols.filter(e => e.show);
+        let totalWidth = showCols.reduce((total, col) => total + col.width, 0);
 
-        let share = (window.innerWidth-46-showCols.length- 2 - this.getScrollbarWidth())/totalWidth;
-        showCols.forEach((col)=>{
-          col.width=col.width*share;
+        let share = (window.innerWidth - 46 - showCols.length - 2 - this.getScrollbarWidth()) / totalWidth;
+        showCols.forEach((col) => {
+          col.width = col.width * share;
         });
       }
 
-      
-    },
-     containsBlockElement(element) {
-  // Get all child elements of the given element
-  const childElements = element.getElementsByTagName('*');
 
-  // Iterate through the child elements
-  for (let i = 0; i < childElements.length; i++) {
-    const childElement = childElements[i];
-    
-    // Check if the child element is a block-level element
-    if (getComputedStyle(childElement).display === 'block') {
-      return true;
-    }
-  }
-  
-  // No block-level elements found
-  return false;
-},
+    },
+    containsBlockElement(element) {
+      // Get all child elements of the given element
+      const childElements = element.getElementsByTagName('*');
+
+      // Iterate through the child elements
+      for (let i = 0; i < childElements.length; i++) {
+        const childElement = childElements[i];
+
+        // Check if the child element is a block-level element
+        if (getComputedStyle(childElement).display === 'block') {
+          return true;
+        }
+      }
+
+      // No block-level elements found
+      return false;
+    },
     copyTableToExcel(data) {
 
 
@@ -397,7 +389,7 @@ export default {
 
 
 
-    cellClass(rowIndex, cellIndex,col) {
+    cellClass(rowIndex, cellIndex, col) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
       const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
       const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
@@ -409,7 +401,7 @@ export default {
         right: selected && cellIndex == maxcellIndex || mincellIndex - 1 == cellIndex && (rowIndex >= minRowIndex && rowIndex <= maxRowIndex),
         top: selected && rowIndex == minRowIndex,
         bottom: selected && rowIndex == maxRowIndex,
-        sticky:col.sticky
+        sticky: col.sticky
       };
     },
     handleMouseDown(event) {
@@ -1049,12 +1041,14 @@ td.bottom {
 .wholeRowSelected td {
   background-color: #E0EEE0 !important
 }
-.sticky{
+
+.sticky {
   position: sticky;
   z-index: 3;
   background: white;
 }
-.cell{
+
+.cell {
   line-height: 2em;
 }
 </style>
