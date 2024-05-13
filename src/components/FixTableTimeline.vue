@@ -35,7 +35,7 @@
       <div class="vue-columns-resizable" style="position: relative;">
         <template v-for="(col, key) in cols.filter(e => e.show)" :key="key">
           <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
-            style=" position: absolute; top: 0px;  width: 8px; cursor: col-resize; z-index: 3;"
+            style=" position: absolute; top: 0px;  width: 2px; cursor: col-resize; z-index: 3;"
             :style="{ height: tableHeight + 'px' }"></div>
         </template>
       </div>
@@ -403,7 +403,7 @@ export default {
       console.log('resize')
       console.log('resize')
       for (let i = 0; i < this.$refs.rbar.length; i++) {
-        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - 4 + 'px';
+        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth/2 + 'px';
 
       }
     },
@@ -418,7 +418,7 @@ export default {
         this.resizeColumn.width = width;
         this.$refs.th[i].style.width = width + 'px';
         let j = i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - 4 + 'px';
+        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth/2 + 'px';
         let lastColIndex = this.$refs.th.length-1;
         if(this.config.fix&&i<lastColIndex){
           let lastWidth = this.resizeLastColumnWidth -(event.x - this.resizeX);
