@@ -34,21 +34,12 @@
     <div class="table-container" style="    flex-grow: 1;
     overflow: auto;">
 
-
-      <div class="vue-columns-resizable" style="position: relative;">
-        <template v-for="(col, key) in cols.filter(e => e.show)" :key="key">
-          <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
-            style=" position: absolute; top: 0px;  width: 2px; cursor: col-resize; z-index: 3;"
-            :style="{ height: tableHeight + 'px' }"></div>
-        </template>
-      </div>
-
       <table ref="table" @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
 
         <thead>
           <tr>
             <th freeze="1" style="min-width: 46px;max-width: 46px;">#</th>
-            <template v-for="(col, key) in cols" :key="key">
+            <template v-for="(col, key) in cols.filter(e=>e.show&& e.cp=='ColTitle')" :key="key">
               <th ref="th" :style="colStyle(col,1)"
                 :class="{sticky:col.sticky}"
                 v-if="col.show">
@@ -93,7 +84,7 @@
                 :class="{ curRow: selectRow == row }">
                 {{ row._rIndex + 1 }}
               </th>
-              <template v-for="(col, cellIndex) in cols.filter(e => e.show)" :key="cellIndex">
+              <template v-for="(col, cellIndex) in cols.filter(e => e.show&& e.cp=='ColTitle')" :key="cellIndex">
                 <td :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1,col)"
                 :style="colStyle(col)"
                   @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
@@ -267,15 +258,7 @@ export default {
     window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
 
-    document.body.addEventListener('mousemove', this.throttleHandleResize);
-    document.body.addEventListener('mouseup', this.resizeBarMouseUp);
 
-
-    window.addEventListener('resize', () =>{
-      
-        this.winResize();
-    });
-    this.winResize();
 
     const table = this.$refs.table;
     this.tableHeight = table.offsetHeight;
@@ -348,7 +331,6 @@ export default {
           col.width=col.width*share;
         });
       }
-      this.$nextTick(()=>{this.resize();});
 
       
     },
@@ -412,67 +394,8 @@ export default {
         console.error('Clipboard API is not supported in this browser.');
       }
     },
-    resize() {
-      console.log('resize')
-      console.log('resize')
-      for (let i = 0; i < this.$refs.rbar.length; i++) {
-        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth/2 + 'px';
-
-      }
-    },
-    throttleHandleResize(event){
-      //clearTimeout(this.throttleTimeout);
-      //this.throttleTimeout=setTimeout(()=>{
-        this.handleResize(event);
-      //},10);
-    },
-    handleResize(event) {
-      console.log('handleResize')
-      if (this.resizeColumn) {
-        let i = this.resizeColumnIndex;
-
-        //let width = this.$refs.th[i].offsetWidth +  event.movementX;
-        let width = this.resizeColumnWidth + event.x - this.resizeX;
-        console.log(this.$refs.th[i].offsetWidth, event.movementX, width);
-        this.resizeColumn.width = width;
-        this.$refs.th[i].style.width = width + 'px';
-        let j = i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth/2 + 'px';
-        let lastColIndex = this.$refs.th.length-1;
-        if(this.config.fix&&i<lastColIndex){
-          let lastWidth = this.resizeLastColumnWidth -(event.x - this.resizeX);
-          this.cols.filter(e => e.show)[lastColIndex].width =lastWidth;
-          this.$refs.th[lastColIndex].style.width = lastWidth+'px';
-        }
-
-      }
-
-    },
-    resizeBarMouseDown(col, colIndex, event) {
-      console.log('resizeBarMouseDown')
-      console.log(col)
-      this.resizeColumn = col;
-      this.resizeColumnIndex = colIndex;
-      this.resizeX = event.x;
-      this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
-      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length-1].offsetWidth;
 
 
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      console.log(event)
-
-    },
-    resizeBarMouseUp() {
-      console.log('resizeBarMouseUp')
-      if (this.resizeColumn) {
-        this.resize();
-        this.saveData();
-      }
-      this.resizeColumn = 0;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    },
 
     cellClass(rowIndex, cellIndex,col) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);

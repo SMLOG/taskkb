@@ -57,31 +57,6 @@
                 </div>
               </th>
             </template>
-            <th :colspan="7 * weeks.length" v-if="config.showSch">
-              <div style="display: flex; flex-wrap: nowrap">
-                <div v-for="week in weeks" :key="week" class="week-slot">
-                  <div>
-                    {{
-                      formatDate(week.start, {
-                        month: "short",
-                        year: "2-digit",
-                      })
-                    }}
-                  </div>
-                  <div style="display: flex; justify-content: space-between">
-                    <span style="margin: 0 10px" :style="{
-                      backgroundColor: isToday(day)
-                        ? 'red'
-                        : isWeekend(day)
-                          ? 'gray'
-                          : 'none',
-                    }" v-for="day in getDatesBetween(week.start, week.end)" :key="day">
-                      {{ formatDate(day, { day: "2-digit" }) }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </th>
           </tr>
         </thead>
         <tbody>
@@ -102,37 +77,6 @@
                   </div>
                 </td>
               </template>
-              <td :colspan="7 * weeks.length" v-if="config.showSch">
-                <div style="display: flex; flex-wrap: nowrap" class="sch">
-                  <div v-for="week in weeks" :key="week" class="week-slot"
-                    :style="{ width: (1 / weeks.length) * 100 + '%' }">
-                    <div style="
-                      display: flex;
-                      justify-content: space-between;
-                      min-height: 1em;
-                    ">
-                      <div style="flex-grow: 1" v-for="day in getDatesBetween(week.start, week.end)" :key="day" :class="{
-                        selected: isDateInRange(day, row._sch),
-                        drag:
-                          selectStart &&
-                          selectStart.row == row &&
-                          selectStart.type == 1,
-                        selectStart:
-                          selectStart &&
-                          selectStart.row == row &&
-                          (selectStart.start.getTime() == day.getTime() ||
-                            (selectStart.end != null &&
-                              isDateInRange2(
-                                day,
-                                selectStart.end,
-                                selectStart.start
-                              ))),
-                      }" @click="clickSch(row, day)" @mouseenter="enterSch(row, day)"
-                        @mousedown.left="mouseDownSch(row, day)"></div>
-                    </div>
-                  </div>
-                </div>
-              </td>
             </tr>
           </template>
         </tbody>
