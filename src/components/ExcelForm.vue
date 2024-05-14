@@ -1073,4 +1073,5 @@ td.bottom {
 .cell{
   line-height: 1.6em;
 }
+td{position: relative;}
 </style>

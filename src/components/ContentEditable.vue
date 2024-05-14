@@ -10,7 +10,7 @@
         <span>T</span>
       </div>
     </div>
-    <div v-show="showDropdown && !isText && dropdownItems" class="dropdown">
+    <div v-show="showDropdown && !isText && dropdownItems&&dropdownItems.length" class="dropdown">
       <ul>
         <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
           {{ item }}
@@ -18,6 +18,7 @@
       </ul>
     </div>
   </div>
+  <div style="position:absolute;inset: 0;z-index: -1;" @dblclick="dblclick()"></div>
 </template>
 
 <script>
@@ -39,6 +40,7 @@ export default {
   components: {
     FormatTool
   },
+  emits: ["change"],
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
       this.$refs.contentEditable.focus();
