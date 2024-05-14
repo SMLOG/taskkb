@@ -922,7 +922,7 @@ table {
 
 th,
 td {
-  border: 1px solid #ddd;
+  border: 1px solid #e4e7e7;
   padding: 0;
   min-height: 1em;
 }
@@ -1071,6 +1071,6 @@ td.bottom {
   background: white;
 }
 .cell{
-  line-height: 2em;
+  line-height: 1.6em;
 }
 </style>
