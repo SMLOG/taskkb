@@ -40,7 +40,7 @@ export default {
   components: {
     FormatTool
   },
-  emits: ["change"],
+  emits: ["change",'update:modelValue'],
   mounted() {
     if (this.editing && this.$refs.contentEditable) {
       this.$refs.contentEditable.focus();

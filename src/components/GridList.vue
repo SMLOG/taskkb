@@ -1,18 +1,9 @@
 <template>
 
-  <div style="
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      overflow: auto;
-      right: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
-    ">
+  <div class="grid-wrap">
 
     <div class="table-container" style="    flex-grow: 1;
-    overflow: auto;">
+    overflow: auto;" :style="{overflowX:config.fix?'hidden':'auto'}">
 
 
       <div class="vue-columns-resizable" style="position: relative;">
@@ -23,10 +14,10 @@
         </template>
       </div>
 
-      <div ref="table" @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+      <div style="display: grid;grid-template-columns: 1fr;"  ref="table" @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
 
-          <div class="row header">
-            <div class="th" freeze="1" style="min-width: 46px;max-width: 46px;">#</div>
+          <div class="row header" >
+            <div class="th col" freeze="1" >#</div>
             <template v-for="(col, key) in cols" :key="key">
               <div class="col" ref="th" :style="colStyle(col,1)"
                 :class="{sticky:col.sticky}"
@@ -38,27 +29,25 @@
             </template>
           </div>
    
-        <tbody>
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-            <tr v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
+            <div class="row" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
               @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-              <th :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
+              <div class="col" :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
                 @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
                 :class="{ curRow: selectRow == row }">
                 {{ row._rIndex + 1 }}
-              </th>
+          </div>
               <template v-for="(col, cellIndex) in cols.filter(e => e.show)" :key="cellIndex">
-                <td :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1,col)"
+                <div class="col" :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1,col)"
                 :style="colStyle(col)"
                   @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                   <div class="cell">
                     <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
                   </div>
-                </td>
+                </div>
               </template>
-            </tr>
+            </div>
           </template>
-        </tbody>
       </div>
     </div>
     <div style="
@@ -1058,4 +1047,21 @@ td.bottom {
   line-height: 1.6em;
 }
 td{position: relative;}
+
+.grid-wrap{
+  position: absolute;
+      top: 0;
+      bottom: 0;
+      overflow: auto;
+      right: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+}
+.row{
+  display: grid;grid-template-columns:repeat(4, 1fr);
+}
+.col {
+  border: 1px solid #ccc; 
+}
 </style>
