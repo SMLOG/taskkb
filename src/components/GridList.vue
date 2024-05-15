@@ -976,7 +976,7 @@ td {
 }
 
 .selected {
-  background-color: #F0FFF0;
+  background-color: #F0FFF0!important;
 }
 
 .sch .selected {
@@ -1048,6 +1048,7 @@ td {
   z-index: var(--vt-index-sticky);
   left:0;
   background: white;
+  text-align: center;
 
 }
 .cell {
