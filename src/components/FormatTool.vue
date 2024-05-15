@@ -1,10 +1,8 @@
 <template>
-  <div style="position: relative;width:100%">
-    <div ref="container" @mouseup="checkSelection">
-      <slot></slot>
-    </div>
-
-    <div id="formatTool" v-if="isFormatToolVisible && editable" :style="{ left: formatToolLeft, top: formatToolTop }">
+  <div @mouseup="checkSelection">
+  <slot ></slot>
+</div>
+  <div id="formatTool" v-show="isFormatToolVisible " :style="{ left: formatToolLeft, top: formatToolTop }">
       <button @click="applyBold">{{isBoldNow?"Un":""}}Bold</button>
       <button class="indicative-element" ref="indicativeElement" @click.prevent.stop="toggleColorSelect" style="color:">
       Color
@@ -14,7 +12,6 @@
       </div>
       
     </div>
-  </div>
 </template>
 
 <script>
@@ -107,6 +104,7 @@ export default {
     checkSelection() {
       const selectedText = window.getSelection().toString();
       // const container = this.$refs.container;
+      console.log('checkSelection')
 
       if (selectedText.length > 0) {
         this.isFormatToolVisible = true;
@@ -142,7 +140,7 @@ export default {
 #formatTool {
   position: fixed;
   background-color: white;
-  z-index: 1;
+  z-index: var(--vt-index-tooltip);
   /* Define the position and style of the format tool */
 }
 </style>
