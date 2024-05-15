@@ -18,7 +18,7 @@
       </ul>
     </div>
   </div>
-  <div style="position:absolute;inset: 0;z-index: -1;" @dblclick="dblclick()"></div>
+  <div style="position:absolute;inset: 0;" @dblclick="dblclick()" v-if="!editable"></div>
 </template>
 
 <script>

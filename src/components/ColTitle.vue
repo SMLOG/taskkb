@@ -7,8 +7,9 @@
                     background: #aaa;
                     margin-right: 5px;
                     border-radius: 5px;
+                    
                   "></span>
-      <div style="margin-right:15px;" :level="row._level" :style="{ paddingLeft: row._level * 15 + 'px' }">
+      <div style="margin-right:15px;z-index: 1;" :level="row._level" :style="{ paddingLeft: row._level * 15 + 'px' }">
         <span >{{ row._id}}</span>
         <span @click="row._collapsed = !row._collapsed"
           :class="{ dot:!row._childs||!row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>

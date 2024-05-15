@@ -14,7 +14,7 @@
       <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
         @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
         <div class="row header" :style="{gridTemplateColumns: `repeat(${cols.length+1},1fr)`}">
-          <div class="th col" freeze="1">#</div>
+          <div class="th col lsticky" freeze="1" style="min-width: 46px;">#</div>
           <template v-for="(col, key) in cols" :key="key">
             <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
               <div class="cell">
@@ -26,7 +26,7 @@
         <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
           <div class="row" :style="{gridTemplateColumns: `repeat(${cols.length+1},1fr)`}" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
             @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-            <div class="col td" :draggable="true" @dragstart="dragstart($event, row)"
+            <div class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
               @click="clickSelectCell($event, rowIndex, row)"
               @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
               :class="{ curRow: selectRow == row }">
@@ -209,11 +209,10 @@ export default {
 
   },
   methods: {
-    colStyle(col, isH) {
+    colStyle(col) {
       let style = { minWidth: col.width + 'px', width: col.width + 'px', maxWidth: col.width + 'px' };;
       if (col.sticky) {
         style.left = "46px";
-        style.zIndex = isH ? 4 : 3
       }
       return style;
     },
@@ -908,7 +907,7 @@ tbody th {
   z-index: 2;
 }
 
-thead th {
+.th {
   position: sticky;
   top: 0;
   background-color: white;
@@ -1040,10 +1039,17 @@ td {
 
 .sticky {
   position: sticky;
-  z-index: 3;
+  z-index: var(--vt-index-sticky);
   background: white;
 }
 
+.lsticky{
+  position: sticky;
+  z-index: var(--vt-index-sticky);
+  left:0;
+  background: white;
+
+}
 .cell {
   line-height: 1.6em;
 }
@@ -1070,5 +1076,12 @@ td {
 
 .col {
   border: 1px solid #ccc;
+}
+.cell{height: 100%;position: relative;}
+.header{
+  position: sticky;
+  top:0;
+  z-index: var(--vt-index-sticky-header);
+  background-color: white
 }
 </style>
