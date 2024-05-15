@@ -5,7 +5,7 @@
     <div class="table-container" style="    flex-grow: 1;
     overflow: auto;" :style="{ overflowX: config.fix ? 'hidden' : 'auto' }">
       <div class="vue-columns-resizable" style="position: relative;">
-        <template v-for="(col, key) in cols.filter(e => e.show)" :key="key">
+        <template v-for="(col, key) in cols" :key="key">
           <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
             style=" position: absolute; top: 0px;  width: 2px; cursor: col-resize; z-index: 3;"
             :style="{ height: tableHeight + 'px' }"></div>
@@ -26,14 +26,14 @@
         <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
           <div class="row" :style="{gridTemplateColumns: `repeat(${cols.length+1},1fr)`}" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
             @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-            <div class="col" :draggable="true" @dragstart="dragstart($event, row)"
+            <div class="col td" :draggable="true" @dragstart="dragstart($event, row)"
               @click="clickSelectCell($event, rowIndex, row)"
               @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
               :class="{ curRow: selectRow == row }">
               {{ row._rIndex + 1 }}
             </div>
-            <template v-for="(col, cellIndex) in cols.filter(e => e.show)" :key="cellIndex">
-              <div class="col" :tabindex="100 * rowIndex + cellIndex"
+            <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+              <div class="col td" :data-row="rowIndex+1" :data-col="cellIndex+1" :tabindex="100 * rowIndex + cellIndex"
                 :class="cellClass(rowIndex + 1, cellIndex + 1, col)" :style="colStyle(col)"
                 @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                 <div class="cell">
@@ -242,7 +242,7 @@ export default {
     },
     winResize() {
       if (this.config.fix) {
-        let showCols = this.cols.filter(e => e.show);
+        let showCols = this.cols;
         let totalWidth = showCols.reduce((total, col) => total + col.width, 0);
 
         let share = (window.innerWidth - 46 - showCols.length - 2 - this.getScrollbarWidth()) / totalWidth;
@@ -343,7 +343,7 @@ export default {
         let lastColIndex = this.$refs.th.length - 1;
         if (this.config.fix && i < lastColIndex) {
           let lastWidth = this.resizeLastColumnWidth - (event.x - this.resizeX);
-          this.cols.filter(e => e.show)[lastColIndex].width = lastWidth;
+          this.cols[lastColIndex].width = lastWidth;
           this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
         }
 
@@ -394,7 +394,7 @@ export default {
     handleMouseDown(event) {
       console.log('mosuedown')
 
-      const cell = event.target.closest('td');
+      const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
         this.startcellIndex = -1;
@@ -410,16 +410,25 @@ export default {
       }
       event.preventDefault();
       this.isMouseDown = true;
-      this.startRowIndex = cell.parentNode.rowIndex;
-      this.startcellIndex = cell.cellIndex;
+
+      const rowIndex = parseInt(cell.getAttribute('data-row'));
+      const cellIndex = parseInt(cell.getAttribute('data-col'));
+
+      this.startRowIndex = rowIndex;
+      this.startcellIndex = cellIndex;
       this.endRowIndex = this.startRowIndex;
       this.endcellIndex = this.startcellIndex;
     },
     handleMouseMove(event) {
       if (this.isMouseDown) {
-        const cell = event.target.closest('td');
-        this.endRowIndex = cell.parentNode.rowIndex;
-        this.endcellIndex = cell.cellIndex;
+        const cell = event.target.closest('div.col');
+
+        
+      const rowIndex = parseInt(cell.getAttribute('data-row'));
+      const cellIndex = parseInt(cell.getAttribute('data-col'));
+
+        this.endRowIndex = rowIndex;
+        this.endcellIndex = cellIndex;
       }
     },
     handleMouseUp() {
@@ -988,19 +997,19 @@ td {
   margin: 0;
 }
 
-td.left {
+.td.left {
   border-left: 1px darkgreen solid;
 }
 
-td.right {
+.td.right {
   border-right: 1px darkgreen solid;
 }
 
-td.top {
+.td.top {
   border-top: 1px darkgreen solid;
 }
 
-td.bottom {
+.td.bottom {
   border-bottom: 1px darkgreen solid;
 }
 
