@@ -3,9 +3,7 @@
   <div class="grid-wrap">
 
     <div class="table-container" style="    flex-grow: 1;
-    overflow: auto;" :style="{overflowX:config.fix?'hidden':'auto'}">
-
-
+    overflow: auto;" :style="{ overflowX: config.fix ? 'hidden' : 'auto' }">
       <div class="vue-columns-resizable" style="position: relative;">
         <template v-for="(col, key) in cols.filter(e => e.show)" :key="key">
           <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
@@ -13,45 +11,41 @@
             :style="{ height: tableHeight + 'px' }"></div>
         </template>
       </div>
-
-      <div style="display: grid;grid-template-columns: 1fr;"  ref="table" @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-
-          <div class="row header" >
-            <div class="th col" freeze="1" >#</div>
-            <template v-for="(col, key) in cols" :key="key">
-              <div class="col" ref="th" :style="colStyle(col,1)"
-                :class="{sticky:col.sticky}"
-                v-if="col.show">
+      <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
+        @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+        <div class="row header" :style="{gridTemplateColumns: `repeat(${cols.length+1},1fr)`}">
+          <div class="th col" freeze="1">#</div>
+          <template v-for="(col, key) in cols" :key="key">
+            <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
+              <div class="cell">
+                <component :is="col.cp" :col="col"></component>
+              </div>
+            </div>
+          </template>
+        </div>
+        <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
+          <div class="row" :style="{gridTemplateColumns: `repeat(${cols.length+1},1fr)`}" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
+            @dragover="dragOver" @drop="drop($event, row, rowIndex)">
+            <div class="col" :draggable="true" @dragstart="dragstart($event, row)"
+              @click="clickSelectCell($event, rowIndex, row)"
+              @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
+              :class="{ curRow: selectRow == row }">
+              {{ row._rIndex + 1 }}
+            </div>
+            <template v-for="(col, cellIndex) in cols.filter(e => e.show)" :key="cellIndex">
+              <div class="col" :tabindex="100 * rowIndex + cellIndex"
+                :class="cellClass(rowIndex + 1, cellIndex + 1, col)" :style="colStyle(col)"
+                @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                 <div class="cell">
-                  <component :is="col.cp" :col="col"></component>
+                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
                 </div>
               </div>
             </template>
           </div>
-   
-          <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-            <div class="row" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
-              @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-              <div class="col" :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-                @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
-                :class="{ curRow: selectRow == row }">
-                {{ row._rIndex + 1 }}
-          </div>
-              <template v-for="(col, cellIndex) in cols.filter(e => e.show)" :key="cellIndex">
-                <div class="col" :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1,col)"
-                :style="colStyle(col)"
-                  @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
-                  <div class="cell">
-                    <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
-                  </div>
-                </div>
-              </template>
-            </div>
-          </template>
+        </template>
       </div>
     </div>
     <div style="
-        
         position: sticky;
         bottom: 0;
         left: 0;
@@ -72,7 +66,6 @@
     </div>
 
   </div>
-
   <!-- Context menu -->
   <div v-show="isContextMenuVisible" :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
     class="contextmenu">
@@ -87,11 +80,8 @@
 
 import Config from './Config.vue';
 
-
-
 </script>
 <script>
-
 const today = new Date();
 today.setHours(0, 0, 0, 0);
 const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
@@ -160,11 +150,11 @@ export default {
         const table = this.$refs.table;
         for (let i = minRowIndex; i <= maxRowIndex; i++) {
           let row = table.rows[i];
-          if(row.style.display === 'none')continue;
+          if (row.style.display === 'none') continue;
           let rowDatas = [];
           for (let j = mincellIndex; j <= maxcellIndex; j++) {
             let cell = row.cells[j];
-            rowDatas.push(this.containsBlockElement(cell.querySelector("[contenteditable]"))?cell.querySelector("[contenteditable]").innerText:cell.querySelector("[contenteditable]").innerHTML);
+            rowDatas.push(this.containsBlockElement(cell.querySelector("[contenteditable]")) ? cell.querySelector("[contenteditable]").innerText : cell.querySelector("[contenteditable]").innerHTML);
           }
           copyTblData.push(rowDatas);
         }
@@ -183,9 +173,9 @@ export default {
     document.body.addEventListener('mouseup', this.resizeBarMouseUp);
 
 
-    window.addEventListener('resize', () =>{
-      
-        this.winResize();
+    window.addEventListener('resize', () => {
+
+      this.winResize();
     });
     this.winResize();
 
@@ -208,7 +198,7 @@ export default {
   computed: {
     cols() {
       if (!this.config.cols) this.config.cols = [];
-      return this.config.cols;
+      return this.config.cols.filter(e => e.show);
     },
     currentCell() {
       return this.selectRow && this.selectCol ? this.selectRow['c' + this.selectCol.fn] : null;
@@ -219,68 +209,68 @@ export default {
 
   },
   methods: {
-    colStyle(col,isH){
+    colStyle(col, isH) {
       let style = { minWidth: col.width + 'px', width: col.width + 'px', maxWidth: col.width + 'px' };;
-      if(col.sticky){
-        style.left="46px";
-        style.zIndex=isH?4:3
+      if (col.sticky) {
+        style.left = "46px";
+        style.zIndex = isH ? 4 : 3
       }
       return style;
     },
-     getScrollbarWidth() {
-  // Create a div element
-  var div = document.createElement('div');
+    getScrollbarWidth() {
+      // Create a div element
+      var div = document.createElement('div');
 
-  // Set the styles for the div element
-  div.style.width = '100px';
-  div.style.height = '100px';
-  div.style.overflow = 'scroll';
-  div.style.position = 'absolute';
-  div.style.top = '-9999px';
+      // Set the styles for the div element
+      div.style.width = '100px';
+      div.style.height = '100px';
+      div.style.overflow = 'scroll';
+      div.style.position = 'absolute';
+      div.style.top = '-9999px';
 
-  // Append the div element to the document body
-  document.body.appendChild(div);
+      // Append the div element to the document body
+      document.body.appendChild(div);
 
-  // Calculate the scrollbar width
-  var scrollbarWidth = div.offsetWidth - div.clientWidth;
+      // Calculate the scrollbar width
+      var scrollbarWidth = div.offsetWidth - div.clientWidth;
 
-  // Remove the div element from the document body
-  document.body.removeChild(div);
+      // Remove the div element from the document body
+      document.body.removeChild(div);
 
-  // Return the scrollbar width
-  return scrollbarWidth;
-},
-    winResize(){
-      if(this.config.fix){
-          let showCols = this.cols.filter(e=>e.show);
-        let totalWidth = showCols.reduce((total,col)=>total+col.width,0);
+      // Return the scrollbar width
+      return scrollbarWidth;
+    },
+    winResize() {
+      if (this.config.fix) {
+        let showCols = this.cols.filter(e => e.show);
+        let totalWidth = showCols.reduce((total, col) => total + col.width, 0);
 
-        let share = (window.innerWidth-46-showCols.length- 2 - this.getScrollbarWidth())/totalWidth;
-        showCols.forEach((col)=>{
-          col.width=col.width*share;
+        let share = (window.innerWidth - 46 - showCols.length - 2 - this.getScrollbarWidth()) / totalWidth;
+        showCols.forEach((col) => {
+          col.width = col.width * share;
         });
       }
-      this.$nextTick(()=>{this.resize();});
+      this.$nextTick(() => { this.resize(); });
 
-      
+
     },
-     containsBlockElement(element) {
-  // Get all child elements of the given element
-  const childElements = element.getElementsByTagName('*');
+    containsBlockElement(element) {
+      // Get all child elements of the given element
+      const childElements = element.getElementsByTagName('*');
 
-  // Iterate through the child elements
-  for (let i = 0; i < childElements.length; i++) {
-    const childElement = childElements[i];
-    
-    // Check if the child element is a block-level element
-    if (getComputedStyle(childElement).display === 'block') {
-      return true;
-    }
-  }
-  
-  // No block-level elements found
-  return false;
-},
+      // Iterate through the child elements
+      for (let i = 0; i < childElements.length; i++) {
+        const childElement = childElements[i];
+
+        // Check if the child element is a block-level element
+        if (getComputedStyle(childElement).display === 'block') {
+          return true;
+        }
+      }
+
+      // No block-level elements found
+      return false;
+    },
     copyTableToExcel(data) {
 
 
@@ -328,14 +318,14 @@ export default {
       console.log('resize')
       console.log('resize')
       for (let i = 0; i < this.$refs.rbar.length; i++) {
-        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth/2 + 'px';
+        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
 
       }
     },
-    throttleHandleResize(event){
+    throttleHandleResize(event) {
       //clearTimeout(this.throttleTimeout);
       //this.throttleTimeout=setTimeout(()=>{
-        this.handleResize(event);
+      this.handleResize(event);
       //},10);
     },
     handleResize(event) {
@@ -349,12 +339,12 @@ export default {
         this.resizeColumn.width = width;
         this.$refs.th[i].style.width = width + 'px';
         let j = i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth/2 + 'px';
-        let lastColIndex = this.$refs.th.length-1;
-        if(this.config.fix&&i<lastColIndex){
-          let lastWidth = this.resizeLastColumnWidth -(event.x - this.resizeX);
-          this.cols.filter(e => e.show)[lastColIndex].width =lastWidth;
-          this.$refs.th[lastColIndex].style.width = lastWidth+'px';
+        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        let lastColIndex = this.$refs.th.length - 1;
+        if (this.config.fix && i < lastColIndex) {
+          let lastWidth = this.resizeLastColumnWidth - (event.x - this.resizeX);
+          this.cols.filter(e => e.show)[lastColIndex].width = lastWidth;
+          this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
         }
 
       }
@@ -367,7 +357,7 @@ export default {
       this.resizeColumnIndex = colIndex;
       this.resizeX = event.x;
       this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
-      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length-1].offsetWidth;
+      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length - 1].offsetWidth;
 
 
       document.body.style.cursor = 'col-resize';
@@ -386,7 +376,7 @@ export default {
       document.body.style.userSelect = '';
     },
 
-    cellClass(rowIndex, cellIndex,col) {
+    cellClass(rowIndex, cellIndex, col) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
       const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
       const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
@@ -398,7 +388,7 @@ export default {
         right: selected && cellIndex == maxcellIndex || mincellIndex - 1 == cellIndex && (rowIndex >= minRowIndex && rowIndex <= maxRowIndex),
         top: selected && rowIndex == minRowIndex,
         bottom: selected && rowIndex == maxRowIndex,
-        sticky:col.sticky
+        sticky: col.sticky
       };
     },
     handleMouseDown(event) {
@@ -987,7 +977,7 @@ td {
 
 .contextmenu {
   background: white;
-  z-index: 1;
+  z-index: var(--vt-index-contextmenu);
   position: fixed;
   border: 2px solid gray;
   border-radius: 5px;
@@ -1038,30 +1028,38 @@ td.bottom {
 .wholeRowSelected td {
   background-color: #E0EEE0 !important
 }
-.sticky{
+
+.sticky {
   position: sticky;
   z-index: 3;
   background: white;
 }
-.cell{
+
+.cell {
   line-height: 1.6em;
 }
-td{position: relative;}
 
-.grid-wrap{
+td {
+  position: relative;
+}
+
+.grid-wrap {
   position: absolute;
-      top: 0;
-      bottom: 0;
-      overflow: auto;
-      right: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
+  top: 0;
+  bottom: 0;
+  overflow: auto;
+  right: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
 }
-.row{
-  display: grid;grid-template-columns:repeat(4, 1fr);
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
 }
+
 .col {
-  border: 1px solid #ccc; 
+  border: 1px solid #ccc;
 }
 </style>
