@@ -7,7 +7,7 @@
       <div class="vue-columns-resizable" style="position: relative;">
         <template v-for="(col, key) in cols" :key="key">
           <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
-            style=" position: absolute; top: 0px;  width: 2px; cursor: col-resize; z-index: 3;"
+            style=" position: absolute; top: 0px;  width: 4px; cursor: col-resize; z-index: 3;"
             :style="{ height: tableHeight + 'px' }"></div>
         </template>
       </div>
@@ -16,7 +16,7 @@
         <div class="row header" :style="{gridTemplateColumns: gridColumns()}">
           <div class="th col lsticky" freeze="1" style="min-width: 46px;">#</div>
           <template v-for="(col, key) in cols" :key="key">
-            <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
+            <div class="col" ref="th"  :data-row="0" :data-col="key+1"    :class="cellClass(0, key+1, col)" v-if="col.show">
               <div class="cell">
                 <component :is="col.cp" :col="col"></component>
               </div>
@@ -26,15 +26,15 @@
         <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
           <div class="row" :style="{gridTemplateColumns: gridColumns()}" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
             @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-            <div class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
+            <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
               @click="clickSelectCell($event, rowIndex, row)"
               @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
               :class="{ curRow: selectRow == row }">
               {{ row._rIndex + 1 }}
-            </div>
+        </a>
             <template v-for="(col, cellIndex) in cols" :key="cellIndex">
               <div class="col td" :data-row="rowIndex+1" :data-col="cellIndex+1" :tabindex="100 * rowIndex + cellIndex"
-                :class="cellClass(rowIndex + 1, cellIndex + 1, col)" :style="colStyle(col)"
+                :class="cellClass(rowIndex + 1, cellIndex + 1, col)" 
                 @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                 <div class="cell">
                   <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
@@ -127,10 +127,10 @@ export default {
       selectCol: null,
 
       isMouseDown: false,
-      startRowIndex: null,
-      startcellIndex: null,
-      endRowIndex: null,
-      endcellIndex: null,
+      startRowIndex: -1,
+      startcellIndex: -1,
+      endRowIndex: -1,
+      endcellIndex: -1,
       wholeRowSelected: false,
       selectWholeRowIndex: null,
     };
@@ -213,13 +213,7 @@ export default {
       
       return ' 46px ' +this.cols.map(e=>e.width+'px').join(' ');
     },
-    colStyle(col) {
-      let style = {  width: col.width + 'px' };;
-      if (col.sticky) {
-        style.left = "46px";
-      }
-      return style;
-    },
+
     getScrollbarWidth() {
       // Create a div element
       var div = document.createElement('div');
@@ -340,14 +334,14 @@ export default {
         let width = this.resizeColumnWidth + event.x - this.resizeX;
         console.log(this.$refs.th[i].offsetWidth, event.movementX, width);
         this.resizeColumn.width = width;
-        this.$refs.th[i].style.width = width + 'px';
+        //this.$refs.th[i].style.width = width + 'px';
         let j = i;
         this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         let lastColIndex = this.$refs.th.length - 1;
         if (this.config.fix && i < lastColIndex) {
           let lastWidth = this.resizeLastColumnWidth - (event.x - this.resizeX);
           this.cols[lastColIndex].width = lastWidth;
-          this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
+          //this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
         }
 
       }
@@ -755,20 +749,20 @@ td {
   margin: 0;
 }
 
-.td.left {
-  border-left: 1px darkgreen solid;
+.left {
+  border-left: 1px darkgreen solid!important;
 }
 
-.td.right {
-  border-right: 1px darkgreen solid;
+.right {
+  border-right: 1px darkgreen solid!important;
 }
 
-.td.top {
-  border-top: 1px darkgreen solid;
+.top {
+  border-top: 1px darkgreen solid!important;
 }
 
-.td.bottom {
-  border-bottom: 1px darkgreen solid;
+.bottom {
+  border-bottom: 1px darkgreen solid!important;;
 }
 
 .filterSearch {
@@ -811,7 +805,7 @@ td {
 
 }
 .cell {
-  line-height: 1.6em;
+  line-height: 2em;
 }
 
 td {
@@ -837,7 +831,7 @@ td {
 .col {
   border: 1px solid #ccc;
 }
-.cell{height: 100%;position: relative;}
+.cell{height: 100%;position: relative;padding:0 2px;}
 .header{
   position: sticky;
   top:0;

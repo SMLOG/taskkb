@@ -79,7 +79,7 @@ export default {
       for (var i = 0; i < links.length; i++) {
         links[i].setAttribute('target', '_blank');
       }
-  return tempElement.firstChild&&tempElement.firstChild.nodeName=='P'?tempElement.firstChild.innerHTML:tempElement.innerHTML.replace(/>\n/g,'>');
+  return tempElement.innerHTML.replaceAll(/<\/?p>/g,'').replace(/>\n/g,'>');
 
     },
    isHTMLSegment(string) {
@@ -209,6 +209,7 @@ export default {
 .editable-dropdown {
   position: relative;
   display: inline-block;
+  z-index: 2;
 }
 
 .editable-dropdown .dropdown {

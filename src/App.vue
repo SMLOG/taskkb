@@ -7,7 +7,8 @@ import FixTableTimeline from './components/FixTableTimeline.vue'
 
     <div class="wrapper">
       <div>
-        <router-link to="/">Table</router-link>
+        <router-link to="/excel">Table</router-link>
+        <router-link to="/">Grid</router-link>
         <router-link to="/timeline">Time</router-link>
         <a>Grid</a><a>List</a><a>Card</a>
       </div>
