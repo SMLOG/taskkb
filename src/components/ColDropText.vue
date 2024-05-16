@@ -4,7 +4,7 @@
     <ContentEditable v-model="row['c'+col.fn]"  :dropdownItems="col.options&&col.options.split(',')" @change="change" ></ContentEditable>
   </div>
   <div v-else-if="col">
-    <ContentEditable v-model="col.name"   :isText="true"  ></ContentEditable>
+    <ContentEditable v-model="col.name"  ></ContentEditable>
   </div>
 </template>
 

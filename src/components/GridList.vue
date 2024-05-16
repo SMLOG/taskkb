@@ -83,8 +83,7 @@ import Config from './Config.vue';
 import FormatTool from "./FormatTool.vue";
 </script>
 <script>
-const today = new Date();
-today.setHours(0, 0, 0, 0);
+
 const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
 function loopToSetDate(row) {
   if (row._sch) for (let peroid of row._sch) {
@@ -390,7 +389,7 @@ export default {
     },
     handleMouseDown(event) {
       console.log('mosuedown')
-
+      this.selectWholeRowIndex=null;
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
@@ -786,7 +785,7 @@ td {
 }
 
 .curRow,
-.wholeRowSelected td {
+.wholeRowSelected > div {
   background-color: #E0EEE0 !important
 }
 

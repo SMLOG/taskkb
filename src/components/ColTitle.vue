@@ -20,7 +20,7 @@
 
   </div>
   <div v-else>
-    <ContentEditable v-model="col.name" :isText="true"></ContentEditable>
+    <ContentEditable v-model="col.name" ></ContentEditable>
   </div>
 </template>
 
