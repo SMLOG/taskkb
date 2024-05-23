@@ -1,5 +1,5 @@
 <template>
-  <div class="editable-dropdown " ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
+  <div class="editable-dropdown " :style="{zIndex:showDropdown?3:2}" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
     <div style="display: flex;    justify-content: space-between;">
       <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste($event)"  @keydown.enter.prevent="handleEnter"
         @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
