@@ -51,13 +51,13 @@
                     }}
                   </div>
                   <div style="display: flex; justify-content: space-between">
-                    <span style="margin: 0 10px" :style="{
+                    <span v-for="day in getDatesBetween(week.start, week.end)" :key="day" style="margin: 0 10px" :style="{
                       backgroundColor: isToday(day)
                         ? 'red'
                         : isWeekend(day)
                           ? 'gray'
                           : 'none',
-                    }" v-for="day in getDatesBetween(week.start, week.end)" :key="day">
+                    }" >
                       {{ formatDate(day, { day: "2-digit" }) }}
                     </span>
                   </div>
@@ -841,6 +841,12 @@ export default {
         return false;
       }
     },
+     getDateAsInteger(dateObj) {
+  let year = dateObj.getFullYear();
+  let month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  let day = String(dateObj.getDate()).padStart(2, '0');
+  return parseInt(`${year}${month}${day}`, 10);
+},
     generateWeeks(startDate, n = 10) {
       const weeks = [];
       let startOfWeek = new Date(startDate);
@@ -856,6 +862,8 @@ export default {
         weeks.push({
           start: new Date(startOfWeek),
           end: new Date(endOfWeek),
+          startn:this.getDateAsInteger(startOfWeek),
+          endn:this.getDateAsInteger(endOfWeek)
         });
 
         startOfWeek.setDate(startOfWeek.getDate() + 7);
