@@ -20,7 +20,7 @@
   --vt-c-text-dark-1: var(--vt-c-white);
   --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
   --vt-index-contextmenu:4;
-  --vt-index-sticky-header:3;
+  --vt-index-sticky-header:5;
   --vt-index-sticky:2;
   --vt-index-tooltip:6;
 }
