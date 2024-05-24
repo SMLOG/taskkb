@@ -89,6 +89,7 @@
                       display: flex;
                       justify-content: space-between;
                       min-height: 1em;
+                      height: 100%;
                     ">
                       <div style="flex-grow: 1" v-for="day in getDatesBetween(week.start, week.end)" :key="day" :class="{
                         selected: isDateInRange(day, row._sch),
@@ -1055,6 +1056,7 @@ td.bottom {
 }
 .col {
   border: 1px solid #ccc;
+  position: relative;
 }
 .header{
   position: sticky;
@@ -1079,4 +1081,5 @@ td.bottom {
 .cell {
   line-height: 2em;
 }
+.sch{height: 100%;}
 </style>
