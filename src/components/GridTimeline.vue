@@ -10,22 +10,6 @@
       display: flex;
       flex-direction: column;
     ">
-    <div style="display: flex;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    width: 100%;
-    top: 0;
-    left: 0; line-height: 1.5em;">
-      <div style="display: flex;">
-        <a>All</a>
-        <div style="position: relative;" class="filterSearch">
-          <input />
-        </div>
-      </div>
-
-
-
-    </div>
     <div class="table-container" style="flex-grow: 1;">
 
       <div ref="table" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
@@ -159,8 +143,11 @@ today.setHours(0, 0, 0, 0);
 const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
 function loopToSetDate(row) {
   if (row._sch) for (let peroid of row._sch) {
-    peroid.start = new Date(peroid.start);
-    peroid.end = new Date(peroid.end);
+    if(peroid.start.date){
+      peroid.start.date = new Date(peroid.start.date);
+      peroid.end.date = new Date(peroid.end.date);
+    }
+
   }
   if (row._childs) {
     for (let ch of row._childs) {
