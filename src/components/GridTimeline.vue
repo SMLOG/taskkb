@@ -47,13 +47,13 @@
                   </div>
                   <div style="display: flex; justify-content: space-between">
                     <span v-for="day in week.dates" :key="day" style="margin: 0 10px" :style="{
-                      backgroundColor: isToday(day)
+                      backgroundColor:day.isCur
                         ? 'red'
-                        : isWeekend(day)
+                        : day.isWeekend
                           ? 'gray'
                           : 'none',
                     }" >
-                      {{ formatDate(day, { day: "2-digit" }) }}
+                      {{ day.label }}
                     </span>
                   </div>
                 </div>
@@ -95,7 +95,7 @@
                         selectStart:
                           selectStart &&
                           selectStart.row == row &&
-                          (selectStart.start.getTime() == day.getTime() ||
+                          (selectStart.start.n == day.n ||
                             (selectStart.end != null &&
                               isDateInRange2(
                                 day,
@@ -656,7 +656,7 @@ export default {
         } else {
           if (
             !this.selectStart.end ||
-            date.getTime() != this.selectStart.end.getTime()
+            date.n != this.selectStart.end.n
           ) {
             this.selectStart.end = date;
           }
@@ -731,6 +731,7 @@ export default {
         this.selectStart = { type: 2, row: row, start: date };
       else if (this.selectStart.row == row) {
         if (!row._sch) row._sch = [];
+        row._sch.length=0;
         this.addDatePeriod(row._sch, {
           start: this.selectStart.start,
           end: date,
@@ -742,11 +743,11 @@ export default {
       if (addPeriod) {
         let newPeriod = {
           start:
-            addPeriod.start.getTime() > addPeriod.end.getTime()
+            addPeriod.start.n > addPeriod.end.n
               ? addPeriod.end
               : addPeriod.start,
           end:
-            addPeriod.start.getTime() < addPeriod.end.getTime()
+            addPeriod.start.n < addPeriod.end.n
               ? addPeriod.end
               : addPeriod.start,
         };
@@ -760,18 +761,18 @@ export default {
       for (const period of mergedPeriods) {
         if (
           removeOldPeriod &&
-          removeOldPeriod.start.getTime() == period.start.getTime()
+          removeOldPeriod.start.n == period.start.n
         )
           continue;
         if (
           updatedMerged.length === 0 ||
-          period.start.getTime() - updatedMerged[updatedMerged.length - 1].end.getTime() > 24 * 3600 * 1000
+          period.start.n - updatedMerged[updatedMerged.length - 1].end.n > 24 * 3600 * 1000
         ) {
           // If no overlap, add the current period as a new merged period
           updatedMerged.push(period);
         } else {
           // If overlap or adjacent, update the end date of the last merged period
-          updatedMerged[updatedMerged.length - 1].end = period.end.getTime() > updatedMerged[updatedMerged.length - 1].end.getTime() ? period.end : updatedMerged[updatedMerged.length - 1].end;
+          updatedMerged[updatedMerged.length - 1].end = period.end.n > updatedMerged[updatedMerged.length - 1].end.n ? period.end : updatedMerged[updatedMerged.length - 1].end;
         }
       }
 
@@ -784,9 +785,9 @@ export default {
 
     isDateInRange2(targetDate, startDate, endDate) {
       // Convert dates to milliseconds since Unix epoch
-      const targetTime = targetDate.getTime();
-      const startTime = startDate.getTime();
-      const endTime = endDate.getTime();
+      const targetTime = targetDate.n;
+      const startTime = startDate.n;
+      const endTime = endDate.n;
 
       // Check if targetDate is between startDate and endDate (inclusive)
       if (startTime <= endTime) {
@@ -801,7 +802,7 @@ export default {
         let startDate = sch[i].start;
         let endDate = sch[i].end;
 
-        if (targetDate >= startDate && targetDate <= endDate)
+        if (targetDate.n >= startDate.n && targetDate.n <= endDate.n)
           return { start: startDate, end: endDate };
       }
 
@@ -818,9 +819,14 @@ export default {
       const lastDate = new Date(endDate);
 
       while (currentDate <= lastDate) {
-        dates.push(new Date(currentDate));
         currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
-        currentDate.n=this.getDateAsInteger(currentDate);
+        let dateWrap = {date:new Date(currentDate),
+          n:this.getDateAsInteger(currentDate),
+          isCur:this.isToday(currentDate),
+          isWeekend:this.isWeekend(currentDate),
+        label:this.formatDate(currentDate, { day: "2-digit" })};
+        dates.push(dateWrap);
+
       }
 
       return dates;
