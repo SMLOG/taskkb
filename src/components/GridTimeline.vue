@@ -43,15 +43,10 @@
               <div style="display: flex; flex-wrap: nowrap">
                 <div v-for="week in weeks" :key="week" class="week-slot">
                   <div>
-                    {{
-                      formatDate(week.start, {
-                        month: "short",
-                        year: "2-digit",
-                      })
-                    }}
+                    {{week.label}}
                   </div>
                   <div style="display: flex; justify-content: space-between">
-                    <span v-for="day in getDatesBetween(week.start, week.end)" :key="day" style="margin: 0 10px" :style="{
+                    <span v-for="day in week.dates" :key="day" style="margin: 0 10px" :style="{
                       backgroundColor: isToday(day)
                         ? 'red'
                         : isWeekend(day)
@@ -91,7 +86,7 @@
                       min-height: 1em;
                       height: 100%;
                     ">
-                      <div style="flex-grow: 1" v-for="day in getDatesBetween(week.start, week.end)" :key="day" :class="{
+                      <div style="flex-grow: 1" v-for="day in week.dates" :class="{
                         selected: isDateInRange(day, row._sch),
                         drag:
                           selectStart &&
@@ -863,7 +858,12 @@ export default {
           start: new Date(startOfWeek),
           end: new Date(endOfWeek),
           startn:this.getDateAsInteger(startOfWeek),
-          endn:this.getDateAsInteger(endOfWeek)
+          endn:this.getDateAsInteger(endOfWeek),
+          label:this.formatDate(startOfWeek, {
+                        month: "short",
+                        year: "2-digit",
+                      }),
+                      dates:this.getDatesBetween(startOfWeek, endOfWeek)
         });
 
         startOfWeek.setDate(startOfWeek.getDate() + 7);
