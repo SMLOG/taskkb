@@ -87,8 +87,11 @@ import FormatTool from "./FormatTool.vue";
 const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
 function loopToSetDate(row) {
   if (row._sch) for (let peroid of row._sch) {
-    peroid.start = new Date(peroid.start);
-    peroid.end = new Date(peroid.end);
+    if(peroid&&peroid.start&&peroid.start.date){
+      peroid.start.date = new Date(peroid.start.date);
+    peroid.end.date = new Date(peroid.end.date);
+    }
+
   }
   if (row._childs) {
     for (let ch of row._childs) {

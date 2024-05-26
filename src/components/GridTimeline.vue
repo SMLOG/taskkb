@@ -13,10 +13,16 @@
     <div class="table-container" style="flex-grow: 1;">
 
       <div ref="table" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-
+        <div class="vue-columns-resizable" style="position: relative;">
+        <template v-for="(col, key) in cols" :key="key">
+          <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
+            style=" position: absolute; top: 0px;  width: 4px; cursor: col-resize; z-index: 3;"
+            :style="{ height: tableHeight + 'px' }"></div>
+        </template>
+        </div>
           <div class="row header" style="grid-template-columns: 46px 368px 1fr;">
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
-            <template v-for="(col, key) in cols.filter(e => e.show && e.cp == 'ColTitle')" :key="key">
+            <template v-for="(col, key) in cols" :key="key">
               <div class="col" ref="th"  :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
                 <div class="cell">
                   <component :is="col.cp" :col="col"></component>
@@ -52,7 +58,7 @@
                 :class="{ curRow: selectRow == row }">
                 {{ row._rIndex + 1 }}
               </div>
-              <template v-for="(col, cellIndex) in cols.filter(e => e.show && e.cp == 'ColTitle')" :key="cellIndex">
+              <template v-for="(col, cellIndex) in cols" :key="cellIndex">
                 <div class="col" :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
                   :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                   <div class="cell">
@@ -143,7 +149,7 @@ today.setHours(0, 0, 0, 0);
 const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
 function loopToSetDate(row) {
   if (row._sch) for (let peroid of row._sch) {
-    if(peroid.start.date){
+    if(peroid&&peroid.start&&peroid.start.date){
       peroid.start.date = new Date(peroid.start.date);
       peroid.end.date = new Date(peroid.end.date);
     }
@@ -241,6 +247,12 @@ export default {
     });
 
     resizeObserver.observe(table);
+
+    window.addEventListener('resize', () => {
+
+    this.winResize();
+    });
+    this.winResize();
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
@@ -249,7 +261,7 @@ export default {
   computed: {
     cols() {
       if (!this.config.cols) this.config.cols = [];
-      return this.config.cols;
+      return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
     },
     currentCell() {
       return this.selectRow && this.selectCol ? this.selectRow['c' + this.selectCol.fn] : null;
@@ -260,8 +272,22 @@ export default {
 
   },
   methods: {
+    winResize() {
+
+      this.$nextTick(() => { this.resize(); });
+
+
+    },
+    resize() {
+      console.log('resize')
+      console.log('resize')
+      for (let i = 0; i < this.$refs.rbar.length; i++) {
+        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+
+      }
+    },
     colStyle(col, isH) {
-      let style = { minWidth: col.width + 'px', width: col.width + 'px', maxWidth: col.width + 'px' };;
+      let style = {  };
       if (col.sticky) {
         style.left = "46px";
         style.zIndex = isH ? 4 : 3
@@ -292,17 +318,60 @@ export default {
       return scrollbarWidth;
     },
     winResize() {
-      if (this.config.fix) {
-        let showCols = this.cols.filter(e => e.show);
-        let totalWidth = showCols.reduce((total, col) => total + col.width, 0);
+      this.$nextTick(() => { this.resize(); });
+    },
+    throttleHandleResize(event) {
+      //clearTimeout(this.throttleTimeout);
+      //this.throttleTimeout=setTimeout(()=>{
+      this.handleResize(event);
+      //},10);
+    },
+    handleResize(event) {
+      console.log('handleResize')
+      if (this.resizeColumn) {
+        let i = this.resizeColumnIndex;
 
-        let share = (window.innerWidth - 46 - showCols.length - 2 - this.getScrollbarWidth()) / totalWidth;
-        showCols.forEach((col) => {
-          col.width = col.width * share;
-        });
+        //let width = this.$refs.th[i].offsetWidth +  event.movementX;
+        let width = this.resizeColumnWidth + event.x - this.resizeX;
+        console.log(this.$refs.th[i].offsetWidth, event.movementX, width);
+        this.resizeColumn.width = width;
+        //this.$refs.th[i].style.width = width + 'px';
+        let j = i;
+        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        let lastColIndex = this.$refs.th.length - 1;
+        if (this.config.fix && i < lastColIndex) {
+          let lastWidth = this.resizeLastColumnWidth - (event.x - this.resizeX);
+          this.cols[lastColIndex].width = lastWidth;
+          //this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
+        }
+
       }
 
+    },
+    resizeBarMouseDown(col, colIndex, event) {
+      console.log('resizeBarMouseDown')
+      console.log(col)
+      this.resizeColumn = col;
+      this.resizeColumnIndex = colIndex;
+      this.resizeX = event.x;
+      this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
+      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length - 1].offsetWidth;
 
+
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      console.log(event)
+
+    },
+    resizeBarMouseUp() {
+      console.log('resizeBarMouseUp')
+      if (this.resizeColumn) {
+        this.resize();
+        this.saveData();
+      }
+      this.resizeColumn = 0;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
     },
     containsBlockElement(element) {
       // Get all child elements of the given element
@@ -785,13 +854,18 @@ export default {
     },
     isDateInRange(targetDate, sch) {
       if (!sch || !sch.length) return false;
-      for (let i = 0; i < sch.length; i++) {
+      try{
+        for (let i = 0; i < sch.length; i++) {
         let startDate = sch[i].start;
         let endDate = sch[i].end;
 
         if (targetDate.n >= startDate.n && targetDate.n <= endDate.n)
           return { start: startDate, end: endDate };
       }
+      }catch(ee){
+        //console.error(ee);
+      }
+
 
       return false;
     },
