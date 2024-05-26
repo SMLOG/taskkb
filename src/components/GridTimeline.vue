@@ -725,7 +725,6 @@ export default {
 
       if (this.isDateInRange(date, row._sch)) {
         console.log("drag start");
-        //  this.selectStart={type:1,row:row,start:date,end:null};
         return;
       }
       if (this.selectStart == null)
@@ -736,7 +735,6 @@ export default {
           start: this.selectStart.start,
           end: date,
         });
-        // row.sch.push({start:this.selectStart[1],end:date});
         this.selectStart = null;
       } else this.selectStart = null;
     },
@@ -822,6 +820,7 @@ export default {
       while (currentDate <= lastDate) {
         dates.push(new Date(currentDate));
         currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
+        currentDate.n=this.getDateAsInteger(currentDate);
       }
 
       return dates;
