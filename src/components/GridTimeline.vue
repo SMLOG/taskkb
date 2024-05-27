@@ -31,8 +31,17 @@
             </template>
             <div class="col" :colspan="7 * weeks.length">
               <div style="display: flex; flex-wrap: nowrap">
-                <div v-for="week in weeks" :key="week" class="week-slot">
+                <div v-for="(week,index) in weeks" :key="week" class="week-slot">
                   <div>
+                    <a v-if="index==0"  @mouseenter="showDatePicker = true" @mouseleave ="showDatePicker=false">
+                      Start 
+                      <div v-if="showDatePicker" style="position: absolute;">
+                        <VueDatePicker v-model="startDate" @date-update="(d)=>{startDate=d;showDatePicker=false}"  :enable-time-picker="false" type="date" inline auto-apply   />
+                        Weeks:<input type="number" v-model="weekCount" :min="20" @mousedown.stop />
+
+                        </div>
+                    
+                    </a>
                     {{week.label}}
                   </div>
                   <div style="display: flex; justify-content: space-between">
@@ -141,31 +150,13 @@
 
 import Config from './Config.vue';
 
-
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css';
 
 </script>
 <script>
 
-const today = new Date();
-today.setHours(0, 0, 0, 0);
-const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
-function loopToSetDate(row) {
-  if (row._sch) for (let peroid of row._sch) {
-    if(peroid&&peroid.start&&peroid.start.date){
-      peroid.start.date = new Date(peroid.start.date);
-      peroid.end.date = new Date(peroid.end.date);
-    }
 
-  }
-  if (row._childs) {
-    for (let ch of row._childs) {
-      loopToSetDate(ch);
-    }
-  }
-}
-for (let d of data) {
-  loopToSetDate(d);
-}
 
 
 import ColTitle from './ColTitle.vue';
@@ -174,25 +165,27 @@ import ColDate from './ColDate.vue';
 
 
 export default {
-  components: { ColTitle, ColDropText, ColDate },
+  components: { ColTitle, ColDropText, ColDate,VueDatePicker },
 
   data() {
     return {
+      weekCount:20,
+      showDatePicker:false,
+      startDate:new Date(),
       tableHeight: 20,
       isContextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
       showConfig: 0,
       selectStart: null,
       isDrag: 0,
-      weeks: this.generateWeeks(today),
+      weeks: [],
       config: localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {},
-      tableData: data,
       dragRow: null,
       selectedRowIndex: null,
       selectRow: null,
       selectedcellIndex: null,
       selectCol: null,
-
+      tableData:[],
       isMouseDown: false,
       startRowIndex: null,
       startcellIndex: null,
@@ -258,7 +251,9 @@ export default {
 
     document.body.addEventListener('mousemove', this.throttleHandleResize);
     document.body.addEventListener('mouseup', this.resizeBarMouseUp);
-
+    this.loadData();
+    this.weeks.length=0;
+      this.weeks.push(...this.generateWeeks(this.startDate,this.weekCount));
   },
   unmounted(){
     document.body.removeEventListener('mousemove', this.throttleHandleResize);
@@ -280,9 +275,38 @@ export default {
 
   },
   watch: {
-
+    startDate(){
+      this.weeks.length=0;
+      this.weeks.push(...this.generateWeeks(this.startDate,this.weekCount));
+    },weekCount(){
+      this.weeks.length=0;
+      this.weeks.push(...this.generateWeeks(this.startDate,this.weekCount));
+    }
   },
   methods: {
+    loadData(){
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
+      function loopToSetDate(row) {
+        if (row._sch) for (let peroid of row._sch) {
+          if(peroid&&peroid.start&&peroid.start.date){
+            peroid.start.date = new Date(peroid.start.date);
+            peroid.end.date = new Date(peroid.end.date);
+          }
+
+        }
+        if (row._childs) {
+          for (let ch of row._childs) {
+            loopToSetDate(ch);
+          }
+        }
+      }
+      for (let d of data) {
+        loopToSetDate(d);
+      }
+      this.tableData=data;
+    },
     winResize() {
 
       this.$nextTick(() => { this.resize(); });
