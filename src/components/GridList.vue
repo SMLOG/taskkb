@@ -137,6 +137,10 @@ export default {
       selectWholeRowIndex: null,
     };
   },
+  unmounted(){
+    document.body.removeEventListener('mousemove', this.throttleHandleResize);
+
+  },
   mounted() {
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {

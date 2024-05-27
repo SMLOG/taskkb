@@ -20,7 +20,7 @@
             :style="{ height: tableHeight + 'px' }"></div>
         </template>
         </div>
-          <div class="row header" style="grid-template-columns: 46px 368px 1fr;">
+          <div class="row header" :style="{gridTemplateColumns: gridColumns()}" >
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
             <template v-for="(col, key) in cols" :key="key">
               <div class="col" ref="th"  :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
@@ -36,7 +36,7 @@
                     {{week.label}}
                   </div>
                   <div style="display: flex; justify-content: space-between">
-                    <span v-for="day in week.dates" :key="day" style="margin: 0 10px" :style="{
+                    <span v-for="day in week.dates" :key="day" class="day" :style="{
                       backgroundColor:day.isCur
                         ? 'red'
                         : day.isWeekend
@@ -53,14 +53,16 @@
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{gridTemplateColumns: gridColumns()}"  v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
               @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-              <div style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
+              <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true" @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
                 @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
                 :class="{ curRow: selectRow == row }">
                 {{ row._rIndex + 1 }}
-              </div>
+          </a>
               <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-                <div class="col" :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
-                  :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+                <div class="col td" :data-row="rowIndex+1" :data-col="cellIndex+1" :tabindex="100 * rowIndex + cellIndex"
+                :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
+                :style="colStyle(col)"
+                   @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                   <div class="cell">
                     <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
                   </div>
@@ -253,6 +255,15 @@ export default {
     this.winResize();
     });
     this.winResize();
+
+    document.body.addEventListener('mousemove', this.throttleHandleResize);
+    document.body.addEventListener('mouseup', this.resizeBarMouseUp);
+
+  },
+  unmounted(){
+    document.body.removeEventListener('mousemove', this.throttleHandleResize);
+    document.body.removeEventListener('mouseup', this.resizeBarMouseUp);
+
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
@@ -338,12 +349,7 @@ export default {
         //this.$refs.th[i].style.width = width + 'px';
         let j = i;
         this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-        let lastColIndex = this.$refs.th.length - 1;
-        if (this.config.fix && i < lastColIndex) {
-          let lastWidth = this.resizeLastColumnWidth - (event.x - this.resizeX);
-          this.cols[lastColIndex].width = lastWidth;
-          //this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
-        }
+
 
       }
 
@@ -453,8 +459,8 @@ export default {
     },
     handleMouseDown(event) {
       console.log('mosuedown')
-
-      const cell = event.target.closest('td');
+      this.selectWholeRowIndex=null;
+      const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
         this.startcellIndex = -1;
@@ -470,16 +476,25 @@ export default {
       }
       event.preventDefault();
       this.isMouseDown = true;
-      this.startRowIndex = cell.parentNode.rowIndex;
-      this.startcellIndex = cell.cellIndex;
+
+      const rowIndex = parseInt(cell.getAttribute('data-row'));
+      const cellIndex = parseInt(cell.getAttribute('data-col'));
+
+      this.startRowIndex = rowIndex;
+      this.startcellIndex = cellIndex;
       this.endRowIndex = this.startRowIndex;
       this.endcellIndex = this.startcellIndex;
     },
     handleMouseMove(event) {
       if (this.isMouseDown) {
-        const cell = event.target.closest('td');
-        this.endRowIndex = cell.parentNode.rowIndex;
-        this.endcellIndex = cell.cellIndex;
+        const cell = event.target.closest('div.col');
+
+        
+      const rowIndex = parseInt(cell.getAttribute('data-row'));
+      const cellIndex = parseInt(cell.getAttribute('data-col'));
+
+        this.endRowIndex = rowIndex;
+        this.endcellIndex = cellIndex;
       }
     },
     handleMouseUp() {
@@ -519,7 +534,7 @@ export default {
     },
     gridColumns(){
       
-      return '46px 368px 1fr';
+      return '46px '+this.cols.map(e=>e.width+'px').join(' ')+' 1fr';
     },
     getAllRow() {
       let rows = [];
@@ -822,7 +837,7 @@ export default {
           continue;
         if (
           updatedMerged.length === 0 ||
-          period.start.n - updatedMerged[updatedMerged.length - 1].end.n > 24 * 3600 * 1000
+          period.start.n - updatedMerged[updatedMerged.length - 1].end.n > 1
         ) {
           // If no overlap, add the current period as a new merged period
           updatedMerged.push(period);
@@ -880,13 +895,13 @@ export default {
       const lastDate = new Date(endDate);
 
       while (currentDate <= lastDate) {
-        currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
         let dateWrap = {date:new Date(currentDate),
           n:this.getDateAsInteger(currentDate),
           isCur:this.isToday(currentDate),
           isWeekend:this.isWeekend(currentDate),
         label:this.formatDate(currentDate, { day: "2-digit" })};
         dates.push(dateWrap);
+        currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
 
       }
 
@@ -908,7 +923,7 @@ export default {
   let day = String(dateObj.getDate()).padStart(2, '0');
   return parseInt(`${year}${month}${day}`, 10);
 },
-    generateWeeks(startDate, n = 10) {
+    generateWeeks(startDate, n = 20) {
       const weeks = [];
       let startOfWeek = new Date(startDate);
 
@@ -1054,11 +1069,11 @@ td {
 }
 
 .selected {
-  background-color: #F0FFF0;
+  background-color: #F0FFF0!important;
 }
 
 .sch .selected {
-  background-color: lightgreen;
+  background-color: lightgreen!important;
 }
 
 .contextmenu {
@@ -1156,4 +1171,11 @@ td.bottom {
   line-height: 2em;
 }
 .sch{height: 100%;}
+.curRow,
+.wholeRowSelected > div {
+  background-color: #E0EEE0 !important
+}
+.day{
+  margin: 0 5px;
+}
 </style>
