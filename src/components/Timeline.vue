@@ -115,9 +115,9 @@
                     <div v-if="row._sch && row._sch.length && row._sch[0].end && row._sch[0].start.date" :style="{
                       width: (calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1) * 100 + '%',
                       marginLeft: (calculateDaysBetweenDates(row._sch[0].start, firstDay)) * 100 + '%'
-                    }" class="plantime">{{ calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1 }}
+                    }" class="plantime" @click="selectRowSch(row)" :class="{selected:selectStart&&selectStart.row==row}" >{{ calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1 }}
                     </div>
-                    <div v-if="selectStart &&
+                    <div v-if="selectStart &&selectStart.type!=1&&
                       selectStart.row == row" :style="{
   width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
   marginLeft: (calculateDaysBetweenDates(!selectStart.end||selectStart.start.n<selectStart.end.n?selectStart.start:selectStart.end, firstDay)) * 100 + '%'
@@ -828,13 +828,13 @@ export default {
         event.code === "Backspace"
       ) {
         if (this.selectStart) {
-          this.addDatePeriod(this.selectStart.row._sch, null, {
-            start: this.selectStart.orgStart,
-            end: this.selectStart.orgEnd,
-          });
+          this.selectStart.row._sch.length=0;
           this.selectStart = null;
         }
       }
+    },
+    selectRowSch(row){
+        this.selectStart = { type: 1, row: row };
     },
     mouseDownSch(event, row) {
       console.log("moousedown");
@@ -1263,5 +1263,6 @@ td.bottom {
 
 .plantime {
   background-color: lightblue;
+  cursor: move;
 }
 </style>
