@@ -13,118 +13,123 @@
     <div class="table-container" style="flex-grow: 1;position: relative;">
       <div>
 
-      <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
-        @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-        <div class="vue-columns-resizable" style="position: relative;">
-          <template v-for="(col, key) in cols" :key="key">
-            <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
-              style=" position: absolute; top: 0px;  width: 4px; cursor: col-resize; z-index: 3;"
-              :style="{ height: tableHeight + 'px' }"></div>
-          </template>
-        </div>
-        <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
-          <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
-          <template v-for="(col, key) in cols" :key="key">
-            <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
-              <div class="cell">
-                <component :is="col.cp" :col="col"></component>
-              </div>
-            </div>
-          </template>
-          <div class="col" :colspan="7 * weeks.length">
-            <div style="display: flex; flex-wrap: nowrap">
-              <div v-for="(week, index) in weeks" :key="week" class="week-slot">
-                <div>
-                  <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
-                    Start
-                    <div v-if="showDatePicker" style="position: absolute;">
-                      <VueDatePicker v-model="startDate" @date-update="(d) => { startDate = d; showDatePicker = false }"
-                        :enable-time-picker="false" type="date" inline auto-apply />
-                      Weeks:<input type="number" v-model="weekCount" :min="20" @mousedown.stop />
-
-                    </div>
-
-                  </a>
-                  {{ week.label }}
-                </div>
-                <div style="display: flex; justify-content: space-between">
-                  <span v-for="day in week.dates" :key="day" class="day" :style="{
-                    backgroundColor: day.isCur
-                      ? 'red'
-                      : day.isWeekend
-                        ? 'gray'
-                        : 'none',
-                  }">
-                    {{ day.label }}
-                  </span>
-                </div>
-              </div>
-            </div>
+        <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
+          @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+          <div class="vue-columns-resizable" style="position: relative;">
+            <template v-for="(col, key) in cols" :key="key">
+              <div v-if="col.show" class="columns-resize-bar" ref="rbar"
+                @mousedown="resizeBarMouseDown(col, key, $event)"
+                style=" position: absolute; top: 0px;  width: 4px; cursor: col-resize; z-index: 3;"
+                :style="{ height: tableHeight + 'px' }"></div>
+            </template>
           </div>
-        </div>
 
 
-        <!--line-->
-        <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
-          <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
-          <template v-for="(col, key) in cols" :key="key">
-            <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
-              <div class="cell">
-              </div>
-            </div>
-          </template>
-          <div class="col" :colspan="7 * weeks.length">
-            <div style="display: flex; flex-wrap: nowrap">
-              <div v-for="(week) in weeks" :key="week" class="week-slot">
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-        <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-          <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
-            :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
-            @drop="drop($event, row, rowIndex)">
-            <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
-              @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-              @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
-              :class="{ curRow: selectRow == row }">
-              {{ row._rIndex + 1 }}
-            </a>
-            <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-              <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
-                :class="cellClass(rowIndex + 1, cellIndex + 1, col)" :style="colStyle(col)"
-                @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+                    <!--line-->
+            <div class="row header line"  :style="{ gridTemplateColumns: gridColumns() }">
+            <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
+            <template v-for="(col, key) in cols" :key="key">
+              <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
                 <div class="cell">
-                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
                 </div>
               </div>
             </template>
             <div class="col" :colspan="7 * weeks.length">
-              <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="mouseDownSch($event, row)"
-                @mousemove="mouseMoveSchRow($event, row)">
-                <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
-                  <div v-if="row._sch && row._sch.length && row._sch[0].end&&row._sch[0].start.date" :style="{
-                    width: (calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1) * 100 + '%',
-                    marginLeft: (calculateDaysBetweenDates(row._sch[0].start, firstDay)) * 100 + '%'
-                  }" class="plantime">{{ calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1 }}
-                  </div>
-                  <div v-if="selectStart &&
-selectStart.row == row" 
-:style="{width:(calculateDaysBetweenDates(selectStart.end||selectStart.start,selectStart.start)+1)*100+'%',
-marginLeft:(calculateDaysBetweenDates(selectStart.start,firstDay))*100+'%'
-}"
-class="selectStart"
->{{ calculateDaysBetweenDates(selectStart.end||selectStart.start,selectStart.start)+1 }}</div>
+              <div style="display: flex; flex-wrap: nowrap">
+                <div v-for="(week) in weeks" :key="week" class="week-slot">
                 </div>
               </div>
             </div>
           </div>
-        </template>
+
+
+          <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
+            <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
+            <template v-for="(col, key) in cols" :key="key">
+              <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
+                <div class="cell">
+                  <component :is="col.cp" :col="col"></component>
+                </div>
+              </div>
+            </template>
+            <div class="col" :colspan="7 * weeks.length">
+              <div style="display: flex; flex-wrap: nowrap">
+                <div v-for="(week, index) in weeks" :key="week" class="week-slot">
+                  <div>
+                    <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
+                      Start
+                      <div v-if="showDatePicker" style="position: absolute;">
+                        <VueDatePicker v-model="startDate"
+                          @date-update="(d) => { startDate = d; showDatePicker = false }" :enable-time-picker="false"
+                          type="date" inline auto-apply />
+                        Weeks:<input type="number" v-model="weekCount" :min="20" @mousedown.stop />
+
+                      </div>
+
+                    </a>
+                    {{ week.label }}
+                  </div>
+                  <div style="display: flex; justify-content: space-between">
+                    <span v-for="day in week.dates" :key="day" class="day" :style="{
+                      backgroundColor: day.isCur
+                        ? 'red'
+                        : day.isWeekend
+                          ? 'gray'
+                          : 'none',
+                    }">
+                      {{ day.label }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+          <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
+            <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+              :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
+              @drop="drop($event, row, rowIndex)">
+              <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
+                @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
+                @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
+                :class="{ curRow: selectRow == row }">
+                {{ row._rIndex + 1 }}
+              </a>
+              <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+                <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
+                  :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
+                  :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+                  <div class="cell">
+                    <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
+                  </div>
+                </div>
+              </template>
+              <div class="col" :colspan="7 * weeks.length">
+                <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="mouseDownSch($event, row)"
+                  @mousemove="mouseMoveSchRow($event, row)">
+                  <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
+                    <div v-if="row._sch && row._sch.length && row._sch[0].end && row._sch[0].start.date" :style="{
+                      width: (calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1) * 100 + '%',
+                      marginLeft: (calculateDaysBetweenDates(row._sch[0].start, firstDay)) * 100 + '%'
+                    }" class="plantime">{{ calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1 }}
+                    </div>
+                    <div v-if="selectStart &&
+                      selectStart.row == row" :style="{
+  width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
+  marginLeft: (calculateDaysBetweenDates(!selectStart.end||selectStart.start.n<selectStart.end.n?selectStart.start:selectStart.end, firstDay)) * 100 + '%'
+}" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1 }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </div>
       </div>
     </div>
-  </div>
     <div style="
         
         position: sticky;
@@ -256,6 +261,9 @@ export default {
         const resizedTable = entry.target;
         console.log('Table has been resized:', resizedTable);
         this.tableHeight = table.offsetHeight;
+
+        document.documentElement.style.setProperty('--table-height', this.tableHeight+'px');
+
       }
     });
 
@@ -309,11 +317,15 @@ export default {
   },
   methods: {
     calculateDaysBetweenDates(date1, date2) {
-      if(date1.date&&date2.date){
-        const oneDay = 24 * 60 * 60 * 1000;
-      return Math.round(Math.abs((date1.date - date2.date) / oneDay));
+      if (!date1.date ) {
+          return 0;
       }
-      return 0;
+      if (!date2.date ) {
+          return 0;
+      }
+        const oneDay = 24 * 60 * 60 * 1000;
+        return Math.round(Math.abs((date1.date - date2.date) / oneDay));
+
 
     },
     mouseMoveSchRow(event, row) {
@@ -1081,6 +1093,7 @@ td {
 
 .week-slot {
   position: relative;
+  flex-grow: 1;
 }
 
 .week-slot::after {
@@ -1091,6 +1104,13 @@ td {
   height: 100%;
   border: 1px solid #ddd;
   right: 0;
+}
+.line .week-slot::after{
+  height: var(--table-height);
+  z-index: -1;
+}
+.line{
+  z-index: -1!important;
 }
 
 .selectStart {
