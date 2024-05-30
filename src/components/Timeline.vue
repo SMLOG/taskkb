@@ -272,7 +272,6 @@ export default {
       }
     });
     document.addEventListener("click", this.hideContextMenu);
-    window.data = this.tableData;
     document.addEventListener("keydown", this.handleKeyDown);
 
 

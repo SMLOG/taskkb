@@ -1,5 +1,5 @@
 <script setup>
-import FixTableTimeline from './components/FixTableTimeline.vue'
+import Operation from './components/Operation.vue'
 </script>
 
 <template>
@@ -20,6 +20,9 @@ import FixTableTimeline from './components/FixTableTimeline.vue'
 
       <router-view></router-view>
   </main>
+  <footer>
+  <Operation/>
+  </footer>
 </template>
 
 <style scoped>
