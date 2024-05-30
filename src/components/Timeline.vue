@@ -112,10 +112,10 @@
                 <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="mouseDownSch($event, row)"
                   @mousemove="mouseMoveSchRow($event, row)">
                   <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
-                    <div v-if="row._sch && row._sch.length && row._sch[0].end && row._sch[0].start.date" :style="{
-                      width: (calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1) * 100 + '%',
-                      marginLeft: (calculateDaysBetweenDates(row._sch[0].start, firstDay)) * 100 + '%'
-                    }" class="plantime" @click="selectRowSch(row)" :class="{selected:selectStart&&selectStart.row==row}" >{{ calculateDaysBetweenDates(row._sch[0].end, row._sch[0].start) + 1 }}
+                    <div v-if="row._tl && row._tl.end " :style="{
+                      width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
+                      marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
+                    }" class="plantime" @click="selectRowSch(row)" :class="{selected:selectStart&&selectStart.row==row}" >{{ calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1 }}
                     </div>
                     <div v-if="selectStart &&selectStart.type!=1&&
                       selectStart.row == row" :style="{
@@ -334,7 +334,6 @@ export default {
       let totalWidth = event.target.closest('.sch').offsetWidth;
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-      console.log(date.n)
       this.enterSch(row, date);
 
     },
@@ -351,11 +350,11 @@ export default {
       today.setHours(0, 0, 0, 0);
       const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
       function loopToSetDate(row) {
-        if (row._sch) for (let peroid of row._sch) {
-          if (peroid && peroid.start && peroid.start.date) {
+        if (row._tl)  {
+          let peroid =row._tl;
             peroid.start.date = new Date(peroid.start.date);
             peroid.end.date = new Date(peroid.end.date);
-          }
+          
 
         }
         if (row._childs) {
@@ -424,7 +423,6 @@ export default {
       //},10);
     },
     handleResize(event) {
-      console.log('handleResize')
       if (this.resizeColumn) {
         let i = this.resizeColumnIndex;
 
@@ -828,7 +826,7 @@ export default {
         event.code === "Backspace"
       ) {
         if (this.selectStart) {
-          this.selectStart.row._sch.length=0;
+          delete this.selectStart.row._tl;
           this.selectStart = null;
         }
       }
@@ -843,30 +841,27 @@ export default {
       let totalWidth = event.target.closest('.sch').offsetWidth;
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-
       this.clickSch(row, date);
 
     },
     clickSch(row, date) {
       console.log("clickSch");
 
-      if (this.isDateInRange(date, row._sch)) {
+      if (this.isDateInRange(date, row._tl)) {
         console.log("drag start");
         return;
       }
       if (this.selectStart == null)
         this.selectStart = { type: 2, row: row, start: date };
       else if (this.selectStart.row == row) {
-        if (!row._sch) row._sch = [];
-        row._sch.length = 0;
-        this.addDatePeriod(row._sch, {
+        row._tl=this.addDatePeriod( {
           start: this.selectStart.start,
           end: date,
         });
         this.selectStart = null;
       } else this.selectStart = null;
     },
-    addDatePeriod(mergedPeriods, addPeriod, removeOldPeriod) {
+    addDatePeriod(addPeriod) {
       if (addPeriod) {
         let newPeriod = {
           start:
@@ -878,36 +873,10 @@ export default {
               ? addPeriod.end
               : addPeriod.start,
         };
-        mergedPeriods.push(newPeriod);
+        return newPeriod;
       }
 
-      mergedPeriods.sort((a, b) => a.start - b.start);
 
-      const updatedMerged = [];
-
-      for (const period of mergedPeriods) {
-        if (
-          removeOldPeriod &&
-          removeOldPeriod.start.n == period.start.n
-        )
-          continue;
-        if (
-          updatedMerged.length === 0 ||
-          period.start.n - updatedMerged[updatedMerged.length - 1].end.n > 1
-        ) {
-          // If no overlap, add the current period as a new merged period
-          updatedMerged.push(period);
-        } else {
-          // If overlap or adjacent, update the end date of the last merged period
-          updatedMerged[updatedMerged.length - 1].end = period.end.n > updatedMerged[updatedMerged.length - 1].end.n ? period.end : updatedMerged[updatedMerged.length - 1].end;
-        }
-      }
-
-      mergedPeriods.length = 0; // Clear the original array
-
-      for (const period of updatedMerged) {
-        mergedPeriods.push(period); // Update the original array with the revised merged periods
-      }
     },
 
     isDateInRange2(targetDate, startDate, endDate) {
