@@ -25,8 +25,8 @@
           </div>
 
 
-                    <!--line-->
-            <div class="row header line"  :style="{ gridTemplateColumns: gridColumns() }">
+          <!--line-->
+          <div class="row header line" :style="{ gridTemplateColumns: gridColumns() }">
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
             <template v-for="(col, key) in cols" :key="key">
               <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
@@ -84,11 +84,7 @@
               </div>
             </div>
           </div>
-
-
-
-
-
+          
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
               :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
@@ -110,18 +106,24 @@
               </template>
               <div class="col" :colspan="7 * weeks.length">
                 <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="mouseDownSch($event, row)"
-                  @mousemove="mouseMoveSchRow($event, row)">
+                  @mousemove.prevent="mouseMoveSchRow($event, row)">
                   <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
-                    <div v-if="row._tl && row._tl.end " :style="{
+                    <div v-if="row._tl && row._tl.end" :style="{
                       width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
                       marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
-                    }" class="plantime" @click="selectRowSch(row)" :class="{selected:selectStart&&selectStart.row==row}" >{{ calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1 }}
+                    }" class="plantime" @click="selectRowSch(row)"
+                      :class="{ selected: selectStart && selectStart.row == row }">{{ calculateDaysBetweenDates(row._tl.end,
+                      row._tl.start) +
+                      1 }}
+
+                      <div class="rightDrag" @mousedown="isMouseDown=1"></div>
                     </div>
-                    <div v-if="selectStart &&selectStart.type!=1&&
+                    <div v-if="selectStart && selectStart.type != 1 &&
                       selectStart.row == row" :style="{
-  width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
-  marginLeft: (calculateDaysBetweenDates(!selectStart.end||selectStart.start.n<selectStart.end.n?selectStart.start:selectStart.end, firstDay)) * 100 + '%'
-}" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1 }}</div>
+                        width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
+                        marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
+                      }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1 }}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -262,7 +264,7 @@ export default {
         console.log('Table has been resized:', resizedTable);
         this.tableHeight = table.offsetHeight;
 
-        document.documentElement.style.setProperty('--table-height', this.tableHeight+'px');
+        document.documentElement.style.setProperty('--table-height', this.tableHeight + 'px');
 
       }
     });
@@ -317,14 +319,14 @@ export default {
   },
   methods: {
     calculateDaysBetweenDates(date1, date2) {
-      if (!date1.date ) {
-          return 0;
+      if (!date1.date) {
+        return 0;
       }
-      if (!date2.date ) {
-          return 0;
+      if (!date2.date) {
+        return 0;
       }
-        const oneDay = 24 * 60 * 60 * 1000;
-        return Math.round(Math.abs((date1.date - date2.date) / oneDay));
+      const oneDay = 24 * 60 * 60 * 1000;
+      return Math.round(Math.abs((date1.date - date2.date) / oneDay));
 
 
     },
@@ -350,11 +352,11 @@ export default {
       today.setHours(0, 0, 0, 0);
       const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
       function loopToSetDate(row) {
-        if (row._tl)  {
-          let peroid =row._tl;
-            peroid.start.date = new Date(peroid.start.date);
-            peroid.end.date = new Date(peroid.end.date);
-          
+        if (row._tl) {
+          let peroid = row._tl;
+          peroid.start.date = new Date(peroid.start.date);
+          peroid.end.date = new Date(peroid.end.date);
+
 
         }
         if (row._childs) {
@@ -831,8 +833,8 @@ export default {
         }
       }
     },
-    selectRowSch(row){
-        this.selectStart = { type: 1, row: row };
+    selectRowSch(row) {
+      this.selectStart = { type: 1, row: row };
     },
     mouseDownSch(event, row) {
       console.log("moousedown");
@@ -841,7 +843,8 @@ export default {
       let totalWidth = event.target.closest('.sch').offsetWidth;
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-      this.clickSch(row, date);
+      if (!row._tl)
+        this.clickSch(row, date);
 
     },
     clickSch(row, date) {
@@ -854,7 +857,7 @@ export default {
       if (this.selectStart == null)
         this.selectStart = { type: 2, row: row, start: date };
       else if (this.selectStart.row == row) {
-        row._tl=this.addDatePeriod( {
+        row._tl = this.addDatePeriod({
           start: this.selectStart.start,
           end: date,
         });
@@ -1074,12 +1077,14 @@ td {
   border: 1px solid #ddd;
   right: 0;
 }
-.line .week-slot::after{
+
+.line .week-slot::after {
   height: var(--table-height);
   z-index: -1;
 }
-.line{
-  z-index: -1!important;
+
+.line {
+  z-index: -1 !important;
 }
 
 .selectStart {
@@ -1233,5 +1238,19 @@ td.bottom {
 .plantime {
   background-color: lightblue;
   cursor: move;
+  position: relative;
+}
+
+.plantime .rightDrag {
+  position: absolute;
+  right: 0px;
+  width: 4px;
+  top: 0;
+  bottom: 0;
+}
+
+.plantime .rightDrag:hover {
+  background: blue;
+  cursor: ew-resize;
 }
 </style>
