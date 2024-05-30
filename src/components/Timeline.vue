@@ -59,15 +59,15 @@
                     <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
                       Start
                       <div v-if="showDatePicker" style="position: absolute;">
-                        <VueDatePicker v-model="startDate"
-                          @date-update="(d) => { startDate = d; showDatePicker = false }" :enable-time-picker="false"
-                          type="date" inline auto-apply />
-                        Weeks:<input type="number" v-model="weekCount" :min="20" @mousedown.stop />
+                        <VueDatePicker v-model="config.startDate"
+                          @date-update="(d) => { config.startDate = d; showDatePicker = false }"
+                          :enable-time-picker="false" type="date" inline auto-apply />
+                        Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop />
 
                       </div>
 
                     </a>
-                    {{ week.label }}
+                    <span>{{ week.label }}</span><span>({{ week.i+1 }})</span>
                   </div>
                   <div style="display: flex; justify-content: space-between">
                     <span v-for="day in week.dates" :key="day" class="day" :style="{
@@ -84,7 +84,7 @@
               </div>
             </div>
           </div>
-          
+
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
               :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
@@ -112,17 +112,19 @@
                       width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
                       marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
                     }" class="plantime" @click="selectRowSch(row)"
-                      :class="{ selected: selectStart && selectStart.row == row }">{{ calculateDaysBetweenDates(row._tl.end,
-                      row._tl.start) +
+                      :class="{ selected: selectStart && selectStart.row == row }">{{
+                        calculateDaysBetweenDates(row._tl.end,
+                          row._tl.start) +
                       1 }}
 
-                      <div class="rightDrag" @mousedown="isMouseDown=1"></div>
+                      <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                     </div>
                     <div v-if="selectStart && selectStart.type != 1 &&
                       selectStart.row == row" :style="{
                         width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
                         marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
-                      }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1 }}
+                      }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start,
+                      selectStart.start) + 1 }}
                     </div>
                   </div>
                 </div>
@@ -170,14 +172,14 @@
 
 <script setup>
 import { useConfigStore } from '@/stores/config'
+import { useDataRowsStore } from '@/stores/dataRows'
 
 import Config from './Config.vue';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-const store = useConfigStore();
-console.log(store.config)
+
 </script>
 <script>
 
@@ -196,7 +198,6 @@ export default {
     return {
       weekCount: 20,
       showDatePicker: false,
-      startDate: new Date(),
       tableHeight: 20,
       isContextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
@@ -204,7 +205,7 @@ export default {
       selectStart: null,
       isDrag: 0,
       weeks: [],
-      config: localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {},
+      config: null,
       dragRow: null,
       selectedRowIndex: null,
       selectRow: null,
@@ -221,6 +222,26 @@ export default {
     };
   },
   mounted() {
+
+    const configStore = useConfigStore();
+    this.config = configStore.config;
+    if(!this.config.startDate)this.config.startDate=new Date();
+    if(!this.config.weekCount)this.config.weekCount=20;
+    this.$watch(
+      () => configStore.config.startDate,
+      () => {
+        this.weeks.length = 0;
+        this.weeks.push(...this.generateWeeks(this.config.startDate, this.config.weekCount));
+      }
+    );
+
+    this.$watch(
+      () => configStore.config.weekCount,
+      () => {
+        this.weeks.length = 0;
+        this.weeks.push(...this.generateWeeks(this.config.startDate, this.config.weekCount));
+      }
+    );
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {
         event.preventDefault();
@@ -281,7 +302,7 @@ export default {
     document.body.addEventListener('mouseup', this.resizeBarMouseUp);
     this.loadData();
     this.weeks.length = 0;
-    this.weeks.push(...this.generateWeeks(this.startDate, this.weekCount));
+    this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.weekCount));
   },
   unmounted() {
     document.body.removeEventListener('mousemove', this.throttleHandleResize);
@@ -300,8 +321,9 @@ export default {
       return this.weekCount * 7;
     },
     cols() {
-      if (!this.config.cols) this.config.cols = [];
-      return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
+      if (this.config && this.config.cols)
+        return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
+      return [];
     },
     currentCell() {
       return this.selectRow && this.selectCol ? this.selectRow['c' + this.selectCol.fn] : null;
@@ -309,13 +331,7 @@ export default {
 
   },
   watch: {
-    startDate() {
-      this.weeks.length = 0;
-      this.weeks.push(...this.generateWeeks(this.startDate, this.weekCount));
-    }, weekCount() {
-      this.weeks.length = 0;
-      this.weeks.push(...this.generateWeeks(this.startDate, this.weekCount));
-    }
+
   },
   methods: {
     calculateDaysBetweenDates(date1, date2) {
@@ -350,7 +366,8 @@ export default {
     loadData() {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
+      const dataRowsStore = useDataRowsStore();
+      const data = dataRowsStore.dataRows;
       function loopToSetDate(row) {
         if (row._tl) {
           let peroid = row._tl;
@@ -756,13 +773,9 @@ export default {
       console.log(bool)
       if (!bool || this.config.autoSave) {
 
-
-        localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
-          if (key === "_p") {
-            return null;
-          } else return value;
-        }));
-        localStorage.setItem('config', JSON.stringify(this.config));
+        const dataRowsStore = useDataRowsStore();
+        dataRowsStore.save();
+        useConfigStore().save();
 
       }
     },
