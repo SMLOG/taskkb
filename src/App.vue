@@ -1,5 +1,7 @@
 <script setup>
 import Operation from '@/components/Operation.vue'
+import FormatTool from "@/components/FormatTool.vue";
+
 </script>
 
 <template>
@@ -26,8 +28,10 @@ import Operation from '@/components/Operation.vue'
       display: flex;
       flex-direction: column;
     ">
+    <FormatTool>
       <router-view>
       </router-view>
+    </FormatTool>
       <Operation />
     </div>
   </main>
@@ -50,9 +54,6 @@ header {
     padding-right: calc(var(--section-gap) / 2);
   }
 
-  .logo {
-    margin: 0 2rem 0 0;
-  }
 
   header .wrapper {
     display: flex;

@@ -1,6 +1,5 @@
 <template>
-<FormatTool>
-  <div class="grid-wrap">
+
 
     <div class="table-container" style="    flex-grow: 1;
     overflow: auto;" :style="{ overflowX: config.fix ? 'hidden' : 'auto' }">
@@ -37,7 +36,7 @@
                 :class="cellClass(rowIndex + 1, cellIndex + 1, col)" 
                 @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                 <div class="cell">
-                  <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
+                  <component :is="col.cp" :row="row" :col="col" ></component>
                 </div>
               </div>
             </template>
@@ -45,42 +44,11 @@
         </template>
       </div>
     </div>
-    <div style="
-        position: sticky;
-        bottom: 0;
-        left: 0;
-        z-index: 3;
-        background: white;
-      ">
-      <div style="display: flex;flex-direction: column;">
-        <Config v-if="showConfig" :config="config"></Config>
-        <div style="display: flex;height: 30px;">
-          <a @click="addRow(1)">Add Row</a>
-          <a @click="deleteRow(selectRow)">Delete Row</a>
-          <a @click="addSubRow(1)">Add Sub Row</a>
-          <a @click="saveData(0)">Save</a>
-          <a @click="showConfig = !showConfig">Configuration</a>
-          <a @click="showConfig = !showConfig">Team</a>
-        </div>
-      </div>
-    </div>
 
-  </div>
-  <!-- Context menu -->
-  <div v-show="isContextMenuVisible" :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
-    class="contextmenu">
-    <ul>
-      <li @click="addRow(1)">Insert Row after {{ selectedRowIndex }}</li>
-      <li>Delete Row</li>
-      <li>Menu Item 3</li>
-    </ul>
-  </div>
-  </FormatTool>
 </template>
 <script setup>
 
-import Config from './Config.vue';
-import FormatTool from "./FormatTool.vue";
+
 </script>
 <script>
 

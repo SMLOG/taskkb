@@ -1,15 +1,6 @@
 <template>
 
-  <div style="
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      overflow: auto;
-      right: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
-    ">
+
     <div class="table-container" style="flex-grow: 1;">
 
       <div ref="table" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown" @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
@@ -113,43 +104,9 @@
           </template>
       </div>
     </div>
-    <div style="
-        
-        position: sticky;
-        bottom: 0;
-        left: 0;
-        z-index: 3;
-        background: white;
-      ">
-      <div style="display: flex;flex-direction: column;">
-        <Config v-if="showConfig" :config="config"></Config>
-        <div style="display: flex;height: 30px;">
-          <a @click="addRow(1)">Add Row</a>
-          <a @click="deleteRow(selectRow)">Delete Row</a>
-          <a @click="addSubRow(1)">Add Sub Row</a>
-          <a @click="saveData(0)">Save</a>
-          <a @click="showConfig = !showConfig">Configuration</a>
-          <a @click="showConfig = !showConfig">Team</a>
-        </div>
-      </div>
-    </div>
 
-  </div>
-
-  <!-- Context menu -->
-  <div v-show="isContextMenuVisible" :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
-    class="contextmenu">
-    <ul>
-      <li @click="addRow(1)">Insert Row after {{ selectedRowIndex }}</li>
-      <li>Delete Row</li>
-      <li>Menu Item 3</li>
-    </ul>
-  </div>
 </template>
 <script setup>
-
-import Config from './Config.vue';
-
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 
