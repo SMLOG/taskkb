@@ -679,15 +679,6 @@ export default {
         this.dragRow = null;
       }
     },
-
-    addSubRow(num) {
-      if (!this.tableData[this.selectedRowIndex].childs)
-        this.tableData[this.selectedRowIndex].childs = [];
-
-      this.tableData[this.selectedRowIndex].childs.push({ _id: '' })
-
-
-    },
     focusNext(index) {
       if (index + 1 < this.$refs.ids.length) {
         console.log('focus' + (index + 1));
@@ -783,6 +774,7 @@ export default {
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
       if (!row._tl)
         this.clickSch(row, date);
+      else this.selectStart = null;
 
     },
     clickSch(row, date) {
@@ -818,20 +810,6 @@ export default {
       }
 
 
-    },
-
-    isDateInRange2(targetDate, startDate, endDate) {
-      // Convert dates to milliseconds since Unix epoch
-      const targetTime = targetDate.n;
-      const startTime = startDate.n;
-      const endTime = endDate.n;
-
-      // Check if targetDate is between startDate and endDate (inclusive)
-      if (startTime <= endTime) {
-        return targetTime >= startTime && targetTime <= endTime;
-      } else {
-        return targetTime >= endTime && targetTime <= startTime;
-      }
     },
     isDateInRange(targetDate, sch) {
       if (!sch || !sch.length) return false;
@@ -875,16 +853,6 @@ export default {
       }
 
       return dates;
-    },
-    isSameDate(date1, date2) {
-      const d1 = new Date(date1);
-      const d2 = new Date(date2);
-
-      if (d1.toDateString() === d2.toDateString()) {
-        return true;
-      } else {
-        return false;
-      }
     },
     getDateAsInteger(dateObj) {
       let year = dateObj.getFullYear();
@@ -940,58 +908,6 @@ export default {
 </script>
 
 <style scoped>
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 0;
-  min-height: 1em;
-}
-
-tbody th {
-  position: sticky;
-  left: 0;
-  top: 0;
-  background-color: white;
-  text-align: left;
-  z-index: 2;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 2;
-}
-
-thead th:first-child {
-  z-index: 4;
-}
-
-th:first-child,
-td:first-child {
-  z-index: 3;
-  /* Ensure the first column stays on top */
-  position: sticky;
-  left: 0;
-  background-color: white;
-  width: 46px;
-  min-width: 46px;
-  text-align: center;
-}
-
-td {
-  vertical-align: top;
-}
-
-.selected th {
-  background-color: #F0FFF0;
-}
-
 .week-slot {
   position: relative;
   flex-grow: 1;
@@ -1048,55 +964,6 @@ td {
 
 .sch .selected {
   background-color: lightgreen !important;
-}
-
-.contextmenu {
-  background: white;
-  z-index: 1;
-  position: fixed;
-  border: 2px solid gray;
-  border-radius: 5px;
-  padding: 5px;
-}
-
-.contextmenu ul {
-  margin: 0;
-}
-
-td.left {
-  border-left: 1px darkgreen solid;
-}
-
-td.right {
-  border-right: 1px darkgreen solid;
-}
-
-td.top {
-  border-top: 1px darkgreen solid;
-}
-
-td.bottom {
-  border-bottom: 1px darkgreen solid;
-}
-
-.filterSearch {
-  position: relative;
-  display: inline-block;
-  width: 200px;
-  height: 24px;
-}
-
-.filterSearch input {
-  width: 100%;
-}
-
-.filterSearch:after {
-  content: "T";
-  position: absolute;
-  right: 3px;
-  top: 0;
-  color: green;
-  font-weight: bold;
 }
 
 .curRow,

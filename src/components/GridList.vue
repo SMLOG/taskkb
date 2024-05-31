@@ -1,8 +1,7 @@
 <template>
 
 
-    <div class="table-container" style="    flex-grow: 1;
-    overflow: auto;" :style="{ overflowX: config.fix ? 'hidden' : 'auto' }">
+    <div class="table-container" style="    flex-grow: 1;" >
       <div class="vue-columns-resizable" style="position: relative;">
         <template v-for="(col, key) in cols" :key="key">
           <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
@@ -46,36 +45,16 @@
     </div>
 
 </template>
+
 <script setup>
-
-
+import { useConfigStore } from '@/stores/config'
+import { useDataRowsStore } from '@/stores/dataRows'
 </script>
 <script>
-
-const data = localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
-function loopToSetDate(row) {
-  if (row._sch) for (let peroid of row._sch) {
-    if(peroid&&peroid.start&&peroid.start.date){
-      peroid.start.date = new Date(peroid.start.date);
-    peroid.end.date = new Date(peroid.end.date);
-    }
-
-  }
-  if (row._childs) {
-    for (let ch of row._childs) {
-      loopToSetDate(ch);
-    }
-  }
-}
-for (let d of data) {
-  loopToSetDate(d);
-}
-
 
 import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
-
 
 export default {
   components: { ColTitle, ColDropText, ColDate },
@@ -88,8 +67,8 @@ export default {
       showConfig: 0,
       selectStart: null,
       isDrag: 0,
-      config: localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {},
-      tableData: data,
+      config: {},
+      tableData: [],
       dragRow: null,
       selectedRowIndex: null,
       selectRow: null,
@@ -110,6 +89,9 @@ export default {
 
   },
   mounted() {
+    this.config = useConfigStore().config;
+    this.tableData = useDataRowsStore().dataRows;
+
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {
         event.preventDefault();
