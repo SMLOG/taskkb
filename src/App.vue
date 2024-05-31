@@ -20,9 +20,7 @@ import Operation from './components/Operation.vue'
 
       <router-view></router-view>
   </main>
-  <footer>
-  <Operation/>
-  </footer>
+
 </template>
 
 <style scoped>

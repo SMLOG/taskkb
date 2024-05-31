@@ -88,6 +88,8 @@
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
               :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
+              @mousedown.left="clickSelectCell($event, rowIndex, row)"
+              @mouseup="moveType=null"
               @drop="drop($event, row, rowIndex)">
               <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
                 @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
@@ -116,6 +118,7 @@
                         calculateDaysBetweenDates(row._tl.end,
                           row._tl.start) +
                       1 }}
+                      <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
 
                       <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                     </div>
@@ -151,6 +154,7 @@
           <a @click="saveData(0)">Save</a>
           <a @click="showConfig = !showConfig">Configuration</a>
           <a @click="showConfig = !showConfig">Team</a>
+          <a @click="download" >Dowload</a>
         </div>
       </div>
     </div>
@@ -209,6 +213,7 @@ export default {
       dragRow: null,
       selectedRowIndex: null,
       selectRow: null,
+      moveType:null,
       selectedcellIndex: null,
       selectCol: null,
       tableData: [],
@@ -333,6 +338,10 @@ export default {
 
   },
   methods: {
+    download(){
+      const dataRowsStore = useDataRowsStore();
+       dataRowsStore.download();;
+    },
     calculateDaysBetweenDates(date1, date2) {
       if (!date1.date) {
         return 0;
@@ -437,7 +446,29 @@ export default {
     throttleHandleResize(event) {
       //clearTimeout(this.throttleTimeout);
       //this.throttleTimeout=setTimeout(()=>{
-      this.handleResize(event);
+        if(this.moveType){
+	  let x = event.clientX - this.moveType.x;
+	  
+      let totalWidth = event.target.closest('.sch').offsetWidth;
+	  let unitWidth = totalWidth/this.weekCount / 7;
+	  
+	  
+	    let index = this.moveType._tl[this.moveType.type=='rightDrag'?'end':'start'].i+parseInt(x/unitWidth)
+      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+      if(this.moveType.type=='rightDrag')
+	    this.selectRow._tl.end=date;
+      else if(this.moveType.type=='leftDrag')
+	    this.selectRow._tl.start=date;
+    else{
+       index = this.moveType._tl.start.i+parseInt(x/unitWidth);
+
+      this.selectRow._tl.start=this.weeks[parseInt(index / 7)].dates[index % 7];
+      index = this.moveType._tl.end.i+parseInt(x/unitWidth);
+
+      this.selectRow._tl.end=this.weeks[parseInt(index / 7)].dates[index % 7];
+    }
+}else this.handleResize(event);
       //},10);
     },
     handleResize(event) {
@@ -625,7 +656,15 @@ export default {
       } else {
         this.selectWholeRowIndex = false;
       }
-
+      if(event.target.classList.contains('plantime') ){ 
+        this.moveType={x:event.clientX,type:'plantime',_tl:JSON.parse(JSON.stringify(row._tl))} }
+      else if(event.target.classList.contains('rightDrag') ){ 
+        this.moveType={x:event.clientX,type:'rightDrag',initValue:row._tl.end,_tl:JSON.parse(JSON.stringify(row._tl))} 
+      }
+      else if(event.target.classList.contains('leftDrag') ){ 
+        this.moveType={x:event.clientX,type:'leftDrag',initValue:row._tl.start,_tl:JSON.parse(JSON.stringify(row._tl))}
+       }
+      
     },
     deleteRow(row) {
       if (confirm("Please confirm to delete it?")) {
@@ -1260,8 +1299,14 @@ td.bottom {
   top: 0;
   bottom: 0;
 }
-
-.plantime .rightDrag:hover {
+.plantime .leftDrag {
+  position: absolute;
+  left: 0px;
+  width: 4px;
+  top: 0;
+  bottom: 0;
+}
+.plantime .rightDrag:hover,.plantime .leftDrag:hover {
   background: blue;
   cursor: ew-resize;
 }
