@@ -1,18 +1,6 @@
 <template>
-
-  <div style="
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      overflow: auto;
-      right: 0;
-      left: 0;
-      display: flex;
-      flex-direction: column;
-    ">
     <div class="table-container" style="flex-grow: 1;position: relative;">
       <div>
-
         <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
           @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
           <div class="vue-columns-resizable" style="position: relative;">
@@ -23,8 +11,6 @@
                 :style="{ height: tableHeight + 'px' }"></div>
             </template>
           </div>
-
-
           <!--line-->
           <div class="row header line" :style="{ gridTemplateColumns: gridColumns() }">
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
@@ -41,8 +27,6 @@
               </div>
             </div>
           </div>
-
-
           <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
             <template v-for="(col, key) in cols" :key="key">
@@ -63,9 +47,7 @@
                           @date-update="(d) => { config.startDate = d; showDatePicker = false }"
                           :enable-time-picker="false" type="date" inline auto-apply />
                         Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop />
-
                       </div>
-
                     </a>
                     <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
                   </div>
@@ -84,7 +66,6 @@
               </div>
             </div>
           </div>
-
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
               :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
@@ -136,36 +117,19 @@
         </div>
       </div>
     </div>
-
-    <Operation />
-
-
-  </div>
-
 </template>
-
-
 
 <script setup>
 import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
-import Operation from '@/components/Operation.vue'
-
-
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-
-
 </script>
 <script>
-
-
-
 
 import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
-
 
 export default {
   components: { ColTitle, ColDropText, ColDate, VueDatePicker },
@@ -197,12 +161,13 @@ export default {
     };
   },
   mounted() {
-    const configStore = useConfigStore();
-    this.config = configStore.config;
+    this.config = useConfigStore().config;
+    this.tableData = useDataRowsStore().dataRows;
+
     if (!this.config.startDate) this.config.startDate = new Date();
     if (!this.config.weekCount) this.config.weekCount = 20;
     this.$watch(
-      () => configStore.config.startDate,
+      () => this.config.startDate,
       () => {
         this.weeks.length = 0;
         this.weeks.push(...this.generateWeeks(this.config.startDate, this.config.weekCount));
@@ -210,7 +175,7 @@ export default {
     );
 
     this.$watch(
-      () => configStore.config.weekCount,
+      () => this.config.weekCount,
       () => {
         this.weeks.length = 0;
         this.weeks.push(...this.generateWeeks(this.config.startDate, this.config.weekCount));
@@ -273,7 +238,7 @@ export default {
 
     document.body.addEventListener('mousemove', this.throttleHandleResize);
     document.body.addEventListener('mouseup', this.resizeBarMouseUp);
-    this.loadData();
+
     this.weeks.length = 0;
     this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.weekCount));
   },
@@ -340,30 +305,7 @@ export default {
       console.log(dayNum, row);
 
     },
-    loadData() {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const dataRowsStore = useDataRowsStore();
-      const data = dataRowsStore.dataRows;
-      function loopToSetDate(row) {
-        if (row._tl) {
-          let peroid = row._tl;
-          peroid.start.date = new Date(peroid.start.date);
-          peroid.end.date = new Date(peroid.end.date);
 
-
-        }
-        if (row._childs) {
-          for (let ch of row._childs) {
-            loopToSetDate(ch);
-          }
-        }
-      }
-      for (let d of data) {
-        loopToSetDate(d);
-      }
-      this.tableData = data;
-    },
     winResize() {
 
       this.$nextTick(() => { this.resize(); });

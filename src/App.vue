@@ -1,5 +1,5 @@
 <script setup>
-import Operation from './components/Operation.vue'
+import Operation from '@/components/Operation.vue'
 </script>
 
 <template>
@@ -14,13 +14,23 @@ import Operation from './components/Operation.vue'
       </div>
     </div>
   </header>
-
   <main style="position: relative;
     flex-grow: 1;">
-      <router-view >
+    <div style="
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      overflow: auto;
+      right: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+    ">
+      <router-view>
       </router-view>
+      <Operation />
+    </div>
   </main>
-
 </template>
 
 <style scoped>
