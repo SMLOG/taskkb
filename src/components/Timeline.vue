@@ -67,7 +67,7 @@
                       </div>
 
                     </a>
-                    <span>{{ week.label }}</span><span>({{ week.i+1 }})</span>
+                    <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
                   </div>
                   <div style="display: flex; justify-content: space-between">
                     <span v-for="day in week.dates" :key="day" class="day" :style="{
@@ -88,13 +88,12 @@
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
               :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
-              @mousedown.left="clickSelectCell($event, rowIndex, row)"
-              @mouseup="moveType=null"
+              @mousedown.left="clickSelectCell($event, rowIndex, row)" @mouseup="moveType = null"
               @drop="drop($event, row, rowIndex)">
               <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
                 @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-                @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
-                :class="{ curRow: selectRow == row }">
+                @contextmenu="clickSelectCell($event, rowIndex, row);"
+                :class="{ curRow: curRow == row }">
                 {{ row._rIndex + 1 }}
               </a>
               <template v-for="(col, cellIndex) in cols" :key="cellIndex">
@@ -102,7 +101,7 @@
                   :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
                   :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
                   <div class="cell">
-                    <component :is="col.cp" :row="row" :col="col" @change="saveData(1)"></component>
+                    <component :is="col.cp" :row="row" :col="col"></component>
                   </div>
                 </div>
               </template>
@@ -117,7 +116,7 @@
                       :class="{ selected: selectStart && selectStart.row == row }">{{
                         calculateDaysBetweenDates(row._tl.end,
                           row._tl.start) +
-                      1 }}
+                        1 }}
                       <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
 
                       <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
@@ -127,7 +126,7 @@
                         width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
                         marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
                       }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start,
-                      selectStart.start) + 1 }}
+                        selectStart.start) + 1 }}
                     </div>
                   </div>
                 </div>
@@ -137,39 +136,12 @@
         </div>
       </div>
     </div>
-    <div style="
-        
-        position: sticky;
-        bottom: 0;
-        left: 0;
-        z-index: 3;
-        background: white;
-      ">
-      <div style="display: flex;flex-direction: column;">
-        <Config v-if="showConfig" :config="config"></Config>
-        <div style="display: flex;height: 30px;">
-          <a @click="addRow(1)">Add Row</a>
-          <a @click="deleteRow(selectRow)">Delete Row</a>
-          <a @click="addSubRow(1)">Add Sub Row</a>
-          <a @click="saveData(0)">Save</a>
-          <a @click="showConfig = !showConfig">Configuration</a>
-          <a @click="showConfig = !showConfig">Team</a>
-          <a @click="download" >Dowload</a>
-        </div>
-      </div>
-    </div>
+
+    <Operation />
+
 
   </div>
 
-  <!-- Context menu -->
-  <div v-show="isContextMenuVisible" :style="{ left: contextMenuPosition.x + 'px', top: contextMenuPosition.y + 'px' }"
-    class="contextmenu">
-    <ul>
-      <li @click="addRow(1)">Insert Row after {{ selectedRowIndex }}</li>
-      <li>Delete Row</li>
-      <li>Menu Item 3</li>
-    </ul>
-  </div>
 </template>
 
 
@@ -177,8 +149,8 @@
 <script setup>
 import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
+import Operation from '@/components/Operation.vue'
 
-import Config from './Config.vue';
 
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
@@ -205,15 +177,13 @@ export default {
       tableHeight: 20,
       isContextMenuVisible: false,
       contextMenuPosition: { x: 0, y: 0 },
-      showConfig: 0,
       selectStart: null,
       isDrag: 0,
       weeks: [],
       config: null,
       dragRow: null,
       selectedRowIndex: null,
-      selectRow: null,
-      moveType:null,
+      moveType: null,
       selectedcellIndex: null,
       selectCol: null,
       tableData: [],
@@ -227,11 +197,10 @@ export default {
     };
   },
   mounted() {
-
     const configStore = useConfigStore();
     this.config = configStore.config;
-    if(!this.config.startDate)this.config.startDate=new Date();
-    if(!this.config.weekCount)this.config.weekCount=20;
+    if (!this.config.startDate) this.config.startDate = new Date();
+    if (!this.config.weekCount) this.config.weekCount = 20;
     this.$watch(
       () => configStore.config.startDate,
       () => {
@@ -329,8 +298,12 @@ export default {
         return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
       return [];
     },
+    curRow() {
+      const configStore = useConfigStore();
+      return configStore.share.curRow;
+    },
     currentCell() {
-      return this.selectRow && this.selectCol ? this.selectRow['c' + this.selectCol.fn] : null;
+      return this.curRow && this.selectCol ? this.curRow['c' + this.selectCol.fn] : null;
     }
 
   },
@@ -338,10 +311,6 @@ export default {
 
   },
   methods: {
-    download(){
-      const dataRowsStore = useDataRowsStore();
-       dataRowsStore.download();;
-    },
     calculateDaysBetweenDates(date1, date2) {
       if (!date1.date) {
         return 0;
@@ -446,29 +415,29 @@ export default {
     throttleHandleResize(event) {
       //clearTimeout(this.throttleTimeout);
       //this.throttleTimeout=setTimeout(()=>{
-        if(this.moveType){
-	  let x = event.clientX - this.moveType.x;
-	  
-      let totalWidth = event.target.closest('.sch').offsetWidth;
-	  let unitWidth = totalWidth/this.weekCount / 7;
-	  
-	  
-	    let index = this.moveType._tl[this.moveType.type=='rightDrag'?'end':'start'].i+parseInt(x/unitWidth)
-      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+      if (this.moveType) {
+        let x = event.clientX - this.moveType.x;
 
-      if(this.moveType.type=='rightDrag')
-	    this.selectRow._tl.end=date;
-      else if(this.moveType.type=='leftDrag')
-	    this.selectRow._tl.start=date;
-    else{
-       index = this.moveType._tl.start.i+parseInt(x/unitWidth);
+        let totalWidth = event.target.closest('.sch').offsetWidth;
+        let unitWidth = totalWidth / this.weekCount / 7;
 
-      this.selectRow._tl.start=this.weeks[parseInt(index / 7)].dates[index % 7];
-      index = this.moveType._tl.end.i+parseInt(x/unitWidth);
 
-      this.selectRow._tl.end=this.weeks[parseInt(index / 7)].dates[index % 7];
-    }
-}else this.handleResize(event);
+        let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
+        let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+        if (this.moveType.type == 'rightDrag')
+          this.curRow._tl.end = date;
+        else if (this.moveType.type == 'leftDrag')
+          this.curRow._tl.start = date;
+        else {
+          index = this.moveType._tl.start.i + parseInt(x / unitWidth);
+
+          this.curRow._tl.start = this.weeks[parseInt(index / 7)].dates[index % 7];
+          index = this.moveType._tl.end.i + parseInt(x / unitWidth);
+
+          this.curRow._tl.end = this.weeks[parseInt(index / 7)].dates[index % 7];
+        }
+      } else this.handleResize(event);
       //},10);
     },
     handleResize(event) {
@@ -506,7 +475,6 @@ export default {
       console.log('resizeBarMouseUp')
       if (this.resizeColumn) {
         this.resize();
-        this.saveData();
       }
       this.resizeColumn = 0;
       document.body.style.cursor = '';
@@ -647,7 +615,8 @@ export default {
 
       this.selectedRowIndex = rowIndex;
       this.selectedcellIndex = cellIndex;
-      this.selectRow = row;
+      const configStore = useConfigStore();
+      configStore.share.curRow = row;
       this.selectCol = col;
 
       if (cellIndex == undefined) {
@@ -656,23 +625,18 @@ export default {
       } else {
         this.selectWholeRowIndex = false;
       }
-      if(event.target.classList.contains('plantime') ){ 
-        this.moveType={x:event.clientX,type:'plantime',_tl:JSON.parse(JSON.stringify(row._tl))} }
-      else if(event.target.classList.contains('rightDrag') ){ 
-        this.moveType={x:event.clientX,type:'rightDrag',initValue:row._tl.end,_tl:JSON.parse(JSON.stringify(row._tl))} 
+      if (event.target.classList.contains('plantime')) {
+        this.moveType = { x: event.clientX, type: 'plantime', _tl: JSON.parse(JSON.stringify(row._tl)) }
       }
-      else if(event.target.classList.contains('leftDrag') ){ 
-        this.moveType={x:event.clientX,type:'leftDrag',initValue:row._tl.start,_tl:JSON.parse(JSON.stringify(row._tl))}
-       }
-      
-    },
-    deleteRow(row) {
-      if (confirm("Please confirm to delete it?")) {
-        let list = row._p && row._p._childs || this.tableData;
-        list.splice(list.indexOf(row), 1);
+      else if (event.target.classList.contains('rightDrag')) {
+        this.moveType = { x: event.clientX, type: 'rightDrag', initValue: row._tl.end, _tl: JSON.parse(JSON.stringify(row._tl)) }
+      }
+      else if (event.target.classList.contains('leftDrag')) {
+        this.moveType = { x: event.clientX, type: 'leftDrag', initValue: row._tl.start, _tl: JSON.parse(JSON.stringify(row._tl)) }
       }
 
     },
+
     gridColumns() {
 
       return '46px ' + this.cols.map(e => e.width + 'px').join(' ') + ' 1fr';
@@ -771,19 +735,9 @@ export default {
         }
 
         this.dragRow = null;
-        this.saveData()
       }
     },
-    addRow(num) {
-      console.log(num)
-      if (this.selectRow) {
-        let list = this.selectRow._p && this.selectRow._p._childs || this.tableData;
-        let index = list.indexOf(this.selectRow);
-        list.splice(index + 1, 0, { _id: '', _p: this.selectRow._p });
 
-      } else this.tableData.push({ _id: '' })
-
-    },
     addSubRow(num) {
       if (!this.tableData[this.selectedRowIndex].childs)
         this.tableData[this.selectedRowIndex].childs = [];
@@ -807,16 +761,7 @@ export default {
         }, 100);
       }
     },
-    saveData(bool) {
-      console.log(bool)
-      if (!bool || this.config.autoSave) {
 
-        const dataRowsStore = useDataRowsStore();
-        dataRowsStore.save();
-        useConfigStore().save();
-
-      }
-    },
     moveCursorToEnd(index) {
       this.$nextTick(() => {
         const spanElement = this.$refs.spanElement[index];
@@ -1047,16 +992,7 @@ export default {
     formatDate(date, format) {
       return date.toLocaleDateString("en-US", { ...format });
     },
-    showContextMenu(event, index) {
-      event.preventDefault();
-      this.isContextMenuVisible = true;
-      this.contextMenuPosition.x = event.clientX;
-      this.contextMenuPosition.y = event.clientY;
-      this.selectedRowIndex = index;
-    },
-    hideContextMenu() {
-      this.isContextMenuVisible = false;
-    },
+
   },
 };
 </script>
@@ -1299,6 +1235,7 @@ td.bottom {
   top: 0;
   bottom: 0;
 }
+
 .plantime .leftDrag {
   position: absolute;
   left: 0px;
@@ -1306,7 +1243,9 @@ td.bottom {
   top: 0;
   bottom: 0;
 }
-.plantime .rightDrag:hover,.plantime .leftDrag:hover {
+
+.plantime .rightDrag:hover,
+.plantime .leftDrag:hover {
   background: blue;
   cursor: ew-resize;
 }

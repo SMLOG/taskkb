@@ -17,8 +17,8 @@ import Operation from './components/Operation.vue'
 
   <main style="position: relative;
     flex-grow: 1;">
-
-      <router-view></router-view>
+      <router-view >
+      </router-view>
   </main>
 
 </template>

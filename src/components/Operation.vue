@@ -1,28 +1,57 @@
 <template>
+  <div style="
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        z-index: 3;
+        background: white;
+      ">
     <div>
       <div style="display: flex;flex-direction: column;">
         <Config v-if="showConfig" :config="config"></Config>
         <div style="display: flex;height: 30px;">
           <a @click="addRow(1)">Add Row</a>
-          <a @click="deleteRow(selectRow)">Delete Row</a>
-          <a @click="addSubRow(1)">Add Sub Row</a>
+          <a @click="deleteRow()">Delete Row</a>
           <a @click="saveData(0)">Save</a>
           <a @click="showConfig = !showConfig">Configuration</a>
           <a @click="showConfig = !showConfig">Team</a>
+          <a @click="download" >Export</a>
         </div>
       </div>
     </div>
+  </div>
+
 </template>
-
-
-
 <script setup>
 import { useConfigStore } from '@/stores/config'
+import { useDataRowsStore } from '@/stores/dataRows'
 import Config from './Config.vue';
 </script>
 <script>
-export default {
 
+function downloadJSON(jsonData, filename = 'data.json') {
+    // Convert the JSON data to a string
+    const jsonString = JSON.stringify(jsonData);
+  
+    // Encode the JSON string
+    const encodedJsonString = encodeURIComponent(jsonString);
+  
+    // Create a download link
+    const downloadLink = document.createElement("a");
+    downloadLink.setAttribute("href", "data:application/json;charset=utf-8," + encodedJsonString);
+    downloadLink.setAttribute("download", filename);
+  
+    // Append the download link to the document
+    document.body.appendChild(downloadLink);
+  
+    // Trigger the download
+    downloadLink.click();
+  
+    // Remove the download link from the document
+    document.body.removeChild(downloadLink);
+  }
+
+export default {
   data() {
     return {
       showConfig: 0,
@@ -31,261 +60,70 @@ export default {
     };
   },
   mounted() {
-
     const configStore = useConfigStore();
     this.config = configStore.config;
+
+    const dataRowsStore = useDataRowsStore();
+    this.tableData = dataRowsStore.dataRows;
+
+
+    this.$watch(
+      () => dataRowsStore.dataRows,
+      () => {
+        this.saveData();
+      }, { deep: true }
+    );
+
 
   },
 
   watch: {
 
   },
+  computed: {
+    curRow() {
+      const configStore = useConfigStore();
+      return configStore.share.curRow;
+    },
+  },
   methods: {
+    download() {
+      let data = JSON.parse(JSON.stringify(this.tableData, function (key, value) {
+        if (key === "_p") {
+          return null;
+        } else return value;
+      }));
+      downloadJSON({data:data,config:this.config,timestamp:new Date().getTime()});
+
+    },
+    saveData(bool) {
+      console.log(bool)
+      if (!bool || this.config.autoSave) {
+        const dataRowsStore = useDataRowsStore();
+        dataRowsStore.save();
+        useConfigStore().save();
+      }
+    },
+    deleteRow() {
+      let row = this.curRow;
+      if (confirm("Please confirm to delete it?")) {
+        let list = row._p && row._p._childs || this.tableData;
+        list.splice(list.indexOf(row), 1);
+      }
+
+    },
+    addRow(num) {
+      console.log(num)
+
+      if (this.curRow) {
+        let list = this.curRow._p && this.curRow._p._childs || this.tableData;
+        let index = list.indexOf(this.curRow);
+        list.splice(index + 1, 0, { _id: '', _p: this.curRow._p });
+
+      } else this.tableData.push({ _id: '' })
+
+    },
   }
 };
 </script>
 
-<style scoped>
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 0;
-  min-height: 1em;
-}
-
-tbody th {
-  position: sticky;
-  left: 0;
-  top: 0;
-  background-color: white;
-  text-align: left;
-  z-index: 2;
-}
-
-thead th {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  z-index: 2;
-}
-
-thead th:first-child {
-  z-index: 4;
-}
-
-th:first-child,
-td:first-child {
-  z-index: 3;
-  /* Ensure the first column stays on top */
-  position: sticky;
-  left: 0;
-  background-color: white;
-  width: 46px;
-  min-width: 46px;
-  text-align: center;
-}
-
-td {
-  vertical-align: top;
-}
-
-.selected th {
-  background-color: #F0FFF0;
-}
-
-.week-slot {
-  position: relative;
-  flex-grow: 1;
-}
-
-.week-slot::after {
-  content: "";
-  width: 0;
-  position: absolute;
-  top: 0;
-  height: 100%;
-  border: 1px solid #ddd;
-  right: 0;
-}
-
-.line .week-slot::after {
-  height: var(--table-height);
-  z-index: -1;
-}
-
-.line {
-  z-index: -1 !important;
-}
-
-.selectStart {
-  background-color: yellow;
-  left: 0px;
-  top: 0px;
-  position: absolute;
-}
-
-.drag {
-  cursor: move;
-}
-
-.resizable {
-  position: relative;
-  overflow: hidden;
-}
-
-.resize-handle {
-  position: absolute;
-  top: 0;
-  right: -11px;
-  bottom: 0;
-  width: 3px;
-  background-color: #eee;
-  cursor: col-resize;
-}
-
-.selected {
-  background-color: #F0FFF0 !important;
-}
-
-.sch .selected {
-  background-color: lightgreen !important;
-}
-
-.contextmenu {
-  background: white;
-  z-index: 1;
-  position: fixed;
-  border: 2px solid gray;
-  border-radius: 5px;
-  padding: 5px;
-}
-
-.contextmenu ul {
-  margin: 0;
-}
-
-td.left {
-  border-left: 1px darkgreen solid;
-}
-
-td.right {
-  border-right: 1px darkgreen solid;
-}
-
-td.top {
-  border-top: 1px darkgreen solid;
-}
-
-td.bottom {
-  border-bottom: 1px darkgreen solid;
-}
-
-.filterSearch {
-  position: relative;
-  display: inline-block;
-  width: 200px;
-  height: 24px;
-}
-
-.filterSearch input {
-  width: 100%;
-}
-
-.filterSearch:after {
-  content: "T";
-  position: absolute;
-  right: 3px;
-  top: 0;
-  color: green;
-  font-weight: bold;
-}
-
-.curRow,
-.wholeRowSelected td {
-  background-color: #E0EEE0 !important
-}
-
-.sticky {
-  position: sticky;
-  z-index: 3;
-  background: white;
-}
-
-.cell {
-  line-height: 2em;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.col {
-  border: 1px solid #ccc;
-  position: relative;
-}
-
-.header {
-  position: sticky;
-  top: 0;
-  z-index: var(--vt-index-sticky-header);
-  background-color: white
-}
-
-.sticky {
-  position: sticky;
-  z-index: var(--vt-index-sticky);
-  background: white;
-}
-
-.lsticky {
-  position: sticky;
-  z-index: var(--vt-index-sticky);
-  left: 0;
-  background: white;
-  text-align: center;
-
-}
-
-.cell {
-  line-height: 2em;
-}
-
-.sch {
-  height: 100%;
-}
-
-.curRow,
-.wholeRowSelected>div {
-  background-color: #E0EEE0 !important
-}
-
-.day {
-  margin: 0 5px;
-  font-size: 60%;
-}
-
-.plantime {
-  background-color: lightblue;
-  cursor: move;
-  position: relative;
-}
-
-.plantime .rightDrag {
-  position: absolute;
-  right: 0px;
-  width: 4px;
-  top: 0;
-  bottom: 0;
-}
-
-.plantime .rightDrag:hover {
-  background: blue;
-  cursor: ew-resize;
-}
-</style>
