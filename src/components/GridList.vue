@@ -1,42 +1,43 @@
 <template>
 
 
-    <div class="table-container" style="    flex-grow: 1;" >
-      <ColumnsResizer  :th="$refs.th" v-if="$refs.th" data="rbar" :table="$refs.table" :cols="cols"/>
-      <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
-        @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-        <div class="row header" :style="{gridTemplateColumns: gridColumns()}">
-          <div class="th col lsticky" freeze="1" style="min-width: 46px;">#</div>
-          <template v-for="(col, key) in cols" :key="key">
-            <div class="col" ref="th"  :data-row="0" :data-col="key+1"    :class="cellClass(0, key+1, col)" v-if="col.show">
+  <div class="table-container" style="    flex-grow: 1;">
+    <ColumnsResizer :th="$refs.th" v-if="$refs.th" data="rbar" :table="$refs.table" :cols="cols" />
+    <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
+      @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+      <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
+        <div class="th col lsticky" freeze="1" style="min-width: 46px;">#</div>
+        <template v-for="(col, key) in cols" :key="key">
+          <div class="col" ref="th" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
+            <div class="cell">
+              <component :is="col.cp" :col="col"></component>
+            </div>
+          </div>
+        </template>
+      </div>
+      <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
+        <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
+          @drop="drop($event, row, rowIndex)">
+          <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
+            @click="clickSelectCell($event, rowIndex, row)"
+            @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
+            :class="{ curRow: selectRow == row }">
+            {{ row._rIndex + 1 }}
+          </a>
+          <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+            <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
+              :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
+              @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
               <div class="cell">
-                <component :is="col.cp" :col="col"></component>
+                <component :is="col.cp" :row="row" :col="col"></component>
               </div>
             </div>
           </template>
         </div>
-        <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-          <div class="row" :style="{gridTemplateColumns: gridColumns()}" v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
-            @dragover="dragOver" @drop="drop($event, row, rowIndex)">
-            <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
-              @click="clickSelectCell($event, rowIndex, row)"
-              @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
-              :class="{ curRow: selectRow == row }">
-              {{ row._rIndex + 1 }}
-        </a>
-            <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-              <div class="col td" :data-row="rowIndex+1" :data-col="cellIndex+1" :tabindex="100 * rowIndex + cellIndex"
-                :class="cellClass(rowIndex + 1, cellIndex + 1, col)" 
-                @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
-                <div class="cell">
-                  <component :is="col.cp" :row="row" :col="col" ></component>
-                </div>
-              </div>
-            </template>
-          </div>
-        </template>
-      </div>
+      </template>
     </div>
+  </div>
 
 </template>
 
@@ -56,10 +57,6 @@ export default {
 
   data() {
     return {
-      tableHeight: 20,
-      isContextMenuVisible: false,
-      contextMenuPosition: { x: 0, y: 0 },
-      showConfig: 0,
       selectStart: null,
       isDrag: 0,
       config: {},
@@ -107,16 +104,9 @@ export default {
           }
           copyTblData.push(rowDatas);
         }
-
         this.copyTableToExcel(copyTblData);
-
-
-
       }
     });
-
-
-
   },
   computed: {
     cols() {
@@ -128,96 +118,44 @@ export default {
     }
 
   },
-  watch: {
-
-  },
   methods: {
-    gridColumns(){
-      
-      return ' 46px ' +this.cols.map(e=>e.width+'px').join(' ');
-    },
-
-    getScrollbarWidth() {
-      // Create a div element
-      var div = document.createElement('div');
-
-      // Set the styles for the div element
-      div.style.width = '100px';
-      div.style.height = '100px';
-      div.style.overflow = 'scroll';
-      div.style.position = 'absolute';
-      div.style.top = '-9999px';
-
-      // Append the div element to the document body
-      document.body.appendChild(div);
-
-      // Calculate the scrollbar width
-      var scrollbarWidth = div.offsetWidth - div.clientWidth;
-
-      // Remove the div element from the document body
-      document.body.removeChild(div);
-
-      // Return the scrollbar width
-      return scrollbarWidth;
-    },
-    winResize() {
-      if (this.config.fix) {
-        let showCols = this.cols;
-        let totalWidth = showCols.reduce((total, col) => total + col.width, 0);
-
-        let share = (window.innerWidth - 46 - showCols.length - 2 - this.getScrollbarWidth()) / totalWidth;
-        showCols.forEach((col) => {
-          col.width = col.width * share;
-        });
-      }
+    gridColumns() {
+      return ' 46px ' + this.cols.map(e => e.width + 'px').join(' ');
     },
     containsBlockElement(element) {
       // Get all child elements of the given element
       const childElements = element.getElementsByTagName('*');
-
       // Iterate through the child elements
       for (let i = 0; i < childElements.length; i++) {
         const childElement = childElements[i];
-
         // Check if the child element is a block-level element
         if (getComputedStyle(childElement).display === 'block') {
           return true;
         }
       }
-
       // No block-level elements found
       return false;
     },
     copyTableToExcel(data) {
-
-
       // Create the table element
       var table = document.createElement('table');
-
       // Iterate over the data array
       for (var i = 0; i < data.length; i++) {
         // Create a new row
         var row = document.createElement('tr');
-
         // Iterate over the inner array (cells)
         for (var j = 0; j < data[i].length; j++) {
           // Create a new cell
           var cell = document.createElement('td');
-
           // Set the cell content using innerHTML
           cell.innerHTML = data[i][j];
-
           // Append the cell to the row
           row.appendChild(cell);
         }
-
         // Append the row to the table
         table.appendChild(row);
       }
-
-
       if (navigator.clipboard) {
-
         var tableHTML = table.outerHTML;
         console.log(tableHTML)
         navigator.clipboard.writeText(tableHTML)
@@ -231,7 +169,6 @@ export default {
         console.error('Clipboard API is not supported in this browser.');
       }
     },
-
     cellClass(rowIndex, cellIndex, col) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
       const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
@@ -249,7 +186,7 @@ export default {
     },
     handleMouseDown(event) {
       console.log('mosuedown')
-      this.selectWholeRowIndex=null;
+      this.selectWholeRowIndex = null;
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
@@ -278,10 +215,8 @@ export default {
     handleMouseMove(event) {
       if (this.isMouseDown) {
         const cell = event.target.closest('div.col');
-
-        
-      const rowIndex = parseInt(cell.getAttribute('data-row'));
-      const cellIndex = parseInt(cell.getAttribute('data-col'));
+        const rowIndex = parseInt(cell.getAttribute('data-row'));
+        const cellIndex = parseInt(cell.getAttribute('data-col'));
 
         this.endRowIndex = rowIndex;
         this.endcellIndex = cellIndex;
@@ -503,8 +438,9 @@ td {
   position: relative;
   overflow: hidden;
 }
+
 .selected {
-  background-color: #F0FFF0!important;
+  background-color: #F0FFF0 !important;
 }
 
 .sch .selected {
@@ -512,23 +448,24 @@ td {
 }
 
 .left {
-  border-left: 1px darkgreen solid!important;
+  border-left: 1px darkgreen solid !important;
 }
 
 .right {
-  border-right: 1px darkgreen solid!important;
+  border-right: 1px darkgreen solid !important;
 }
 
 .top {
-  border-top: 1px darkgreen solid!important;
+  border-top: 1px darkgreen solid !important;
 }
 
 .bottom {
-  border-bottom: 1px darkgreen solid!important;;
+  border-bottom: 1px darkgreen solid !important;
+  ;
 }
 
 .curRow,
-.wholeRowSelected > div {
+.wholeRowSelected>div {
   background-color: #E0EEE0 !important
 }
 
@@ -538,14 +475,15 @@ td {
   background: white;
 }
 
-.lsticky{
+.lsticky {
   position: sticky;
   z-index: var(--vt-index-sticky);
-  left:0;
+  left: 0;
   background: white;
   text-align: center;
 
 }
+
 .cell {
   line-height: 2em;
 }
@@ -573,10 +511,16 @@ td {
 .col {
   border: 1px solid #ccc;
 }
-.cell{height: 100%;position: relative;padding:0 2px;}
-.header{
+
+.cell {
+  height: 100%;
+  position: relative;
+  padding: 0 2px;
+}
+
+.header {
   position: sticky;
-  top:0;
+  top: 0;
   z-index: var(--vt-index-sticky-header);
   background-color: white
 }
