@@ -45,13 +45,7 @@
                     <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
                   </div>
                   <div style="display: flex; justify-content: space-between">
-                    <span v-for="day in week.dates" :key="day" class="day" :style="{
-                      backgroundColor: day.isCur
-                        ? 'red'
-                        : day.isWeekend
-                          ? 'gray'
-                          : 'none',
-                    }">
+                    <span v-for="day in week.dates" :key="day" class="day" :class="{selected:selectStart&&(day.i>=selectStart.start.i&&day.i<=selectStart.end.i),today:day.isCur,weekend:day.isWeekend}">
                       {{ day.label }}
                     </span>
                   </div>
@@ -132,9 +126,6 @@ export default {
     return {
       weekCount: 20,
       showDatePicker: false,
-      tableHeight: 20,
-      isContextMenuVisible: false,
-      contextMenuPosition: { x: 0, y: 0 },
       selectStart: null,
       isDrag: 0,
       weeks: [],
@@ -183,8 +174,6 @@ export default {
         const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
         const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
         const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
-
-
         let copyTblData = [];
         const table = this.$refs.table;
         for (let i = minRowIndex; i <= maxRowIndex; i++) {
@@ -233,11 +222,7 @@ export default {
     curRow() {
       const configStore = useConfigStore();
       return configStore.share.curRow;
-    },
-    currentCell() {
-      return this.curRow && this.selectCol ? this.curRow['c' + this.selectCol.fn] : null;
     }
-
   },
   watch: {
 
@@ -261,7 +246,10 @@ export default {
       let totalWidth = event.target.closest('.sch').offsetWidth;
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-      this.enterSch(row, date);
+
+      if (this.selectStart != null && row == this.selectStart.row && !this.selectStart.row._tl) {
+        this.selectStart.end = date;
+      }
 
     },
     setSchStart(event, row) {
@@ -588,46 +576,6 @@ export default {
         }
       });
     },
-    subtractDates(date1, date2) {
-      const oneDay = 24 * 60 * 60 * 1000; // Number of milliseconds in a day
-
-      const convertedDate1 = new Date(date1);
-      const convertedDate2 = new Date(date2);
-
-      const timeDiff = convertedDate1.getTime() - convertedDate2.getTime();
-
-      const diffInDays = Math.round(timeDiff / oneDay);
-
-      return diffInDays;
-    },
-    increaseDateByDays(date, days) {
-      const newDate = new Date(date);
-      newDate.setDate(newDate.getDate() + days);
-      return newDate;
-    },
-    enterSch(row, date) {
-      if (this.selectStart != null && row == this.selectStart.row) {
-        if (this.selectStart.type == 1) {
-          let days = this.subtractDates(date, this.selectStart.date);
-
-          this.selectStart.start = this.increaseDateByDays(
-            this.selectStart.orgStart,
-            days
-          );
-          this.selectStart.end = this.increaseDateByDays(
-            this.selectStart.orgEnd,
-            days
-          );
-        } else {
-          if (
-            !this.selectStart.end ||
-            date.n != this.selectStart.end.n
-          ) {
-            this.selectStart.end = date;
-          }
-        }
-      }
-    },
     handleKeyDown(event) {
       if (
         event.key === "Delete" ||
@@ -642,7 +590,7 @@ export default {
       }
     },
     selectRowSch(row) {
-      this.selectStart = { type: 1, row: row };
+      this.selectStart = { type: 1, row: row,start:row._tl.start,end:row._tl.end };
     },
     mouseDownSch(event, row) {
       console.log("moousedown");
@@ -664,7 +612,7 @@ export default {
         return;
       }
       if (this.selectStart == null)
-        this.selectStart = { type: 2, row: row, start: date };
+        this.selectStart = { type: 2, row: row, start: date,end:date };
       else if (this.selectStart.row == row) {
         row._tl = this.addDatePeriod({
           start: this.selectStart.start,
@@ -841,7 +789,7 @@ export default {
   background-color: #F0FFF0 !important;
 }
 
-.sch .selected {
+.selected {
   background-color: lightgreen !important;
 }
 
@@ -902,11 +850,11 @@ export default {
 
 .curRow,
 .wholeRowSelected>div {
-  background-color: #E0EEE0 !important
+  background-color: rgba(224, 238, 224, 0.5) !important
 }
 
 .day {
-  margin: 0 5px;
+  padding: 0 5px;
   font-size: 60%;
 }
 
@@ -936,5 +884,13 @@ export default {
 .plantime .leftDrag:hover {
   background: blue;
   cursor: ew-resize;
+}
+.today{
+  color:red!important;
+  font-weight: bold
+}
+.weekend{
+  background-color: #ccc;
+  color:blue;
 }
 </style>
