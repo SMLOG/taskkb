@@ -56,7 +56,7 @@
           <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
             <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
               :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
-              @mousedown.left="clickSelectCell($event, rowIndex, row)" @mouseup="moveType = null"
+              @mousedown.left="clickSelectCell($event, rowIndex, row)" @mouseup="mouseDownSch($event, row);moveType = null"
               @drop="drop($event, row, rowIndex)">
               <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
                 @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
@@ -80,21 +80,19 @@
                     <div v-if="row._tl && row._tl.end" :style="{
                       width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
                       marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
-                    }" class="plantime" @click="selectRowSch(row)"
-                      :class="{ selected: selectStart && selectStart.row == row }">{{
+                    }" class="plantime" @mouseover="selectRowSch(row)">{{
                         calculateDaysBetweenDates(row._tl.end,
                           row._tl.start) +
                         1 }}
-                      <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
-
-                      <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                     </div>
-                    <div v-if="selectStart && selectStart.type != 1 &&
+                    <div v-if="selectStart &&
                       selectStart.row == row" :style="{
                         width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
                         marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
                       }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start,
                         selectStart.start) + 1 }}
+                      <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
+                      <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                     </div>
                   </div>
                 </div>
@@ -252,14 +250,6 @@ export default {
       }
 
     },
-    setSchStart(event, row) {
-      let x = event.clientX - event.target.getBoundingClientRect().left;
-      let totalWidth = event.target.closest('.sch').offsetWidth;
-      let dayWidth = totalWidth / this.weekCount * 7;
-      let dayNum = parseInt(x / dayWidth);
-      console.log(dayNum, row);
-
-    },
     colStyle(col, isH) {
       let style = {};
       if (col.sticky) {
@@ -280,16 +270,16 @@ export default {
         let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
         if (this.moveType.type == 'rightDrag')
-          this.curRow._tl.end = date;
+          this.selectStart.end = date;
         else if (this.moveType.type == 'leftDrag')
-          this.curRow._tl.start = date;
+          this.selectStart.start = date;
         else {
-          index = this.moveType._tl.start.i + parseInt(x / unitWidth);
+          index = this.moveType.start.i + parseInt(x / unitWidth);
 
-          this.curRow._tl.start = this.weeks[parseInt(index / 7)].dates[index % 7];
-          index = this.moveType._tl.end.i + parseInt(x / unitWidth);
+          this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
+          index = selectStart.end.i + parseInt(x / unitWidth);
 
-          this.curRow._tl.end = this.weeks[parseInt(index / 7)].dates[index % 7];
+          this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
         }
       } 
     },
@@ -440,8 +430,8 @@ export default {
       } else {
         this.selectWholeRowIndex = false;
       }
-      if (event.target.classList.contains('plantime')) {
-        this.moveType = { x: event.clientX, type: 'plantime', _tl: JSON.parse(JSON.stringify(row._tl)) }
+      if (event.target.classList.contains('selectStart')) {
+        this.moveType = { x: event.clientX, type: 'selectStart', _tl: JSON.parse(JSON.stringify(row._tl)) }
       }
       else if (event.target.classList.contains('rightDrag')) {
         this.moveType = { x: event.clientX, type: 'rightDrag', initValue: row._tl.end, _tl: JSON.parse(JSON.stringify(row._tl)) }
@@ -591,6 +581,7 @@ export default {
     },
     selectRowSch(row) {
       this.selectStart = { type: 1, row: row,start:row._tl.start,end:row._tl.end };
+      console.log('select selectstart',this.selectStart);
     },
     mouseDownSch(event, row) {
       console.log("moousedown");
@@ -599,9 +590,13 @@ export default {
       let totalWidth = event.target.closest('.sch').offsetWidth;
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-      if (!row._tl)
+      if (!row._tl||this.moveType)
         this.clickSch(row, date);
-      else this.selectStart = null;
+      else if(row!=this.selectStart.row) {
+        
+        this.selectStart = null;
+        console.log('delete selectStart')
+      }
 
     },
     clickSch(row, date) {
@@ -618,8 +613,12 @@ export default {
           start: this.selectStart.start,
           end: date,
         });
+
+      } else {
         this.selectStart = null;
-      } else this.selectStart = null;
+        console.log('delete selectStart')
+
+      }
     },
     addDatePeriod(addPeriod) {
       if (addPeriod) {
@@ -864,7 +863,7 @@ export default {
   position: relative;
 }
 
-.plantime .rightDrag {
+.rightDrag {
   position: absolute;
   right: 0px;
   width: 4px;
@@ -872,7 +871,7 @@ export default {
   bottom: 0;
 }
 
-.plantime .leftDrag {
+ .leftDrag {
   position: absolute;
   left: 0px;
   width: 4px;
@@ -880,8 +879,8 @@ export default {
   bottom: 0;
 }
 
-.plantime .rightDrag:hover,
-.plantime .leftDrag:hover {
+ .rightDrag:hover,
+.leftDrag:hover {
   background: blue;
   cursor: ew-resize;
 }
