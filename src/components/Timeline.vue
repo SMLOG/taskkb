@@ -3,14 +3,7 @@
       <div>
         <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
           @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-          <div class="vue-columns-resizable" style="position: relative;">
-            <template v-for="(col, key) in cols" :key="key">
-              <div v-if="col.show" class="columns-resize-bar" ref="rbar"
-                @mousedown="resizeBarMouseDown(col, key, $event)"
-                style=" position: absolute; top: 0px;  width: 4px; cursor: col-resize; z-index: 3;"
-                :style="{ height: tableHeight + 'px' }"></div>
-            </template>
-          </div>
+          <ColumnsResizer  :th="$refs.th" v-if="$refs.th" data="rbar" :cols="cols"/>
           <!--line-->
           <div class="row header line" :style="{ gridTemplateColumns: gridColumns() }">
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
@@ -130,6 +123,7 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
+import ColumnsResizer from '@/components/ColumnsResizer.vue';
 
 export default {
   components: { ColTitle, ColDropText, ColDate, VueDatePicker },
@@ -315,10 +309,7 @@ export default {
     resize() {
       console.log('resize')
       console.log('resize')
-      for (let i = 0; i < this.$refs.rbar.length; i++) {
-        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
 
-      }
     },
     colStyle(col, isH) {
       let style = {};
