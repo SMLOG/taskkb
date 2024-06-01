@@ -113,10 +113,6 @@ export default {
       if (!this.config.cols) this.config.cols = [];
       return this.config.cols.filter(e => e.show);
     },
-    currentCell() {
-      return this.selectRow && this.selectCol ? this.selectRow['c' + this.selectCol.fn] : null;
-    }
-
   },
   methods: {
     gridColumns() {
