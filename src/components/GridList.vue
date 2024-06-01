@@ -2,13 +2,7 @@
 
 
     <div class="table-container" style="    flex-grow: 1;" >
-      <div class="vue-columns-resizable" style="position: relative;">
-        <template v-for="(col, key) in cols" :key="key">
-          <div v-if="col.show" class="columns-resize-bar" ref="rbar" @mousedown="resizeBarMouseDown(col, key, $event)"
-            style=" position: absolute; top: 0px;  width: 4px; cursor: col-resize; z-index: 3;"
-            :style="{ height: tableHeight + 'px' }"></div>
-        </template>
-      </div>
+      <ColumnsResizer  :th="$refs.th" v-if="$refs.th" data="rbar" :cols="cols"/>
       <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
         @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
         <div class="row header" :style="{gridTemplateColumns: gridColumns()}">
@@ -47,6 +41,7 @@
 </template>
 
 <script setup>
+import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
 </script>
@@ -84,10 +79,8 @@ export default {
       selectWholeRowIndex: null,
     };
   },
-  unmounted(){
-    document.body.removeEventListener('mousemove', this.throttleHandleResize);
 
-  },
+
   mounted() {
     this.config = useConfigStore().config;
     this.tableData = useDataRowsStore().dataRows;
@@ -122,15 +115,7 @@ export default {
       }
     });
     document.addEventListener("click", this.hideContextMenu);
-    window.data = this.tableData;
-    document.addEventListener("keydown", this.handleKeyDown);
-
-    document.body.addEventListener('mousemove', this.throttleHandleResize);
-    document.body.addEventListener('mouseup', this.resizeBarMouseUp);
-
-
     window.addEventListener('resize', () => {
-
       this.winResize();
     });
     this.winResize();
@@ -142,14 +127,10 @@ export default {
         const resizedTable = entry.target;
         console.log('Table has been resized:', resizedTable);
         this.tableHeight = table.offsetHeight;
+        document.documentElement.style.setProperty('--table-height', this.tableHeight + 'px');
       }
     });
-
     resizeObserver.observe(table);
-  },
-  beforeUnmount() {
-    document.removeEventListener("keydown", this.handleKeyDown);
-    document.removeEventListener("click", this.hideContextMenu);
   },
   computed: {
     cols() {
@@ -203,9 +184,6 @@ export default {
           col.width = col.width * share;
         });
       }
-      this.$nextTick(() => { this.resize(); });
-
-
     },
     containsBlockElement(element) {
       // Get all child elements of the given element
@@ -266,67 +244,6 @@ export default {
       } else {
         console.error('Clipboard API is not supported in this browser.');
       }
-    },
-    resize() {
-      console.log('resize')
-      console.log('resize')
-      for (let i = 0; i < this.$refs.rbar.length; i++) {
-        this.$refs.rbar[i].style.left = this.$refs.th[i].offsetLeft + this.$refs.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-
-      }
-    },
-    throttleHandleResize(event) {
-      //clearTimeout(this.throttleTimeout);
-      //this.throttleTimeout=setTimeout(()=>{
-      this.handleResize(event);
-      //},10);
-    },
-    handleResize(event) {
-      console.log('handleResize')
-      if (this.resizeColumn) {
-        let i = this.resizeColumnIndex;
-
-        //let width = this.$refs.th[i].offsetWidth +  event.movementX;
-        let width = this.resizeColumnWidth + event.x - this.resizeX;
-        console.log(this.$refs.th[i].offsetWidth, event.movementX, width);
-        this.resizeColumn.width = width;
-        //this.$refs.th[i].style.width = width + 'px';
-        let j = i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-        let lastColIndex = this.$refs.th.length - 1;
-        if (this.config.fix && i < lastColIndex) {
-          let lastWidth = this.resizeLastColumnWidth - (event.x - this.resizeX);
-          this.cols[lastColIndex].width = lastWidth;
-          //this.$refs.th[lastColIndex].style.width = lastWidth + 'px';
-        }
-
-      }
-
-    },
-    resizeBarMouseDown(col, colIndex, event) {
-      console.log('resizeBarMouseDown')
-      console.log(col)
-      this.resizeColumn = col;
-      this.resizeColumnIndex = colIndex;
-      this.resizeX = event.x;
-      this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
-      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length - 1].offsetWidth;
-
-
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      console.log(event)
-
-    },
-    resizeBarMouseUp() {
-      console.log('resizeBarMouseUp')
-      if (this.resizeColumn) {
-        this.resize();
-        this.saveData();
-      }
-      this.resizeColumn = 0;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
     },
 
     cellClass(rowIndex, cellIndex, col) {
@@ -412,14 +329,6 @@ export default {
       }
 
     },
-    deleteRow(row) {
-      if (confirm("Please confirm to delete it?")) {
-        let list = row._p && row._p._childs || this.tableData;
-        list.splice(list.indexOf(row), 1);
-      }
-
-    },
-
     getAllRow() {
       let rows = [];
       let _rIndex = 0;
@@ -517,50 +426,12 @@ export default {
         this.saveData()
       }
     },
-    addRow(num) {
-      console.log(num)
-      if (this.selectRow) {
-        let list = this.selectRow._p && this.selectRow._p._childs || this.tableData;
-        let index = list.indexOf(this.selectRow);
-        list.splice(index + 1, 0, { _id: '', _p: this.selectRow._p });
-
-      } else this.tableData.push({ _id: '' })
-
-    },
-    addSubRow(num) {
-      if (!this.tableData[this.selectedRowIndex].childs)
-        this.tableData[this.selectedRowIndex].childs = [];
-
-      this.tableData[this.selectedRowIndex].childs.push({ _id: '' })
-
-
-    },
     focusNext(index) {
       if (index + 1 < this.$refs.ids.length) {
         console.log('focus' + (index + 1));
         setTimeout(() => {
           this.$refs.ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
         }, 100);
-
-      }
-      else {
-        this.addRow(1)
-        setTimeout(() => {
-          this.$refs.ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
-        }, 100);
-      }
-    },
-    saveData(bool) {
-      console.log(bool)
-      if (!bool || this.config.autoSave) {
-
-
-        localStorage.setItem('data', JSON.stringify(this.tableData, function (key, value) {
-          if (key === "_p") {
-            return null;
-          } else return value;
-        }));
-        localStorage.setItem('config', JSON.stringify(this.config));
 
       }
     },
@@ -578,22 +449,9 @@ export default {
         }
       });
     },
-
- 
-    showContextMenu(event, index) {
-      event.preventDefault();
-      this.isContextMenuVisible = true;
-      this.contextMenuPosition.x = event.clientX;
-      this.contextMenuPosition.y = event.clientY;
-      this.selectedRowIndex = index;
-    },
-    hideContextMenu() {
-      this.isContextMenuVisible = false;
-    },
   },
 };
 </script>
-
 <style scoped>
 table {
   border-collapse: separate;
@@ -647,20 +505,6 @@ td {
   background-color: #F0FFF0;
 }
 
-.week-slot {
-  position: relative;
-}
-
-.week-slot::after {
-  content: "";
-  width: 0;
-  position: absolute;
-  top: 0;
-  height: 100%;
-  border: 1px solid #ddd;
-  right: 0;
-}
-
 .selectStart {
   background-color: yellow;
 }
@@ -673,36 +517,12 @@ td {
   position: relative;
   overflow: hidden;
 }
-
-.resize-handle {
-  position: absolute;
-  top: 0;
-  right: -11px;
-  bottom: 0;
-  width: 3px;
-  background-color: #eee;
-  cursor: col-resize;
-}
-
 .selected {
   background-color: #F0FFF0!important;
 }
 
 .sch .selected {
   background-color: lightgreen;
-}
-
-.contextmenu {
-  background: white;
-  z-index: var(--vt-index-contextmenu);
-  position: fixed;
-  border: 2px solid gray;
-  border-radius: 5px;
-  padding: 5px;
-}
-
-.contextmenu ul {
-  margin: 0;
 }
 
 .left {
@@ -719,26 +539,6 @@ td {
 
 .bottom {
   border-bottom: 1px darkgreen solid!important;;
-}
-
-.filterSearch {
-  position: relative;
-  display: inline-block;
-  width: 200px;
-  height: 24px;
-}
-
-.filterSearch input {
-  width: 100%;
-}
-
-.filterSearch:after {
-  content: "T";
-  position: absolute;
-  right: 3px;
-  top: 0;
-  color: green;
-  font-weight: bold;
 }
 
 .curRow,
