@@ -3,7 +3,7 @@
       <div>
         <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
           @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-          <ColumnsResizer  :th="$refs.th" v-if="$refs.th" data="rbar" :cols="cols"/>
+          <ColumnsResizer  :th="$refs.th" v-if="$refs.th" :table="$refs.table" data="rbar" :cols="cols"/>
           <!--line-->
           <div class="row header line" :style="{ gridTemplateColumns: gridColumns() }">
             <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
@@ -204,46 +204,19 @@ export default {
 
       }
     });
-    document.addEventListener("click", this.hideContextMenu);
     document.addEventListener("keydown", this.handleKeyDown);
 
-
-
-    const table = this.$refs.table;
-    this.tableHeight = table.offsetHeight;
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const resizedTable = entry.target;
-        console.log('Table has been resized:', resizedTable);
-        this.tableHeight = table.offsetHeight;
-
-        document.documentElement.style.setProperty('--table-height', this.tableHeight + 'px');
-
-      }
-    });
-
-    resizeObserver.observe(table);
-
-    window.addEventListener('resize', () => {
-
-      this.winResize();
-    });
-    this.winResize();
-
     document.body.addEventListener('mousemove', this.throttleHandleResize);
-    document.body.addEventListener('mouseup', this.resizeBarMouseUp);
 
     this.weeks.length = 0;
     this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.weekCount));
   },
   unmounted() {
     document.body.removeEventListener('mousemove', this.throttleHandleResize);
-    document.body.removeEventListener('mouseup', this.resizeBarMouseUp);
 
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
-    document.removeEventListener("click", this.hideContextMenu);
   },
   computed: {
     firstDay() {
@@ -299,18 +272,6 @@ export default {
       console.log(dayNum, row);
 
     },
-
-    winResize() {
-
-      this.$nextTick(() => { this.resize(); });
-
-
-    },
-    resize() {
-      console.log('resize')
-      console.log('resize')
-
-    },
     colStyle(col, isH) {
       let style = {};
       if (col.sticky) {
@@ -319,35 +280,7 @@ export default {
       }
       return style;
     },
-    getScrollbarWidth() {
-      // Create a div element
-      var div = document.createElement('div');
-
-      // Set the styles for the div element
-      div.style.width = '100px';
-      div.style.height = '100px';
-      div.style.overflow = 'scroll';
-      div.style.position = 'absolute';
-      div.style.top = '-9999px';
-
-      // Append the div element to the document body
-      document.body.appendChild(div);
-
-      // Calculate the scrollbar width
-      var scrollbarWidth = div.offsetWidth - div.clientWidth;
-
-      // Remove the div element from the document body
-      document.body.removeChild(div);
-
-      // Return the scrollbar width
-      return scrollbarWidth;
-    },
-    winResize() {
-      this.$nextTick(() => { this.resize(); });
-    },
     throttleHandleResize(event) {
-      //clearTimeout(this.throttleTimeout);
-      //this.throttleTimeout=setTimeout(()=>{
       if (this.moveType) {
         let x = event.clientX - this.moveType.x;
 
@@ -370,49 +303,10 @@ export default {
 
           this.curRow._tl.end = this.weeks[parseInt(index / 7)].dates[index % 7];
         }
-      } else this.handleResize(event);
-      //},10);
+      } 
     },
-    handleResize(event) {
-      if (this.resizeColumn) {
-        let i = this.resizeColumnIndex;
-
-        //let width = this.$refs.th[i].offsetWidth +  event.movementX;
-        let width = this.resizeColumnWidth + event.x - this.resizeX;
-        console.log(this.$refs.th[i].offsetWidth, event.movementX, width);
-        this.resizeColumn.width = width;
-        //this.$refs.th[i].style.width = width + 'px';
-        let j = i;
-        this.$refs.rbar[i].style.left = this.$refs.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
 
 
-      }
-
-    },
-    resizeBarMouseDown(col, colIndex, event) {
-      console.log('resizeBarMouseDown')
-      console.log(col)
-      this.resizeColumn = col;
-      this.resizeColumnIndex = colIndex;
-      this.resizeX = event.x;
-      this.resizeColumnWidth = this.$refs.th[colIndex].offsetWidth;
-      this.resizeLastColumnWidth = this.$refs.th[this.$refs.th.length - 1].offsetWidth;
-
-
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
-      console.log(event)
-
-    },
-    resizeBarMouseUp() {
-      console.log('resizeBarMouseUp')
-      if (this.resizeColumn) {
-        this.resize();
-      }
-      this.resizeColumn = 0;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    },
     containsBlockElement(element) {
       // Get all child elements of the given element
       const childElements = element.getElementsByTagName('*');
@@ -677,12 +571,6 @@ export default {
           this.$refs.ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
         }, 100);
 
-      }
-      else {
-        this.addRow(1)
-        setTimeout(() => {
-          this.$refs.ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
-        }, 100);
       }
     },
 

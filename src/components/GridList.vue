@@ -2,7 +2,7 @@
 
 
     <div class="table-container" style="    flex-grow: 1;" >
-      <ColumnsResizer  :th="$refs.th" v-if="$refs.th" data="rbar" :cols="cols"/>
+      <ColumnsResizer  :th="$refs.th" v-if="$refs.th" data="rbar" :table="$refs.table" :cols="cols"/>
       <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
         @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
         <div class="row header" :style="{gridTemplateColumns: gridColumns()}">
@@ -114,23 +114,9 @@ export default {
 
       }
     });
-    document.addEventListener("click", this.hideContextMenu);
-    window.addEventListener('resize', () => {
-      this.winResize();
-    });
-    this.winResize();
 
-    const table = this.$refs.table;
-    this.tableHeight = table.offsetHeight;
-    const resizeObserver = new ResizeObserver(entries => {
-      for (const entry of entries) {
-        const resizedTable = entry.target;
-        console.log('Table has been resized:', resizedTable);
-        this.tableHeight = table.offsetHeight;
-        document.documentElement.style.setProperty('--table-height', this.tableHeight + 'px');
-      }
-    });
-    resizeObserver.observe(table);
+
+
   },
   computed: {
     cols() {
