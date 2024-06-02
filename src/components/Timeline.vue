@@ -34,8 +34,12 @@
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
               <div style="display: flex; justify-content: space-between">
-                <span v-for="day in week.dates" :key="day" class="day"
-                  :class="{ selected: selectStart && (day.i >= selectStart.start.i && day.i <= selectStart.end.i), today: day.isCur, weekend: day.isWeekend }">
+                <span v-for="day in week.dates" :key="day" class="day" :class="{
+                  selected: selectStart && (day.i >= selectStart.start.i && day.i <= selectStart.end.i),
+                  today: day.isCur,
+                  weekend: day.isWeekend,
+                  holiday: day.holiday
+                }">
                   {{ day.label }}
                 </span>
               </div>
@@ -63,19 +67,18 @@
             <div style="display: flex; flex-wrap: nowrap" class="sch">
               <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
-                  width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
-                  marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
+                  width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) ) * 100 + '%',
+                  marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)-1) * 100 + '%'
                 }" class="plantime" @mouseover="selectRowSch(row)">{{
                   calculateDaysBetweenDates(row._tl.end,
-                    row._tl.start) +
-                  1 }}
+                    row._tl.start,true)  }}d
                 </div>
                 <div v-if="selectStart &&
                   selectStart.row == row" :style="{
-                    width: (calculateDaysBetweenDates(selectStart.end, selectStart.start) + 1) * 100 + '%',
-                    marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
+                    width: (calculateDaysBetweenDates(selectStart.end, selectStart.start)) * 100 + '%',
+                    marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)-1) * 100 + '%'
                   }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end,
-                    selectStart.start) + 1 }}
+                    selectStart.start,true)  }}d
                   <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
                   <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                 </div>
@@ -112,6 +115,25 @@ export default {
 
   data() {
     return {
+      holidays: [
+        { date: '2024-01-01', n: 20240101, name: 'New Year\'s Day' },
+        { date: '2024-02-10', n: 20240210, name: 'Lunar New Year\'s Day' },
+        { date: '2024-02-12', n: 20240212, name: 'The third day of Lunar New Year' },
+        { date: '2024-02-13', n: 20240213, name: 'The fourth day of Lunar New Year' },
+        { date: '2024-03-29', n: 20240329, name: 'Good Friday' },
+        { date: '2024-03-30', n: 20240330, name: 'The day following Good Friday' },
+        { date: '2024-04-01', n: 20240401, name: 'Easter Monday' },
+        { date: '2024-04-04', n: 20240404, name: 'Ching Ming Festival' },
+        { date: '2024-05-01', n: 20240501, name: 'Labour Day' },
+        { date: '2024-05-15', n: 20240515, name: 'The Birthday of the Buddha' },
+        { date: '2024-06-10', n: 20240610, name: 'Tuen Ng Festival' },
+        { date: '2024-07-01', n: 20240701, name: 'Hong Kong Special Administrative Region Establishment Day' },
+        { date: '2024-09-18', n: 20240918, name: 'The day following the Chinese Mid-Autumn Festival' },
+        { date: '2024-10-01', n: 20241001, name: 'National Day' },
+        { date: '2024-10-11', n: 20241011, name: 'Chung Yeung Festival' },
+        { date: '2024-12-25', n: 20241225, name: 'Christmas Day' },
+        { date: '2024-12-26', n: 20241226, name: 'The first weekday after Christmas Day' }
+      ],
       showMoveOverLayer: false,
       weekCount: 20,
       showDatePicker: false,
@@ -186,15 +208,30 @@ export default {
 
   },
   methods: {
-    calculateDaysBetweenDates(date1, date2) {
-      if (!date1.date) {
-        return 0;
+    calculateDaysBetweenDates(date1, date2,exclusiveHolidayWeeken) {
+
+      
+      
+      if(exclusiveHolidayWeeken){
+        let weekIndex1 = parseInt(date1.i/7);
+        let weekIndex2 = parseInt(date2.i/7);
+
+        let i=date2.i%7;
+        let count = 0;
+        for(let w=weekIndex2;w<=weekIndex1;w++){
+
+          for(;i<=(w<weekIndex1?6:date1.i%7);i++){
+            let day = this.weeks[w].dates[i];
+            if(day.isWeekend||day.holiday)continue;
+            count++;
+            
+          }
+          i=0;
+        }
+        return count;
+
       }
-      if (!date2.date) {
-        return 0;
-      }
-      const oneDay = 24 * 60 * 60 * 1000;
-      return Math.round(Math.abs((date1.date - date2.date) / oneDay));
+      return date1.i-date2.i+1;
 
 
     },
@@ -233,8 +270,8 @@ export default {
         let row = this.fromPosToRow(rowPos);
         const configStore = useConfigStore();
         configStore.share.curRow = row;
-        if(row._tl){
-            if (event.target.classList.contains('selectStart')) {
+        if (row._tl) {
+          if (event.target.classList.contains('selectStart')) {
             this.moveType = { x: event.clientX, type: 'selectStart', _tl: deepCopy(row._tl) }
           }
           else if (event.target.classList.contains('rightDrag')) {
@@ -244,7 +281,7 @@ export default {
             this.moveType = { x: event.clientX, type: 'leftDrag', initValue: deepCopy(row._tl.start), _tl: deepCopy(row._tl) }
           }
         }
-         else if (event.target.closest('.sch')) {
+        else if (event.target.closest('.sch')) {
           let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
           let totalWidth = event.target.closest('.sch').offsetWidth;
           let index = parseInt(x / totalWidth * this.weekCount * 7);
@@ -309,47 +346,47 @@ export default {
       }
 
       let sch = event.target.closest('.sch');
-      if(sch){
-
-     
-      let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
-      let totalWidth = event.target.closest('.sch').offsetWidth;
-      let index = parseInt(x / totalWidth * this.weekCount * 7);
-      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-
-      if (this.selectStart != null) {
-        if ((!this.selectStart.row._tl))
-          this.selectStart.end = date;
-        else {
-          if (this.moveType) {
-            let x = event.clientX - this.moveType.x;
-
-            let totalWidth = event.target.closest('.sch').offsetWidth;
-            let unitWidth = totalWidth / this.weekCount / 7;
+      if (sch) {
 
 
-            let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
-            let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+        let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
+        let totalWidth = event.target.closest('.sch').offsetWidth;
+        let index = parseInt(x / totalWidth * this.weekCount * 7);
+        let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
-            if (this.moveType.type == 'rightDrag')
-              this.selectStart.end = date;
-            else if (this.moveType.type == 'leftDrag')
-              this.selectStart.start = date;
-            else {
-              let moveUnits = parseInt(x / unitWidth);
-              index = this.moveType._tl.start.i + moveUnits;
+        if (this.selectStart != null) {
+          if ((!this.selectStart.row._tl))
+            this.selectStart.end = date;
+          else {
+            if (this.moveType) {
+              let x = event.clientX - this.moveType.x;
 
-              this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
+              let totalWidth = event.target.closest('.sch').offsetWidth;
+              let unitWidth = totalWidth / this.weekCount / 7;
 
-              index = this.moveType._tl.end.i + moveUnits;
 
-              this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
-              console.log('moveUnits', moveUnits)
+              let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
+              let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+              if (this.moveType.type == 'rightDrag')
+                this.selectStart.end = date;
+              else if (this.moveType.type == 'leftDrag')
+                this.selectStart.start = date;
+              else {
+                let moveUnits = parseInt(x / unitWidth);
+                index = this.moveType._tl.start.i + moveUnits;
+
+                this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+                index = this.moveType._tl.end.i + moveUnits;
+
+                this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
+                console.log('moveUnits', moveUnits)
+              }
             }
           }
         }
       }
-    }
     },
     handleMouseUp() {
       this.isMouseDown = false;
@@ -577,13 +614,16 @@ export default {
       const lastDate = new Date(endDate);
       let i = 0;
       while (currentDate <= lastDate) {
+        let n = this.getDateAsInteger(currentDate);
+        let holiday = this.holidays.filter(e => e.n == n);
         let dateWrap = {
           date: new Date(currentDate),
-          n: this.getDateAsInteger(currentDate),
+          n: n,
           i: weekIndex * 7 + i++,
           isCur: this.isToday(currentDate),
           isWeekend: this.isWeekend(currentDate),
-          label: this.formatDate(currentDate, { day: "2-digit" })
+          label: this.formatDate(currentDate, { day: "2-digit" }),
+          holiday: holiday.length && holiday[0]
         };
         dates.push(dateWrap);
         currentDate.setDate(currentDate.getDate() + 1); // Move to the next day
@@ -671,7 +711,7 @@ export default {
 }
 
 .selectStart {
-  background-color: lightgreen;
+  background-color: #CCFFCC;
   left: 0px;
   top: 0px;
   position: absolute;
@@ -800,8 +840,14 @@ export default {
 }
 
 .weekend {
-  background-color: #ccc;
-  color: blue;
+  text-decoration: line-through;
 }
-.sch{user-select: none;}
+
+.sch {
+  user-select: none;
+}
+
+.holiday {
+  text-decoration: underline;
+}
 </style>
