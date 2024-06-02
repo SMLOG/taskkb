@@ -74,9 +74,9 @@
                 </div>
                 <div v-if="selectStart &&
                   selectStart.row == row" :style="{
-                    width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
-                    marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
-                  }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start,
+                    width: (calculateDaysBetweenDates(selectStart.end , selectStart.start) + 1) * 100 + '%',
+                    marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
+                  }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end ,
                     selectStart.start) + 1 }}
                   <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
                   <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
@@ -494,7 +494,7 @@ export default {
     },
     selectRowSch(row) {
       this.selectStart = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
-      console.log('select selectstart', this.selectStart);
+
     },
     startRowSchFirst(event, row) {
       console.log("moousedown");
@@ -663,7 +663,7 @@ export default {
 }
 
 .selectStart {
-  background-color: yellow;
+  background-color: lightgreen;
   left: 0px;
   top: 0px;
   position: absolute;
