@@ -222,7 +222,7 @@ export default {
 }
 
 .col {
-  border: 1px solid #ccc;
+  border-left: 1px solid #ccc;
   position: relative;
 }
 

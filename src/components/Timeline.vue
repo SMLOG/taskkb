@@ -763,17 +763,19 @@ export default {
 }
 
 .col {
-  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   position: relative;
 }
 
 .header {
-  border-top: 1px solid #ccc;
   position: sticky;
   top: 0;
   z-index: var(--vt-index-sticky-header);
   background-color: white
+}
+.header .col{
+  border-top: 1px solid #ccc;
 }
 
 .sticky {
