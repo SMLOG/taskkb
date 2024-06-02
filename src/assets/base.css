@@ -88,3 +88,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--vt-index-overlay);
+  user-select: none;
+}

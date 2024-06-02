@@ -15,6 +15,7 @@ export default {
       resizeColumn: null,
     };
   },
+
   mounted() {
 
     const table = this.table;
@@ -93,7 +94,6 @@ export default {
   position: fixed;
   inset: 0;
   z-index: var(--vt-index-overlay);
-  cursor: col-resize;
   user-select: none;
 }
 

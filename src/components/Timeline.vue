@@ -1,107 +1,93 @@
 <template>
-    <div class="table-container" style="flex-grow: 1;position: relative;">
-      <div>
-        <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
-          @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
-          <ColumnsResizer  :th="$refs.th" v-if="$refs.th" :table="$refs.table" data="rbar" :cols="cols"/>
-          <!--line-->
-          <div class="row header line" :style="{ gridTemplateColumns: gridColumns() }">
-            <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
-            <template v-for="(col, key) in cols" :key="key">
-              <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
-                <div class="cell">
-                </div>
+  <div class="table-container" style="flex-grow: 1;position: relative;">
+    <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
+      @mouseup.prevent="stopHandleMovement">
+    </div>
+    <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseCellsDown"
+      @mousemove="handleMouseCellsMove" @mouseup.left="handleMouseUp">
+      <ColumnsResizer :th="$refs.th" v-if="$refs.th" :table="$refs.table" data="rbar" :cols="cols" />
+      <!--line-->
+      <TimelineHeader />
+      <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
+        <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
+        <template v-for="(col, key) in cols" :key="key">
+          <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
+            <div class="cell">
+              <component :is="col.cp" :col="col"></component>
+            </div>
+          </div>
+        </template>
+        <div class="col" :colspan="7 * weeks.length">
+          <div style="display: flex; flex-wrap: nowrap">
+            <div v-for="(week, index) in weeks" :key="week" class="week-slot">
+              <div>
+                <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
+                  Start
+                  <div v-if="showDatePicker" style="position: absolute;">
+                    <VueDatePicker v-model="config.startDate"
+                      @date-update="(d) => { config.startDate = d; showDatePicker = false }" :enable-time-picker="false"
+                      type="date" inline auto-apply />
+                    Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop />
+                  </div>
+                </a>
+                <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
-            </template>
-            <div class="col" :colspan="7 * weeks.length">
-              <div style="display: flex; flex-wrap: nowrap">
-                <div v-for="(week) in weeks" :key="week" class="week-slot">
-                </div>
+              <div style="display: flex; justify-content: space-between">
+                <span v-for="day in week.dates" :key="day" class="day"
+                  :class="{ selected: selectStart && (day.i >= selectStart.start.i && day.i <= selectStart.end.i), today: day.isCur, weekend: day.isWeekend }">
+                  {{ day.label }}
+                </span>
               </div>
             </div>
           </div>
-          <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
-            <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
-            <template v-for="(col, key) in cols" :key="key">
-              <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
-                <div class="cell">
-                  <component :is="col.cp" :col="col"></component>
-                </div>
-              </div>
-            </template>
-            <div class="col" :colspan="7 * weeks.length">
-              <div style="display: flex; flex-wrap: nowrap">
-                <div v-for="(week, index) in weeks" :key="week" class="week-slot">
-                  <div>
-                    <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
-                      Start
-                      <div v-if="showDatePicker" style="position: absolute;">
-                        <VueDatePicker v-model="config.startDate"
-                          @date-update="(d) => { config.startDate = d; showDatePicker = false }"
-                          :enable-time-picker="false" type="date" inline auto-apply />
-                        Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop />
-                      </div>
-                    </a>
-                    <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
-                  </div>
-                  <div style="display: flex; justify-content: space-between">
-                    <span v-for="day in week.dates" :key="day" class="day" :class="{selected:selectStart&&(day.i>=selectStart.start.i&&day.i<=selectStart.end.i),today:day.isCur,weekend:day.isWeekend}">
-                      {{ day.label }}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-            <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
-              :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
-              @mousedown.left="clickSelectCell($event, rowIndex, row)" @mouseup="mouseDownSch($event, row);moveType = null"
-              @drop="drop($event, row, rowIndex)">
-              <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
-                @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-                @contextmenu="clickSelectCell($event, rowIndex, row);"
-                :class="{ curRow: curRow == row }">
-                {{ row._rIndex + 1 }}
-              </a>
-              <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-                <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
-                  :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
-                  :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
-                  <div class="cell">
-                    <component :is="col.cp" :row="row" :col="col"></component>
-                  </div>
-                </div>
-              </template>
-              <div class="col" :colspan="7 * weeks.length">
-                <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="mouseDownSch($event, row)"
-                  @mousemove.prevent="mouseMoveSchRow($event, row)">
-                  <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
-                    <div v-if="row._tl && row._tl.end" :style="{
-                      width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
-                      marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
-                    }" class="plantime" @mouseover="selectRowSch(row)">{{
-                        calculateDaysBetweenDates(row._tl.end,
-                          row._tl.start) +
-                        1 }}
-                    </div>
-                    <div v-if="selectStart &&
-                      selectStart.row == row" :style="{
-                        width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
-                        marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
-                      }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start,
-                        selectStart.start) + 1 }}
-                      <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
-                      <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
-                    </div>
-                  </div>
-                </div>
+        </div>
+      </div>
+      <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
+        <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
+          @mousedown.left="clickSelectCell($event, rowIndex, row)" @drop="drop($event, row, rowIndex)">
+          <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
+            @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
+            :class="{ curRow: curRow == row }">
+            {{ row._rIndex + 1 }}
+          </a>
+          <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+            <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
+              :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
+              :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+              <div class="cell">
+                <component :is="col.cp" :row="row" :col="col"></component>
               </div>
             </div>
           </template>
+          <div class="col" :colspan="7 * weeks.length">
+            <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="startRowSchFirst($event, row)"
+              @mouseup="updateRowSche(row)" @mousemove.prevent="moveOrRejustRowSch($event, row)">
+              <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
+                <div v-if="row._tl && row._tl.end" :style="{
+                  width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
+                  marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)) * 100 + '%'
+                }" class="plantime" @mouseover="selectRowSch(row)">{{
+                  calculateDaysBetweenDates(row._tl.end,
+                    row._tl.start) +
+                  1 }}
+                </div>
+                <div v-if="selectStart &&
+                  selectStart.row == row" :style="{
+                    width: (calculateDaysBetweenDates(selectStart.end || selectStart.start, selectStart.start) + 1) * 100 + '%',
+                    marginLeft: (calculateDaysBetweenDates(!selectStart.end || selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
+                  }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end || selectStart.start,
+                    selectStart.start) + 1 }}
+                  <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
+                  <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
+  </div>
 </template>
 
 <script setup>
@@ -109,6 +95,8 @@ import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
+import TimelineHeader from '@/components/TimelineHeader.vue';
+
 </script>
 <script>
 
@@ -117,11 +105,16 @@ import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 
+function deepCopy(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+
 export default {
   components: { ColTitle, ColDropText, ColDate, VueDatePicker },
 
   data() {
     return {
+      showMoveOverLayer: false,
       weekCount: 20,
       showDatePicker: false,
       selectStart: null,
@@ -164,43 +157,12 @@ export default {
         this.weeks.push(...this.generateWeeks(this.config.startDate, this.config.weekCount));
       }
     );
-    document.addEventListener('keydown', (event) => {
-      if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {
-        event.preventDefault();
 
-        const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
-        const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
-        const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
-        const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
-        let copyTblData = [];
-        const table = this.$refs.table;
-        for (let i = minRowIndex; i <= maxRowIndex; i++) {
-          let row = table.rows[i];
-          if (row.style.display === 'none') continue;
-          let rowDatas = [];
-          for (let j = mincellIndex; j <= maxcellIndex; j++) {
-            let cell = row.cells[j];
-            rowDatas.push(this.containsBlockElement(cell.querySelector("[contenteditable]")) ? cell.querySelector("[contenteditable]").innerText : cell.querySelector("[contenteditable]").innerHTML);
-          }
-          copyTblData.push(rowDatas);
-        }
-
-        this.copyTableToExcel(copyTblData);
-
-
-
-      }
-    });
     document.addEventListener("keydown", this.handleKeyDown);
 
-    document.body.addEventListener('mousemove', this.throttleHandleResize);
 
     this.weeks.length = 0;
     this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.weekCount));
-  },
-  unmounted() {
-    document.body.removeEventListener('mousemove', this.throttleHandleResize);
-
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
@@ -238,18 +200,7 @@ export default {
 
 
     },
-    mouseMoveSchRow(event, row) {
 
-      let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
-      let totalWidth = event.target.closest('.sch').offsetWidth;
-      let index = parseInt(x / totalWidth * this.weekCount * 7);
-      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-
-      if (this.selectStart != null && row == this.selectStart.row && !this.selectStart.row._tl) {
-        this.selectStart.end = date;
-      }
-
-    },
     colStyle(col, isH) {
       let style = {};
       if (col.sticky) {
@@ -258,95 +209,56 @@ export default {
       }
       return style;
     },
-    throttleHandleResize(event) {
-      if (this.moveType) {
-        let x = event.clientX - this.moveType.x;
+    updateRowSche(row){
+      if(this.moveType){
+        this.moveType = null;
+        this.selectStart.row._tl.start=this.selectStart.start;
+        this.selectStart.row._tl.end=this.selectStart.end;
+      }
+    },
+    moveOrRejustRowSch(event, row) {
 
-        let totalWidth = event.target.closest('.sch').offsetWidth;
-        let unitWidth = totalWidth / this.weekCount / 7;
+      let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
+      let totalWidth = event.target.closest('.sch').offsetWidth;
+      let index = parseInt(x / totalWidth * this.weekCount * 7);
+      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
-
-        let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
-        let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-
-        if (this.moveType.type == 'rightDrag')
+      if (this.selectStart != null && row == this.selectStart.row) {
+        if ((!this.selectStart.row._tl))
           this.selectStart.end = date;
-        else if (this.moveType.type == 'leftDrag')
-          this.selectStart.start = date;
         else {
-          index = this.moveType.start.i + parseInt(x / unitWidth);
+          if (this.moveType) {
+            let x = event.clientX - this.moveType.x;
 
-          this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
-          index = selectStart.end.i + parseInt(x / unitWidth);
-
-          this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
-        }
-      } 
-    },
+            let totalWidth = event.target.closest('.sch').offsetWidth;
+            let unitWidth = totalWidth / this.weekCount / 7;
 
 
-    containsBlockElement(element) {
-      // Get all child elements of the given element
-      const childElements = element.getElementsByTagName('*');
+            let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
+            let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
-      // Iterate through the child elements
-      for (let i = 0; i < childElements.length; i++) {
-        const childElement = childElements[i];
+            if (this.moveType.type == 'rightDrag')
+              this.selectStart.end = date;
+            else if (this.moveType.type == 'leftDrag')
+              this.selectStart.start = date;
+            else {
+              let moveUnits = parseInt(x / unitWidth);
+              index = this.moveType._tl.start.i + moveUnits;
 
-        // Check if the child element is a block-level element
-        if (getComputedStyle(childElement).display === 'block') {
-          return true;
+              this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+              index = this.moveType._tl.end.i + moveUnits;
+
+              this.selectStart.end =   this.weeks[parseInt(index / 7)].dates[index % 7];
+              console.log('moveUnits', moveUnits)
+            }
+          }
         }
       }
 
-      // No block-level elements found
-      return false;
+
+
     },
-    copyTableToExcel(data) {
-
-
-      // Create the table element
-      var table = document.createElement('table');
-
-      // Iterate over the data array
-      for (var i = 0; i < data.length; i++) {
-        // Create a new row
-        var row = document.createElement('tr');
-
-        // Iterate over the inner array (cells)
-        for (var j = 0; j < data[i].length; j++) {
-          // Create a new cell
-          var cell = document.createElement('td');
-
-          // Set the cell content using innerHTML
-          cell.innerHTML = data[i][j];
-
-          // Append the cell to the row
-          row.appendChild(cell);
-        }
-
-        // Append the row to the table
-        table.appendChild(row);
-      }
-
-
-      if (navigator.clipboard) {
-
-        var tableHTML = table.outerHTML;
-        console.log(tableHTML)
-        navigator.clipboard.writeText(tableHTML)
-          .then(function () {
-            console.log('Table item copied successfully.');
-          })
-          .catch(function (error) {
-            console.error('Copy failed:', error);
-          });
-      } else {
-        console.error('Clipboard API is not supported in this browser.');
-      }
-    },
-
-
 
     cellClass(rowIndex, cellIndex, col) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
@@ -363,7 +275,7 @@ export default {
         sticky: col.sticky
       };
     },
-    handleMouseDown(event) {
+    handleMouseCellsDown(event) {
       console.log('mosuedown')
       this.selectWholeRowIndex = null;
       const cell = event.target.closest('div.col');
@@ -391,7 +303,7 @@ export default {
       this.endRowIndex = this.startRowIndex;
       this.endcellIndex = this.startcellIndex;
     },
-    handleMouseMove(event) {
+    handleMouseCellsMove(event) {
       if (this.isMouseDown) {
         const cell = event.target.closest('div.col');
 
@@ -431,14 +343,15 @@ export default {
         this.selectWholeRowIndex = false;
       }
       if (event.target.classList.contains('selectStart')) {
-        this.moveType = { x: event.clientX, type: 'selectStart', _tl: JSON.parse(JSON.stringify(row._tl)) }
+        this.moveType = { x: event.clientX, type: 'selectStart', _tl: deepCopy(row._tl) }
       }
       else if (event.target.classList.contains('rightDrag')) {
-        this.moveType = { x: event.clientX, type: 'rightDrag', initValue: row._tl.end, _tl: JSON.parse(JSON.stringify(row._tl)) }
+        this.moveType = { x: event.clientX, type: 'rightDrag', initValue: deepCopy(row._tl.end), _tl: deepCopy(row._tl) }
       }
       else if (event.target.classList.contains('leftDrag')) {
-        this.moveType = { x: event.clientX, type: 'leftDrag', initValue: row._tl.start, _tl: JSON.parse(JSON.stringify(row._tl)) }
+        this.moveType = { x: event.clientX, type: 'leftDrag', initValue: deepCopy(row._tl.start), _tl: deepCopy(row._tl) }
       }
+      console.log('movetype', this.moveType)
 
     },
 
@@ -580,44 +493,35 @@ export default {
       }
     },
     selectRowSch(row) {
-      this.selectStart = { type: 1, row: row,start:row._tl.start,end:row._tl.end };
-      console.log('select selectstart',this.selectStart);
+      this.selectStart = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
+      console.log('select selectstart', this.selectStart);
     },
-    mouseDownSch(event, row) {
+    startRowSchFirst(event, row) {
       console.log("moousedown");
 
       let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
       let totalWidth = event.target.closest('.sch').offsetWidth;
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-      if (!row._tl||this.moveType)
-        this.clickSch(row, date);
-      else if(row!=this.selectStart.row) {
-        
+      if (!row._tl) {
+        if (this.selectStart == null)
+          this.selectStart = { type: 2, row: row, start: date, end: date };
+        else if (this.selectStart.row == row) {
+          row._tl = this.addDatePeriod({
+            start: this.selectStart.start,
+            end: date,
+          });
+
+        } else {
+          this.selectStart = null;
+          console.log('delete selectStart')
+
+        }
+      }
+      else if (row != this.selectStart.row) {
+
         this.selectStart = null;
         console.log('delete selectStart')
-      }
-
-    },
-    clickSch(row, date) {
-      console.log("clickSch");
-
-      if (this.isDateInRange(date, row._tl)) {
-        console.log("drag start");
-        return;
-      }
-      if (this.selectStart == null)
-        this.selectStart = { type: 2, row: row, start: date,end:date };
-      else if (this.selectStart.row == row) {
-        row._tl = this.addDatePeriod({
-          start: this.selectStart.start,
-          end: date,
-        });
-
-      } else {
-        this.selectStart = null;
-        console.log('delete selectStart')
-
       }
     },
     addDatePeriod(addPeriod) {
@@ -763,6 +667,7 @@ export default {
   left: 0px;
   top: 0px;
   position: absolute;
+  cursor: move;
 }
 
 .drag {
@@ -785,11 +690,7 @@ export default {
 }
 
 .selected {
-  background-color: #F0FFF0 !important;
-}
-
-.selected {
-  background-color: lightgreen !important;
+  background-color: #F0FFD0 !important;
 }
 
 .curRow,
@@ -871,7 +772,7 @@ export default {
   bottom: 0;
 }
 
- .leftDrag {
+.leftDrag {
   position: absolute;
   left: 0px;
   width: 4px;
@@ -879,17 +780,19 @@ export default {
   bottom: 0;
 }
 
- .rightDrag:hover,
+.rightDrag:hover,
 .leftDrag:hover {
   background: blue;
   cursor: ew-resize;
 }
-.today{
-  color:red!important;
+
+.today {
+  color: red !important;
   font-weight: bold
 }
-.weekend{
+
+.weekend {
   background-color: #ccc;
-  color:blue;
+  color: blue;
 }
 </style>

@@ -5,8 +5,13 @@ import { ref } from 'vue'
 function loopToSetDate(row) {
   if (row._tl) {
     let peroid = row._tl;
-    peroid.start.date = new Date(peroid.start.date);
-    peroid.end.date = new Date(peroid.end.date);
+    if(!peroid.start||!peroid.end){
+      peroid.start=peroid.end=null;
+    }else{
+      peroid.start.date = new Date(peroid.start.date);
+      peroid.end.date = new Date(peroid.end.date);
+    }
+
 
 
   }
