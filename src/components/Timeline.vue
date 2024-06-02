@@ -60,8 +60,7 @@
             </div>
           </template>
           <div class="col" :colspan="7 * weeks.length">
-            <div style="display: flex; flex-wrap: nowrap" class="sch"
-              @mouseup="updateRowSche(row)" @mousemove.prevent="moveOrRejustRowSch($event, row)">
+            <div style="display: flex; flex-wrap: nowrap" class="sch">
               <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
                   width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) + 1) * 100 + '%',
@@ -208,56 +207,6 @@ export default {
       }
       return style;
     },
-    updateRowSche(row) {
-      if (this.moveType) {
-        this.moveType = null;
-        this.selectStart.row._tl.start = this.selectStart.start;
-        this.selectStart.row._tl.end = this.selectStart.end;
-      }
-    },
-    moveOrRejustRowSch(event, row) {
-
-      let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
-      let totalWidth = event.target.closest('.sch').offsetWidth;
-      let index = parseInt(x / totalWidth * this.weekCount * 7);
-      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-
-      if (this.selectStart != null) {
-        if ((!this.selectStart.row._tl))
-          this.selectStart.end = date;
-        else {
-          if (this.moveType) {
-            let x = event.clientX - this.moveType.x;
-
-            let totalWidth = event.target.closest('.sch').offsetWidth;
-            let unitWidth = totalWidth / this.weekCount / 7;
-
-
-            let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
-            let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-
-            if (this.moveType.type == 'rightDrag')
-              this.selectStart.end = date;
-            else if (this.moveType.type == 'leftDrag')
-              this.selectStart.start = date;
-            else {
-              let moveUnits = parseInt(x / unitWidth);
-              index = this.moveType._tl.start.i + moveUnits;
-
-              this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
-
-              index = this.moveType._tl.end.i + moveUnits;
-
-              this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
-              console.log('moveUnits', moveUnits)
-            }
-          }
-        }
-      }
-
-
-
-    },
 
     cellClass(rowIndex, cellIndex, col) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
@@ -358,9 +307,58 @@ export default {
         this.endRowIndex = rowIndex;
         this.endcellIndex = cellIndex;
       }
+
+      let sch = event.target.closest('.sch');
+      if(sch){
+
+     
+      let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
+      let totalWidth = event.target.closest('.sch').offsetWidth;
+      let index = parseInt(x / totalWidth * this.weekCount * 7);
+      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+      if (this.selectStart != null) {
+        if ((!this.selectStart.row._tl))
+          this.selectStart.end = date;
+        else {
+          if (this.moveType) {
+            let x = event.clientX - this.moveType.x;
+
+            let totalWidth = event.target.closest('.sch').offsetWidth;
+            let unitWidth = totalWidth / this.weekCount / 7;
+
+
+            let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
+            let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+            if (this.moveType.type == 'rightDrag')
+              this.selectStart.end = date;
+            else if (this.moveType.type == 'leftDrag')
+              this.selectStart.start = date;
+            else {
+              let moveUnits = parseInt(x / unitWidth);
+              index = this.moveType._tl.start.i + moveUnits;
+
+              this.selectStart.start = this.weeks[parseInt(index / 7)].dates[index % 7];
+
+              index = this.moveType._tl.end.i + moveUnits;
+
+              this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
+              console.log('moveUnits', moveUnits)
+            }
+          }
+        }
+      }
+    }
     },
     handleMouseUp() {
       this.isMouseDown = false;
+      if (this.moveType) {
+        this.moveType = null;
+        this.selectStart.row._tl.start = this.selectStart.start;
+        this.selectStart.row._tl.end = this.selectStart.end;
+      }
+
 
     },
     isSelected(rowIndex, cellIndex) {
@@ -805,4 +803,5 @@ export default {
   background-color: #ccc;
   color: blue;
 }
+.sch{user-select: none;}
 </style>
