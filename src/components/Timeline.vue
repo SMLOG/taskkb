@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container" style="flex-grow: 1;position: relative;">
+  <div class="table-container" style="flex-grow: 1;position: relative;" :class="{drag:moveType&&(moveType.type=='leftDrag'||moveType.type=='rightDrag'),move:moveType&&moveType.type=='move'}">
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
@@ -272,7 +272,7 @@ export default {
         configStore.share.curRow = row;
         if (row._tl) {
           if (event.target.classList.contains('selectStart')) {
-            this.moveType = { x: event.clientX, type: 'selectStart', _tl: deepCopy(row._tl) }
+            this.moveType = { x: event.clientX, type: 'move', _tl: deepCopy(row._tl) }
           }
           else if (event.target.classList.contains('rightDrag')) {
             this.moveType = { x: event.clientX, type: 'rightDrag', initValue: deepCopy(row._tl.end), _tl: deepCopy(row._tl) }
@@ -565,6 +565,7 @@ export default {
       }
     },
     selectRowSch(row) {
+      if(!this.moveType)
       this.selectStart = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
 
     },
@@ -849,5 +850,11 @@ export default {
 
 .holiday {
   text-decoration: underline;
+}
+.drag{
+  cursor: ew-resize;
+}
+.move{
+  cursor:move;
 }
 </style>
