@@ -4,7 +4,8 @@
       @mouseup.prevent="stopHandleMovement">
     </div>
     <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseCellsDown"
-      @mousemove="handleMouseCellsMove" @mouseup.left="handleMouseUp">
+      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove"
+      @mouseup.left="handleMouseUp">
       <ColumnsResizer :th="$refs.th" v-if="$refs.th" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
       <TimelineHeader />
@@ -43,12 +44,11 @@
         </div>
       </div>
       <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-        <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
-          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
-          @mousedown.left="clickSelectCell($event, rowIndex, row)" @drop="drop($event, row, rowIndex)">
-          <a style="min-width: 46px;max-width: 46px;" class="col lsticky" :draggable="true"
-            @dragstart="dragstart($event, row)" @click="clickSelectCell($event, rowIndex, row)"
-            :class="{ curRow: curRow == row }">
+        <div class="row" :data-pos="row._pos" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
+          @mousedown.left="clickSelectCell($event, rowIndex, row)">
+          <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype" :draggable="true"
+            @click="clickSelectCell($event, rowIndex, row)" :class="{ curRow: curRow == row }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
@@ -74,9 +74,9 @@
                 </div>
                 <div v-if="selectStart &&
                   selectStart.row == row" :style="{
-                    width: (calculateDaysBetweenDates(selectStart.end , selectStart.start) + 1) * 100 + '%',
+                    width: (calculateDaysBetweenDates(selectStart.end, selectStart.start) + 1) * 100 + '%',
                     marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)) * 100 + '%'
-                  }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end ,
+                  }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end,
                     selectStart.start) + 1 }}
                   <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
                   <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
@@ -105,7 +105,7 @@ import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 
-function deepCopy(obj){
+function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 
@@ -209,11 +209,11 @@ export default {
       }
       return style;
     },
-    updateRowSche(row){
-      if(this.moveType){
+    updateRowSche(row) {
+      if (this.moveType) {
         this.moveType = null;
-        this.selectStart.row._tl.start=this.selectStart.start;
-        this.selectStart.row._tl.end=this.selectStart.end;
+        this.selectStart.row._tl.start = this.selectStart.start;
+        this.selectStart.row._tl.end = this.selectStart.end;
       }
     },
     moveOrRejustRowSch(event, row) {
@@ -223,7 +223,7 @@ export default {
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
-      if (this.selectStart != null ) {
+      if (this.selectStart != null) {
         if ((!this.selectStart.row._tl))
           this.selectStart.end = date;
         else {
@@ -249,7 +249,7 @@ export default {
 
               index = this.moveType._tl.end.i + moveUnits;
 
-              this.selectStart.end =   this.weeks[parseInt(index / 7)].dates[index % 7];
+              this.selectStart.end = this.weeks[parseInt(index / 7)].dates[index % 7];
               console.log('moveUnits', moveUnits)
             }
           }
@@ -365,6 +365,7 @@ export default {
       for (let root of this.tableData) {
         root._level = 0;
         root._rIndex = _rIndex++;
+        root._pos = root._rIndex;
         rows.push(...this.getRootRows(root));
       }
       return rows;
@@ -387,6 +388,7 @@ export default {
           row._level = rootRow._level + 1;
           row._p = rootRow;
           row._rIndex = rindex++;
+          row._pos = rootRow._pos + "," + row._rIndex;
 
           list.push(...this.getRootRows(row));
         }
@@ -396,26 +398,26 @@ export default {
 
 
     },
-    dragstart(event, row) {
-      this.dragRow = row;
-      console.log(event);
-      this.dragStartClientX = event.clientX;
+    fromPosToRow(posStr){
+      return posStr.split(',').reduce((acc, cur) => acc[parseInt(cur)] || acc._childs[parseInt(cur)], this.tableData);
     },
-    dragOver(event) {
-      event.preventDefault();
-    },
-    isParentMoveToChild(fromRow, toRow) {
-      if (!fromRow._childs) return false;
-      for (let row of fromRow._childs) {
-        if (row == toRow) return true;
-
-        if (this.isParentMoveToChild(row, toRow)) return true;
+    dragstart(event) {
+      let interceptor = event.target.closest('.etype');
+      if (interceptor) {
+        let rowPos = interceptor.closest('.row').dataset.pos;
+        let row = this.fromPosToRow(rowPos);
+        this.dragRow = row;
+        console.log(event);
+        this.dragStartClientX = event.clientX;
       }
-      return false;
 
     },
-    drop(event, row) {
+    drop(event) {
 
+      let interceptor = event.target.closest('.etype');
+      if (!interceptor) { return }
+      let rowPos = interceptor.closest('.row').dataset.pos;
+      let row = this.fromPosToRow(rowPos);
       console.log(event);
       if (this.isParentMoveToChild(this.dragRow, row)) {
         console.error("not allow parent move to child.");
@@ -455,6 +457,21 @@ export default {
         this.dragRow = null;
       }
     },
+
+    dragOver(event) {
+      event.preventDefault();
+    },
+    isParentMoveToChild(fromRow, toRow) {
+      if (!fromRow._childs) return false;
+      for (let row of fromRow._childs) {
+        if (row == toRow) return true;
+
+        if (this.isParentMoveToChild(row, toRow)) return true;
+      }
+      return false;
+
+    },
+
     focusNext(index) {
       if (index + 1 < this.$refs.ids.length) {
         console.log('focus' + (index + 1));
