@@ -3,7 +3,7 @@
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
-    <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseCellsDown"
+    <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove"
       @mouseup.left="handleMouseUp">
       <ColumnsResizer :th="$refs.th" v-if="$refs.th" :table="$refs.table" data="rbar" :cols="cols" />
@@ -45,23 +45,22 @@
       </div>
       <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
         <div class="row" :data-pos="row._pos" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
-          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }"
-          @mousedown.left="clickSelectCell($event, rowIndex, row)">
+          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }">
           <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype" :draggable="true"
-            @click="clickSelectCell($event, rowIndex, row)" :class="{ curRow: curRow == row }">
+            :class="{ curRow: curRow == row }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
               :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
-              :style="colStyle(col)" @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+              :style="colStyle(col)">
               <div class="cell">
                 <component :is="col.cp" :row="row" :col="col"></component>
               </div>
             </div>
           </template>
           <div class="col" :colspan="7 * weeks.length">
-            <div style="display: flex; flex-wrap: nowrap" class="sch" @mousedown.left="startRowSchFirst($event, row)"
+            <div style="display: flex; flex-wrap: nowrap" class="sch"
               @mouseup="updateRowSche(row)" @mousemove.prevent="moveOrRejustRowSch($event, row)">
               <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
@@ -275,8 +274,56 @@ export default {
         sticky: col.sticky
       };
     },
-    handleMouseCellsDown(event) {
+    handleMouseDown(event) {
       console.log('mosuedown')
+
+
+      if (event.target.closest('.row')) {
+
+        let rowPos = event.target.closest('.row').dataset.pos;
+        let row = this.fromPosToRow(rowPos);
+        const configStore = useConfigStore();
+        configStore.share.curRow = row;
+        if(row._tl){
+            if (event.target.classList.contains('selectStart')) {
+            this.moveType = { x: event.clientX, type: 'selectStart', _tl: deepCopy(row._tl) }
+          }
+          else if (event.target.classList.contains('rightDrag')) {
+            this.moveType = { x: event.clientX, type: 'rightDrag', initValue: deepCopy(row._tl.end), _tl: deepCopy(row._tl) }
+          }
+          else if (event.target.classList.contains('leftDrag')) {
+            this.moveType = { x: event.clientX, type: 'leftDrag', initValue: deepCopy(row._tl.start), _tl: deepCopy(row._tl) }
+          }
+        }
+         else if (event.target.closest('.sch')) {
+          let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
+          let totalWidth = event.target.closest('.sch').offsetWidth;
+          let index = parseInt(x / totalWidth * this.weekCount * 7);
+          let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+          if (!row._tl) {
+            if (this.selectStart == null)
+              this.selectStart = { type: 2, row: row, start: date, end: date };
+            else if (this.selectStart.row == row) {
+              row._tl = this.addDatePeriod({
+                start: this.selectStart.start,
+                end: date,
+              });
+
+            } else {
+              this.selectStart = null;
+              console.log('delete selectStart')
+
+            }
+          }
+          else if (this.selectStart && row != this.selectStart.row) {
+
+            this.selectStart = null;
+            console.log('delete selectStart')
+          }
+        }
+
+      }
+
       this.selectWholeRowIndex = null;
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
@@ -292,7 +339,6 @@ export default {
       if (activeElement) {
         activeElement.blur();
       }
-      event.preventDefault();
       this.isMouseDown = true;
 
       const rowIndex = parseInt(cell.getAttribute('data-row'));
@@ -304,19 +350,18 @@ export default {
       this.endcellIndex = this.startcellIndex;
     },
     handleMouseCellsMove(event) {
-      if (this.isMouseDown) {
-        const cell = event.target.closest('div.col');
+      const cell = event.target.closest('div.col');
 
-
+      if (this.isMouseDown && cell) {
         const rowIndex = parseInt(cell.getAttribute('data-row'));
         const cellIndex = parseInt(cell.getAttribute('data-col'));
-
         this.endRowIndex = rowIndex;
         this.endcellIndex = cellIndex;
       }
     },
     handleMouseUp() {
       this.isMouseDown = false;
+
     },
     isSelected(rowIndex, cellIndex) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
@@ -328,32 +373,7 @@ export default {
         (cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
       );
     },
-    clickSelectCell(event, rowIndex, row, cellIndex, col) {
 
-      this.selectedRowIndex = rowIndex;
-      this.selectedcellIndex = cellIndex;
-      const configStore = useConfigStore();
-      configStore.share.curRow = row;
-      this.selectCol = col;
-
-      if (cellIndex == undefined) {
-        this.selectWholeRowIndex = rowIndex;
-        this.selectCol = null;
-      } else {
-        this.selectWholeRowIndex = false;
-      }
-      if (event.target.classList.contains('selectStart')) {
-        this.moveType = { x: event.clientX, type: 'selectStart', _tl: deepCopy(row._tl) }
-      }
-      else if (event.target.classList.contains('rightDrag')) {
-        this.moveType = { x: event.clientX, type: 'rightDrag', initValue: deepCopy(row._tl.end), _tl: deepCopy(row._tl) }
-      }
-      else if (event.target.classList.contains('leftDrag')) {
-        this.moveType = { x: event.clientX, type: 'leftDrag', initValue: deepCopy(row._tl.start), _tl: deepCopy(row._tl) }
-      }
-      console.log('movetype', this.moveType)
-
-    },
 
     gridColumns() {
 
@@ -398,7 +418,7 @@ export default {
 
 
     },
-    fromPosToRow(posStr){
+    fromPosToRow(posStr) {
       return posStr.split(',').reduce((acc, cur) => acc[parseInt(cur)] || acc._childs[parseInt(cur)], this.tableData);
     },
     dragstart(event) {
@@ -513,34 +533,7 @@ export default {
       this.selectStart = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
 
     },
-    startRowSchFirst(event, row) {
-      console.log("moousedown");
 
-      let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
-      let totalWidth = event.target.closest('.sch').offsetWidth;
-      let index = parseInt(x / totalWidth * this.weekCount * 7);
-      let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-      if (!row._tl) {
-        if (this.selectStart == null)
-          this.selectStart = { type: 2, row: row, start: date, end: date };
-        else if (this.selectStart.row == row) {
-          row._tl = this.addDatePeriod({
-            start: this.selectStart.start,
-            end: date,
-          });
-
-        } else {
-          this.selectStart = null;
-          console.log('delete selectStart')
-
-        }
-      }
-      else if (row != this.selectStart.row) {
-
-        this.selectStart = null;
-        console.log('delete selectStart')
-      }
-    },
     addDatePeriod(addPeriod) {
       if (addPeriod) {
         let newPeriod = {
