@@ -223,7 +223,7 @@ export default {
       let index = parseInt(x / totalWidth * this.weekCount * 7);
       let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
-      if (this.selectStart != null && row == this.selectStart.row) {
+      if (this.selectStart != null ) {
         if ((!this.selectStart.row._tl))
           this.selectStart.end = date;
         else {
