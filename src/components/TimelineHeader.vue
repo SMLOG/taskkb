@@ -191,7 +191,7 @@ export default {
   position: absolute;
   top: 0;
   height: 100%;
-  border: 1px solid #ddd;
+  border-left: 1px solid #ddd;
   right: 0;
 }
 

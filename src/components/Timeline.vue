@@ -18,17 +18,17 @@
             </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length">
+        <div class="col" :colspan="7 * weeks.length" style="user-select: none;">
           <div style="display: flex; flex-wrap: nowrap">
             <div v-for="(week, index) in weeks" :key="week" class="week-slot">
               <div>
                 <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
                   Start
-                  <div v-if="showDatePicker" style="position: absolute;">
+                  <div v-if="showDatePicker" style="position: absolute;background: white;">
                     <VueDatePicker v-model="config.startDate"
                       @date-update="(d) => { config.startDate = d; showDatePicker = false }" :enable-time-picker="false"
                       type="date" inline auto-apply />
-                    Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop />
+                      <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop /></div>
                   </div>
                 </a>
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
@@ -698,7 +698,7 @@ export default {
   position: absolute;
   top: 0;
   height: 100%;
-  border: 1px solid #ddd;
+  border-left: 1px solid #ddd;
   right: 0;
 }
 
@@ -763,11 +763,13 @@ export default {
 }
 
 .col {
-  border: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   position: relative;
 }
 
 .header {
+  border-top: 1px solid #ccc;
   position: sticky;
   top: 0;
   z-index: var(--vt-index-sticky-header);
