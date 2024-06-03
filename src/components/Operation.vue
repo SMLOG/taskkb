@@ -5,6 +5,7 @@
         left: 0;
         z-index: 3;
         background: white;
+        user-select: none;
       ">
     <div>
       <div style="display: flex;flex-direction: column;">
@@ -126,4 +127,8 @@ export default {
   }
 };
 </script>
-
+<style scoped>
+a{
+  cursor: pointer;
+}
+</style>

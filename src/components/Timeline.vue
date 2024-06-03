@@ -236,11 +236,10 @@ export default {
 
     },
 
-    colStyle(col, isH) {
+    colStyle(col) {
       let style = {};
       if (col.sticky) {
         style.left = "46px";
-        style.zIndex = isH ? 4 : 3
       }
       return style;
     },
@@ -469,7 +468,7 @@ export default {
     },
     drop(event) {
 
-      let interceptor = event.target.closest('.etype');
+      let interceptor = event.target.closest('.row');
       if (!interceptor) { return }
       let rowPos = interceptor.closest('.row').dataset.pos;
       let row = this.fromPosToRow(rowPos);
