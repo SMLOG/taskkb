@@ -48,7 +48,7 @@
         </div>
       </div>
       <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-        <div class="row" :data-pos="row._pos" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+        <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }">
           <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype" :draggable="true"
             :class="{ curRow: curRow == row }">
@@ -262,10 +262,11 @@ export default {
     handleMouseDown(event) {
       console.log('mosuedown')
 
+      let rowEl = event.target.closest('.row');
+      if (rowEl) {
 
-      if (event.target.closest('.row')) {
-
-        let rowPos = event.target.closest('.row').dataset.pos;
+        this.selectWholeRowIndex = parseInt(rowEl.dataset.rowIndex);
+        let rowPos = rowEl.dataset.pos;
         let row = this.fromPosToRow(rowPos);
         const configStore = useConfigStore();
         configStore.share.curRow = row;
@@ -307,9 +308,10 @@ export default {
           }
         }
 
+      }else{
+        this.selectWholeRowIndex = null;
       }
 
-      this.selectWholeRowIndex = null;
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
