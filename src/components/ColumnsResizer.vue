@@ -1,7 +1,10 @@
 <template>
-  <div class="vue-columns-resizable" style="position: relative;">
+  <div class="vue-columns-resizable" style="position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;">
     <template v-for="(col, key) in cols" :key="key">
-      <div class="columns-resize-bar" ref="rbar" @mousedown="startResize(col, key, $event)"></div>
+      <div class="columns-resize-bar" :class="{sticky:col.sticky}" ref="rbar" @mousedown="startResize(col, key, $event)"></div>
     </template>
     <div class="overlay" v-if="resizeColumn" @mousemove.prevent="handleResize" @mouseup.prevent="resizeBarMouseUp">
     </div>
@@ -15,7 +18,10 @@ export default {
       resizeColumn: null,
     };
   },
+unmounted(){
+  window.removeEventListener('scroll', this.scrollEventHanlder);
 
+},
   mounted() {
 
     const table = this.table;
@@ -31,8 +37,13 @@ export default {
     });
     this.winResize();
 
+    window.addEventListener('scroll', this.scrollEventHanlder);
+
   },
   methods: {
+    scrollEventHanlder(){
+        this.resize();
+    },
     winResize() {
       this.$nextTick(() => { this.resize(); });
     },
@@ -40,6 +51,7 @@ export default {
 
       for (let i = 0; i < this.$refs.rbar.length; i++) {
         this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+      
       }
     },
     winResize() {
@@ -53,6 +65,9 @@ export default {
         this.resizeColumn.width = width;
         let j = i;
         this.$refs.rbar[i].style.left = this.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        if(this.th[j].classList.contains('.sticky')){
+          this.$refs.rbar[i].style.left = this.th[j].style.left + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        }
       }
 
     },
@@ -108,5 +123,9 @@ export default {
 
 .columns-resize-bar:hover {
   background-color: gray;
+}
+
+.sticky{
+  position: sticky;
 }
 </style>
