@@ -1,12 +1,12 @@
 <template>
-  <div class="table-container" style="flex-grow: 1;position: relative;" :class="{drag:moveType&&(moveType.type=='leftDrag'||moveType.type=='rightDrag'),move:moveType&&moveType.type=='move'}">
+  <div class="table-container" style="position: relative;" :class="{drag:moveType&&(moveType.type=='leftDrag'||moveType.type=='rightDrag'),move:moveType&&moveType.type=='move'}">
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
     <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove"
       @mouseup.left="handleMouseUp">
-      <ColumnsResizer :th="$refs.th" v-if="$refs.th" :table="$refs.table" data="rbar" :cols="cols" />
+      <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
       <TimelineHeader />
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
@@ -115,6 +115,7 @@ export default {
 
   data() {
     return {
+      isMounted:false,
       holidays: [
         { date: '2024-01-01', n: 20240101, name: 'New Year\'s Day' },
         { date: '2024-02-10', n: 20240210, name: 'Lunar New Year\'s Day' },
@@ -135,7 +136,6 @@ export default {
         { date: '2024-12-26', n: 20241226, name: 'The first weekday after Christmas Day' }
       ],
       showMoveOverLayer: false,
-      weekCount: 20,
       showDatePicker: false,
       selectStart: null,
       isDrag: 0,
@@ -182,7 +182,8 @@ export default {
 
 
     this.weeks.length = 0;
-    this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.weekCount));
+    this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.config.weekCount));
+    this.$nextTick(() =>this.isMounted=true);
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
@@ -192,7 +193,7 @@ export default {
       return this.weeks[0].dates[0];
     },
     days() {
-      return this.weekCount * 7;
+      return this.config.weekCount * 7;
     },
     cols() {
       if (this.config && this.config.cols)
@@ -284,7 +285,7 @@ export default {
         else if (event.target.closest('.sch')) {
           let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
           let totalWidth = event.target.closest('.sch').offsetWidth;
-          let index = parseInt(x / totalWidth * this.weekCount * 7);
+          let index = parseInt(x / totalWidth * this.config.weekCount * 7);
           let date = this.weeks[parseInt(index / 7)].dates[index % 7];
           if (!row._tl) {
             if (this.selectStart == null)
@@ -352,7 +353,7 @@ export default {
 
         let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
         let totalWidth = event.target.closest('.sch').offsetWidth;
-        let index = parseInt(x / totalWidth * this.weekCount * 7);
+        let index = parseInt(x / totalWidth * this.config.weekCount * 7);
         let date = this.weeks[parseInt(index / 7)].dates[index % 7];
 
         if (this.selectStart != null) {
@@ -363,7 +364,7 @@ export default {
               let x = event.clientX - this.moveType.x;
 
               let totalWidth = event.target.closest('.sch').offsetWidth;
-              let unitWidth = totalWidth / this.weekCount / 7;
+              let unitWidth = totalWidth / this.config.weekCount / 7;
 
 
               let index = this.moveType._tl[this.moveType.type == 'rightDrag' ? 'end' : 'start'].i + parseInt(x / unitWidth)
@@ -640,7 +641,7 @@ export default {
       let day = String(dateObj.getDate()).padStart(2, '0');
       return parseInt(`${year}${month}${day}`, 10);
     },
-    generateWeeks(startDate, n = 20) {
+    generateWeeks(startDate, n) {
       const weeks = [];
       let startOfWeek = new Date(startDate);
 

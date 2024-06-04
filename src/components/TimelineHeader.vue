@@ -75,7 +75,7 @@ export default {
 
 
     this.weeks.length = 0;
-    this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.weekCount));
+    this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.config.weekCount));
   },
 
   computed: {

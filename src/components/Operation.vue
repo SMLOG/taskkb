@@ -1,14 +1,14 @@
 <template>
   <div style="
-        position: sticky;
         bottom: 0;
         left: 0;
         z-index: 3;
         background: white;
         user-select: none;
+        position: sticky;
       ">
-    <div>
-      <div style="display: flex;flex-direction: column;">
+    <div style="display: grid;grid-template-columns: auto 1fr;">
+      <div style="display: flex;flex-direction: column; position: sticky;left: 0;bottom:0;">
         <Config v-if="showConfig" :config="config"></Config>
         <div style="display: flex;height: 30px;">
           <a @click="addRow(1)">Add Row</a>

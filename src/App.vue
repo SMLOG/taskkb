@@ -27,6 +27,7 @@ import FormatTool from "@/components/FormatTool.vue";
       left: 0;
       display: grid;
       grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
     ">
     <FormatTool>
       <router-view>
