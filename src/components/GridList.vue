@@ -16,12 +16,11 @@
         </template>
       </div>
       <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-        <div class="row" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+        <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
           @drop="drop($event, row, rowIndex)">
           <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
             @click="clickSelectCell($event, rowIndex, row)"
-            @contextmenu="clickSelectCell($event, rowIndex, row); showContextMenu($event, rowIndex)"
             :class="{ curRow: selectRow == row }">
             {{ row._rIndex + 1 }}
           </a>
@@ -113,6 +112,10 @@ export default {
       if (!this.config.cols) this.config.cols = [];
       return this.config.cols.filter(e => e.show);
     },
+    curRow() {
+      const configStore = useConfigStore();
+      return configStore.share.curRow;
+    }
   },
   methods: {
     gridColumns() {
@@ -180,8 +183,23 @@ export default {
         sticky: col.sticky
       };
     },
+    fromPosToRow(posStr) {
+      return posStr.split(',').reduce((acc, cur) => acc[parseInt(cur)] || acc._childs[parseInt(cur)], this.tableData);
+    },
     handleMouseDown(event) {
       console.log('mosuedown')
+
+      let rowEl = event.target.closest('.row');
+      if (rowEl) {
+
+        this.selectWholeRowIndex = parseInt(rowEl.dataset.rowIndex);
+        let rowPos = rowEl.dataset.pos;
+        let row = this.fromPosToRow(rowPos);
+        const configStore = useConfigStore();
+        configStore.share.curRow = row;
+
+      }
+
       this.selectWholeRowIndex = null;
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
@@ -252,6 +270,7 @@ export default {
       for (let root of this.tableData) {
         root._level = 0;
         root._rIndex = _rIndex++;
+        root._pos = root._rIndex;
         rows.push(...this.getRootRows(root));
       }
       return rows;
@@ -266,23 +285,24 @@ export default {
     },
     getRootRows(rootRow) {
 
-      let list = [];
-      list.push(rootRow);
-      if (rootRow._childs) {
-        let rindex = 0;
-        for (let row of rootRow._childs) {
-          row._level = rootRow._level + 1;
-          row._p = rootRow;
-          row._rIndex = rindex++;
+let list = [];
+list.push(rootRow);
+if (rootRow._childs) {
+  let rindex = 0;
+  for (let row of rootRow._childs) {
+    row._level = rootRow._level + 1;
+    row._p = rootRow;
+    row._rIndex = rindex++;
+    row._pos = rootRow._pos + "," + row._rIndex;
 
-          list.push(...this.getRootRows(row));
-        }
+    list.push(...this.getRootRows(row));
+  }
 
-      }
-      return list;
+}
+return list;
 
 
-    },
+},
     dragstart(event, row) {
       this.dragRow = row;
       console.log(event);
@@ -340,7 +360,6 @@ export default {
         }
 
         this.dragRow = null;
-        this.saveData()
       }
     },
     focusNext(index) {

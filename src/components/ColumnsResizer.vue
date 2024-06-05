@@ -51,7 +51,9 @@ unmounted(){
 
       for (let i = 0; i < this.$refs.rbar.length; i++) {
         this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-      
+        if(this.th[i].classList.contains('.sticky')){
+          this.$refs.rbar[i].style.left = this.th[i].style.left + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        }
       }
     },
     winResize() {
