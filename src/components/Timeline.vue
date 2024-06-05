@@ -5,6 +5,7 @@
     </div>
     <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove"
+      @click="handleClick"
       @mouseup.left="handleMouseUp">
       <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
@@ -55,7 +56,8 @@
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
+            <div class="col td title" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
+
               :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
               :style="colStyle(col)">
               <div class="cell">
@@ -259,6 +261,17 @@ export default {
         bottom: selected && rowIndex == maxRowIndex,
         sticky: col.sticky
       };
+    },
+    handleClick(event){
+      
+      let title = event.target.closest('.title');
+      if (title) {
+        let rowEl = title.closest('.row');
+        let plantime =rowEl.querySelector('.plantime');
+        if(plantime)
+          rowEl.closest('#mainContent').scrollLeft=plantime.offsetLeft;
+
+      }
     },
     handleMouseDown(event) {
       console.log('mosuedown')

@@ -16,7 +16,9 @@ import FormatTool from "@/components/FormatTool.vue";
   </header>
   <main style="position: relative;
     flex-grow: 1;">
-    <div style="
+    <div 
+    id="mainContent"
+    style="
       position: absolute;
       top: 0;
       bottom: 0;
