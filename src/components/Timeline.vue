@@ -1,11 +1,11 @@
 <template>
-  <div class="table-container" style="position: relative;" :class="{drag:moveType&&(moveType.type=='leftDrag'||moveType.type=='rightDrag'),move:moveType&&moveType.type=='move'}">
+  <div class="table-container" style="position: relative;"
+    :class="{ drag: moveType && (moveType.type == 'leftDrag' || moveType.type == 'rightDrag'), move: moveType && moveType.type == 'move' }">
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
     <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
-      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove"
-      @click="handleClick"
+      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp">
       <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
@@ -29,14 +29,15 @@
                     <VueDatePicker v-model="config.startDate"
                       @date-update="(d) => { config.startDate = d; showDatePicker = false }" :enable-time-picker="false"
                       type="date" inline auto-apply />
-                      <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20" @mousedown.stop /></div>
+                    <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20"
+                        @mousedown.stop /></div>
                   </div>
                 </a>
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
               <div style="display: flex; justify-content: space-between">
                 <span v-for="day in week.dates" :key="day" class="day" :class="{
-                  selected: selectStart && (day.i >= selectStart.start.i && day.i <= selectStart.end.i),
+                  selected: selectStart && isBetween(selectStart.start.i, selectStart.end.i, day.i),
                   today: day.isCur,
                   weekend: day.isWeekend,
                   holiday: day.holiday
@@ -48,16 +49,15 @@
           </div>
         </div>
       </div>
-      <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
-        <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
-          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }">
-          <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype" :draggable="true"
-            :class="{ curRow: curRow == row }">
+      <template v-for="(row, rowIndex) in getAllRows()" :key="rowIndex">
+        <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }"
+          v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectRows && selectRows.indexOf(row._pos) > -1 }">
+          <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype num"
+            :draggable="isDrag" :class="{ curRow: curRow == row }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <div class="col td title" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
-
               :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
               :style="colStyle(col)">
               <div class="cell">
@@ -69,18 +69,18 @@
             <div style="display: flex; flex-wrap: nowrap" class="sch">
               <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
-                  width: (calculateDaysBetweenDates(row._tl.end, row._tl.start) ) * 100 + '%',
-                  marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay)-1) * 100 + '%'
+                  width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
+                  marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
                 }" class="plantime" @mouseover="selectRowSch(row)">{{
                   calculateDaysBetweenDates(row._tl.end,
-                    row._tl.start,true)  }}d
+                    row._tl.start, true) }}d
                 </div>
                 <div v-if="selectStart &&
                   selectStart.row == row" :style="{
                     width: (calculateDaysBetweenDates(selectStart.end, selectStart.start)) * 100 + '%',
-                    marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay)-1) * 100 + '%'
+                    marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay) - 1) * 100 + '%'
                   }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end,
-                    selectStart.start,true)  }}d
+                    selectStart.start, true) }}d
                   <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
                   <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                 </div>
@@ -117,7 +117,9 @@ export default {
 
   data() {
     return {
-      isMounted:false,
+      isMounted: false,
+      selectRowStart: -1,
+      selectRowEnd: -1,
       holidays: [
         { date: '2024-01-01', n: 20240101, name: 'New Year\'s Day' },
         { date: '2024-02-10', n: 20240210, name: 'Lunar New Year\'s Day' },
@@ -154,8 +156,6 @@ export default {
       startcellIndex: null,
       endRowIndex: null,
       endcellIndex: null,
-      wholeRowSelected: false,
-      selectWholeRowIndex: null,
     };
   },
   mounted() {
@@ -185,7 +185,7 @@ export default {
 
     this.weeks.length = 0;
     this.weeks.push(...this.generateWeeks(this.config.startDate || new Date(), this.config.weekCount));
-    this.$nextTick(() =>this.isMounted=true);
+    this.$nextTick(() => this.isMounted = true);
   },
   beforeUnmount() {
     document.removeEventListener("keydown", this.handleKeyDown);
@@ -205,36 +205,44 @@ export default {
     curRow() {
       const configStore = useConfigStore();
       return configStore.share.curRow;
+    },
+    selectRows() {
+      const configStore = useConfigStore();
+      return configStore.share.selectRows;
     }
   },
   watch: {
 
   },
   methods: {
-    calculateDaysBetweenDates(date1, date2,exclusiveHolidayWeeken) {
+    isBetween(a, b, c) {
+      return (a <= c && c <= b) || (b <= c && c <= a);
+    },
+    calculateDaysBetweenDates(d1, d2, exclusiveHolidayWeeken) {
 
-      
-      
-      if(exclusiveHolidayWeeken){
-        let weekIndex1 = parseInt(date1.i/7);
-        let weekIndex2 = parseInt(date2.i/7);
 
-        let i=date2.i%7;
+      let date1 = d1.i > d2.i ? d1 : d2;
+      let date2 = d1.i > d2.i ? d2 : d1;
+      if (exclusiveHolidayWeeken) {
+        let weekIndex1 = parseInt(date1.i / 7);
+        let weekIndex2 = parseInt(date2.i / 7);
+
+        let i = date2.i % 7;
         let count = 0;
-        for(let w=weekIndex2;w<=weekIndex1;w++){
+        for (let w = weekIndex2; w <= weekIndex1; w++) {
 
-          for(;i<=(w<weekIndex1?6:date1.i%7);i++){
+          for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
             let day = this.weeks[w].dates[i];
-            if(day.isWeekend||day.holiday)continue;
+            if (day.isWeekend || day.holiday) continue;
             count++;
-            
+
           }
-          i=0;
+          i = 0;
         }
         return count;
 
       }
-      return date1.i-date2.i+1;
+      return date1.i - date2.i + 1;
 
 
     },
@@ -262,14 +270,14 @@ export default {
         sticky: col.sticky
       };
     },
-    handleClick(event){
-      
+    handleClick(event) {
+
       let title = event.target.closest('.title');
       if (title) {
         let rowEl = title.closest('.row');
-        let plantime =rowEl.querySelector('.plantime');
-        if(plantime)
-          rowEl.closest('#mainContent').scrollLeft=plantime.offsetLeft;
+        let plantime = rowEl.querySelector('.plantime');
+        if (plantime)
+          rowEl.closest('#mainContent').scrollLeft = plantime.offsetLeft;
 
       }
     },
@@ -278,53 +286,70 @@ export default {
 
       let rowEl = event.target.closest('.row');
       if (rowEl) {
-
-        this.selectWholeRowIndex = parseInt(rowEl.dataset.rowIndex);
+        this.isMouseDown = true;
         let rowPos = rowEl.dataset.pos;
         let row = this.fromPosToRow(rowPos);
         const configStore = useConfigStore();
         configStore.share.curRow = row;
-        if (row._tl) {
-          if (event.target.classList.contains('selectStart')) {
-            this.moveType = { x: event.clientX, type: 'move', _tl: deepCopy(row._tl) }
-          }
-          else if (event.target.classList.contains('rightDrag')) {
-            this.moveType = { x: event.clientX, type: 'rightDrag', initValue: deepCopy(row._tl.end), _tl: deepCopy(row._tl) }
-          }
-          else if (event.target.classList.contains('leftDrag')) {
-            this.moveType = { x: event.clientX, type: 'leftDrag', initValue: deepCopy(row._tl.start), _tl: deepCopy(row._tl) }
-          }
+        if (!configStore.share.selectRows) {
+          configStore.share.selectRows = [];
         }
-        else if (event.target.closest('.sch')) {
-          let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
-          let totalWidth = event.target.closest('.sch').offsetWidth;
-          let index = parseInt(x / totalWidth * this.config.weekCount * 7);
-          let date = this.weeks[parseInt(index / 7)].dates[index % 7];
-          if (!row._tl) {
-            if (this.selectStart == null)
-              this.selectStart = { type: 2, row: row, start: date, end: date };
-            else if (this.selectStart.row == row) {
-              row._tl = this.addDatePeriod({
-                start: this.selectStart.start,
-                end: date,
-              });
+        let selectRows = configStore.share.selectRows;
 
-            } else {
-              this.selectStart = null;
-              console.log('delete selectStart')
+        if (event.target.classList.contains('num')) {
+          if (selectRows.indexOf(rowPos) > -1) {
+            //drag
+            this.isDrag = true;
+          } else {
+            this.selectRowStart = parseInt(rowEl.dataset.rowIndex);
+            this.selectRowEnd = parseInt(rowEl.dataset.rowIndex);
+            selectRows.length = 0;
+            selectRows.push(rowPos);
+          }
+        } else {
+          selectRows.length = 0;
+          this.selectRowStart = this.selectRowEnd = -1;
 
+          if (row._tl && row._tl.start && this.selectStart && this.selectStart.row==row) {
+            if (event.target.classList.contains('selectStart')) {
+              this.moveType = { x: event.clientX, type: 'move', _tl: deepCopy(row._tl) }
+            }
+            else if (event.target.classList.contains('rightDrag')) {
+              this.moveType = { x: event.clientX, type: 'rightDrag', initValue: deepCopy(row._tl.end), _tl: deepCopy(row._tl) }
+            }
+            else if (event.target.classList.contains('leftDrag')) {
+              this.moveType = { x: event.clientX, type: 'leftDrag', initValue: deepCopy(row._tl.start), _tl: deepCopy(row._tl) }
             }
           }
-          else if (this.selectStart && row != this.selectStart.row) {
+          else if (event.target.closest('.sch')) {
+            let x = event.clientX - event.target.closest('.sch').getBoundingClientRect().left;
+            let totalWidth = event.target.closest('.sch').offsetWidth;
+            let index = parseInt(x / totalWidth * this.config.weekCount * 7);
+            let date = this.weeks[parseInt(index / 7)].dates[index % 7];
+            if (!row._tl || !row._tl.start) {
+              if (this.selectStart == null){
+                this.selectStart = { type: 2, row: row, start: date, end: date };
+              }
+              else if (this.selectStart.row == row && this.selectStart.start) {
+                row._tl = this.addDatePeriod({
+                  start: this.selectStart.start,
+                  end: date,
+                });
 
-            this.selectStart = null;
-            console.log('delete selectStart')
+              } else {
+                this.selectStart = null;
+                console.log('delete selectStart')
+
+              }
+            }
+            else if (this.selectStart && row != this.selectStart.row) {
+
+              this.selectStart = null;
+              console.log('delete selectStart')
+            }
           }
         }
-
-      }else{
-        this.selectWholeRowIndex = null;
-      }
+      } 
 
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
@@ -341,7 +366,7 @@ export default {
         activeElement.blur();
       }
       this.isMouseDown = true;
-
+      event.preventDefault();
       const rowIndex = parseInt(cell.getAttribute('data-row'));
       const cellIndex = parseInt(cell.getAttribute('data-col'));
 
@@ -351,14 +376,22 @@ export default {
       this.endcellIndex = this.startcellIndex;
     },
     handleMouseCellsMove(event) {
-      const cell = event.target.closest('div.col');
-
-      if (this.isMouseDown && cell) {
-        const rowIndex = parseInt(cell.getAttribute('data-row'));
-        const cellIndex = parseInt(cell.getAttribute('data-col'));
-        this.endRowIndex = rowIndex;
-        this.endcellIndex = cellIndex;
+      let rowEl = event.target.closest('.row');
+      if (rowEl) {
+        if (this.isMouseDown) {
+          const cell = event.target.closest('div.col');
+          if(useConfigStore().share.selectRows && useConfigStore().share.selectRows.length){
+            this.selectRowEnd = parseInt(rowEl.dataset.rowIndex);
+          }else if (cell) {
+            const rowIndex = parseInt(cell.getAttribute('data-row'));
+            const cellIndex = parseInt(cell.getAttribute('data-col'));
+            this.endRowIndex = rowIndex;
+            this.endcellIndex = cellIndex;
+          } 
+        }
       }
+
+
 
       let sch = event.target.closest('.sch');
       if (sch) {
@@ -404,7 +437,7 @@ export default {
       }
     },
     handleMouseUp() {
-      this.isMouseDown = false;
+      this.isDrag = this.isMouseDown = false;
       if (this.moveType) {
         this.moveType = null;
         this.selectStart.row._tl.start = this.selectStart.start;
@@ -419,8 +452,8 @@ export default {
       const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
       const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
       return (
-        (rowIndex >= minRowIndex && rowIndex <= maxRowIndex) &&
-        (cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
+        (minRowIndex>=0&&rowIndex >= minRowIndex && rowIndex <= maxRowIndex) &&
+        (mincellIndex>=0&&cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
       );
     },
 
@@ -429,14 +462,14 @@ export default {
 
       return '46px ' + this.cols.map(e => e.width + 'px').join(' ') + ' 1fr';
     },
-    getAllRow() {
+    getAllRows() {
       let rows = [];
       let _rIndex = 0;
       for (let root of this.tableData) {
         root._level = 0;
         root._rIndex = _rIndex++;
         root._pos = root._rIndex;
-        rows.push(...this.getRootRows(root));
+        rows.push(...this.getRowRows(root));
       }
       return rows;
     },
@@ -448,7 +481,7 @@ export default {
       return false;
 
     },
-    getRootRows(rootRow) {
+    getRowRows(rootRow) {
 
       let list = [];
       list.push(rootRow);
@@ -460,7 +493,7 @@ export default {
           row._rIndex = rindex++;
           row._pos = rootRow._pos + "," + row._rIndex;
 
-          list.push(...this.getRootRows(row));
+          list.push(...this.getRowRows(row));
         }
 
       }
@@ -580,8 +613,8 @@ export default {
       }
     },
     selectRowSch(row) {
-      if(!this.moveType)
-      this.selectStart = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
+      if (!this.moveType && (!this.selectStart||this.selectStart.type!=2) )
+        this.selectStart = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
 
     },
 
@@ -754,7 +787,7 @@ export default {
 }
 
 .selected {
-  background-color: #F0FFD0 !important;
+  background-color: #F0FFF0 !important;
 }
 
 .curRow,
@@ -775,11 +808,11 @@ export default {
 .row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #ccc;
 }
 
 .col {
   border-right: 1px solid #ccc;
-  border-bottom: 1px solid #ccc;
   position: relative;
 }
 
@@ -789,7 +822,8 @@ export default {
   z-index: var(--vt-index-sticky-header);
   background-color: white
 }
-.header .col{
+
+.header .col {
   border-top: 1px solid #ccc;
 }
 
@@ -870,10 +904,15 @@ export default {
 .holiday {
   text-decoration: underline;
 }
-.drag{
+
+.drag {
   cursor: ew-resize;
 }
-.move{
-  cursor:move;
+
+.move {
+  cursor: move;
+}
+.num{
+  user-select: none;
 }
 </style>

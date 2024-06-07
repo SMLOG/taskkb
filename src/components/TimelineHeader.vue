@@ -219,10 +219,11 @@ export default {
 .row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+
 }
 
 .col {
-  border-left: 1px solid #ccc;
+  border-right: 1px solid #ccc;
   position: relative;
 }
 
