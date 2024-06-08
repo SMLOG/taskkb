@@ -21,15 +21,18 @@ function loopToSetDate(row) {
     }
   }
 }
+
+let treeRows =localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
+
+
+for (let r of treeRows) {
+  loopToSetDate(r);
+}
+
+const dataRows = ref(treeRows)
+
 export const useDataRowsStore = defineStore('dataRows', () => {
-  let rows =localStorage.getItem('data') ? JSON.parse(localStorage.getItem('data')) : [];
 
-
-  for (let r of rows) {
-    loopToSetDate(r);
-  }
-
-  const dataRows = ref(rows)
   function save() {
     localStorage.setItem('data', JSON.stringify(dataRows.value, function (key, value) {
         if (key === "_p") {
