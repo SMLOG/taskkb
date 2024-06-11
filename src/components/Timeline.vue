@@ -51,9 +51,9 @@
       </div>
       <template v-for="(row, rowIndex) in getAllRows()" :key="rowIndex">
         <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }"
-          v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectRows && selectRows.indexOf(row._pos) > -1 }">
+          v-show="!isCollapsed(row)" :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }">
           <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype num"
-            :draggable="isDrag" :class="{ curRow: curRow == row }">
+            :draggable="isDrag" :class="{ curRow: rowIndex == curRowIndex }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
@@ -156,11 +156,18 @@ export default {
       startcellIndex: null,
       endRowIndex: null,
       endcellIndex: null,
+      flatRows:null,
+      selectRowsIndex:null,
+      curRowIndex:null,
     };
   },
   mounted() {
+
     this.config = useConfigStore().config;
     this.tableData = useDataRowsStore().dataRows;
+    this.flatRows = useDataRowsStore().flatRows;
+    this.selectRowsIndex = useDataRowsStore().selectRowsIndex;
+    this.curRowIndex=useDataRowsStore().curRowIndex;
 
     if (!this.config.startDate) this.config.startDate = new Date();
     if (!this.config.weekCount) this.config.weekCount = 20;
@@ -201,10 +208,6 @@ export default {
       if (this.config && this.config.cols)
         return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
       return [];
-    },
-    curRow() {
-      const configStore = useConfigStore();
-      return configStore.share.curRow;
     },
     selectRows() {
       const configStore = useConfigStore();
@@ -287,24 +290,19 @@ export default {
       let rowEl = event.target.closest('.row');
       if (rowEl) {
         this.isMouseDown = true;
-        let rowPos = rowEl.dataset.pos;
-        let row = this.fromPosToRow(rowPos);
-        const configStore = useConfigStore();
-        configStore.share.curRow = row;
-        if (!configStore.share.selectRows) {
-          configStore.share.selectRows = [];
-        }
-        let selectRows = configStore.share.selectRows;
-
+        let rowIndex = parseInt(rowEl.dataset.rowIndex);
+        let row = this.flatRows[rowIndex];
+        useDataRowsStore().curRowIndex = parseInt(rowEl.dataset.rowIndex);
+        let selectRows = this.selectRowsIndex;
         if (event.target.classList.contains('num')) {
-          if (selectRows.indexOf(rowPos) > -1) {
+          if (selectRows.indexOf(rowIndex) > -1) {
             //drag
             this.isDrag = true;
           } else {
             this.selectRowStart = parseInt(rowEl.dataset.rowIndex);
             this.selectRowEnd = parseInt(rowEl.dataset.rowIndex);
             selectRows.length = 0;
-            selectRows.push(rowPos);
+            selectRows.push(this.selectRowStart);
           }
         } else {
           selectRows.length = 0;
@@ -380,7 +378,7 @@ export default {
       if (rowEl) {
         if (this.isMouseDown) {
           const cell = event.target.closest('div.col');
-          if(useConfigStore().share.selectRows && useConfigStore().share.selectRows.length){
+          if(this.selectRowsIndex.length){
             this.selectRowEnd = parseInt(rowEl.dataset.rowIndex);
           }else if (cell) {
             const rowIndex = parseInt(cell.getAttribute('data-row'));
@@ -463,15 +461,7 @@ export default {
       return '46px ' + this.cols.map(e => e.width + 'px').join(' ') + ' 1fr';
     },
     getAllRows() {
-      let rows = [];
-      let _rIndex = 0;
-      for (let root of this.tableData) {
-        root._level = 0;
-        root._rIndex = _rIndex++;
-        root._pos = root._rIndex;
-        rows.push(...this.getRowRows(root));
-      }
-      return rows;
+      return this.flatRows;
     },
     isCollapsed(row) {
       if (row && row._p) {
@@ -481,34 +471,11 @@ export default {
       return false;
 
     },
-    getRowRows(rootRow) {
-
-      let list = [];
-      list.push(rootRow);
-      if (rootRow._childs) {
-        let rindex = 0;
-        for (let row of rootRow._childs) {
-          row._level = rootRow._level + 1;
-          row._p = rootRow;
-          row._rIndex = rindex++;
-          row._pos = rootRow._pos + "," + row._rIndex;
-
-          list.push(...this.getRowRows(row));
-        }
-
-      }
-      return list;
-
-
-    },
-    fromPosToRow(posStr) {
-      return posStr.split(',').reduce((acc, cur) => acc[parseInt(cur)] || acc._childs[parseInt(cur)], this.tableData);
-    },
     dragstart(event) {
       let interceptor = event.target.closest('.etype');
       if (interceptor) {
-        let rowPos = interceptor.closest('.row').dataset.pos;
-        let row = this.fromPosToRow(rowPos);
+        let rowIndex = parseInt(interceptor.closest('.row').dataset.rowIndex);
+        let row = this.flatRows[rowIndex];
         this.dragRow = row;
         console.log(event);
         this.dragStartClientX = event.clientX;
@@ -519,8 +486,8 @@ export default {
 
       let interceptor = event.target.closest('.row');
       if (!interceptor) { return }
-      let rowPos = interceptor.closest('.row').dataset.pos;
-      let row = this.fromPosToRow(rowPos);
+      let rowIndex =  parseInt(interceptor.closest('.row').dataset.rowIndex);
+      let row = this.flatRows[rowIndex];
       console.log(event);
       if (this.isParentMoveToChild(this.dragRow, row)) {
         console.error("not allow parent move to child.");

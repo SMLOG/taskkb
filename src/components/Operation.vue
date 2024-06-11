@@ -108,20 +108,15 @@ export default {
     deleteRow() {
       let row = this.curRow;
       if (confirm("Please confirm to delete it?")) {
-        let list = row._p && row._p._childs || this.tableData;
-        list.splice(list.indexOf(row), 1);
+        useDataRowsStore().remove();
+        this.saveData(true);
       }
 
     },
     addRow(num) {
       console.log(num)
+      useDataRowsStore().insert({ _id: '' });
 
-      if (this.curRow) {
-        let list = this.curRow._p && this.curRow._p._childs || this.tableData;
-        let index = list.indexOf(this.curRow);
-        list.splice(index + 1, 0, { _id: '', _p: this.curRow._p });
-
-      } else this.tableData.push({ _id: '' })
 
     },
   }

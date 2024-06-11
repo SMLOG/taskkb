@@ -50,9 +50,10 @@ unmounted(){
     resize() {
 
       for (let i = 0; i < this.$refs.rbar.length; i++) {
+        let width = this.th[i].offsetWidth;
         this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-        if(this.th[i].classList.contains('.sticky')){
-          this.$refs.rbar[i].style.left = this.th[i].style.left + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        if(this.th[i].classList.contains('sticky')){
+          this.$refs.rbar[i].style.left = parseFloat(this.th[i].style.left) + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         }
       }
     },
@@ -67,8 +68,8 @@ unmounted(){
         this.resizeColumn.width = width;
         let j = i;
         this.$refs.rbar[i].style.left = this.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-        if(this.th[j].classList.contains('.sticky')){
-          this.$refs.rbar[i].style.left = this.th[j].style.left + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+        if(this.th[j].classList.contains('sticky')){
+          this.$refs.rbar[i].style.left = parseFloat(this.th[j].style.left) + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         }
       }
 
