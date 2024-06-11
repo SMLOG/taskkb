@@ -145,7 +145,6 @@ export default {
       isDrag: 0,
       weeks: [],
       config: null,
-      dragRow: null,
       selectedRowIndex: null,
       moveType: null,
       selectedcellIndex: null,
@@ -480,7 +479,6 @@ export default {
       if (interceptor) {
         let rowIndex = parseInt(interceptor.closest('.row').dataset.rowIndex);
         let row = this.flatRows[rowIndex];
-        this.dragRow = row;
         console.log(event);
         this.dragStartClientX = event.clientX;
       }
@@ -493,43 +491,50 @@ export default {
       let rowIndex =  parseInt(interceptor.closest('.row').dataset.rowIndex);
       let row = this.flatRows[rowIndex];
       console.log(event);
-      if (this.isParentMoveToChild(this.dragRow, row)) {
-        console.error("not allow parent move to child.");
-        return;
-      } else if (row == this.dragRow) {
-        console.error('same row');
-        return;
-      }
-      let toChildList = row._p._childs ;
-      console.log('drop');
 
-      if (this.dragRow !== null) {
+      this.selectRowsIndex.forEach((e)=>{
+        let dragRow = this.flatRows[e];
+            if (this.isParentMoveToChild(dragRow, row)) {
+            console.error("not allow parent move to child.");
+            return;
+          } else if (row == dragRow) {
+            console.error('same row');
+            return;
+          }
+          let toChildList = row._p._childs ;
+          console.log('drop');
 
-        let fromChildList = this.dragRow._p._childs;
-        let fromIndex = fromChildList.indexOf(this.dragRow);
-        let targetIndex = toChildList.indexOf(row);
+          if (dragRow !== null) {
 
-        if (event.clientX - this.dragStartClientX > 50) {
-          console.log('drop to child.');
-          fromChildList.splice(fromIndex, 1);
-          if (!row._childs) row._childs = [];
-          row._childs.push(this.dragRow);
-          this.dragRow._p = row;
-          this.dragRow._level = row._level + 1;
-        } else if (row._p == this.dragRow._p && fromIndex - targetIndex == 1) {
-          fromChildList.splice(fromIndex, 1);
-          targetIndex = toChildList.indexOf(row);
-          fromChildList.splice(targetIndex, 0, this.dragRow);
-        } else {
-          fromChildList.splice(fromIndex, 1);
-          targetIndex = toChildList.indexOf(row);
-          toChildList.splice(targetIndex + 1, 0, this.dragRow);
-          this.dragRow._p = row._p;
-          this.dragRow._level = row._level;
-        }
+            let fromChildList = dragRow._p._childs;
+            let fromIndex = fromChildList.indexOf(dragRow);
+            let targetIndex = toChildList.indexOf(row);
 
-        this.dragRow = null;
-      }
+            if (event.clientX - this.dragStartClientX > 50) {
+              console.log('drop to child.');
+              fromChildList.splice(fromIndex, 1);
+              if (!row._childs) row._childs = [];
+              row._childs.push(dragRow);
+              dragRow._p = row;
+              dragRow._level = row._level + 1;
+            } else if (row._p == dragRow._p && fromIndex - targetIndex == 1) {
+              fromChildList.splice(fromIndex, 1);
+              targetIndex = toChildList.indexOf(row);
+              fromChildList.splice(targetIndex, 0, dragRow);
+            } else {
+              fromChildList.splice(fromIndex, 1);
+              targetIndex = toChildList.indexOf(row);
+              toChildList.splice(targetIndex + 1, 0, dragRow);
+              dragRow._p = row._p;
+              dragRow._level = row._level;
+            }
+
+          }
+
+      });
+
+
+
     },
 
     dragOver(event) {
