@@ -533,6 +533,9 @@ export default {
 
       });
 
+      this.selectRowsIndex.length=0;
+      this.isDrag=false;
+
 
 
     },
