@@ -17,7 +17,7 @@
       </div>
       <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
         <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
-          :class="{ wholeRowSelected: selectWholeRowIndex === rowIndex }" @dragover="dragOver"
+          :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }" @dragover="dragOver"
           @drop="drop($event, row, rowIndex)">
           <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
             @click="clickSelectCell($event, rowIndex, row)"
@@ -67,19 +67,22 @@ export default {
       selectCol: null,
 
       isMouseDown: false,
-      startRowIndex: -1,
-      startcellIndex: -1,
-      endRowIndex: -1,
-      endcellIndex: -1,
-      wholeRowSelected: false,
-      selectWholeRowIndex: null,
+      startRowIndex: null,
+      startcellIndex: null,
+      endRowIndex: null,
+      endcellIndex: null,
+      flatRows:null,
+      selectRowsIndex:null,
+      curRowIndex:null,
     };
   },
 
 
   mounted() {
     this.config = useConfigStore().config;
-    this.tableData = useDataRowsStore().dataRows;
+    this.flatRows = useDataRowsStore().flatRows;
+    this.selectRowsIndex = useDataRowsStore().selectRowsIndex;
+    this.curRowIndex=useDataRowsStore().curRowIndex;
 
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {
@@ -183,24 +186,19 @@ export default {
         sticky: col.sticky
       };
     },
-    fromPosToRow(posStr) {
-      return posStr.split(',').reduce((acc, cur) => acc[parseInt(cur)] || acc._childs[parseInt(cur)], this.tableData);
-    },
     handleMouseDown(event) {
       console.log('mosuedown')
 
       let rowEl = event.target.closest('.row');
       if (rowEl) {
 
-        this.selectWholeRowIndex = parseInt(rowEl.dataset.rowIndex);
-        let rowPos = rowEl.dataset.pos;
-        let row = this.fromPosToRow(rowPos);
+        let rowIndex  = parseInt(rowEl.dataset.rowIndex);
+        let row = this.flatRows[rowIndex];
         const configStore = useConfigStore();
         configStore.share.curRow = row;
 
       }
 
-      this.selectWholeRowIndex = null;
       const cell = event.target.closest('div.col');
       if (!cell || this.resizeColumn) {
         this.startRowIndex = -1;
@@ -265,15 +263,7 @@ export default {
 
     },
     getAllRow() {
-      let rows = [];
-      let _rIndex = 0;
-      for (let root of this.tableData) {
-        root._level = 0;
-        root._rIndex = _rIndex++;
-        root._pos = root._rIndex;
-        rows.push(...this.getRootRows(root));
-      }
-      return rows;
+      return this.flatRows;
     },
     isCollapsed(row) {
       if (row && row._p) {
