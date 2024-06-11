@@ -150,7 +150,6 @@ export default {
       moveType: null,
       selectedcellIndex: null,
       selectCol: null,
-      tableData: [],
       isMouseDown: false,
       startRowIndex: null,
       startcellIndex: null,
@@ -164,7 +163,6 @@ export default {
   mounted() {
 
     this.config = useConfigStore().config;
-    this.tableData = useDataRowsStore().dataRows;
     this.flatRows = useDataRowsStore().flatRows;
     this.selectRowsIndex = useDataRowsStore().selectRowsIndex;
     this.curRowIndex=useDataRowsStore().curRowIndex;
@@ -502,12 +500,12 @@ export default {
         console.error('same row');
         return;
       }
-      let toChildList = row._p ? row._p._childs : this.tableData;
+      let toChildList = row._p._childs ;
       console.log('drop');
 
       if (this.dragRow !== null) {
 
-        let fromChildList = this.dragRow._p ? this.dragRow._p._childs : this.tableData;
+        let fromChildList = this.dragRow._p._childs;
         let fromIndex = fromChildList.indexOf(this.dragRow);
         let targetIndex = toChildList.indexOf(row);
 
