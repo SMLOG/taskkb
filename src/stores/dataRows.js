@@ -76,7 +76,9 @@ function insert(row){
     row._p=flatRows.value[curRowIndexValue]._p;
 
     if(row._p){
-      flatRows.value.splice(curRowIndexValue+1,0,row); 
+      let nextIndex = curRowIndexValue+1;
+      flatRows.value.splice(nextIndex,0,row); 
+      curRowIndex.value=nextIndex;
       let index =  row._p._childs.indexOf(flatRows.value[curRowIndexValue]);
       row._p._childs.splice(index+1,0,row); 
       row._p._childs.forEach((v,i)=>v._rIndex=i);

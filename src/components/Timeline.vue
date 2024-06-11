@@ -379,7 +379,10 @@ export default {
         if (this.isMouseDown) {
           const cell = event.target.closest('div.col');
           if(this.selectRowsIndex.length){
+            this.selectRowsIndex.length=0;
             this.selectRowEnd = parseInt(rowEl.dataset.rowIndex);
+            this.selectRowsIndex.push(...Array.from({length: Math.abs(this.selectRowStart-this.selectRowEnd)+1}, (_, i) =>  Math.min(this.selectRowStart,this.selectRowEnd) + i));
+            
           }else if (cell) {
             const rowIndex = parseInt(cell.getAttribute('data-row'));
             const cellIndex = parseInt(cell.getAttribute('data-col'));
@@ -435,6 +438,9 @@ export default {
       }
     },
     handleMouseUp() {
+      if(this.isDrag){
+        this.selectRowsIndex.length=0;
+      }
       this.isDrag = this.isMouseDown = false;
       if (this.moveType) {
         this.moveType = null;
@@ -758,7 +764,7 @@ export default {
 }
 
 .curRow,
-.wholeRowSelected td {
+.wholeRowSelected .col {
   background-color: #E0EEE0 !important
 }
 
