@@ -489,69 +489,18 @@ export default {
       let interceptor = event.target.closest('.row');
       if (!interceptor) { return }
       let rowIndex =  parseInt(interceptor.closest('.row').dataset.rowIndex);
-      let row = this.flatRows[rowIndex];
-      console.log(event);
 
-      this.selectRowsIndex.forEach((e)=>{
-        let dragRow = this.flatRows[e];
-            if (this.isParentMoveToChild(dragRow, row)) {
-            console.error("not allow parent move to child.");
-            return;
-          } else if (row == dragRow) {
-            console.error('same row');
-            return;
-          }
-          let toChildList = row._p._childs ;
-          console.log('drop');
+      useDataRowsStore().dragAndDrop(rowIndex,event.clientX - this.dragStartClientX > 50);
 
-          if (dragRow !== null) {
-
-            let fromChildList = dragRow._p._childs;
-            let fromIndex = fromChildList.indexOf(dragRow);
-            let targetIndex = toChildList.indexOf(row);
-
-            if (event.clientX - this.dragStartClientX > 50) {
-              console.log('drop to child.');
-              fromChildList.splice(fromIndex, 1);
-              if (!row._childs) row._childs = [];
-              row._childs.push(dragRow);
-              dragRow._p = row;
-              dragRow._level = row._level + 1;
-            } else if (row._p == dragRow._p && fromIndex - targetIndex == 1) {
-              fromChildList.splice(fromIndex, 1);
-              targetIndex = toChildList.indexOf(row);
-              fromChildList.splice(targetIndex, 0, dragRow);
-            } else {
-              fromChildList.splice(fromIndex, 1);
-              targetIndex = toChildList.indexOf(row);
-              toChildList.splice(targetIndex + 1, 0, dragRow);
-              dragRow._p = row._p;
-              dragRow._level = row._level;
-            }
-
-          }
-
-      });
-
+      
       this.selectRowsIndex.length=0;
       this.isDrag=false;
 
-
-
+    
     },
 
     dragOver(event) {
       event.preventDefault();
-    },
-    isParentMoveToChild(fromRow, toRow) {
-      if (!fromRow._childs) return false;
-      for (let row of fromRow._childs) {
-        if (row == toRow) return true;
-
-        if (this.isParentMoveToChild(row, toRow)) return true;
-      }
-      return false;
-
     },
 
     focusNext(index) {
