@@ -100,6 +100,9 @@ import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import TimelineHeader from '@/components/TimelineHeader.vue';
 
+import {useTableComposable} from '@/components/useTableComposable'
+const {dragOver}=useTableComposable(); 
+
 </script>
 <script>
 
@@ -114,7 +117,6 @@ function deepCopy(obj) {
 
 export default {
   components: { ColTitle, ColDropText, ColDate, VueDatePicker },
-
   data() {
     return {
       isMounted: false,
@@ -444,8 +446,6 @@ export default {
         this.selectStart.row._tl.start = this.selectStart.start;
         this.selectStart.row._tl.end = this.selectStart.end;
       }
-
-
     },
     isSelected(rowIndex, cellIndex) {
       const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
@@ -492,14 +492,14 @@ export default {
 
       useDataRowsStore().dragAndDrop(rowIndex,event.clientX - this.dragStartClientX > 50);
 
-      
+
       this.selectRowsIndex.length=0;
       this.isDrag=false;
 
     
     },
 
-    dragOver(event) {
+    dragOver2(event) {
       event.preventDefault();
     },
 
