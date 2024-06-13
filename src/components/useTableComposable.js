@@ -338,6 +338,16 @@ export function useTableComposable() {
 
   }
 
+  const locateCurSch = (event) =>{
+
+    let title = event.target.classList.contains('sch');
+    if (title) {
+      let rowEl = event.target.closest('.row');
+      let plantime = rowEl.querySelector('.plantime');
+      if (plantime)
+        rowEl.closest('#mainContent').scrollLeft = plantime.offsetLeft;
+    }
+  }
   return {
     dragOver,
     handleMouseDown,
@@ -351,6 +361,6 @@ export function useTableComposable() {
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag,curRowIndex,moveType
+    isDrag,curRowIndex,moveType,locateCurSch
   };
 }

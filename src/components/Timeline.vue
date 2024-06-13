@@ -1,6 +1,8 @@
 <template>
   <div class="table-container" style="position: relative;"
-    :class="{ drag: moveType && (moveType.type == 'leftDrag' || moveType.type == 'rightDrag'), move: moveType && moveType.type == 'move' }">
+    :class="{ drag: moveType && (moveType.type == 'leftDrag' || moveType.type == 'rightDrag'), move: moveType && moveType.type == 'move' }"
+    @click="locateCurSch"
+    >
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
@@ -104,7 +106,7 @@ import TimelineHeader from '@/components/TimelineHeader.vue';
 import { useTableComposable } from '@/components/useTableComposable'
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
   cellClass,getCacWidth,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
-  dragstart,drop,curRowIndex,moveType
+  dragstart,drop,curRowIndex,moveType,locateCurSch
   } = useTableComposable();
 document.addEventListener("keydown", handleKeyDown);
 
