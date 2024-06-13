@@ -1,7 +1,9 @@
 <template>
 
 
-  <div class="table-container" style="    flex-grow: 1;">
+  <div class="table-container" style="    flex-grow: 1;" @mousedown.left="handleMouseDown"
+      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
+      @mouseup.left="handleMouseUp">
     <ColumnsResizer :th="$refs.th" v-if="$refs.th" data="rbar" :table="$refs.table" :cols="cols" />
     <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
       @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
@@ -15,19 +17,17 @@
           </div>
         </template>
       </div>
-      <template v-for="(row, rowIndex) in getAllRow()" :key="rowIndex">
+      <template v-for="(row, rowIndex) in getAllRows()" :key="rowIndex">
         <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }" @dragover="dragOver"
           @drop="drop($event, row, rowIndex)">
           <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
-            @click="clickSelectCell($event, rowIndex, row)"
             :class="{ curRow: selectRow == row }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
-              :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
-              @click="clickSelectCell($event, rowIndex, row, cellIndex, col)">
+              :class="cellClass(rowIndex + 1, cellIndex + 1, col)">
               <div class="cell">
                 <component :is="col.cp" :row="row" :col="col"></component>
               </div>
@@ -44,6 +44,13 @@
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
+
+import { useTableComposable } from '@/components/useTableComposable'
+const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
+  cellClass,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
+  dragstart,drop,
+  } = useTableComposable();
+document.addEventListener("keydown", handleKeyDown);
 </script>
 <script>
 
@@ -115,12 +122,19 @@ export default {
       if (!this.config.cols) this.config.cols = [];
       return this.config.cols.filter(e => e.show);
     },
-    curRow() {
-      const configStore = useConfigStore();
-      return configStore.share.curRow;
-    }
   },
   methods: {
+    getAllRows() {
+      return this.flatRows;
+    },
+    isCollapsed(row) {
+      if (row && row._p) {
+        if (row._p._collapsed) return true;
+        return this.isCollapsed(row._p)
+      }
+      return false;
+
+    },
     gridColumns() {
       return ' 46px ' + this.cols.map(e => e.width + 'px').join(' ');
     },
@@ -171,187 +185,7 @@ export default {
         console.error('Clipboard API is not supported in this browser.');
       }
     },
-    cellClass(rowIndex, cellIndex, col) {
-      const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
-      const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
-      const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
-      const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
-      let selected = this.isSelected(rowIndex, cellIndex);
-      return {
-        selected: selected,
-        left: selected && cellIndex == mincellIndex,
-        right: selected && cellIndex == maxcellIndex || mincellIndex - 1 == cellIndex && (rowIndex >= minRowIndex && rowIndex <= maxRowIndex),
-        top: selected && rowIndex == minRowIndex,
-        bottom: selected && rowIndex == maxRowIndex,
-        sticky: col.sticky
-      };
-    },
-    handleMouseDown(event) {
-      console.log('mosuedown')
 
-      let rowEl = event.target.closest('.row');
-      if (rowEl) {
-
-        let rowIndex  = parseInt(rowEl.dataset.rowIndex);
-        let row = this.flatRows[rowIndex];
-        const configStore = useConfigStore();
-        configStore.share.curRow = row;
-
-      }
-
-      const cell = event.target.closest('div.col');
-      if (!cell || this.resizeColumn) {
-        this.startRowIndex = -1;
-        this.startcellIndex = -1;
-        this.endRowIndex = -1;
-        this.endcellIndex = -1;
-        return null;
-      }
-      const activeElement = document.activeElement;
-
-      if (cell.querySelector("[contenteditable=true]")) return;
-      if (activeElement) {
-        activeElement.blur();
-      }
-      event.preventDefault();
-      this.isMouseDown = true;
-
-      const rowIndex = parseInt(cell.getAttribute('data-row'));
-      const cellIndex = parseInt(cell.getAttribute('data-col'));
-
-      this.startRowIndex = rowIndex;
-      this.startcellIndex = cellIndex;
-      this.endRowIndex = this.startRowIndex;
-      this.endcellIndex = this.startcellIndex;
-    },
-    handleMouseMove(event) {
-      if (this.isMouseDown) {
-        const cell = event.target.closest('div.col');
-        const rowIndex = parseInt(cell.getAttribute('data-row'));
-        const cellIndex = parseInt(cell.getAttribute('data-col'));
-
-        this.endRowIndex = rowIndex;
-        this.endcellIndex = cellIndex;
-      }
-    },
-    handleMouseUp() {
-      this.isMouseDown = false;
-    },
-    isSelected(rowIndex, cellIndex) {
-      const minRowIndex = Math.min(this.startRowIndex, this.endRowIndex);
-      const maxRowIndex = Math.max(this.startRowIndex, this.endRowIndex);
-      const mincellIndex = Math.min(this.startcellIndex, this.endcellIndex);
-      const maxcellIndex = Math.max(this.startcellIndex, this.endcellIndex);
-      return (
-        (rowIndex >= minRowIndex && rowIndex <= maxRowIndex) &&
-        (cellIndex >= mincellIndex && cellIndex <= maxcellIndex)
-      );
-    },
-    clickSelectCell(event, rowIndex, row, cellIndex, col) {
-
-      this.selectedRowIndex = rowIndex;
-      this.selectedcellIndex = cellIndex;
-      this.selectRow = row;
-      this.selectCol = col;
-
-      if (cellIndex == undefined) {
-        this.selectWholeRowIndex = rowIndex;
-        this.selectCol = null;
-      } else {
-        this.selectWholeRowIndex = false;
-      }
-
-    },
-    getAllRow() {
-      return this.flatRows;
-    },
-    isCollapsed(row) {
-      if (row && row._p) {
-        if (row._p._collapsed) return true;
-        return this.isCollapsed(row._p)
-      }
-      return false;
-
-    },
-    getRootRows(rootRow) {
-
-let list = [];
-list.push(rootRow);
-if (rootRow._childs) {
-  let rindex = 0;
-  for (let row of rootRow._childs) {
-    row._level = rootRow._level + 1;
-    row._p = rootRow;
-    row._rIndex = rindex++;
-    row._pos = rootRow._pos + "," + row._rIndex;
-
-    list.push(...this.getRootRows(row));
-  }
-
-}
-return list;
-
-
-},
-    dragstart(event, row) {
-      this.dragRow = row;
-      console.log(event);
-      this.dragStartClientX = event.clientX;
-    },
-    dragOver(event) {
-      event.preventDefault();
-    },
-    isParentMoveToChild(fromRow, toRow) {
-      if (!fromRow._childs) return false;
-      for (let row of fromRow._childs) {
-        if (row == toRow) return true;
-
-        if (this.isParentMoveToChild(row, toRow)) return true;
-      }
-      return false;
-
-    },
-    drop(event, row) {
-
-      console.log(event);
-      if (this.isParentMoveToChild(this.dragRow, row)) {
-        console.error("not allow parent move to child.");
-        return;
-      } else if (row == this.dragRow) {
-        console.error('same row');
-        return;
-      }
-      let toChildList = row._p ? row._p._childs : this.tableData;
-      console.log('drop');
-
-      if (this.dragRow !== null) {
-
-        let fromChildList = this.dragRow._p ? this.dragRow._p._childs : this.tableData;
-        let fromIndex = fromChildList.indexOf(this.dragRow);
-        let targetIndex = toChildList.indexOf(row);
-
-        if (event.clientX - this.dragStartClientX > 50) {
-          console.log('drop to child.');
-          fromChildList.splice(fromIndex, 1);
-          if (!row._childs) row._childs = [];
-          row._childs.push(this.dragRow);
-          this.dragRow._p = row;
-          this.dragRow._level = row._level + 1;
-        } else if (row._p == this.dragRow._p && fromIndex - targetIndex == 1) {
-          fromChildList.splice(fromIndex, 1);
-          targetIndex = toChildList.indexOf(row);
-          fromChildList.splice(targetIndex, 0, this.dragRow);
-        } else {
-          fromChildList.splice(fromIndex, 1);
-          targetIndex = toChildList.indexOf(row);
-          toChildList.splice(targetIndex + 1, 0, this.dragRow);
-          this.dragRow._p = row._p;
-          this.dragRow._level = row._level;
-        }
-
-        this.dragRow = null;
-      }
-    },
     focusNext(index) {
       if (index + 1 < this.$refs.ids.length) {
         console.log('focus' + (index + 1));
