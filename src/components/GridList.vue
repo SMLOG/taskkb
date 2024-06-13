@@ -21,8 +21,8 @@
         <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }" @dragover="dragOver"
           @drop="drop($event, row, rowIndex)">
-          <a class="col td lsticky" :draggable="true" @dragstart="dragstart($event, row)"
-            :class="{ curRow: selectRow == row }">
+          <a class="col td lsticky etype num" :draggable="isDrag" 
+            :class="{ curRow: rowIndex == curRowIndex }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
@@ -63,24 +63,9 @@ export default {
 
   data() {
     return {
-      selectStart: null,
-      isDrag: 0,
       config: {},
-      tableData: [],
-      dragRow: null,
-      selectedRowIndex: null,
-      selectRow: null,
-      selectedcellIndex: null,
       selectCol: null,
-
-      isMouseDown: false,
-      startRowIndex: null,
-      startcellIndex: null,
-      endRowIndex: null,
-      endcellIndex: null,
-      flatRows:null,
-      selectRowsIndex:null,
-      curRowIndex:null,
+      flatRows: null,
     };
   },
 
