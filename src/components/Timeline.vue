@@ -37,7 +37,7 @@
               </div>
               <div style="display: flex; justify-content: space-between">
                 <span v-for="day in week.dates" :key="day" class="day" :class="{
-                  selected: selectStart && selectStart.start && isBetween(selectStart.start.i, selectStart.end.i, day.i),
+                  selected: selectStartRef && selectStartRef.start && isBetween(selectStartRef.start.i, selectStartRef.end.i, day.i),
                   today: day.isCur,
                   weekend: day.isWeekend,
                   holiday: day.holiday
@@ -76,12 +76,12 @@
                   calculateDaysBetweenDates(row._tl.end,
                     row._tl.start, true) }}d
                 </div>
-                <div v-if="selectStart &&
-                  selectStart.row == row" :style="{
+                <div v-if="selectStartRef &&
+                  selectStartRef.row == row" :style="{
                     width: getCacWidth(),
-                    marginLeft: (calculateDaysBetweenDates(selectStart.start.n < selectStart.end.n ? selectStart.start : selectStart.end, firstDay) - 1) * 100 + '%'
-                  }" class="selectStart">{{ calculateDaysBetweenDates(selectStart.end,
-                    selectStart.start, true) }}d
+                    marginLeft: (calculateDaysBetweenDates(selectStartRef.start.n < selectStartRef.end.n ? selectStartRef.start : selectStartRef.end, firstDay) - 1) * 100 + '%'
+                  }" class="selectStartRef">{{ calculateDaysBetweenDates(selectStartRef.end,
+                    selectStartRef.start, true) }}d
                   <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
                   <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
                 </div>
@@ -102,7 +102,10 @@ import '@vuepic/vue-datepicker/dist/main.css';
 import TimelineHeader from '@/components/TimelineHeader.vue';
 
 import { useTableComposable } from '@/components/useTableComposable'
-const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, cellClass,getCacWidth,handleKeyDown,selectRowSch } = useTableComposable();
+const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
+  cellClass,getCacWidth,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
+  dragstart,drop,curRowIndex,moveType
+  } = useTableComposable();
 document.addEventListener("keydown", handleKeyDown);
 
 </script>
@@ -141,21 +144,9 @@ export default {
       ],
       showMoveOverLayer: false,
       showDatePicker: false,
-      isDrag: 0,
       config: null,
-      selectedRowIndex: null,
-      moveType: null,
-      selectedcellIndex: null,
       selectCol: null,
-      isMouseDown: false,
-      startRowIndex: null,
-      startcellIndex: null,
-      endRowIndex: null,
-      endcellIndex: null,
       flatRows: null,
-      selectRowsIndex: null,
-      curRowIndex: null,
-      selectStart:null,
     };
   },
   mounted() {
@@ -163,9 +154,6 @@ export default {
     this.config = useConfigStore().config;
     this.flatRows = useDataRowsStore().flatRows;
     this.selectRowsIndex = useDataRowsStore().selectRowsIndex;
-    this.curRowIndex = useDataRowsStore().curRowIndex;
-    const { selectStartRef } = useTableComposable();
-    this.selectStart = selectStartRef;
 
 
     if (!this.config.startDate) this.config.startDate = new Date();
@@ -219,34 +207,6 @@ export default {
   methods: {
     isBetween(a, b, c) {
       return (a <= c && c <= b) || (b <= c && c <= a);
-    },
-    calculateDaysBetweenDates(d1, d2, exclusiveHolidayWeeken) {
-
-
-      let date1 = d1.i > d2.i ? d1 : d2;
-      let date2 = d1.i > d2.i ? d2 : d1;
-      if (exclusiveHolidayWeeken) {
-        let weekIndex1 = parseInt(date1.i / 7);
-        let weekIndex2 = parseInt(date2.i / 7);
-
-        let i = date2.i % 7;
-        let count = 0;
-        for (let w = weekIndex2; w <= weekIndex1; w++) {
-
-          for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
-            let day = this.weeks[w].dates[i];
-            if (day.isWeekend || day.holiday) continue;
-            count++;
-
-          }
-          i = 0;
-        }
-        return count;
-
-      }
-      return date1.i - date2.i + 1;
-
-
     },
 
     colStyle(col) {
@@ -400,7 +360,7 @@ export default {
   z-index: -1 !important;
 }
 
-.selectStart {
+.selectStartRef {
   background-color: #CCFFCC;
   left: 0px;
   top: 0px;
@@ -557,4 +517,5 @@ export default {
 .num {
   user-select: none;
 }
+
 </style>
