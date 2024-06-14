@@ -5,8 +5,8 @@
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp">
     <ColumnsResizer :th="$refs.th" v-if="$refs.th" data="rbar" :table="$refs.table" :cols="cols" />
-    <div style="display: grid;grid-template-columns: 1fr;" ref="table" @mousedown.left="handleMouseDown"
-      @mousemove="handleMouseMove" @mouseup.left="handleMouseUp">
+    <div style="display: grid;grid-template-columns: 1fr;" ref="table" 
+      @mousemove="handleMouseMove" >
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
         <div class="th col lsticky" freeze="1" style="min-width: 46px;">#</div>
         <template v-for="(col, key) in cols" :key="key">
