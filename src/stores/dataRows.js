@@ -37,7 +37,7 @@ function getRowRows(rootRow) {
 
 let root = localStorage.getItem("data")
   ? JSON.parse(localStorage.getItem("data"))
-  : {};
+  : {_childs:[]};
 root._level = 0;
 
 for (let r of root._childs) {
@@ -79,6 +79,12 @@ function insert(row) {
       row._p._childs.splice(index + 1, 0, row);
       row._p._childs.forEach((v, i) => (v._rIndex = i));
     }
+  }else {
+    row._p = root;
+    row._level=1;
+    row._rIndex = root._childs.length+1;
+    flatRows.value.push(row);
+    root._childs.push(row);
   }
 }
 function remove() {
