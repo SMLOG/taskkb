@@ -2,7 +2,7 @@
   <div style="
         bottom: 0;
         left: 0;
-        z-index: 3;
+        z-index: 2;
         background: white;
         user-select: none;
         position: sticky;

@@ -18,7 +18,7 @@
         </template>
       </div>
       <template v-for="(row, rowIndex) in getAllRows()" :key="rowIndex">
-        <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+        <div class="row"  :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }" @dragover="dragOver"
           @drop="drop($event, row, rowIndex)">
           <a class="col td lsticky etype num" :draggable="isDrag" 

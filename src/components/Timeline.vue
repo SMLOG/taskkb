@@ -8,7 +8,9 @@
     </div>
     <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
-      @mouseup.left="handleMouseUp">
+      @mouseup.left="handleMouseUp"
+      @dblclick="dblclickHandle"
+      >
       <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
       <TimelineHeader />
@@ -52,11 +54,11 @@
         </div>
       </div>
       <template v-for="(row, rowIndex) in getAllRows()" :key="rowIndex">
-        <div class="row" :data-pos="row._pos" :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }"
+        <div class="row"  :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }"
           v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }">
           <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype num" :draggable="isDrag"
-            :class="{ curRow: rowIndex == curRowIndex }">
+            :class="{ curRow: rowIndex == curRowIndex,lock:row._lock }">
             {{ row._rIndex + 1 }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
@@ -74,15 +76,15 @@
                 <div v-if="row._tl && row._tl.end" :style="{
                   width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
                   marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
-                }" class="plantime" @mouseover="selectRowSch(row)">{{
+                }" class="plantime" @click="selectRowSch(row)">{{
                   calculateDaysBetweenDates(row._tl.end,
                     row._tl.start, true) }}d
                 </div>
                 <div v-if="selectStartRef &&
-                  selectStartRef.row == row" :style="{
+                  selectStartRef.row == row" @dblclick="dragMode=!dragMode" :style="{
                     width: getCacWidth(),
                     marginLeft: (calculateDaysBetweenDates(selectStartRef.start.n < selectStartRef.end.n ? selectStartRef.start : selectStartRef.end, firstDay) - 1) * 100 + '%'
-                  }" class="selectStartRef">{{ calculateDaysBetweenDates(selectStartRef.end,
+                  }" class="selectStartRef" :class="{dragMode:dragMode}">{{ calculateDaysBetweenDates(selectStartRef.end,
                     selectStartRef.start, true) }}d
                   <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
                   <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
@@ -106,7 +108,7 @@ import TimelineHeader from '@/components/TimelineHeader.vue';
 import { useTableComposable } from '@/components/useTableComposable'
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
   cellClass,getCacWidth,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
-  dragstart,drop,curRowIndex,moveType,locateCurSch
+  dragstart,drop,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle
   } = useTableComposable();
 document.addEventListener("keydown", handleKeyDown);
 
@@ -338,5 +340,13 @@ export default {
 </script>
 
 <style src="./grid.css" scoped>
+</style>
+<style scoped>
+.selectStartRef.dragMode{
+  background-color: green!important;
+}
+.lock{
+  color:red;
+}
 </style>
 
