@@ -267,6 +267,7 @@ export function useTableComposable() {
           let row = flatRows[j];
           if(row._lock)break;
           if(row._tl){
+            if(row._tl.end.i<orgDate.i)break;
             row._tl.end = plusWorkDays(row._tl.end.i,workdays);
             if(row._tl.start.i>orgDate.i)
               row._tl.start = plusWorkDays(row._tl.start.i,workdays);
