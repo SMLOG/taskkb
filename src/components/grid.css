@@ -22,13 +22,7 @@
   z-index: -1 !important;
 }
 
-.selectStartRef {
-  background-color: #CCFFCC;
-  left: 0px;
-  top: 0px;
-  position: absolute;
-  cursor: move;
-}
+
 
 .drag {
   cursor: move;
@@ -52,7 +46,16 @@
 .selected {
   background-color: #F0FFF0 !important;
 }
-
+.header .selected {
+  background-color: limegreen !important;
+  }
+  .selectStartRef {
+    background-color: limegreen !important;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    cursor: move;
+  }
 .curRow,
 .wholeRowSelected .col {
   background-color: #E0EEE0 !important

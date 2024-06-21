@@ -44,9 +44,27 @@ export function useTableComposable() {
     event.preventDefault();
   };
 
-  const selectRowSch = (row)=> {
-    if (!moveType.value && (!selectStartRef.value || selectStartRef.value.type != 2))
+  const selectRowSch = (row,event)=> {
+    if (!moveType.value && (!selectStartRef.value || selectStartRef.value.type != 2)){
       selectStartRef.value = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
+
+      {
+  
+      const cell = event.target.closest(".row");
+
+      const rowIndex = parseInt(cell.dataset.rowIndex);
+      dragIndexRang.value.length=0;
+      let orgDate = selectStartRef.value.row._tl.end;
+      for(let j=rowIndex+1;j<flatRows.length;j++){
+        let row = flatRows[j];
+        if(row._lock)break;
+        if(row._tl){
+          if(row._tl.end.i<orgDate.i)break;
+             dragIndexRang.value.push(j);
+        }
+      }
+    }
+  }
 
   }
 
@@ -107,6 +125,9 @@ export function useTableComposable() {
           if (!row._tl || !row._tl.start) {
             if (selectStartRef.value == null) {
               selectStartRef.value = { type: 2, row: row, start: date, end: date };
+
+
+
             } else if (selectStartRef.value.row == row && selectStartRef.value.start) {
               console.log('update');
               row._tl = addDatePeriod({
@@ -123,7 +144,7 @@ export function useTableComposable() {
               selectStartRef.value = null;
               console.log("delete selectStart");
             }else{
-              selectRowSch(row);
+              selectRowSch(row,event);
             }
 
           } 
@@ -230,6 +251,8 @@ export function useTableComposable() {
     }
     isDrag.value = isMouseDown = false;
     if (moveType.value) {
+      event.stopPropagation();
+      console.log('event.stopPropagation();',event)
       moveType.value = null;
       let orgDate = selectStartRef.value.row._tl.end;
 
@@ -276,7 +299,13 @@ export function useTableComposable() {
         console.log(workdays);
       }
 
+      
+
     }
+  };
+  const dragIndexRang = ref([]);
+  const inDragRang = (rowIndex)=>{
+      return dragIndexRang.value.indexOf(rowIndex)>-1;
   };
 
   const isSelected = (rowIndex, cellIndex) => {
@@ -388,6 +417,7 @@ export function useTableComposable() {
 
   const locateCurSch = (event) =>{
 
+    console.log('locateCurSch',event);
     let title = event.target.classList.contains('sch');
     if (title) {
       let rowEl = event.target.closest('.row');
@@ -410,6 +440,7 @@ export function useTableComposable() {
     return  weeks[parseInt(i / 7)].dates[i % 7];
   
   }
+
   return {
     dragOver,
     handleMouseDown,
@@ -423,6 +454,7 @@ export function useTableComposable() {
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate
+    isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate,
+    inDragRang
   };
 }

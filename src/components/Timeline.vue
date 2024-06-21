@@ -76,7 +76,9 @@
                 <div v-if="row._tl && row._tl.end" :style="{
                   width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
                   marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
-                }" class="plantime" @click="selectRowSch(row)">{{
+                }" class="plantime" @click="selectRowSch(row,$event)" 
+                :class="{dragMode:dragMode && inDragRang(rowIndex)}"
+                >{{
                   calculateDaysBetweenDates(row._tl.end,
                     row._tl.start, true) }}d
                 </div>
@@ -108,7 +110,8 @@ import TimelineHeader from '@/components/TimelineHeader.vue';
 import { useTableComposable } from '@/components/useTableComposable'
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
   cellClass,getCacWidth,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
-  dragstart,drop,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle
+  dragstart,drop,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,
+  inDragRang
   } = useTableComposable();
 document.addEventListener("keydown", handleKeyDown);
 
@@ -342,7 +345,7 @@ export default {
 <style src="./grid.css" scoped>
 </style>
 <style scoped>
-.selectStartRef.dragMode{
+.selectStartRef.dragMode,.dragMode{
   background-color: green!important;
 }
 .lock{

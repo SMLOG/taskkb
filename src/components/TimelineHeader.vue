@@ -205,8 +205,8 @@ export default {
 }
 
 
-.selected {
-  background-color: #F0FFD0 !important;
+.header .selected {
+background-color: green !important;
 }
 
 
