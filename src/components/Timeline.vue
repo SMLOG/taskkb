@@ -1,7 +1,6 @@
 <template>
   <div class="table-container" style="position: relative;"
     :class="{ drag: moveType && (moveType.type == 'leftDrag' || moveType.type == 'rightDrag'), move: moveType && moveType.type == 'move' }"
-    @click="locateCurSch"
     >
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">

@@ -92,7 +92,7 @@ export default {
     renderToHtml(modelValue) {
       if (!this.editable ) {
         if(modelValue){
-            let replacedText = this.convertMarkdownToHtml(modelValue.replace(/<br>/g,'\n'));
+            let replacedText = this.convertMarkdownToHtml(modelValue/*.replace(/<br>/g,'\n')*/);
             /*var urlRegex = /(https?:\/\/[^\s]+)/g;
             var replacedText = str.replace(urlRegex, function (url) {
               return '<a target="_blank" href="' + url + '">' + url + '</a>';

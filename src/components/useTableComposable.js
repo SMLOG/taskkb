@@ -22,6 +22,25 @@ function addDatePeriod(addPeriod) {
 function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
+function getDate(i){
+  return  weeks[parseInt(i / 7)].dates[i % 7];
+
+}
+function plusWorkDays  (startIndex,days){
+  let start = startIndex;
+  let k=0;
+  let total = Math.abs(days);
+  let inc = days>0?1:-1;
+  if(days==0)return getDate(start);
+  for(;true;){
+    start += inc;
+    let date = getDate(start);
+    if(date.isWeekend||date.holiday)continue;
+    k++;
+    if(k==total)return getDate(start);
+  }
+  
+}
 export function useTableComposable() {
   const flatRows = useDataRowsStore().flatRows;
   const config = useConfigStore().config;
@@ -213,14 +232,14 @@ export function useTableComposable() {
         if (!selectStartRef.value.row._tl) selectStartRef.value.end = date;
         else {
           if (moveType.value) {
-            let x = event.clientX - moveType.value.x;
+            let ox = event.clientX - moveType.value.x;
 
             let totalWidth = event.target.closest(".sch").offsetWidth;
             let unitWidth = totalWidth / config.weekCount / 7;
 
             let index =
               moveType.value._tl[moveType.value.type == "rightDrag" ? "end" : "start"].i +
-              parseInt(x / unitWidth);
+              parseInt(ox / unitWidth);
             let date = weeks[parseInt(index / 7)].dates[index % 7];
 
             if (moveType.value.type == "rightDrag") {
@@ -229,12 +248,12 @@ export function useTableComposable() {
             }
             else if (moveType.value.type == "leftDrag") selectStartRef.value.start = date;
             else {
-              let moveUnits = parseInt(x / unitWidth);
-              index = moveType.value._tl.start.i + moveUnits;
+              let moveUnits = parseInt(ox / unitWidth);
+              index = plusWorkDays( moveType.value._tl.start.i,moveUnits).i;
 
               selectStartRef.value.start = weeks[parseInt(index / 7)].dates[index % 7];
 
-              index = moveType.value._tl.end.i + moveUnits;
+              index = plusWorkDays( moveType.value._tl.end.i,moveUnits).i;
 
               selectStartRef.value.end = weeks[parseInt(index / 7)].dates[index % 7];
               console.log("moveUnits", moveUnits);
@@ -253,8 +272,8 @@ export function useTableComposable() {
     if (moveType.value) {
       event.stopPropagation();
       console.log('event.stopPropagation();',event)
-      moveType.value = null;
       let orgDate = selectStartRef.value.row._tl.end;
+      let orgStartDate = selectStartRef.value.row._tl.start;
 
       selectStartRef.value.row._tl.start = selectStartRef.value.start;
       selectStartRef.value.row._tl.end = selectStartRef.value.end;
@@ -267,21 +286,7 @@ export function useTableComposable() {
         .map(e=>getDate(e))
         .filter(e=>!(e.isWeekend||e.holiday)).length;
 
-        let plusWorkDays = (startIndex,days)=>{
-          let start = startIndex;
-          let k=0;
-          let total = Math.abs(days);
-          let inc = days>0?1:-1;
-          if(days==0)return getDate(start);
-          for(;true;){
-            start += inc;
-            let date = getDate(start);
-            if(date.isWeekend||date.holiday)continue;
-            k++;
-            if(k==total)return getDate(start);
-          }
-          
-        }
+
         const cell = event.target.closest(".row");
 
         const rowIndex = parseInt(cell.dataset.rowIndex);
@@ -292,7 +297,7 @@ export function useTableComposable() {
           if(row._tl){
             if(row._tl.end.i<orgDate.i)break;
             row._tl.end = plusWorkDays(row._tl.end.i,workdays);
-            if(row._tl.start.i>orgDate.i)
+            if(row._tl.start.i>orgDate.i || moveType.value.type=='move'&&row._tl.start.i<=orgStartDate.i)
               row._tl.start = plusWorkDays(row._tl.start.i,workdays);
           }
         }
@@ -300,7 +305,10 @@ export function useTableComposable() {
       }
 
       
+      moveType.value = null;
 
+    }else{
+      locateCurSch(event);
     }
   };
   const dragIndexRang = ref([]);
@@ -418,6 +426,7 @@ export function useTableComposable() {
   const locateCurSch = (event) =>{
 
     console.log('locateCurSch',event);
+    if(moveType.value)return;
     let title = event.target.classList.contains('sch');
     if (title) {
       let rowEl = event.target.closest('.row');
@@ -436,10 +445,7 @@ export function useTableComposable() {
 
     }
   }
-  const getDate=(i)=>{
-    return  weeks[parseInt(i / 7)].dates[i % 7];
-  
-  }
+
 
   return {
     dragOver,
