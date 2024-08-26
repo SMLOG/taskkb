@@ -8,9 +8,9 @@
     <div style="display: grid;grid-template-columns: 1fr;" ref="table" 
       @mousemove="handleMouseMove" >
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
-        <div class="th col lsticky" freeze="1" style="min-width: 46px;">#</div>
+        <div class="th col lsticky"  freeze="1" style="min-width: 46px;">#</div>
         <template v-for="(col, key) in cols" :key="key">
-          <div class="col" ref="th" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
+          <div class="col" ref="th" :style="colStyle(col, 1)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
             <div class="cell">
               <component :is="col.cp" :col="col"></component>
             </div>
@@ -23,10 +23,10 @@
           @drop="drop($event, row, rowIndex)">
           <a class="col td lsticky etype num" :draggable="isDrag" 
             :class="{ curRow: rowIndex == curRowIndex }">
-            {{ row._rIndex + 1 }}
+            {{ row._rIndex  }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <div class="col td" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
+            <div class="col td" :style="colStyle(col, 1)" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
               :class="cellClass(rowIndex + 1, cellIndex + 1, col)">
               <div class="cell">
                 <component :is="col.cp" :row="row" :col="col"></component>
@@ -119,6 +119,14 @@ export default {
       }
       return false;
 
+    },
+    colStyle(col, isH) {
+      let style = {};
+      if (col.sticky) {
+        style.left = "46px";
+        style.zIndex = isH ? 4 : 3
+      }
+      return style;
     },
     gridColumns() {
       return ' 46px ' + this.cols.map(e => e.width + 'px').join(' ');

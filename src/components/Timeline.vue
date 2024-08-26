@@ -109,7 +109,7 @@ import TimelineHeader from '@/components/TimelineHeader.vue';
 import { useTableComposable } from '@/components/useTableComposable'
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
   cellClass,getCacWidth,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
-  dragstart,drop,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,
+  dragstart,drop,curRowIndex,moveType,dragMode,dblclickHandle,
   inDragRang
   } = useTableComposable();
 document.addEventListener("keydown", handleKeyDown);

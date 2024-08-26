@@ -2,7 +2,7 @@
   <div style="
         bottom: 0;
         left: 0;
-        z-index: 2;
+        z-index: 4;
         background: white;
         user-select: none;
         position: sticky;
@@ -17,6 +17,7 @@
           <a @click="showConfig = !showConfig">Configuration</a>
           <a @click="showConfig = !showConfig">Team</a>
           <a @click="download" >Export</a>
+          <a @click="downloadSch" >Export Sch</a>
         </div>
       </div>
     </div>
@@ -27,6 +28,9 @@
 import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
 import Config from './Config.vue';
+import { useTableComposable } from '@/components/useTableComposable'
+const { downloadSch
+  } = useTableComposable();
 </script>
 <script>
 
@@ -97,6 +101,7 @@ export default {
       downloadJSON({data:data,config:this.config,timestamp:new Date().getTime()});
 
     },
+
     saveData(bool) {
       console.log(bool)
       if (!bool || this.config.autoSave) {

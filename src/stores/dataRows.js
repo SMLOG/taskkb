@@ -22,11 +22,11 @@ function getRowRows(rootRow) {
   let list = [];
   list.push(rootRow);
   if (rootRow._childs) {
-    let rindex = 0;
+    let rindex = 1;
     for (let row of rootRow._childs) {
       row._level = rootRow._level + 1;
       row._p = rootRow;
-      row._rIndex = rindex++;
+      row._rIndex =  rindex++;
       row._pos = rootRow._pos + "," + row._rIndex;
 
       list.push(...getRowRows(row));
@@ -156,6 +156,6 @@ export const useDataRowsStore = defineStore("dataRows", () => {
     selectRowsIndex,
     remove,
     curRowIndex,
-    dragAndDrop,
+    dragAndDrop,getRowRows
   };
 });

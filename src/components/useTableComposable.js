@@ -44,7 +44,7 @@ function plusWorkDays  (startIndex,days){
 export function useTableComposable() {
   const flatRows = useDataRowsStore().flatRows;
   const config = useConfigStore().config;
-
+  
   const selectRowsIndex = useDataRowsStore().selectRowsIndex;
 
   let isMouseDown;
@@ -446,6 +446,25 @@ export function useTableComposable() {
     }
   }
 
+  const downloadSch = ()=>{
+    let titleCol = config.cols.filter(e => e.show && e.cp == 'ColTitle');
+    let row = flatRows[useDataRowsStore().curRowIndex];
+    console.log(row)
+    let titleProp = 'c'+titleCol[0].fn;
+    let fileName = row[titleProp].replace(/<.*?>/g,'').trim();
+    let dataList  = useDataRowsStore().getRowRows(row);
+      // Create a download link
+      const csvContent = dataList.map(e=>['" '.repeat(e._level-row._level)+`${e[titleProp].replace(/<.*?>/g,'').trim()}"`]).map(e => e.join(',')).join('\n');
+
+      const downloadLink = document.createElement('a');
+      downloadLink.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+      downloadLink.setAttribute('download', `${fileName}.csv`);
+
+      // Append the link to the document and click it
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+  }
 
   return {
     dragOver,
@@ -461,6 +480,6 @@ export function useTableComposable() {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate,
-    inDragRang
+    inDragRang,downloadSch
   };
 }
