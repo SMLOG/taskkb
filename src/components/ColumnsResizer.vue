@@ -44,10 +44,8 @@ unmounted(){
     scrollEventHanlder(){
         this.resize();
     },
-    winResize() {
-      this.$nextTick(() => { this.resize(); });
-    },
     resize() {
+
 
       for (let i = 0; i < this.$refs.rbar.length; i++) {
         let width = this.th[i].offsetWidth;
@@ -55,9 +53,16 @@ unmounted(){
         if(this.th[i].classList.contains('sticky')){
           this.$refs.rbar[i].style.left = parseFloat(this.th[i].style.left) + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         }
+        let offset=0;
+        if(i>0)offset = parseFloat(this.$refs.rbar[i-1].style.left)+2;
+        document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
+
       }
     },
     winResize() {
+      for (let i = 0; i < this.$refs.rbar.length; i++) 
+      document.documentElement.style.removeProperty('--sticky-left-'+(i));
+      /*this.resize();*/
       this.$nextTick(() => { this.resize(); });
     },
 
@@ -69,7 +74,7 @@ unmounted(){
         let j = i;
         this.$refs.rbar[i].style.left = this.th[j].offsetLeft + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         if(this.th[j].classList.contains('sticky')){
-          this.$refs.rbar[i].style.left = parseFloat(this.th[j].style.left) + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+         this.winResize();
         }
       }
 

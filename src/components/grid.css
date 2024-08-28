@@ -84,6 +84,9 @@
     position: relative;
 }
 
+.row > .col:first-child{
+  border-left: 1px solid #ccc;
+}
 .header {
   position: sticky;
   top: 0;

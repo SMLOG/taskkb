@@ -11,11 +11,8 @@
             <option v-for="cp in cpList">{{ cp }}</option>
           </select> </div>
         <div> <input v-model="col.name" /></div>
-        <div v-if="col.cp=='ColDropText'">
-             Options:<input v-model="col.options" />
-        </div>
-        <div v-if="col.cp=='ColDate'">
-             Format:<input v-model="col.fmt" />
+        <div v-if="col.cp == 'ColDropText'">
+          Options:<input v-model="col.options" />
         </div>
         <div style="width:60px;margin-left: 10px;">Sticky <input type="checkbox" v-model="col.sticky" /></div>
         <div style="width:60px;margin-left: 10px;">Show <input type="checkbox" v-model="col.show" /></div>
@@ -29,7 +26,7 @@
       <div>show shedule: <input type="checkbox" v-model="config.showSch" /></div>
       <div>Auto Save: <input type="checkbox" v-model="config.autoSave" /></div>
       <div>Fix: <input type="checkbox" v-model="config.fix" /></div>
-      
+
     </div>
   </div>
 </template>
@@ -47,7 +44,7 @@ setTimeout(() => {
 export default {
   data() {
     return {
-      cpList: ["ColTitle", "ColDropText", "ColDate", "Time"],
+      cpList: ["ColTitle", "ColDropText", "ColDate", "Time", "ColSeq"],
       // cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [],
       dragStartIndex: null
     }
@@ -59,8 +56,8 @@ export default {
     }
 
   },
-  computed:{
-    cols(){
+  computed: {
+    cols() {
       return this.config.cols;
     }
   },
@@ -133,7 +130,7 @@ export default {
       let nextcid = this.findMissingNumber(this.cols.map(e => e.fn).sort());
       let text = "New Column";
       let width = this.calculateTextWidth(text + "  ");
-      this.cols.push({ field: {}, cp: 'ColDropText', width: width, name: text, fn: nextcid,show:true })
+      this.cols.push({ field: {}, cp: 'ColDropText', width: width, name: text, fn: nextcid, show: true })
     },
     delCol(col, i) {
       this.cols.splice(i, 1);

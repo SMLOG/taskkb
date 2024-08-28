@@ -8,9 +8,8 @@
     <div style="display: grid;grid-template-columns: 1fr;" ref="table" 
       @mousemove="handleMouseMove" >
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
-        <div class="th col lsticky"  freeze="1" style="min-width: 46px;">#</div>
         <template v-for="(col, key) in cols" :key="key">
-          <div class="col" ref="th" :style="colStyle(col, 1)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
+          <div class="col" ref="th" :style="colStyle(col, 1,key)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
             <div class="cell">
               <component :is="col.cp" :col="col"></component>
             </div>
@@ -21,12 +20,9 @@
         <div class="row"  :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }" @dragover="dragOver"
           @drop="drop($event, row, rowIndex)">
-          <a class="col td lsticky etype num" :draggable="isDrag" 
-            :class="{ curRow: rowIndex == curRowIndex }">
-            {{ row._rIndex  }}
-          </a>
+
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <div class="col td" :style="colStyle(col, 1)" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
+            <div class="col td" :style="colStyle(col, 1,cellIndex)" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
               :class="cellClass(rowIndex + 1, cellIndex + 1, col)">
               <div class="cell">
                 <component :is="col.cp" :row="row" :col="col"></component>
@@ -57,9 +53,10 @@ document.addEventListener("keydown", handleKeyDown);
 import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
+import ColSeq from './ColSeq.vue';
 
 export default {
-  components: { ColTitle, ColDropText, ColDate },
+  components: { ColTitle, ColDropText, ColDate,ColSeq },
 
   data() {
     return {
@@ -120,16 +117,16 @@ export default {
       return false;
 
     },
-    colStyle(col, isH) {
+    colStyle(col, isH,index) {
       let style = {};
       if (col.sticky) {
-        style.left = "46px";
         style.zIndex = isH ? 4 : 3
-      }
+        style.left='var(--sticky-left-'+index+')';
+      }else style.left = 'auto';
       return style;
     },
     gridColumns() {
-      return ' 46px ' + this.cols.map(e => e.width + 'px').join(' ');
+      return this.cols.map(e => e.width + 'px').join(' ');
     },
     containsBlockElement(element) {
       // Get all child elements of the given element
