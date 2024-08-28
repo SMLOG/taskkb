@@ -4,7 +4,7 @@
     right: 0;
     left: 0;">
     <template v-for="(col, key) in cols" :key="key">
-      <div class="columns-resize-bar" :class="{sticky:col.sticky}" ref="rbar" @mousedown="startResize(col, key, $event)"></div>
+      <div class="columns-resize-bar"  ref="rbar" @mousedown="startResize(col, key, $event)"></div>
     </template>
     <div class="overlay" v-if="resizeColumn" @mousemove.prevent="handleResize" @mouseup.prevent="resizeBarMouseUp">
     </div>
@@ -38,6 +38,12 @@ unmounted(){
     this.winResize();
 
     window.addEventListener('scroll', this.scrollEventHanlder);
+      document.documentElement.style.setProperty('--scroll-left','0px');
+      document.querySelector('#mainContent').addEventListener('scroll',function(){
+      document.documentElement.style.setProperty('--scroll-left',  document.querySelector('#mainContent').scrollLeft+'px');
+    });
+  
+
 
   },
   methods: {
@@ -51,10 +57,12 @@ unmounted(){
         let width = this.th[i].offsetWidth;
         this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         if(this.th[i].classList.contains('sticky')){
-          this.$refs.rbar[i].style.left = parseFloat(this.th[i].style.left) + width - this.$refs.rbar[i].offsetWidth / 2 + 'px';
+
+          let left =this.$refs.rbar[i].style.left;
+          this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${left})`;  ;
         }
         let offset=0;
-        if(i>0)offset = parseFloat(this.$refs.rbar[i-1].style.left)+2;
+        if(i>0)offset = parseFloat(this.th[i].offsetLeft);
         document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
 
       }
