@@ -52,18 +52,20 @@ unmounted(){
     },
     resize() {
 
-
+      let offset=0;
       for (let i = 0; i < this.$refs.rbar.length; i++) {
         let width = this.th[i].offsetWidth;
         this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
         if(this.th[i].classList.contains('sticky')){
 
           let left =this.$refs.rbar[i].style.left;
-          this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${left})`;  ;
+          this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${left})`;  
+          document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
+          offset =  offset + parseFloat(this.th[i].offsetWidth);
         }
-        let offset=0;
-        if(i>0)offset = parseFloat(this.th[i].offsetLeft);
-        document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
+       
+       
+       
 
       }
     },
