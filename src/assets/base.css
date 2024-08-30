@@ -25,7 +25,9 @@
   --vt-index-tooltip:6;
   --vt-index-overlay:7;
 }
-
+.promote.sticky{
+  z-index: 6!important;
+}
 /* semantic color variables for this project */
 :root {
   --color-background: var(--vt-c-white);

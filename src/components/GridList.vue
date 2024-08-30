@@ -121,7 +121,6 @@ export default {
     colStyle(col, isH,index) {
       let style = {};
       if (col.sticky) {
-        style.zIndex = isH ? 4 : 3
         style.left='var(--sticky-left-'+index+')';
       }else style.left = 'auto';
       return style;

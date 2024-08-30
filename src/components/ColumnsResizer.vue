@@ -59,9 +59,9 @@ unmounted(){
 
           let stickyLeft = parseFloat(getComputedStyle(this.th[i]).getPropertyValue('--sticky-left-'+i));
           let left = this.th[i].getBoundingClientRect().x;
-          if(stickyLeft<=left){
-            document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
+          document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
           offset =  offset + parseFloat(this.th[i].offsetWidth);
+          if(stickyLeft>=left){
           this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${offset}px)`;  
           }
 
@@ -137,7 +137,7 @@ unmounted(){
   z-index: var(--vt-index-overlay);
   position: absolute;
   top: 0px;
-  width: 4px;
+  width: 2px;
   cursor: col-resize;
   height: var(--table-height);
 }

@@ -66,6 +66,15 @@ export default {
       editable: false,
     };
   },
+  watch:{
+           showDropdown(bool){
+            if(bool)this.$refs.contentEditable.closest('.col').classList.add('promote');
+            else if(bool)this.$refs.contentEditable.closest('.col').classList.remove('promote');
+
+
+           }
+
+  },
   methods: {
     sanitizePaste(e) {
             e.preventDefault();
@@ -153,7 +162,6 @@ export default {
           this.editing = false;
           this.editable = false;
           console.log('stop editing')
-
           this.$emit('update:modelValue', this.getValue());//.replace(/<[/]?b\s*>/ig,'**').replace(/\s*<[/]?strong.*?>/ig,'**'));
           if (this.getValue() !== this.modelValue) {
             this.$emit('change', this.getValue());
