@@ -54,14 +54,17 @@ unmounted(){
 
       let offset=0;
       for (let i = 0; i < this.$refs.rbar.length; i++) {
-        let width = this.th[i].offsetWidth;
         this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-        if(this.th[i].classList.contains('sticky')){
+        if(this.th[i].classList.contains('sticky') ){
 
-          let left =this.$refs.rbar[i].style.left;
-          this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${left})`;  
-          document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
+          let stickyLeft = parseFloat(getComputedStyle(this.th[i]).getPropertyValue('--sticky-left-'+i));
+          let left = this.th[i].getBoundingClientRect().x;
+          if(stickyLeft<=left){
+            document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
           offset =  offset + parseFloat(this.th[i].offsetWidth);
+          this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${offset}px)`;  
+          }
+
         }
        
        
