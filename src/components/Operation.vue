@@ -18,6 +18,7 @@
           <a @click="showConfig = !showConfig">Team</a>
           <a @click="download" >Export</a>
           <a @click="downloadSch" >Export Sch</a>
+          <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="copyRow">Copy</a>
         </div>
       </div>
     </div>
@@ -61,6 +62,7 @@ export default {
     return {
       showConfig: 0,
       config: null,
+      selectRowsIndex:null
 
     };
   },
@@ -70,6 +72,7 @@ export default {
 
     const dataRowsStore = useDataRowsStore();
     this.tableData = dataRowsStore.dataRows;
+    this.selectRowsIndex = dataRowsStore.selectRowsIndex;
 
 
     this.$watch(
@@ -124,6 +127,9 @@ export default {
 
 
     },
+    copyRow(){
+      useDataRowsStore().copyRow();
+    }
   }
 };
 </script>

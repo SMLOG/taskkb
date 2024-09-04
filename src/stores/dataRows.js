@@ -18,8 +18,9 @@ function loopToSetDate(row) {
   }
 }
 
-function getRowRows(rootRow) {
+function getRowRows(rootRow,newRoot) {
   let list = [];
+  
   list.push(rootRow);
   if (rootRow._childs) {
     let rindex = 1;
@@ -33,6 +34,16 @@ function getRowRows(rootRow) {
     }
   }
   return list;
+}
+
+function clearParent(rootRow) {
+  delete rootRow._p;
+  if (rootRow._childs) {
+    for (let row of rootRow._childs) {
+      delete row._p ;
+      clearParent(row)
+    }
+  }
 }
 
 let root = localStorage.getItem("data")
@@ -86,6 +97,17 @@ function insert(row) {
     flatRows.value.push(row);
     root._childs.push(row);
   }
+}
+function copyRow(){
+  let item = flatRows.value.slice(selectRowsIndex.value[0], selectRowsIndex.value[0]+1)[0];
+  let _p = item._p;
+  clearParent(item);
+  let newItem = JSON.parse(JSON.stringify(item));
+  getRowRows(item);
+  item._p=_p;
+ let newRows = getRowRows(newItem);
+ flatRows.value.splice(selectRowsIndex.value[0]+newRows.length, 0, ...newRows);
+ newItem._p=_p;
 }
 function remove() {
   selectRowsIndex.value
@@ -156,6 +178,6 @@ export const useDataRowsStore = defineStore("dataRows", () => {
     selectRowsIndex,
     remove,
     curRowIndex,
-    dragAndDrop,getRowRows
+    dragAndDrop,getRowRows,copyRow
   };
 });
