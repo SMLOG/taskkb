@@ -108,6 +108,8 @@ function copyRow(){
  let newRows = getRowRows(newItem);
  flatRows.value.splice(selectRowsIndex.value[0]+newRows.length, 0, ...newRows);
  newItem._p=_p;
+ let pos = _p._childs.indexOf(item);
+ _p._childs.splice(pos,0,newItem);
 }
 function remove() {
   selectRowsIndex.value
