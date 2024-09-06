@@ -18,16 +18,16 @@ function loopToSetDate(row) {
   }
 }
 
-function getRowRows(rootRow,newRoot) {
+function getRowRows(rootRow) {
   let list = [];
-  
+
   list.push(rootRow);
   if (rootRow._childs) {
     let rindex = 1;
     for (let row of rootRow._childs) {
       row._level = rootRow._level + 1;
       row._p = rootRow;
-      row._rIndex =  rindex++;
+      row._rIndex = (rootRow._rIndex? (rootRow._rIndex+"."):"")+rindex++;
       row._pos = rootRow._pos + "," + row._rIndex;
 
       list.push(...getRowRows(row));
@@ -40,15 +40,15 @@ function clearParent(rootRow) {
   delete rootRow._p;
   if (rootRow._childs) {
     for (let row of rootRow._childs) {
-      delete row._p ;
-      clearParent(row)
+      delete row._p;
+      clearParent(row);
     }
   }
 }
 
 let root = localStorage.getItem("data")
   ? JSON.parse(localStorage.getItem("data"))
-  : {_childs:[]};
+  : { _childs: [] };
 root._level = 0;
 
 for (let r of root._childs) {
@@ -85,32 +85,85 @@ function insert(row) {
       let nextIndex = curRowIndexValue + 1;
       flatRows.value.splice(nextIndex, 0, row);
       curRowIndex.value = nextIndex;
-      row._level=flatRows.value[curRowIndexValue]._level;
+      row._level = flatRows.value[curRowIndexValue]._level;
       let index = row._p._childs.indexOf(flatRows.value[curRowIndexValue]);
       row._p._childs.splice(index + 1, 0, row);
       row._p._childs.forEach((v, i) => (v._rIndex = i));
     }
-  }else {
+  } else {
     row._p = root;
-    row._level=1;
-    row._rIndex = root._childs.length+1;
+    row._level = 1;
+    row._rIndex = root._childs.length + 1;
     flatRows.value.push(row);
     root._childs.push(row);
   }
 }
-function copyRow(){
-  let item = flatRows.value.slice(selectRowsIndex.value[0], selectRowsIndex.value[0]+1)[0];
+function copyRow() {
+  let item = flatRows.value.slice(
+    selectRowsIndex.value[0],
+    selectRowsIndex.value[0] + 1
+  )[0];
   let _p = item._p;
   clearParent(item);
   let newItem = JSON.parse(JSON.stringify(item));
   getRowRows(item);
-  item._p=_p;
- let newRows = getRowRows(newItem);
- flatRows.value.splice(selectRowsIndex.value[0]+newRows.length, 0, ...newRows);
- newItem._p=_p;
- let pos = _p._childs.indexOf(item);
- _p._childs.splice(pos,0,newItem);
+  item._p = _p;
+  let newRows = getRowRows(newItem);
+  flatRows.value.splice(
+    selectRowsIndex.value[0] + newRows.length,
+    0,
+    ...newRows
+  );
+  newItem._p = _p;
+  let pos = _p._childs.indexOf(item);
+  _p._childs.splice(pos, 0, newItem);
 }
+
+function dowloadText(text, name) {
+  let link = document.createElement("a");
+  link.setAttribute("download", name);
+  link.setAttribute(
+    "href",
+    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+  );
+  document.body.append(link);
+  link.click();
+  document.body.removeChild(link);
+}
+function exportCSV(config) {
+  let item = flatRows.value.slice(
+    selectRowsIndex.value[0],
+    selectRowsIndex.value[0] + 1
+  )[0];
+
+  let rows = getRowRows(item);
+  let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
+  rows = rows.map((row) => cols.map((col,i) => (i==0?row._rIndex.substr(item._rIndex.length+1)+" ":"")+(row["c" + col.fn]?row["c" + col.fn]:'')));
+  rows.unshift(cols.map((c) => c.name));
+  let text = rows
+    .map((r) =>
+      r
+        .map(
+          (d) =>
+            `${
+              (d &&
+                d
+                  .replace(/"/g, '""')
+                  .replace(/<.*?>/g, "")
+                  .replace(/&lt;/g, "<")
+                  .replace(/&gt;/g, ">")
+                  .replace(/&amp;/g, "&")
+                  .replace(/\\n/g, "\\n")) ||
+              ""
+            }`
+        )
+        .map((d, i) => `"${d}"`)
+        .join(",")
+    )
+    .join("\n");
+  dowloadText(text, "exportcsv.csv");
+}
+
 function remove() {
   selectRowsIndex.value
     .sort((a, b) => b - a)
@@ -180,6 +233,9 @@ export const useDataRowsStore = defineStore("dataRows", () => {
     selectRowsIndex,
     remove,
     curRowIndex,
-    dragAndDrop,getRowRows,copyRow
+    dragAndDrop,
+    getRowRows,
+    copyRow,
+    exportCSV,
   };
 });

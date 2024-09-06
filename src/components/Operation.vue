@@ -19,6 +19,7 @@
           <a @click="download" >Export</a>
           <a @click="downloadSch" >Export Sch</a>
           <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="copyRow">Copy</a>
+          <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="exportCSV">Export CSV</a>
         </div>
       </div>
     </div>
@@ -129,6 +130,9 @@ export default {
     },
     copyRow(){
       useDataRowsStore().copyRow();
+    },
+    exportCSV(){
+      useDataRowsStore().exportCSV(this.config);
     }
   }
 };

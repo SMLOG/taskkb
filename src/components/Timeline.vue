@@ -5,6 +5,18 @@
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
+    <a v-if="config"  @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false" style="position: fixed;top:20%;right:10px;z-index: 100;;">
+                  Start
+                  <div v-show="showDatePicker" style="position: absolute;background: white;right:0;">
+                    <VueDatePicker v-model="config.startDate"
+                      @date-update="(d) => { config.startDate = d; showDatePicker = false }" :enable-time-picker="false"
+                      type="date" inline auto-apply />
+                    <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20"
+                        @mousedown.stop /></div>
+                        <div style="margin:10px;"> Allow Options:<input type="number" v-model="config.allowOptions" :min="20"
+                          @mousedown.stop /></div>
+                  </div>
+     </a>
     <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp"
@@ -26,16 +38,7 @@
           <div style="display: flex; flex-wrap: nowrap">
             <div v-for="(week, index) in weeks" :key="week" class="week-slot">
               <div>
-                <a v-if="index == 0" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false">
-                  Start
-                  <div v-if="showDatePicker" style="position: absolute;background: white;">
-                    <VueDatePicker v-model="config.startDate"
-                      @date-update="(d) => { config.startDate = d; showDatePicker = false }" :enable-time-picker="false"
-                      type="date" inline auto-apply />
-                    <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20"
-                        @mousedown.stop /></div>
-                  </div>
-                </a>
+
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
               <div style="display: flex; justify-content: space-between">
