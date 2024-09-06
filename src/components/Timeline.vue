@@ -61,7 +61,7 @@
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }">
           <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype num" :draggable="isDrag"
             :class="{ curRow: rowIndex == curRowIndex,lock:row._lock }">
-            {{ row._rIndex + 1 }}
+            {{ row._rIndex }}
           </a>
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <div class="col td title" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
