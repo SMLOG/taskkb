@@ -35,15 +35,16 @@ function plusWorkDays  (startIndex,days){
   for(;true;){
     start += inc;
     let date = getDate(start);
-    if(date.isWeekend||date.holiday)continue;
+    if(date.isWeekend && config.allowOptions&&config.allowOptions.indexOf('W')==-1 ||date.holiday&&config.allowOptions&&config.allowOptions.indexOf('H')==-1)continue;
     k++;
     if(k==total)return getDate(start);
   }
   
 }
+let config;
 export function useTableComposable() {
   const flatRows = useDataRowsStore().flatRows;
-  const config = useConfigStore().config;
+ config = useConfigStore().config;
   
   const selectRowsIndex = useDataRowsStore().selectRowsIndex;
 
@@ -284,7 +285,7 @@ export function useTableComposable() {
         let workdays =(newDate.i-orgDate.i>0?1:-1)*new Array(Math.abs(newDate.i-orgDate.i))
         .fill(0).map((e,index)=>Math.min(orgDate.i,newDate.i)+index+1)
         .map(e=>getDate(e))
-        .filter(e=>!(e.isWeekend||e.holiday)).length;
+        .filter(e=>!(e.isWeekend&&config.allowOptions&&config.allowOptions.indexOf('W')==-1||e.holiday&&config.allowOptions&&config.allowOptions.indexOf('H')==-1)).length;
 
 
         const cell = event.target.closest(".row");
@@ -409,7 +410,7 @@ export function useTableComposable() {
 
         for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
           let day = weeks[w].dates[i];
-          if (day.isWeekend || day.holiday) continue;
+          if (day.isWeekend && config.allowOptions && config.allowOptions.indexOf('W')==-1 || day.holiday&&config.allowOptions && config.allowOptions.indexOf('H')==-1) continue;
           count++;
 
         }

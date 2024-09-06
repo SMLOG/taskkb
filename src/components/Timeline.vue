@@ -13,7 +13,7 @@
                       type="date" inline auto-apply />
                     <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20"
                         @mousedown.stop /></div>
-                        <div style="margin:10px;"> Allow Options:<input type="number" v-model="config.allowOptions" :min="20"
+                        <div style="margin:10px;"> Allow Options:<input  v-model="config.allowOptions" :min="20"
                           @mousedown.stop /></div>
                   </div>
      </a>
