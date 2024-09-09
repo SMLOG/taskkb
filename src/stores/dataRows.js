@@ -130,6 +130,15 @@ function dowloadText(text, name) {
   link.click();
   document.body.removeChild(link);
 }
+function formatDate(date) {
+  const year = date.getFullYear(); // Get last two digits of the year
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[date.getMonth()]; // Get month abbreviation
+  const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+
+  return `${day}-${month}-${year}`;
+}
 function exportCSV(config) {
   let item = flatRows.value.slice(
     selectRowsIndex.value[0],
@@ -138,8 +147,11 @@ function exportCSV(config) {
 
   let rows = getRowRows(item);
   let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
-  rows = rows.map((row) => cols.map((col,i) => (i==0?row._rIndex.substr(item._rIndex.length+1)+" ":"")+(row["c" + col.fn]?row["c" + col.fn]:'')));
-  rows.unshift(cols.map((c) => c.name));
+  rows = rows.map((row) => 
+    cols.map((col,i) => (i==0?('  '.repeat(row._level-item._level) +row._rIndex.substr(item._rIndex.length+1)+" "):"")+(row["c" + col.fn]?row["c" + col.fn]:''))
+  .concat([row._tl?formatDate(row._tl.start.date):'',row._tl?formatDate(row._tl.end.date):''])
+);
+  rows.unshift(cols.map((c) => c.name).concat(['Start Date','End Date']));
   let text = rows
     .map((r) =>
       r
@@ -153,6 +165,7 @@ function exportCSV(config) {
                   .replace(/&lt;/g, "<")
                   .replace(/&gt;/g, ">")
                   .replace(/&amp;/g, "&")
+                  .replace(/&nbsp;/g, " ")
                   .replace(/\\n/g, "\\n")) ||
               ""
             }`
