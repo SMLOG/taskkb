@@ -1,8 +1,7 @@
 <template>
   <div class="row header line" :style="{ gridTemplateColumns: gridColumns() }">
-    <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;"></div>
-    <template v-for="(col, key) in cols" :key="key">
-      <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }">
+    <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+      <div class="col" ref="th" :style="colStyle(col, 1,cellIndex)" :class="{ sticky: col.sticky }">
         <div class="cell">
         </div>
       </div>
@@ -81,7 +80,7 @@ export default {
   computed: {
     cols() {
       if (this.config && this.config.cols)
-        return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
+        return this.config.cols.filter(e => e.show);
       return [];
     },
     curRow() {
@@ -90,16 +89,15 @@ export default {
     }
   },
   methods: {
-    colStyle(col, isH) {
+    colStyle(col, isH,index) {
       let style = {};
       if (col.sticky) {
-        style.left = "46px";
-        style.zIndex = isH ? 4 : 3
-      }
+        style.left='var(--sticky-left-'+index+')';
+      }else style.left = 'auto';
       return style;
     },
     gridColumns() {
-      return '46px ' + this.cols.map(e => e.width + 'px').join(' ') + ' 1fr';
+      return this.cols.map(e => e.width + 'px').join(' ');
     },
     isWeekend(date) {
       const dayOfWeek = date.getDay();

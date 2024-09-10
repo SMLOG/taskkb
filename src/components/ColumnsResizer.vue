@@ -39,8 +39,9 @@ unmounted(){
 
     window.addEventListener('scroll', this.scrollEventHanlder);
       document.documentElement.style.setProperty('--scroll-left','0px');
-      document.querySelector('#mainContent').addEventListener('scroll',function(){
+      document.querySelector('#mainContent').addEventListener('scroll',()=>{
       document.documentElement.style.setProperty('--scroll-left',  document.querySelector('#mainContent').scrollLeft+'px');
+      this.scrollEventHanlder();
     });
   
 
@@ -48,35 +49,38 @@ unmounted(){
   },
   methods: {
     scrollEventHanlder(){
-        this.resize();
+        this.reAdjustBars();
     },
-    resize() {
-
-      let offset=0;
-      for (let i = 0; i < this.$refs.rbar.length; i++) {
-        this.$refs.rbar[i].style.left = this.th[i].offsetLeft + this.th[i].offsetWidth - this.$refs.rbar[i].offsetWidth / 2 + 'px';
-        if(this.th[i].classList.contains('sticky') ){
-
-          let stickyLeft = parseFloat(getComputedStyle(this.th[i]).getPropertyValue('--sticky-left-'+i));
-          let left = this.th[i].getBoundingClientRect().x;
-          document.documentElement.style.setProperty('--sticky-left-'+(i),  offset+'px');
-          offset =  offset + parseFloat(this.th[i].offsetWidth);
-          if(stickyLeft>=left){
-          this.$refs.rbar[i].style.left = `calc( var(--scroll-left) + ${offset}px)`;  
-          }
-
-        }
-       
-       
-       
-
+     reAdjustBars() {
+  let nextStickyLeft = 0;
+  for (let i = 0; i < this.$refs.rbar.length; i++) {
+    this.$refs.rbar[i].style.left =
+      this.th[i].offsetLeft +
+      this.th[i].offsetWidth -
+      this.$refs.rbar[i].offsetWidth / 2 +
+      "px";
+    if (this.th[i].classList.contains("sticky")) {
+      let stickyed = false;
+      if (nextStickyLeft >= this.th[i].offsetLeft) {
+        stickyed = true;
       }
-    },
+
+      document.documentElement.style.setProperty('--sticky-left-'+(i),  nextStickyLeft+'px');
+
+      nextStickyLeft = nextStickyLeft + parseFloat(this.th[i].offsetWidth);
+      if (stickyed) {
+        this.$refs.rbar[
+          i
+        ].style.left = `calc( var(--scroll-left) + ${nextStickyLeft}px)`;
+      }
+    }
+  }
+},
     winResize() {
       for (let i = 0; i < this.$refs.rbar.length; i++) 
       document.documentElement.style.removeProperty('--sticky-left-'+(i));
       /*this.resize();*/
-      this.$nextTick(() => { this.resize(); });
+      this.$nextTick(() => { this.reAdjustBars(); });
     },
 
     handleResize(event) {
@@ -102,7 +106,7 @@ unmounted(){
     },
     resizeBarMouseUp() {
       if (this.resizeColumn) {
-        this.resize();
+        this.reAdjustBars();
       }
       this.resizeColumn = 0;
     },

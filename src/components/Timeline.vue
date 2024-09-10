@@ -24,11 +24,9 @@
       >
       <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
-      <TimelineHeader />
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
-        <div freeze="1" class="th col lsticky" style="min-width: 46px;max-width: 46px;">#</div>
-        <template v-for="(col, key) in cols" :key="key">
-          <div class="col" ref="th" :style="colStyle(col, 1)" :class="{ sticky: col.sticky }" v-if="col.show">
+        <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+          <div class="col" ref="th" :style="colStyle(col, 1,cellIndex)" :class="{ sticky: col.sticky }" v-if="col.show">
             <div class="cell">
               <component :is="col.cp" :col="col"></component>
             </div>
@@ -59,14 +57,11 @@
         <div class="row"  :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }"
           v-show="!isCollapsed(row)"
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }">
-          <a style="min-width: 46px;max-width: 46px;" class="col lsticky etype num" :draggable="isDrag"
-            :class="{ curRow: rowIndex == curRowIndex,lock:row._lock }">
-            {{ row._rIndex }}
-          </a>
+
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <div class="col td title" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
               :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
-              :style="colStyle(col)">
+              :style="colStyle(col, 1,cellIndex)">
               <div class="cell">
                 <component :is="col.cp" :row="row" :col="col"></component>
               </div>
@@ -124,9 +119,10 @@ import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
+import ColSeq from './ColSeq.vue';
 
 export default {
-  components: { ColTitle, ColDropText, ColDate, VueDatePicker },
+  components: { ColTitle, ColDropText, ColDate, VueDatePicker,ColSeq },
   data() {
     return {
       isMounted: false,
@@ -206,7 +202,7 @@ export default {
     },
     cols() {
       if (this.config && this.config.cols)
-        return this.config.cols.filter(e => e.show && e.cp == 'ColTitle');
+        return this.config.cols.filter(e => e.show );
       return [];
     }
   },
@@ -218,15 +214,15 @@ export default {
       return (a <= c && c <= b) || (b <= c && c <= a);
     },
 
-    colStyle(col) {
+    colStyle(col, isH,index) {
       let style = {};
       if (col.sticky) {
-        style.left = "46px";
-      }
+        style.left='var(--sticky-left-'+index+')';
+      }else style.left = 'auto';
       return style;
     },
     gridColumns() {
-      return '46px ' + this.cols.map(e => e.width + 'px').join(' ') + ' 1fr';
+      return this.cols.map(e => e.width + 'px').join(' ')+ ' 1fr';
     },
     getAllRows() {
       return this.flatRows;
