@@ -59,7 +59,8 @@
           :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }">
 
           <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <div class="col td title" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
+            <component v-if="col.cp=='ColSeq'" :class="cellClass(rowIndex + 1, cellIndex + 1, col)" class="col td" :is="col.cp" :row="row" :col="col" :style="colStyle(col, 1,cellIndex)" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex" ></component>
+            <div v-else class="col td title" :data-row="rowIndex + 1" :data-col="cellIndex + 1"
               :tabindex="100 * rowIndex + cellIndex" :class="cellClass(rowIndex + 1, cellIndex + 1, col)"
               :style="colStyle(col, 1,cellIndex)">
               <div class="cell">
