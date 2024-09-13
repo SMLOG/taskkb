@@ -3,8 +3,9 @@
     top: 0;
     right: 0;
     left: 0;">
+    <div ref="justDiv" class="vsp" style="height: 1px;width:0px;"></div>
     <template v-for="(col, key) in cols" :key="key">
-      <div class="columns-resize-bar"  ref="rbar" @mousedown="startResize(col, key, $event)"></div>
+      <div class="columns-resize-bar"   ref="rbar" @mousedown="startResize(col, key, $event)"></div>
     </template>
     <div class="overlay" v-if="resizeColumn" @mousemove.prevent="handleResize" @mouseup.prevent="resizeBarMouseUp">
     </div>
@@ -16,6 +17,7 @@ export default {
   data() {
     return {
       resizeColumn: null,
+      lastStickyBar:-1,
     };
   },
 unmounted(){
@@ -53,6 +55,7 @@ unmounted(){
     },
      reAdjustBars() {
   let nextStickyLeft = 0;
+  let lastSticky=-1;
   for (let i = 0; i < this.$refs.rbar.length; i++) {
     this.$refs.rbar[i].style.left =
       this.th[i].offsetLeft +
@@ -60,21 +63,20 @@ unmounted(){
       this.$refs.rbar[i].offsetWidth / 2 +
       "px";
     if (this.th[i].classList.contains("sticky")) {
-      let stickyed = false;
-      if (nextStickyLeft >= this.th[i].offsetLeft) {
-        stickyed = true;
-      }
-
       document.documentElement.style.setProperty('--sticky-left-'+(i),  nextStickyLeft+'px');
+      if(this.th[i].getBoundingClientRect().x===nextStickyLeft&&document.querySelector('#mainContent').scrollLeft>0){
+        lastSticky=i;
+      }
 
       nextStickyLeft = nextStickyLeft + parseFloat(this.th[i].offsetWidth);
-      if (stickyed) {
-        this.$refs.rbar[
-          i
-        ].style.left = `calc( var(--scroll-left) + ${nextStickyLeft}px)`;
-      }
     }
   }
+  /*if(lastSticky>-1)  {
+    this.$refs.justDiv.style.width= this.$refs.rbar[lastSticky].style.left;
+
+  }else{
+    this.$refs.justDiv.style.width='0'
+  }*/
 },
     winResize() {
       for (let i = 0; i < this.$refs.rbar.length; i++) 
@@ -129,6 +131,10 @@ unmounted(){
   background-color: #eee;
   cursor: col-resize;
 }
+.stickyed{
+  border-right: 1px solid red;
+  position: sticky!important;;
+}
 
 .overlay {
   position: fixed;
@@ -152,5 +158,20 @@ unmounted(){
 
 .sticky{
   position: sticky;
+}
+.vsp::after{
+  background-color: gray;
+    content: "";
+    width: 1px;
+    display: block;
+    position: absolute;
+    right: 0;
+}
+.vsp{
+  position: sticky;
+    background: yellow;
+    z-index: 1111;
+    left: 0;
+    top:0;
 }
 </style>

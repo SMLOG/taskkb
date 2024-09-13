@@ -97,7 +97,7 @@ export default {
       return style;
     },
     gridColumns() {
-      return this.cols.map(e => e.width + 'px').join(' ');
+      return this.cols.map(e => e.width + 'px').join(' ')+' 1fr';
     },
     isWeekend(date) {
       const dayOfWeek = date.getDay();
