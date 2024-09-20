@@ -200,6 +200,7 @@ export default {
 
 .line {
   z-index: -1 !important;
+  height: 1px;
 }
 
 
