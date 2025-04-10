@@ -20,6 +20,8 @@
           <a @click="downloadSch" >Export Sch</a>
           <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="copyRow">Copy</a>
           <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="exportCSV">Export CSV</a>
+          <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="copyClipboard">Clipboard</a>
+
         </div>
       </div>
     </div>
@@ -133,7 +135,10 @@ export default {
     },
     exportCSV(){
       useDataRowsStore().exportCSV(this.config);
+    },copyClipboard(){
+      useDataRowsStore().copyClipboard(this.config);
     }
+
   }
 };
 </script>

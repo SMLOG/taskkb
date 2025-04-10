@@ -10,4 +10,6 @@ if %errorlevel% neq 0 (
 
 docker build -t mynode .
 rem docker run   --rm -it -v .:/app -p 8081:8080  --name mynode mynode
-docker run   --rm -d -v .:/app -p 8081:8080  --name mynode mynode
+docker run    --rm -v "%CD%":/app -p 8081:8080  --name mynode mynode
+
+pause

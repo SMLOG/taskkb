@@ -410,7 +410,7 @@ export function useTableComposable() {
 
         for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
           let day = weeks[w].dates[i];
-          if (day.isWeekend && config.allowOptions && config.allowOptions.indexOf('W')==-1 || day.holiday&&config.allowOptions && config.allowOptions.indexOf('H')==-1) continue;
+          if (day.isWeekend || day.holiday) continue;
           count++;
 
         }
@@ -455,6 +455,7 @@ export function useTableComposable() {
     let fileName = row[titleProp].replace(/<.*?>/g,'').trim();
     let dataList  = useDataRowsStore().getRowRows(row);
       // Create a download link
+      console.log(dataList);
       const csvContent = dataList.map(e=>['" '.repeat(e._level-row._level)+`${e[titleProp].replace(/<.*?>/g,'').trim()}"`]).map(e => e.join(',')).join('\n');
 
       const downloadLink = document.createElement('a');

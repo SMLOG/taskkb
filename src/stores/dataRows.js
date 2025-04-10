@@ -118,7 +118,51 @@ function copyRow() {
   let pos = _p._childs.indexOf(item);
   _p._childs.splice(pos, 0, newItem);
 }
+function copyClipboard(config){
+  let item = flatRows.value.slice(
+    selectRowsIndex.value[0],
+    selectRowsIndex.value[0] + 1
+  )[0];
 
+  let rows = getRowRows(item);
+  console.log(rows);
+  let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
+  rows = rows.map((row) => 
+    cols.map((col,i) => (i==0?('  '.repeat(row._level-item._level) +" "):"")+(row["c" + col.fn]?row["c" + col.fn]:''))
+  .concat([row._tl?formatDate(row._tl.start.date):'',row._tl?formatDate(row._tl.end.date):''])
+);
+  rows.unshift(cols.map((c) => c.name).concat(['Start Date','End Date']));
+
+  let text = rows
+    .map((r) =>
+      r
+        .map(
+          (d) =>
+            `${
+              (d &&
+                d
+                  .replace(/"/g, '""')
+                  .replace(/<.*?>/g, "")
+                  .replace(/&lt;/g, "<")
+                  .replace(/&gt;/g, ">")
+                  .replace(/&amp;/g, "&")
+                  .replace(/&nbsp;/g, " ")
+                  .replace(/\t/g, "    ")
+                  .replace(/\\n/g, "\\n")) ||
+              ""
+            }`
+        )
+        .map((d, i) => `"${d}"`)
+        .join("\t")
+    )
+    .join("\n");
+
+    navigator.clipboard.writeText(text).then(function() {
+      console.log('Text copied to clipboard!');
+  }).catch(function(err) {
+      console.error('Could not copy text: ', err);
+  });
+}
 function dowloadText(text, name) {
   let link = document.createElement("a");
   link.setAttribute("download", name);
@@ -146,12 +190,14 @@ function exportCSV(config) {
   )[0];
 
   let rows = getRowRows(item);
+  console.log(rows);
   let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
   rows = rows.map((row) => 
-    cols.map((col,i) => (i==0?('  '.repeat(row._level-item._level) +row._rIndex.substr(item._rIndex.length+1)+" "):"")+(row["c" + col.fn]?row["c" + col.fn]:''))
+    cols.map((col,i) => (i==0?('  '.repeat(row._level-item._level) +(parseInt(row._rIndex.substr(item._rIndex.length+1,item._rIndex.length+2))-1)+'.'+row._rIndex.substr(item._rIndex.length+2)+" "):"")+(row["c" + col.fn]?row["c" + col.fn]:''))
   .concat([row._tl?formatDate(row._tl.start.date):'',row._tl?formatDate(row._tl.end.date):''])
 );
   rows.unshift(cols.map((c) => c.name).concat(['Start Date','End Date']));
+
   let text = rows
     .map((r) =>
       r
@@ -250,5 +296,6 @@ export const useDataRowsStore = defineStore("dataRows", () => {
     getRowRows,
     copyRow,
     exportCSV,
+    copyClipboard
   };
 });
