@@ -133,7 +133,7 @@ unmounted(){
 }
 .stickyed{
   border-right: 1px solid red;
-  position: sticky!important;;
+  position: sticky!important;
 }
 
 .overlay {

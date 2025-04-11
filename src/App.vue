@@ -14,8 +14,8 @@ import FormatTool from "@/components/FormatTool.vue";
       </div>
     </div>
   </header>
-  <main style="position: relative;
-    flex-grow: 1;">
+  <main class="flex-grow" style="position: relative;
+    ">
     <div 
     id="mainContent"
     style="
@@ -39,6 +39,7 @@ import FormatTool from "@/components/FormatTool.vue";
 </template>
 
 <style scoped>
+
 header {
   line-height: 1.5;
 }
