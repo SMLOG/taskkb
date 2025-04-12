@@ -16,7 +16,22 @@
           </div>
         </template>
       </div>
-      <Tree :row="root" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns() }" v-if="root"></Tree>
+      <template v-for="(row, rowIndex) in getAllRows()" :key="rowIndex">
+        <div class="row"  :data-row-index="rowIndex" :style="{ gridTemplateColumns: gridColumns() }" v-show="!isCollapsed(row)"
+          :class="{ wholeRowSelected: selectRowsIndex && selectRowsIndex.indexOf(rowIndex) > -1 }" @dragover="dragOver"
+          @drop="drop($event, row, rowIndex)">
+
+          <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+            <component v-if="col.cp=='ColSeq'" :class="cellClass(rowIndex + 1, cellIndex + 1, col)" class="col td" :is="col.cp" :row="row" :col="col" :style="colStyle(col, 1,cellIndex)" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex" ></component>
+            <div v-else class="col td" :style="colStyle(col, 1,cellIndex)" :data-row="rowIndex + 1" :data-col="cellIndex + 1" :tabindex="100 * rowIndex + cellIndex"
+              :class="cellClass(rowIndex + 1, cellIndex + 1, col)">
+              <div class="cell">
+                <component :is="col.cp" :row="row" :col="col"></component>
+              </div>
+            </div>
+          </template>
+        </div>
+      </template>
     </div>
   </div>
 
@@ -40,17 +55,15 @@ import ColTitle from './ColTitle.vue';
 import ColDropText from './ColDropText.vue';
 import ColDate from './ColDate.vue';
 import ColSeq from './ColSeq.vue';
-import Tree from './Tree.vue';
 
 export default {
-  components: { ColTitle, ColDropText, ColDate,ColSeq,Tree },
+  components: { ColTitle, ColDropText, ColDate,ColSeq },
 
   data() {
     return {
       config: {},
       selectCol: null,
       flatRows: null,
-      root:null,
     };
   },
 
@@ -58,8 +71,6 @@ export default {
   mounted() {
     this.config = useConfigStore().config;
     this.flatRows = useDataRowsStore().flatRows;
-    this.root = useDataRowsStore().dataRows;
-    console.error(this.root);
     this.selectRowsIndex = useDataRowsStore().selectRowsIndex;
     this.curRowIndex=useDataRowsStore().curRowIndex;
 

@@ -42,7 +42,7 @@ function plusWorkDays  (startIndex,days){
   
 }
 let config;
-export function useTableComposable() {
+export function useDrapDropComposable() {
   const flatRows = useDataRowsStore().flatRows;
  config = useConfigStore().config;
   
@@ -113,7 +113,7 @@ export function useTableComposable() {
         selectRows.length = 0;
         selectRowStart = selectRowEnd = -1;
 
-        if (row&&row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
+        if (row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
           if (event.target.classList.contains("selectStartRef")) {
             moveType.value = {
               x: event.clientX,

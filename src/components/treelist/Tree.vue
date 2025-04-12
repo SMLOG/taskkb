@@ -1,6 +1,7 @@
 <template>
 
-    <div class="row grid" v-if="row && row._level > 0" :style="gridStyle">
+    <div class="row grid" v-if="row && row._level > 0" :style="gridStyle" 
+        @dragstart="dragstart" @dragover="dragOver" @drop="drop" :draggable="true">
         <template v-for="(col, cellIndex) in cols" :key="cellIndex" >
 
             <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col" ></component>
@@ -15,12 +16,17 @@
         <tree v-for="(child, index) in row._childs" :key="index" :row="child" :cols="cols" :gridStyle="gridStyle" />
     </template>
 </template>
+<script setup>
 
+import { useDrapDropComposable } from '@/components/useDrapDropComposable'
+const { dragOver,dragstart,drop,
+  } = useDrapDropComposable();
+</script>
 <script>
-import ColTitle from './ColTitle.vue';
-import ColDropText from './ColDropText.vue';
-import ColDate from './ColDate.vue';
-import ColSeq from './ColSeq.vue';
+import ColTitle from '@/components/ColTitle.vue';
+import ColDropText from '@/components/ColDropText.vue';
+import ColDate from '@/components/ColDate.vue';
+import ColSeq from '@/components/ColSeq.vue';
 
 export default {
     components: { ColTitle, ColDropText, ColDate, ColSeq },
@@ -39,5 +45,7 @@ export default {
     }
 };
 </script>
+<style src="@/components/grid.css" scoped>
+</style>
 
-<style scoped></style>
+
