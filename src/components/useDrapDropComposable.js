@@ -43,6 +43,15 @@ function plusWorkDays  (startIndex,days){
   }
   
 }
+
+const  depthsToIndex=()=> Array.from(document.querySelectorAll('.row')).reduce((acc, element, index) => {
+  const depth = element?.dataset?.depth ?? 'undefined'; // Handle missing depth
+  acc[depth] = index; // Store the latest index
+  return acc;
+}, {});
+
+
+
 let config;
 export function useDrapDropComposable() {
   const flatRows = useDataRowsStore().flatRows;
@@ -51,8 +60,8 @@ export function useDrapDropComposable() {
  // const selectDepths = useDataRowsStore().selectDepths;
 
   let isMouseDown;
-  let selectRowStart;
-  let selectRowEnd;
+  let selectDetphStart;
+  let selectDetphEnd;
   let moveType =ref(null);
   let resizeColumn;
   let startRowIndex=ref(-1);
@@ -97,20 +106,20 @@ export function useDrapDropComposable() {
     let rowEl = event.target.closest(".row");
     if (rowEl) {
       isMouseDown = true;
-      let selectRows = selectDepths;
       let depth = rowEl.dataset.depth;
+      const depthMap = depthsToIndex();
       if (event.target.classList.contains("num")) {
-        if (selectRows.indexOf(depth) > -1) {
+        if (selectDepths.indexOf(depth) > -1) {
           //drag
           isDrag.value = true;
         } else {
 
-          selectRows.push(depth);
-          console.log(selectDepths);
+          selectDepths.push(depth);
+          selectDetphStart = depth;
         }
       } else {
-        selectRows.length = 0;
-        selectRowStart = selectRowEnd = -1;
+        selectDepths.length = 0;
+        selectDetphStart = selectDetphEnd = null;
 
         if (row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
           if (event.target.classList.contains("selectStartRef")) {
@@ -203,14 +212,24 @@ export function useDrapDropComposable() {
         const cell = event.target.closest("div.col");
         if (!isDrag.value && selectDepths.length) {
           selectDepths.length = 0;
-          selectRowEnd = parseInt(rowEl.dataset.rowIndex);
+          selectDetphEnd = rowEl.dataset.depth;
+          let rowsDepth = Array.from(document.querySelectorAll('.row')).map(e => e?.dataset?.depth ?? null);
+
+          let rowsDepthIndexMap = rowsDepth.reduce((acc, depth, index) => {
+            acc[depth] = index; // Store the latest index
+            return acc;
+          }, {});
+
+          let startIndex = rowsDepthIndexMap[selectDetphStart];
+          let endIndex = rowsDepthIndexMap[selectDetphEnd];
           selectDepths.push(
             ...Array.from(
-              { length: Math.abs(selectRowStart - selectRowEnd) + 1 },
-              (_, i) => Math.min(selectRowStart, selectRowEnd) + i
-            )
+              { length: Math.abs( startIndex - endIndex) + 1 },
+              (_, i) => Math.min(startIndex, endIndex) + i
+            ).map(e=>rowsDepth[e])
           );
         } else if (cell) {
+
           const rowIndex = parseInt(cell.getAttribute("data-row"));
           const cellIndex = parseInt(cell.getAttribute("data-col"));
           endRowIndex.value = rowIndex;
