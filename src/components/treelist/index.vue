@@ -25,8 +25,8 @@
 <script setup>
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import { useConfigStore } from '@/stores/config'
-import { useDataRowsStore } from '@/stores/dataRows'
-import { useDrapDropComposable } from '@/components/useDrapDropComposable'
+import { useTreeRowsStore } from '@/stores/treeRows'
+import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable'
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
   cellClass,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
   dragstart,drop,
@@ -56,11 +56,11 @@ export default {
 
   mounted() {
     this.config = useConfigStore().config;
-    this.flatRows = useDataRowsStore().flatRows;
-    this.root = useDataRowsStore().dataRows;
+    this.flatRows = useTreeRowsStore().flatRows;
+    this.root = useTreeRowsStore().dataRows;
     console.error(this.root);
-    this.selectRowsIndex = useDataRowsStore().selectRowsIndex;
-    this.curRowIndex=useDataRowsStore().curRowIndex;
+    this.selectRowsIndex = useTreeRowsStore().selectRowsIndex;
+    this.curRowIndex=useTreeRowsStore().curRowIndex;
 
     document.addEventListener('keydown', (event) => {
       if (event.ctrlKey && event.key === 'c' && !this.$refs.table.querySelector('[contenteditable=true]')) {
@@ -192,3 +192,4 @@ export default {
 </script>
 <style src="@/components/grid.css" scoped>
 </style>
+@/components/useDrapTreeDropComposable@/components/useTreeDrapDropComposable

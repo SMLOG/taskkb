@@ -17,7 +17,7 @@
 </template>
 <script setup>
 
-import { useDrapDropComposable } from '@/components/useDrapDropComposable'
+import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable'
 const { dragOver,dragstart,drop,isDrag,selectDepths
   } = useDrapDropComposable();
 </script>
@@ -53,3 +53,4 @@ export default {
 </style>
 
 
+@/components/useDrapTreeDropComposable@/components/useTreeDrapDropComposable

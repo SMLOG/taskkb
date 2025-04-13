@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { useDataRowsStore } from "@/stores/dataRows";
+import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
 
 const weeksRef = ref([]);
@@ -43,11 +43,11 @@ function plusWorkDays  (startIndex,days){
 }
 let config;
 export function useTreeComposable() {
-  const flatRows = useDataRowsStore().flatRows;
-  const rootObj = useDataRowsStore().dataRows;
+  const flatRows = useTreeRowsStore().flatRows;
+  const rootObj = useTreeRowsStore().dataRows;
  config = useConfigStore().config;
   
-  const selectRowsIndex = useDataRowsStore().selectRowsIndex;
+  const selectRowsIndex = useTreeRowsStore().selectRowsIndex;
 
   let isMouseDown;
   let selectRowStart;
@@ -89,7 +89,7 @@ export function useTreeComposable() {
 
   }
 
-  let curRowIndex = useDataRowsStore().curRowIndex;
+  let curRowIndex = useTreeRowsStore().curRowIndex;
   const handleMouseDown = (event) => {
     console.log("mosuedown");
 
@@ -100,7 +100,7 @@ export function useTreeComposable() {
       console.log(rootObj);
 
       let row = flatRows[rowIndex];
-      useDataRowsStore().curRowIndex = parseInt(rowEl.dataset.rowIndex);
+      useTreeRowsStore().curRowIndex = parseInt(rowEl.dataset.rowIndex);
       let selectRows = selectRowsIndex;
       if (event.target.classList.contains("num")) {
         if (selectRows.indexOf(rowIndex) > -1) {
@@ -371,7 +371,7 @@ export function useTreeComposable() {
     }
     let rowIndex = parseInt(interceptor.closest(".row").dataset.rowIndex);
 
-    useDataRowsStore().dragAndDrop(
+    useTreeRowsStore().dragAndDrop(
       rowIndex,
       event.clientX - dragStartClientX > 50
     );
@@ -452,11 +452,11 @@ export function useTreeComposable() {
 
   const downloadSch = ()=>{
     let titleCol = config.cols.filter(e => e.show && e.cp == 'ColTitle');
-    let row = flatRows[useDataRowsStore().curRowIndex];
+    let row = flatRows[useTreeRowsStore().curRowIndex];
     console.log(row)
     let titleProp = 'c'+titleCol[0].fn;
     let fileName = row[titleProp].replace(/<.*?>/g,'').trim();
-    let dataList  = useDataRowsStore().getRowRows(row);
+    let dataList  = useTreeRowsStore().getRowRows(row);
       // Create a download link
       console.log(dataList);
       const csvContent = dataList.map(e=>['" '.repeat(e._level-row._level)+`${e[titleProp].replace(/<.*?>/g,'').trim()}"`]).map(e => e.join(',')).join('\n');
