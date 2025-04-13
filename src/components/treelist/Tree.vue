@@ -1,9 +1,8 @@
 <template>
 
-    <div class="row grid" v-if="row && row._level > 0" :style="gridStyle" 
-        @dragstart="dragstart" @dragover="dragOver" @drop="drop" :draggable="true">
+    <div class="row grid" :class="{'bg-green-300':selectDepths.indexOf(depth)>-1}" :data-depth="depth" v-if="depth!=''" :draggable="isDrag" :style="gridStyle" 
+        @dragstart="dragstart" @dragover="dragOver" @drop="drop" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex" >
-
             <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col" ></component>
             <div v-else class="col td">
                 <div class="cell">
@@ -13,13 +12,13 @@
         </template>
     </div>
     <template v-if="row && row._childs && row._childs.length && !row._collapsed">
-        <tree v-for="(child, index) in row._childs" :key="index" :row="child" :cols="cols" :gridStyle="gridStyle" />
+        <tree v-for="(child, index)  in row._childs" :depth="depth+'.'+index" :key="index" :row="child" :cols="cols" :gridStyle="gridStyle" />
     </template>
 </template>
 <script setup>
 
 import { useDrapDropComposable } from '@/components/useDrapDropComposable'
-const { dragOver,dragstart,drop,
+const { dragOver,dragstart,drop,isDrag,selectDepths
   } = useDrapDropComposable();
 </script>
 <script>
@@ -39,6 +38,11 @@ export default {
             type: Array,
             required: true,
         },
+        depth: {
+            type: String,
+            required: true,
+        },
+        
         gridStyle:{  type: Object}
     },
     mounted() {

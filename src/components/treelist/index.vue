@@ -16,7 +16,7 @@
           </div>
         </template>
       </div>
-      <Tree :row="root" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns() }" v-if="root"></Tree>
+      <Tree :row="root" :depth="''" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns() }" v-if="root"></Tree>
     </div>
   </div>
 
@@ -26,12 +26,11 @@
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import { useConfigStore } from '@/stores/config'
 import { useDataRowsStore } from '@/stores/dataRows'
-
-import { useTableComposable } from '@/components/useTableComposable'
+import { useDrapDropComposable } from '@/components/useDrapDropComposable'
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
   cellClass,handleKeyDown,selectRowSch,selectStartRef,calculateDaysBetweenDates,isDrag,
   dragstart,drop,
-  } = useTableComposable();
+  } = useDrapDropComposable();
 document.addEventListener("keydown", handleKeyDown);
 </script>
 <script>
