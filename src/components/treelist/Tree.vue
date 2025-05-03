@@ -3,10 +3,10 @@
     <div class="row grid" :class="{'bg-green-300':selectDepths.indexOf(depth)>-1}" :data-depth="depth" v-if="depth!=''" :draggable="isDrag" :style="gridStyle" 
         @dragstart="dragstart" @dragover="dragOver" @drop="drop" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex" >
-            <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col" ></component>
+            <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col"  ></component>
             <div v-else class="col td">
                 <div class="cell">
-                    <component :is="col.cp" :row="row" :col="col"></component>
+                    <component :is="col.cp" :row="row" :col="col" ></component>
                 </div>
             </div>
         </template>

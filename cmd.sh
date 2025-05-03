@@ -3,7 +3,7 @@
 
 VERSION=`git branch --show-current`
 
-dest='../alearningapp.github.io/todo'
+dest='../todo'
 
 
 

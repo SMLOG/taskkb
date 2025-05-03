@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory,createWebHashHistory } from 'vue-router';
 
 import GridTimeline from './components/GridTimeline.vue';
 import GridList from './components/GridList.vue';
@@ -13,7 +13,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory('/todo'),
+  history: createWebHashHistory('/grid'),
   routes
 });
 export default router;

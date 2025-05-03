@@ -65,6 +65,8 @@ const  depthsToIndex=()=> Array.from(document.querySelectorAll('.row')).reduce((
 
 
 let config;
+let dragStartClientX;
+
 export function useDrapDropComposable() {
   const flatRows = useTreeRowsStore().flatRows;
  config = useConfigStore().config;
@@ -81,7 +83,6 @@ export function useDrapDropComposable() {
   let endRowIndex=ref(-1);
   let endcellIndex=ref(-1);
   let selectStartRef =ref(null);
-  let dragStartClientX;
 
   const dragOver = (event) => {
     event.preventDefault();
@@ -383,12 +384,10 @@ export function useDrapDropComposable() {
   };
 
   const dragstart = (event) => {
-    let interceptor = event.target.closest(".etype");
-    if (interceptor) {
-      let rowIndex = parseInt(interceptor.closest(".row").dataset.rowIndex);
-      let row = flatRows[rowIndex];
-      console.log(event);
+    let interceptor = event.target.closest(".row");
+    if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
+      console.log('dragStartClientX',dragStartClientX);
     }
   };
 
@@ -399,36 +398,28 @@ export function useDrapDropComposable() {
     }
 
      selectDetphEnd = interceptor.dataset.depth;
-    let rowsDepth = Array.from(document.querySelectorAll('.row')).map(e => e?.dataset?.depth ?? null);
+     if(selectDepths.indexOf(selectDetphEnd)>-1)return;
 
-    let rowsDepthIndexMap = rowsDepth.reduce((acc, depth, index) => {
-      acc[depth] = index; // Store the latest index
-      return acc;
-    }, {});
-
-    let rowIndex = rowsDepthIndexMap[selectDetphEnd];
 
     const rootTree = useTreeRowsStore().dataRows;
-
-
-
 
     console.log(selectDetphEnd,selectDepths,rootTree);
     console.log(getRowFromDepth(rootTree,selectDetphEnd));
     let targetNode = getRowFromDepth(rootTree,selectDetphEnd);
 
-    for(let depth of selectDepths){
-      if(!targetNode._childs)targetNode._childs=[];
-      let srcNode = getRowFromDepth(rootTree,depth);
-      targetNode._childs.push(srcNode);
-      let index = parseInt(depth.split('.').pop());
-      srcNode._p._childs.splice(index, 1);
+    if( event.clientX - dragStartClientX > 50){
+      for(let depth of selectDepths.sort((a,b)=>b.localeCompare(a))){
+        if(!targetNode._childs)targetNode._childs=[];
+        let srcNode = getRowFromDepth(rootTree,depth);
+        targetNode._childs.push(srcNode);
+        let index = parseInt(depth.split('.').pop());
+        srcNode._p._childs.splice(index, 1);
+      }
     }
 
-    useTreeRowsStore().dragAndDrop(
-      rowIndex,
-      event.clientX - dragStartClientX > 50
-    );
+
+
+  
 
     selectDepths.length = 0;
     isDrag.value =false;
