@@ -17,6 +17,8 @@
           <a @click="showConfig = !showConfig">Configuration</a>
           <a @click="showConfig = !showConfig">Team</a>
           <a @click="download" >Export</a>
+          <a @click="overImport" >Import</a>
+          <input type="file" ref="fileInput" @change="handleFileUpload" accept=".json" style="display: none;" />
           <a @click="downloadSch" >Export Sch</a>
           <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="copyRow">Copy</a>
           <a v-if="selectRowsIndex&&selectRowsIndex.length==1" @click="exportCSV">Export CSV</a>
@@ -98,6 +100,34 @@ export default {
     },
   },
   methods: {
+
+    overImport(){
+      this.$refs.fileInput.click();
+    },
+    handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (file && file.type === "application/json") {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          try {
+            let data = JSON.parse(e.target.result);
+            if(data&&data.data&&data.config){
+              localStorage.setItem('data',JSON.stringify(data.data));
+              localStorage.setItem('config',JSON.stringify(data.config));
+              location.reload();
+            }else throw new Error("wrong format");
+            
+            
+          } catch (error) {
+            console.error("Invalid JSON file", error);
+          }
+        };
+        reader.readAsText(file);
+      } else {
+        alert("Please select a valid JSON file.");
+      }
+  },
+  
     download() {
       let data = JSON.parse(JSON.stringify(this.tableData, function (key, value) {
         if (key === "_p") {
