@@ -3,11 +3,11 @@
        @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
        @mouseup.left="handleMouseUp">
     <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" />
-    <div style="display: grid; grid-template-columns: 1fr;" ref="table" 
+    <div style="display: grid; grid-template-columns: 1fr;" ref="tableRef" 
          @mousemove="handleMouseMove">
       <div class="row header" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
-          <div class="col" ref="th" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
+          <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
             <div class="cell">
               <component :is="col.cp" :col="col"></component>
             </div>
@@ -141,9 +141,7 @@ const moveCursorToEnd = (index, spanElement) => {
 
 // Lifecycle hooks
 onMounted(() => {
-  nextTick(()=>{
-    console.log(thRefs)
-  });
+
   config.value = configStore.config;
   flatRows.value = treeRowsStore.flatRows;
   root.value = treeRowsStore.dataRows;
