@@ -1,67 +1,100 @@
 <template>
+    <div class="row grid" 
+         :class="{'bg-green-300': selectDepths.indexOf(depth) > -1}" 
+         :data-depth="depth" 
+         v-if="depth !== ''" 
+         :draggable="isDrag" 
+         :style="gridStyle" 
+         @dragstart="dragstart" 
+         @dragover="dragOver" 
+         @drop="drop">
+        <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+            <component v-if="col.cp === 'ColSeq'" 
+                      class="col td" 
+                      :is="resolveComponent(col.cp)"
+                      :row="row" 
+                      :col="col" 
+                      :class="{sticky: col.sticky}" 
+                      :style="colStyle(col, 1, cellIndex)">
 
-    <div class="row grid" :class="{'bg-green-300':selectDepths.indexOf(depth)>-1}" :data-depth="depth" v-if="depth!=''" :draggable="isDrag" :style="gridStyle" 
-        @dragstart="dragstart" @dragover="dragOver" @drop="drop" >
-        <template v-for="(col, cellIndex) in cols" :key="cellIndex" >
-            <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col"  :class="{sticky: col.sticky}" :style="colStyle(col, 1,cellIndex)" ></component>
-            <div v-else class="col td" :class="{sticky: col.sticky}" :style="colStyle(col, 1,cellIndex)">
-                <div class="cell" >
-                    <component :is="col.cp" :row="row" :col="col" ></component>
+
+            </component>
+            <div v-else 
+                 class="col td" 
+                 :class="{sticky: col.sticky}" 
+                 :style="colStyle(col, 1, cellIndex)">
+                <div class="cell">
+                    <component :is="resolveComponent(col.cp)"
+                              :row="row" 
+                              :col="col">
+                    </component>
                 </div>
             </div>
         </template>
     </div>
     <template v-if="row && row._childs && row._childs.length && !row._collapsed">
-        <tree v-for="(child, index)  in row._childs" :depth="depth+'.'+index" :key="index" :row="child" :cols="cols" :gridStyle="gridStyle" />
+        <tree v-for="(child, index) in row._childs" 
+              :depth="depth + '.' + index" 
+              :key="index" 
+              :row="child" 
+              :cols="cols" 
+              :gridStyle="gridStyle" />
     </template>
 </template>
+
 <script setup>
-
-import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable'
-const { dragOver,dragstart,drop,isDrag,selectDepths
-  } = useDrapDropComposable();
-
-  const colStyle = (col, isH, index) => {
-  let style = {};
-  if (col.sticky) {
-    style.left = `var(--sticky-left-${index})`;
-  } else {
-    style.left = 'auto';
-  }
-  return style;
-};
-
-</script>
-<script>
+import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable';
 import ColTitle from '@/components/ColTitle.vue';
 import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
 import ColSeq from '@/components/ColSeq.vue';
+import { defineProps } from 'vue';
 
-export default {
-    components: { ColTitle, ColDropText, ColDate, ColSeq },
-    props: {
-        row: {
-            type: Object,
-            required: true,
-        },
-        cols: {
-            type: Array,
-            required: true,
-        },
-        depth: {
-            type: String,
-            required: true,
-        },
-        
-        gridStyle:{  type: Object}
+// Define props
+const props = defineProps({
+    row: {
+        type: Object,
+        required: true,
     },
-    mounted() {
+    cols: {
+        type: Array,
+        required: true,
+    },
+    depth: {
+        type: String,
+        required: true,
+    },
+    gridStyle: {
+        type: Object
     }
+});
+
+// Drag and drop composable
+const { dragOver, dragstart, drop, isDrag, selectDepths } = useDrapDropComposable();
+
+// Column style function
+const colStyle = (col, isH, index) => {
+    let style = {};
+    if (col.sticky) {
+        style.left = `var(--sticky-left-${index})`;
+    } else {
+        style.left = 'auto';
+    }
+    return style;
 };
+
+const componentMap = {
+  ColTitle,
+  ColDropText,
+  ColDate,
+  ColSeq,
+};
+// Resolve component dynamically
+const resolveComponent = (cp) => {
+  return componentMap[cp] || null; // Fallback to null if component not found
+};
+
 </script>
+
 <style src="@/components/grid.css" scoped>
 </style>
-
-
-@/components/useDrapTreeDropComposable@/components/useTreeDrapDropComposable
