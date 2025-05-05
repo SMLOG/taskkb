@@ -1,17 +1,13 @@
 <template>
   <div v-if="row">
-
     <div style="display: flex">
-
-      <div style="margin-right:15px;z-index: 1;" :level="row._level" :style="{ paddingLeft: row._level * 15 + 'px' }">
+      <div style="margin-right:15px;z-index: 1;" :level="row._level" :style="{ paddingLeft: (level||row._level) * 15 + 'px' }">
         <span>{{ row._id }}</span>
         <span @click="row._collapsed = !row._collapsed"
           :class="{ dot: !row._childs || !row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>
       </div>
       <ContentEditable v-model="row['c' + col.fn]" @change="change"></ContentEditable>
-
     </div>
-
   </div>
   <div v-else>
     <ContentEditable v-model="col.name"></ContentEditable>
@@ -20,31 +16,25 @@
 
 <script setup>
 import ContentEditable from './ContentEditable.vue';
-</script>
-<script>
-export default {
 
-  props: {
-    col: {
-      type: Object
-    },
-    row: {
-      type: Object,
-      required: false,
-    },
+const props = defineProps({
+  col: {
+    type: Object
   },
-  data() {
-    return {
+  row: {
+    type: Object,
+    required: false
+  },
+  level:{
+    
+  }
+});
 
-    };
-  },
-  methods: {
-    change(oldVal, newVal) {
-      console.log(oldVal, newVal, '...')
-      this.$emit('change', oldVal, newVal);
+const emit = defineEmits(['change']);
 
-    }
-  },
+const change = (oldVal, newVal) => {
+  console.log(oldVal, newVal, '...');
+  emit('change', oldVal, newVal);
 };
 </script>
 
@@ -60,7 +50,6 @@ export default {
   display: inline-block;
   cursor: pointer;
   transition: all 0.3s ease;
-
 }
 
 .dot {
@@ -73,7 +62,6 @@ export default {
   border: 2px solid #ddd;
   border-radius: 2px;
   margin-left: 3px;
-
 }
 
 .collapsed {

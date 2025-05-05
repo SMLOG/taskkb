@@ -1,5 +1,5 @@
 <template>
-  <div class="config">
+  <div class="config border border-gray-500 border-2 p-4 !m-4" >
     <div>
       <span>Columns</span> <a @click="addCol()">+</a>
     </div>

@@ -114,7 +114,6 @@ export function useDrapDropComposable() {
 
   let curRowIndex = useTreeRowsStore().curRowIndex;
   const handleMouseDown = (event) => {
-    console.log("mosuedown");
 
     let rowEl = event.target.closest(".row");
     if (rowEl) {
@@ -133,8 +132,8 @@ export function useDrapDropComposable() {
       } else {
         selectDepths.length = 0;
         selectDetphStart = selectDetphEnd = null;
-
-        if (row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
+        let row;
+        if (row&&row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
           if (event.target.classList.contains("selectStartRef")) {
             moveType.value = {
               x: event.clientX,
@@ -297,14 +296,12 @@ export function useDrapDropComposable() {
   };
 
   const handleMouseUp = (event) => {
-    console.log(event)
     if (isDrag.value) {
       selectDepths.length = 0;
     }
     isDrag.value = isMouseDown = false;
     if (moveType.value) {
       event.stopPropagation();
-      console.log('event.stopPropagation();',event)
       let orgDate = selectStartRef.value.row._tl.end;
       let orgStartDate = selectStartRef.value.row._tl.start;
 
@@ -474,7 +471,6 @@ export function useDrapDropComposable() {
 
   const locateCurSch = (event) =>{
 
-    console.log('locateCurSch',event);
     if(moveType.value)return;
     let title = event.target.classList.contains('sch');
     if (title) {

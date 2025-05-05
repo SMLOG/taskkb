@@ -1,37 +1,25 @@
 <template>
-    <a v-if="row" class="etype num" :draggable="isDrag">{{ row._rIndex }}</a>
-  <div v-else>
-    #
-  </div>
+  <a v-if="row" class="etype num" :draggable="isDrag">{{ index||row._rIndex }}</a>
+  <div v-else>#</div>
 </template>
 
 <script setup>
 import { useTableComposable } from '@/components/useTableComposable'
+import { defineProps } from 'vue'
 
-const { isDrag
-  } = useTableComposable();
-</script>
-<script>
-export default {
-
-  props: {
-    col: {
-      type: Object
-    },
-    row: {
-      type: Object,
-      required: false,
-    },
+defineProps({
+  col: {
+    type: Object
   },
-  data() {
-    return {
-
-    };
+  row: {
+    type: Object,
+    required: false
   },
-  methods: {
+  index:{
+  }
+})
 
-  },
-};
+const { isDrag } = useTableComposable()
 </script>
 
 <style></style>

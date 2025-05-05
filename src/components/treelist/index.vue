@@ -13,7 +13,7 @@
           </div>
         </template>
       </div>
-      <Tree :row="root" :depth="''" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns }" v-if="root"></Tree>
+      <Tree :row="root" :depth="''"   :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns }" v-if="root"></Tree>
     </div>
   </div>
 </template>

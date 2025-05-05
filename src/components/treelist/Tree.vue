@@ -1,6 +1,6 @@
 <template>
     <div class="row grid" 
-         :class="{'bg-green-300': selectDepths.indexOf(depth) > -1}" 
+         :class="{'!bg-green-300': selectDepths.indexOf(depth) > -1}" 
          :data-depth="depth" 
          v-if="depth !== ''" 
          :draggable="isDrag" 
@@ -15,7 +15,9 @@
                       :row="row" 
                       :col="col" 
                       :class="{sticky: col.sticky}" 
-                      :style="colStyle(col, 1, cellIndex)">
+                      :style="colStyle(col, 1, cellIndex)"
+                      :index="depth"
+                      >
 
 
             </component>
@@ -26,7 +28,9 @@
                 <div class="cell">
                     <component :is="resolveComponent(col.cp)"
                               :row="row" 
-                              :col="col">
+                              :col="col"
+                              :level="level"
+                              >
                     </component>
                 </div>
             </div>
@@ -38,6 +42,7 @@
               :key="index" 
               :row="child" 
               :cols="cols" 
+              :level="level+1"
               :gridStyle="gridStyle" />
     </template>
 </template>
@@ -66,6 +71,10 @@ const props = defineProps({
     },
     gridStyle: {
         type: Object
+    },
+    level:{
+        type:Number,
+        required:true
     }
 });
 
