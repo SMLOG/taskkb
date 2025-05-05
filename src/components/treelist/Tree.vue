@@ -16,7 +16,7 @@
                       :col="col" 
                       :class="{sticky: col.sticky}" 
                       :style="colStyle(col, 1, cellIndex)"
-                      :index="depth"
+                      :index="id"
                       >
 
 
@@ -43,6 +43,7 @@
               :row="child" 
               :cols="cols" 
               :level="level+1"
+              :id="(id?id+'.':'')+(index+1)"
               :gridStyle="gridStyle" />
     </template>
 </template>
@@ -75,6 +76,8 @@ const props = defineProps({
     level:{
         type:Number,
         required:true
+    },id:{
+
     }
 });
 
