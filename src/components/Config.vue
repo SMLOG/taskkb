@@ -26,118 +26,98 @@
       <div>show shedule: <input type="checkbox" v-model="config.showSch" /></div>
       <div>Auto Save: <input type="checkbox" v-model="config.autoSave" /></div>
       <div>Fix: <input type="checkbox" v-model="config.fix" /></div>
-
     </div>
   </div>
 </template>
 
 <script setup>
-import { useCounterStore } from '@/stores/counter'
+import { ref, computed, onMounted } from 'vue';
+import { useCounterStore } from '@/stores/counter';
 
-// access the `store` variable anywhere in the component ✨
+// Access the store
 const store = useCounterStore();
-setTimeout(() => {
-  store.increment()
-}, 1000)
-</script>
-<script>
-export default {
-  data() {
-    return {
-      cpList: ["ColTitle", "ColDropText", "ColDate", "Time", "ColSeq"],
-      // cols: localStorage.getItem('cols') ? JSON.parse(localStorage.getItem('cols')) : [],
-      dragStartIndex: null
-    }
+onMounted(() => {
+  setTimeout(() => {
+    store.increment();
+  }, 1000);
+});
+
+// Props
+const props = defineProps({
+  config: {
+    type: Object,
+    required: true,
   },
+});
 
-  props: {
-    config: {
-      type: Object,
+// Reactive state
+const cpList = ref(["ColTitle", "ColDropText", "ColDate", "Time", "ColSeq"]);
+const dragStartIndex = ref(null);
+
+// Computed properties
+const cols = computed(() => props.config.cols);
+
+// Methods
+const dragstart = (event, row, i) => {
+  dragStartIndex.value = i;
+};
+
+const dragOver = (event) => {
+  event.preventDefault();
+};
+
+const drop = (event, row, endIndex) => {
+  let startIndex = dragStartIndex.value;
+  let startRow = cols.value.splice(startIndex, 1)[0];
+  if (endIndex > startIndex) endIndex -= 1;
+  let endRow = cols.value.splice(endIndex, 1, startRow)[0];
+  cols.value.splice(startIndex, 0, endRow);
+};
+
+const findMissingNumber = (list) => {
+  list.sort((a, b) => a - b);
+  let missingNumber = 0;
+  for (let i = 0; i < list.length; i++) {
+    if (list[i] !== missingNumber) {
+      break;
     }
+    missingNumber++;
+  }
+  return missingNumber;
+};
 
-  },
-  computed: {
-    cols() {
-      return this.config.cols;
+const calculateTextWidth = (text) => {
+  const body = document.querySelector("body");
+  const computedStyle = window.getComputedStyle(body);
+  const font = computedStyle.fontSize + " " + computedStyle.fontFamily;
+  const fontFamilies = font.split(",");
+  let maxWidth = 0;
+
+  for (let i = 0; i < fontFamilies.length; i++) {
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    context.font = fontFamilies[i];
+    const metrics = context.measureText(text);
+    const width = metrics.width;
+    if (width > maxWidth) {
+      maxWidth = width;
     }
-  },
-  methods: {
+  }
+  return maxWidth;
+};
 
-    dragstart(event, row, i) {
-      this.dragStartIndex = i;
-    },
-    dragOver(event) {
-      event.preventDefault();
-    },
-    drop(event, row, endIndex) {
+const addCol = () => {
+  let nextcid = findMissingNumber(cols.value.map(e => e.fn).sort());
+  let text = "New Column";
+  let width = calculateTextWidth(text + "  ");
+  cols.value.push({ field: {}, cp: 'ColDropText', width: width, name: text, fn: nextcid, show: true });
+};
 
-      console.log(row);
-      let startIndex = this.dragStartIndex;
-
-      let startRow = this.cols.splice(startIndex, 1)[0];
-      if (endIndex > startIndex) endIndex -= 1;
-
-      let endRow = this.cols.splice(endIndex, 1, startRow)[0];
-      this.cols.splice(startIndex, 0, endRow);
-
-
-
-
-    }, findMissingNumber(list) {
-      list.sort(function (a, b) {
-        return a - b;
-      });
-
-      var missingNumber = 0;
-      for (var i = 0; i < list.length; i++) {
-        if (list[i] != missingNumber) {
-          break;
-        }
-        missingNumber++;
-      }
-
-      return missingNumber;
-    },
-    calculateTextWidth(text) {
-
-      var body = document.querySelector("body");
-      var computedStyle = window.getComputedStyle(body);
-      var font = computedStyle.fontSize + " " + computedStyle.fontFamily;
-
-      var fontFamilies = font.split(",");
-
-      var maxWidth = 0;
-      for (var i = 0; i < fontFamilies.length; i++) {
-        var canvas = document.createElement("canvas");
-        var context = canvas.getContext("2d");
-        context.font = fontFamilies[i];
-
-        var metrics = context.measureText(text);
-        var width = metrics.width;
-
-        console.log(fontFamilies[i], width);
-        if (width > maxWidth) {
-          maxWidth = width;
-        }
-
-        canvas = null;
-      }
-
-      return maxWidth;
-    },
-    addCol() {
-
-      let nextcid = this.findMissingNumber(this.cols.map(e => e.fn).sort());
-      let text = "New Column";
-      let width = this.calculateTextWidth(text + "  ");
-      this.cols.push({ field: {}, cp: 'ColDropText', width: width, name: text, fn: nextcid, show: true })
-    },
-    delCol(col, i) {
-      this.cols.splice(i, 1);
-    }
-
-  },
+const delCol = (col, i) => {
+  cols.value.splice(i, 1);
 };
 </script>
 
-<style></style>
+<style>
+/* Add styles here if needed */
+</style>
