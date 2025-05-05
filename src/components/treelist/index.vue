@@ -8,9 +8,8 @@
       <div class="row header" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
-            <div class="cell">
-              <component :is="col.cp" :col="col"></component>
-            </div>
+            <div class="cell" >
+              <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>            </div>
           </div>
         </template>
       </div>
@@ -48,6 +47,17 @@ const thRefs = ref([]);
 // Store instances
 const configStore = useConfigStore();
 const treeRowsStore = useTreeRowsStore();
+
+const componentMap = {
+  ColTitle,
+  ColDropText,
+  ColDate,
+  ColSeq,
+};
+// Resolve component dynamically
+const resolveComponent = (cp) => {
+  return componentMap[cp] || null; // Fallback to null if component not found
+};
 
 // Computed properties
 const cols = computed(() => {

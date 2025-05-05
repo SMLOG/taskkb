@@ -3,9 +3,9 @@
     <div class="row grid" :class="{'bg-green-300':selectDepths.indexOf(depth)>-1}" :data-depth="depth" v-if="depth!=''" :draggable="isDrag" :style="gridStyle" 
         @dragstart="dragstart" @dragover="dragOver" @drop="drop" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex" >
-            <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col"  ></component>
-            <div v-else class="col td">
-                <div class="cell">
+            <component v-if="col.cp == 'ColSeq'" class="col td" :is="col.cp" :row="row" :col="col"  :class="{sticky: col.sticky}" :style="colStyle(col, 1,cellIndex)" ></component>
+            <div v-else class="col td" :class="{sticky: col.sticky}" :style="colStyle(col, 1,cellIndex)">
+                <div class="cell" >
                     <component :is="col.cp" :row="row" :col="col" ></component>
                 </div>
             </div>
@@ -20,6 +20,17 @@
 import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable'
 const { dragOver,dragstart,drop,isDrag,selectDepths
   } = useDrapDropComposable();
+
+  const colStyle = (col, isH, index) => {
+  let style = {};
+  if (col.sticky) {
+    style.left = `var(--sticky-left-${index})`;
+  } else {
+    style.left = 'auto';
+  }
+  return style;
+};
+
 </script>
 <script>
 import ColTitle from '@/components/ColTitle.vue';
