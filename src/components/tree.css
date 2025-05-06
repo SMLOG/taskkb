@@ -1,0 +1,188 @@
+.week-slot {
+  position: relative;
+  flex-grow: 1;
+}
+
+.week-slot::after {
+  content: "";
+  width: 0;
+  position: absolute;
+  top: 0;
+  height: 100%;
+  border-left: 1px solid #ddd;
+  right: 0;
+}
+
+.line .week-slot::after {
+  height: var(--table-height);
+  z-index: -1;
+}
+
+.line {
+  z-index: -1 !important;
+}
+
+
+
+.drag {
+  cursor: move;
+}
+
+.resizable {
+  position: relative;
+  overflow: hidden;
+}
+
+.resize-handle {
+  position: absolute;
+  top: 0;
+  right: -11px;
+  bottom: 0;
+  width: 3px;
+  background-color: #eee;
+  cursor: col-resize;
+}
+
+.selected,.selected > * {
+  background-color: #F0FFF0 !important;
+}
+
+.header .selected {
+  background-color: limegreen !important;
+  }
+  .selectStartRef {
+    background-color: limegreen !important;
+    left: 0px;
+    top: 0px;
+    position: absolute;
+    cursor: move;
+  }
+.curRow,
+.wholeRowSelected .col {
+  background-color: #E0EEE0 !important
+}
+
+.sticky {
+  position: sticky;
+  z-index: 3;
+  background: white;
+}
+
+.cell {
+  line-height: 2em;
+}
+
+.row {
+  grid-template-columns: repeat(3, 1fr);
+  line-height: 24px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 1px;
+}
+.table-container{width:0px;}
+.col {
+    border-right: 1px solid #ccc;
+    position: relative;
+}
+
+.row > .col:first-child{
+  border-left: 1px solid #ccc;
+}
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--vt-index-sticky-header);
+  background-color: white
+}
+
+.header .col {
+  border-top: 1px solid #ccc;
+}
+
+.sticky {
+  position: sticky;
+  z-index: var(--vt-index-sticky);
+  background: white;
+}
+
+.lsticky {
+  position: sticky;
+  z-index: var(--vt-index-sticky);
+  left: 0;
+  background: white;
+
+}
+
+.cell {
+  line-height: 2em;
+}
+
+.sch {
+  height: 100%;
+}
+
+.curRow,
+.wholeRowSelected>div {
+  background-color: rgba(224, 238, 224, 0.5) !important
+}
+
+.day {
+  padding: 0 5px;
+  font-size: 60%;
+}
+
+.plantime {
+  background-color: lightblue;
+  cursor: move;
+  position: relative;
+}
+
+.rightDrag {
+  position: absolute;
+  right: 0px;
+  width: 4px;
+  top: 0;
+  bottom: 0;
+}
+
+.leftDrag {
+  position: absolute;
+  left: 0px;
+  width: 4px;
+  top: 0;
+  bottom: 0;
+}
+
+.rightDrag:hover,
+.leftDrag:hover {
+  background: blue;
+  cursor: ew-resize;
+}
+
+.today {
+  color: red !important;
+  font-weight: bold
+}
+
+.weekend {
+  text-decoration: line-through;
+}
+
+.sch {
+  user-select: none;
+}
+
+.holiday {
+  text-decoration: underline;
+}
+
+.drag {
+  cursor: ew-resize;
+}
+
+.move {
+  cursor: move;
+}
+
+.num {
+  user-select: none;
+}
