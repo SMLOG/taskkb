@@ -24,7 +24,6 @@
       >
       <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" />
       <!--line-->
-      <TimelineHeader/>
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
           <div class="col" ref="th" :style="colStyle(col, 1,cellIndex)" :class="{ sticky: col.sticky }" v-if="col.show">

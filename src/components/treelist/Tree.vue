@@ -1,6 +1,6 @@
 <template>
     <div class="row grid" 
-         :class="{'!bg-green-300': selectDepths.indexOf(depth) > -1}" 
+         :class="{selected: selectDepths.indexOf(depth) > -1}" 
          :data-depth="depth" 
          v-if="depth !== ''" 
          :draggable="isDrag" 
@@ -12,7 +12,7 @@
             <component v-if="col.cp === 'ColSeq'" 
                       class="col td" 
                       :is="resolveComponent(col.cp)"
-                      :row="row" 
+                      :row="row"
                       :col="col" 
                       :class="{sticky: col.sticky}" 
                       :style="colStyle(col, 1, cellIndex)"
@@ -108,5 +108,5 @@ const resolveComponent = (cp) => {
 
 </script>
 
-<style src="@/components/grid.css" scoped>
+<style src="@/components/tree.css" scoped>
 </style>
