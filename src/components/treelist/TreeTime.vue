@@ -21,7 +21,7 @@
                         width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
                         marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
                     }" class="plantime" @click="selectRowSch(row, $event)"
-                        :class="{ dragMode: dragMode && inDragRang(rowIndex) }">{{
+                        :class="{ dragMode: dragMode  }">{{
                             calculateDaysBetweenDates(row._tl.end,
                                 row._tl.start, true)
                         }}d

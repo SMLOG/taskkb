@@ -5,6 +5,7 @@ import {getRowFromDepth} from './treelib'
 
 const weeksRef = ref([]);
 const weeks = weeksRef.value;
+const selectStartRef =ref(null);
 
 const isDrag = ref(false);
 const dragMode = ref(false);
@@ -59,7 +60,6 @@ export function useTreeComposable() {
   let startcellIndex=ref(-1);
   let endRowIndex=ref(-1);
   let endcellIndex=ref(-1);
-  let selectStartRef =ref(null);
   let dragStartClientX;
 
   const dragOver = (event) => {
@@ -395,6 +395,7 @@ export function useTreeComposable() {
       if (selectStartRef.value) {
         delete selectStartRef.value.row._tl;
         selectStartRef.value = null;
+        console.log(selectStartRef.value)
       }
     }
   }
