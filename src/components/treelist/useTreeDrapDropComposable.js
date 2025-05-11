@@ -1,12 +1,16 @@
 import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
-
+import {getRowFromDepth} from './treelib'
 const weeksRef = ref([]);
 const weeks = weeksRef.value;
+const selectDepthsRef = ref([]);
+const selectDepths = selectDepthsRef.value;
 
 const isDrag = ref(false);
 const dragMode = ref(false);
+
+
 
 function addDatePeriod(addPeriod) {
   if (addPeriod) {
@@ -41,17 +45,27 @@ function plusWorkDays  (startIndex,days){
   }
   
 }
+
+const  depthsToIndex=()=> Array.from(document.querySelectorAll('.row')).reduce((acc, element, index) => {
+  const depth = element?.dataset?.depth ?? 'undefined'; // Handle missing depth
+  acc[depth] = index; // Store the latest index
+  return acc;
+}, {});
+
+
+
 let config;
-export function useTreeComposable() {
+let dragStartClientX;
+
+export function useDrapDropComposable() {
   const flatRows = useTreeRowsStore().flatRows;
-  const rootObj = useTreeRowsStore().dataRows;
  config = useConfigStore().config;
-  
-  const selectRowsIndex = useTreeRowsStore().selectRowsIndex;
+
+ // const selectDepths = useTreeRowsStore().selectDepths;
 
   let isMouseDown;
-  let selectRowStart;
-  let selectRowEnd;
+  let selectDetphStart;
+  let selectDetphEnd;
   let moveType =ref(null);
   let resizeColumn;
   let startRowIndex=ref(-1);
@@ -59,7 +73,6 @@ export function useTreeComposable() {
   let endRowIndex=ref(-1);
   let endcellIndex=ref(-1);
   let selectStartRef =ref(null);
-  let dragStartClientX;
 
   const dragOver = (event) => {
     event.preventDefault();
@@ -91,31 +104,25 @@ export function useTreeComposable() {
 
   let curRowIndex = useTreeRowsStore().curRowIndex;
   const handleMouseDown = (event) => {
-    console.log("mosuedown");
 
     let rowEl = event.target.closest(".row");
     if (rowEl) {
       isMouseDown = true;
-      let rowIndex = parseInt(rowEl.dataset.rowIndex);
-      console.log(rootObj);
-
-      let row = flatRows[rowIndex];
-      useTreeRowsStore().curRowIndex = parseInt(rowEl.dataset.rowIndex);
-      let selectRows = selectRowsIndex;
+      let depth = rowEl.dataset.depth;
+      const depthMap = depthsToIndex();
       if (event.target.classList.contains("num")) {
-        if (selectRows.indexOf(rowIndex) > -1) {
+        if (selectDepths.indexOf(depth) > -1) {
           //drag
           isDrag.value = true;
         } else {
-          selectRowStart = parseInt(rowEl.dataset.rowIndex);
-          selectRowEnd = parseInt(rowEl.dataset.rowIndex);
-          selectRows.length = 0;
-          selectRows.push(selectRowStart);
+
+          selectDepths.push(depth);
+          selectDetphStart = depth;
         }
       } else {
-        selectRows.length = 0;
-        selectRowStart = selectRowEnd = -1;
-
+        selectDepths.length = 0;
+        selectDetphStart = selectDetphEnd = null;
+        let row;
         if (row&&row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
           if (event.target.classList.contains("selectStartRef")) {
             moveType.value = {
@@ -205,16 +212,26 @@ export function useTreeComposable() {
     if (rowEl) {
       if (isMouseDown) {
         const cell = event.target.closest("div.col");
-        if (!isDrag.value && selectRowsIndex.length) {
-          selectRowsIndex.length = 0;
-          selectRowEnd = parseInt(rowEl.dataset.rowIndex);
-          selectRowsIndex.push(
+        if (!isDrag.value && selectDepths.length) {
+          selectDepths.length = 0;
+          selectDetphEnd = rowEl.dataset.depth;
+          let rowsDepth = Array.from(document.querySelectorAll('.row')).map(e => e?.dataset?.depth ?? null);
+
+          let rowsDepthIndexMap = rowsDepth.reduce((acc, depth, index) => {
+            acc[depth] = index; // Store the latest index
+            return acc;
+          }, {});
+
+          let startIndex = rowsDepthIndexMap[selectDetphStart];
+          let endIndex = rowsDepthIndexMap[selectDetphEnd];
+          selectDepths.push(
             ...Array.from(
-              { length: Math.abs(selectRowStart - selectRowEnd) + 1 },
-              (_, i) => Math.min(selectRowStart, selectRowEnd) + i
-            )
+              { length: Math.abs( startIndex - endIndex) + 1 },
+              (_, i) => Math.min(startIndex, endIndex) + i
+            ).map(e=>rowsDepth[e])
           );
         } else if (cell) {
+
           const rowIndex = parseInt(cell.getAttribute("data-row"));
           const cellIndex = parseInt(cell.getAttribute("data-col"));
           endRowIndex.value = rowIndex;
@@ -270,12 +287,11 @@ export function useTreeComposable() {
 
   const handleMouseUp = (event) => {
     if (isDrag.value) {
-      selectRowsIndex.length = 0;
+      selectDepths.length = 0;
     }
     isDrag.value = isMouseDown = false;
     if (moveType.value) {
       event.stopPropagation();
-      console.log('event.stopPropagation();',event)
       let orgDate = selectStartRef.value.row._tl.end;
       let orgStartDate = selectStartRef.value.row._tl.start;
 
@@ -355,28 +371,64 @@ export function useTreeComposable() {
   };
 
   const dragstart = (event) => {
-    let interceptor = event.target.closest(".etype");
-    if (interceptor) {
-      let rowIndex = parseInt(interceptor.closest(".row").dataset.rowIndex);
-      let row = flatRows[rowIndex];
-      console.log(event);
+    let interceptor = event.target.closest(".row");
+    if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
+      console.log('dragStartClientX',dragStartClientX);
     }
   };
+
+
+  function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
+    let targetNode = getRowFromDepth(rootTree, selectDetphEnd);
+    let xDiff = event.clientX - dragStartClientX;
+
+    for (let depth of selectDepths.sort((a, b) => b.localeCompare(a))) {
+        let srcNode = getRowFromDepth(rootTree, depth);
+        let index = parseInt(depth.split('.').pop());
+        
+        // Remove srcNode from its current parent's children
+        srcNode._p._childs.splice(index, 1);
+
+        if (xDiff > 50) {
+            // Make srcNode a child of targetNode
+            if (!targetNode._childs) targetNode._childs = [];
+            targetNode._childs.push(srcNode);
+            srcNode._p = targetNode; // Update srcNode's parent
+        } else {
+            // Move srcNode next to targetNode at same level
+            let parentChilds = targetNode._p._childs;
+            let targetIndex = parentChilds.findIndex(node => node === targetNode);
+            parentChilds.splice(targetIndex + (xDiff < 0 ? 0 : 1), 0, srcNode);
+            srcNode._p = targetNode._p; // Update srcNode's parent to target's parent
+        }
+    }
+}
 
   const drop = (event) => {
     let interceptor = event.target.closest(".row");
     if (!interceptor) {
       return;
     }
-    let rowIndex = parseInt(interceptor.closest(".row").dataset.rowIndex);
 
-    useTreeRowsStore().dragAndDrop(
-      rowIndex,
-      event.clientX - dragStartClientX > 50
-    );
+     selectDetphEnd = interceptor.dataset.depth;
+     if(selectDepths.indexOf(selectDetphEnd)>-1)return;
 
-    selectRowsIndex.length = 0;
+
+    const rootTree = useTreeRowsStore().dataRows;
+
+    console.log(selectDetphEnd,selectDepths,rootTree);
+
+
+    moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
+
+  
+
+
+
+  
+
+    selectDepths.length = 0;
     isDrag.value =false;
   };
 
@@ -429,7 +481,6 @@ export function useTreeComposable() {
 
   const locateCurSch = (event) =>{
 
-    console.log('locateCurSch',event);
     if(moveType.value)return;
     let title = event.target.classList.contains('sch');
     if (title) {
@@ -485,6 +536,6 @@ export function useTreeComposable() {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate,
-    inDragRang,downloadSch
+    inDragRang,downloadSch,selectDepths
   };
 }

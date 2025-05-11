@@ -18,7 +18,8 @@
             @mousedown.stop /></div>
       </div>
     </a>
-    <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;" 
+    <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
+      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
       <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" />
       <TimelineHeader />
@@ -66,11 +67,11 @@ import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import ColSeq from '@/components/ColSeq.vue';
-import { useTableComposable } from '@/components/useTableComposable';
+import { useTreeComposable } from './useTreeComposable';
 import TreeTime from '@/components/treelist/TreeTime.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
-import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable';
+import { useDrapDropComposable } from '@/components/treelist/useTreeDrapDropComposable';
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -83,7 +84,7 @@ const {
   cellClass, getCacWidth, handleKeyDown, selectRowSch, selectStartRef,
   calculateDaysBetweenDates, isDrag, dragstart, drop, curRowIndex,
   moveType, dragMode, dblclickHandle, inDragRang, weeks
-} = useTableComposable();
+} = useTreeComposable();
 
 // Reactive state
 const isMounted = ref(false);
@@ -297,4 +298,4 @@ const cols = computed(() => config.value && config.value.cols ? config.value.col
 .lock {
   color: red;
 }
-</style>
+</style>@/components/treelist/useTreeDrapDropComposable

@@ -47,20 +47,20 @@
 </template>
 
 <script setup>
-import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable';
+import { useDrapDropComposable } from '@/components/treelist/useTreeDrapDropComposable';
 import ColTitle from '@/components/ColTitle.vue';
 import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
 import ColSeq from '@/components/ColSeq.vue';
 import { defineProps } from 'vue';
 import TreeTime from '@/components/treelist/TreeTime.vue';
-import { useTableComposable } from '@/components/useTableComposable';
+import { useTreeComposable } from './useTreeComposable';
 // Composable
 const {
   cellClass, getCacWidth, handleKeyDown, selectRowSch, selectStartRef,
   calculateDaysBetweenDates, 
   moveType, dragMode, dblclickHandle, inDragRang, weeks
-} = useTableComposable();
+} = useTreeComposable();
 
 // Define props
 const props = defineProps({
@@ -114,4 +114,4 @@ const resolveComponent = (cp) => {
 
 </script>
 
-<style src="@/components/tree.css" scoped></style>
+<style src="@/components/tree.css" scoped></style>@/components/treelist/useTreeDrapDropComposable
