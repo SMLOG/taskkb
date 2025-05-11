@@ -100,7 +100,7 @@ export function useTreeComposable() {
       let rowIndex = parseInt(rowEl.dataset.rowIndex);
       console.log(rootObj);
 
-      let row = flatRows[rowIndex];
+      let row = getRowFromDepth(rootObj,rowEl.dataset.depth) ;
       useTreeRowsStore().curRowIndex = parseInt(rowEl.dataset.rowIndex);
       let selectRows = selectRowsIndex;
       if (event.target.classList.contains("num")) {
