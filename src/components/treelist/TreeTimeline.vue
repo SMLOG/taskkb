@@ -18,9 +18,9 @@
             @mousedown.stop /></div>
       </div>
     </a>
-    <div ref="table" style="display: grid; grid-template-columns: 1fr;" 
+    <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;" 
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
-     <!-- <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" /> --> 
+      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" />
       <TimelineHeader />
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
         <template v-for="(col, key) in cols" :key="key">
@@ -72,7 +72,8 @@ import TreeTime from '@/components/treelist/TreeTime.vue';
 import { useTreeRowsStore } from '@/stores/treeRows';
 import { useDrapDropComposable } from '@/components/useTreeDrapDropComposable';
 
-
+const tableRef = ref(null);
+const thRefs = ref([]);
         
 const treeRowsStore = useTreeRowsStore();
 
