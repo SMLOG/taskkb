@@ -18,8 +18,7 @@
             @mousedown.stop /></div>
       </div>
     </a>
-    <div ref="table" style="display: grid; grid-template-columns: 1fr;" @mousedown.left="handleMouseDown"
-      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
+    <div ref="table" style="display: grid; grid-template-columns: 1fr;" 
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
      <!-- <ColumnsResizer :th="$refs.th" v-if="isMounted" :table="$refs.table" data="rbar" :cols="cols" /> --> 
       <TimelineHeader />
@@ -50,7 +49,7 @@
           </div>
         </div>
       </div>
-      <TreeTime :row="root" :depth="''"  :weeks="weeks"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns()  }" v-if="root"></TreeTime>
+      <TreeTime :row="root" :depth="''"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns()  }" v-if="root"></TreeTime>
     </div>
   </div>
 </template>

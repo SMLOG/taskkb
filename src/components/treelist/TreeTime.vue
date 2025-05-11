@@ -84,7 +84,7 @@ const props = defineProps({
         required: true
     }, id: {
 
-    }, weeks: {}
+    }, weeks: {},days:{},firstDay:{}
 });
 
 // Drag and drop composable

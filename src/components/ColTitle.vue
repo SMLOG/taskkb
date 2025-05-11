@@ -3,7 +3,7 @@
     <div style="display: flex">
       <div style="margin-right:15px;z-index: 1;" :level="row._level" :style="{ paddingLeft: (level||row._level) * 15 + 'px' }">
         <span>{{ row._id }}</span>
-        <span @click="row._collapsed = !row._collapsed"
+        <span @click="()=>clickRow(row)"
           :class="{ dot: !row._childs || !row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>
       </div>
       <ContentEditable v-model="row['c' + col.fn]" @change="change"></ContentEditable>
@@ -16,7 +16,13 @@
 
 <script setup>
 import ContentEditable from './ContentEditable.vue';
-
+const clickRow =(row)=>{
+  try{
+  row._collapsed = !row._collapsed
+  }catch(error){
+    console.log(error)
+  }
+}
 const props = defineProps({
   col: {
     type: Object

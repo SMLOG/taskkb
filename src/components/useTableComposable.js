@@ -397,7 +397,7 @@ export function useTableComposable() {
 
   const calculateDaysBetweenDates=(d1, d2, exclusiveHolidayWeeken)=> {
 
-
+    if(!d2)return 0;
     let date1 = d1.i > d2.i ? d1 : d2;
     let date2 = d1.i > d2.i ? d2 : d1;
     if (exclusiveHolidayWeeken) {
