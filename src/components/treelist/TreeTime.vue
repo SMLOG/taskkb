@@ -28,7 +28,7 @@
                     </div>
                     <div v-if="selectStartRef && selectStartRef.row == row" @dblclick="dragMode = !dragMode" :style="{
                         width: getCacWidth(),
-                        marginLeft: (calculateDaysBetweenDates(selectStartRef.start.n < selectStartRef.end.n ? selectStartRef.start : selectStartRef.end, firstDay) - 1) * 100 + '%'
+                        marginLeft: calDiffDates(firstDay) * 100 + '%'
                     }" class="selectStartRef" :class="{ dragMode: dragMode }">{{
                     calculateDaysBetweenDates(selectStartRef.end,
                         selectStartRef.start, true)
@@ -42,7 +42,7 @@
     </div>
     <template v-if="row && row._childs && row._childs.length && !row._collapsed">
         <TreeTime v-for="(child, index) in row._childs" :depth="depth + '.' + index" :key="index" :row="child"
-            :cols="cols" :level="level + 1" :id="(id ? id + '.' : '') + (index + 1)" :gridStyle="gridStyle" :weeks="weeks" />
+            :cols="cols" :days="days" :firstDay="firstDay" :level="level + 1" :id="(id ? id + '.' : '') + (index + 1)" :gridStyle="gridStyle" :weeks="weeks" />
     </template>
 </template>
 
@@ -59,7 +59,7 @@ import { useTreeComposable } from './useTreeComposable';
 const {
   cellClass, getCacWidth, handleKeyDown, selectRowSch, selectStartRef,
   calculateDaysBetweenDates, 
-  moveType, dragMode, dblclickHandle, inDragRang, weeks
+  moveType, dragMode, dblclickHandle, inDragRang, weeks,calDiffDates
 } = useTreeComposable();
 
 // Define props

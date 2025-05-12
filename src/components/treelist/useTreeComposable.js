@@ -437,8 +437,8 @@ export function useTreeComposable() {
     if (title) {
       let rowEl = event.target.closest('.row');
       let plantime = rowEl.querySelector('.plantime');
-      if (plantime)
-        rowEl.closest('#mainContent').scrollLeft = plantime.offsetLeft;
+     // if (plantime)
+     //   rowEl.closest('#mainContent').scrollLeft = plantime.offsetLeft;
     }
   }
   const dblclickHandle = (event)=>{
@@ -471,7 +471,9 @@ export function useTreeComposable() {
       downloadLink.click();
       document.body.removeChild(downloadLink);
   }
-
+const calDiffDates = (firstDay)=>{
+  return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
+}
   return {
     dragOver,
     handleMouseDown,
@@ -486,6 +488,6 @@ export function useTreeComposable() {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate,
-    inDragRang,downloadSch
+    inDragRang,downloadSch,calDiffDates
   };
 }
