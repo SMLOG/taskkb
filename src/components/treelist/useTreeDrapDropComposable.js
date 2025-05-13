@@ -1,12 +1,12 @@
 import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
-import {getRowFromDepth} from './treelib'
+import { getRowFromDepth } from './treelib'
 const weeksRef = ref([]);
 const weeks = weeksRef.value;
 const selectDepthsRef = ref([]);
 const selectDepths = selectDepthsRef.value;
-let selectStartRef =ref(null);
+let selectStartRef = ref(null);
 
 const isDrag = ref(false);
 const dragMode = ref(false);
@@ -27,27 +27,27 @@ function addDatePeriod(addPeriod) {
 function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
-function getDate(i){
-  return  weeks[parseInt(i / 7)].dates[i % 7];
+function getDate(i) {
+  return weeks[parseInt(i / 7)].dates[i % 7];
 
 }
-function plusWorkDays  (startIndex,days){
+function plusWorkDays(startIndex, days) {
   let start = startIndex;
-  let k=0;
+  let k = 0;
   let total = Math.abs(days);
-  let inc = days>0?1:-1;
-  if(days==0)return getDate(start);
-  for(;true;){
+  let inc = days > 0 ? 1 : -1;
+  if (days == 0) return getDate(start);
+  for (; true;) {
     start += inc;
     let date = getDate(start);
-    if(date.isWeekend && config.allowOptions&&config.allowOptions.indexOf('W')==-1 ||date.holiday&&config.allowOptions&&config.allowOptions.indexOf('H')==-1)continue;
+    if (date.isWeekend && config.allowOptions && config.allowOptions.indexOf('W') == -1 || date.holiday && config.allowOptions && config.allowOptions.indexOf('H') == -1) continue;
     k++;
-    if(k==total)return getDate(start);
+    if (k == total) return getDate(start);
   }
-  
+
 }
 
-const  depthsToIndex=()=> Array.from(document.querySelectorAll('.row')).reduce((acc, element, index) => {
+const depthsToIndex = () => Array.from(document.querySelectorAll('.row')).reduce((acc, element, index) => {
   const depth = element?.dataset?.depth ?? 'undefined'; // Handle missing depth
   acc[depth] = index; // Store the latest index
   return acc;
@@ -61,46 +61,29 @@ let dragStartClientX;
 export function useDrapDropComposable() {
   const flatRows = useTreeRowsStore().flatRows;
   const rootObj = useTreeRowsStore().dataRows;
-  
+
   config = useConfigStore().config;
 
- // const selectDepths = useTreeRowsStore().selectDepths;
+  // const selectDepths = useTreeRowsStore().selectDepths;
 
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;
-  let moveType =ref(null);
+  let moveType = ref(null);
   let resizeColumn;
-  let startRowIndex=ref(-1);
-  let startcellIndex=ref(-1);
-  let endRowIndex=ref(-1);
-  let endcellIndex=ref(-1);
+  let startRowIndex = ref(-1);
+  let startcellIndex = ref(-1);
+  let endRowIndex = ref(-1);
+  let endcellIndex = ref(-1);
 
   const dragOver = (event) => {
     event.preventDefault();
   };
 
-  const selectRowSch = (row,event)=> {
-    if (!moveType.value && (!selectStartRef.value || selectStartRef.value.type != 2)){
+  const selectRowSch = (row, event) => {
+    if (!moveType.value && (!selectStartRef.value || selectStartRef.value.type != 2)) {
       selectStartRef.value = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
-
-      {
-  
-      const cell = event.target.closest(".row");
-
-      const rowIndex = parseInt(cell.dataset.rowIndex);
-      dragIndexRang.value.length=0;
-      let orgDate = selectStartRef.value.row._tl.end;
-      for(let j=rowIndex+1;j<flatRows.length;j++){
-        let row = flatRows[j];
-        if(row._lock)break;
-        if(row._tl){
-          if(row._tl.end.i<orgDate.i)break;
-             dragIndexRang.value.push(j);
-        }
-      }
     }
-  }
 
   }
 
@@ -124,9 +107,9 @@ export function useDrapDropComposable() {
       } else {
         selectDepths.length = 0;
         selectDetphStart = selectDetphEnd = null;
-        
-        let row = getRowFromDepth(rootObj,rowEl.dataset.depth) ;
-        if (row&&row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
+
+        let row = getRowFromDepth(rootObj, rowEl.dataset.depth);
+        if (row && row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
           if (event.target.classList.contains("selectStartRef")) {
             moveType.value = {
               x: event.clientX,
@@ -176,11 +159,11 @@ export function useDrapDropComposable() {
             if (selectStartRef.value && row != selectStartRef.value.row) {
               selectStartRef.value = null;
               console.log("delete selectStart");
-            }else{
-              selectRowSch(row,event);
+            } else {
+              selectRowSch(row, event);
             }
 
-          } 
+          }
         }
       }
     }
@@ -229,9 +212,9 @@ export function useDrapDropComposable() {
           let endIndex = rowsDepthIndexMap[selectDetphEnd];
           selectDepths.push(
             ...Array.from(
-              { length: Math.abs( startIndex - endIndex) + 1 },
+              { length: Math.abs(startIndex - endIndex) + 1 },
               (_, i) => Math.min(startIndex, endIndex) + i
-            ).map(e=>rowsDepth[e])
+            ).map(e => rowsDepth[e])
           );
         } else if (cell) {
 
@@ -273,11 +256,11 @@ export function useDrapDropComposable() {
             else if (moveType.value.type == "leftDrag") selectStartRef.value.start = date;
             else {
               let moveUnits = parseInt(ox / unitWidth);
-              index = plusWorkDays( moveType.value._tl.start.i,moveUnits).i;
+              index = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
 
               selectStartRef.value.start = weeks[parseInt(index / 7)].dates[index % 7];
 
-              index = plusWorkDays( moveType.value._tl.end.i,moveUnits).i;
+              index = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
 
               selectStartRef.value.end = weeks[parseInt(index / 7)].dates[index % 7];
               console.log("moveUnits", moveUnits);
@@ -303,40 +286,40 @@ export function useDrapDropComposable() {
 
       let newDate = selectStartRef.value.end;
 
-      if(newDate.i-orgDate.i!=0 && dragMode.value){
-        let workdays =(newDate.i-orgDate.i>0?1:-1)*new Array(Math.abs(newDate.i-orgDate.i))
-        .fill(0).map((e,index)=>Math.min(orgDate.i,newDate.i)+index+1)
-        .map(e=>getDate(e))
-        .filter(e=>!(e.isWeekend&&config.allowOptions&&config.allowOptions.indexOf('W')==-1||e.holiday&&config.allowOptions&&config.allowOptions.indexOf('H')==-1)).length;
+      if (newDate.i - orgDate.i != 0 && dragMode.value) {
+        let workdays = (newDate.i - orgDate.i > 0 ? 1 : -1) * new Array(Math.abs(newDate.i - orgDate.i))
+          .fill(0).map((e, index) => Math.min(orgDate.i, newDate.i) + index + 1)
+          .map(e => getDate(e))
+          .filter(e => !(e.isWeekend && config.allowOptions && config.allowOptions.indexOf('W') == -1 || e.holiday && config.allowOptions && config.allowOptions.indexOf('H') == -1)).length;
 
 
         const cell = event.target.closest(".row");
 
         const rowIndex = parseInt(cell.dataset.rowIndex);
 
-        for(let j=rowIndex+1;j<flatRows.length;j++){
+        for (let j = rowIndex + 1; j < flatRows.length; j++) {
           let row = flatRows[j];
-          if(row._lock)break;
-          if(row._tl){
-            if(row._tl.end.i<orgDate.i)break;
-            row._tl.end = plusWorkDays(row._tl.end.i,workdays);
-            if(row._tl.start.i>orgDate.i || moveType.value.type=='move'&&row._tl.start.i<=orgStartDate.i)
-              row._tl.start = plusWorkDays(row._tl.start.i,workdays);
+          if (row._lock) break;
+          if (row._tl) {
+            if (row._tl.end.i < orgDate.i) break;
+            row._tl.end = plusWorkDays(row._tl.end.i, workdays);
+            if (row._tl.start.i > orgDate.i || moveType.value.type == 'move' && row._tl.start.i <= orgStartDate.i)
+              row._tl.start = plusWorkDays(row._tl.start.i, workdays);
           }
         }
         console.log(workdays);
       }
 
-      
+
       moveType.value = null;
 
-    }else{
+    } else {
       locateCurSch(event);
     }
   };
   const dragIndexRang = ref([]);
-  const inDragRang = (rowIndex)=>{
-      return dragIndexRang.value.indexOf(rowIndex)>-1;
+  const inDragRang = (rowIndex) => {
+    return dragIndexRang.value.indexOf(rowIndex) > -1;
   };
 
   const isSelected = (rowIndex, cellIndex) => {
@@ -377,7 +360,7 @@ export function useDrapDropComposable() {
     let interceptor = event.target.closest(".row");
     if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
-      console.log('dragStartClientX',dragStartClientX);
+      console.log('dragStartClientX', dragStartClientX);
     }
   };
 
@@ -387,59 +370,45 @@ export function useDrapDropComposable() {
     let xDiff = event.clientX - dragStartClientX;
 
     for (let depth of selectDepths.sort((a, b) => b.localeCompare(a))) {
-        let srcNode = getRowFromDepth(rootTree, depth);
-        let index = parseInt(depth.split('.').pop());
-        
-        // Remove srcNode from its current parent's children
-        srcNode._p._childs.splice(index, 1);
+      let srcNode = getRowFromDepth(rootTree, depth);
+      let index = parseInt(depth.split('.').pop());
 
-        if (xDiff > 50) {
-            // Make srcNode a child of targetNode
-            if (!targetNode._childs) targetNode._childs = [];
-            targetNode._childs.push(srcNode);
-            srcNode._p = targetNode; // Update srcNode's parent
-        } else {
-            // Move srcNode next to targetNode at same level
-            let parentChilds = targetNode._p._childs;
-            let targetIndex = parentChilds.findIndex(node => node === targetNode);
-            parentChilds.splice(targetIndex + (xDiff < 0 ? 0 : 1), 0, srcNode);
-            srcNode._p = targetNode._p; // Update srcNode's parent to target's parent
-        }
+      // Remove srcNode from its current parent's children
+      srcNode._p._childs.splice(index, 1);
+
+      if (xDiff > 50) {
+        // Make srcNode a child of targetNode
+        if (!targetNode._childs) targetNode._childs = [];
+        targetNode._childs.push(srcNode);
+        srcNode._p = targetNode; // Update srcNode's parent
+      } else {
+        // Move srcNode next to targetNode at same level
+        let parentChilds = targetNode._p._childs;
+        let targetIndex = parentChilds.findIndex(node => node === targetNode);
+        parentChilds.splice(targetIndex + (xDiff < 0 ? 0 : 1), 0, srcNode);
+        srcNode._p = targetNode._p; // Update srcNode's parent to target's parent
+      }
     }
-}
+  }
 
   const drop = (event) => {
     let interceptor = event.target.closest(".row");
     if (!interceptor) {
       return;
     }
-
-     selectDetphEnd = interceptor.dataset.depth;
-     if(selectDepths.indexOf(selectDetphEnd)>-1)return;
-
-
+    selectDetphEnd = interceptor.dataset.depth;
+    if (selectDepths.indexOf(selectDetphEnd) > -1) return;
     const rootTree = useTreeRowsStore().dataRows;
-
-    console.log(selectDetphEnd,selectDepths,rootTree);
-
-
     moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
-
-  
-
-
-
-  
-
     selectDepths.length = 0;
-    isDrag.value =false;
+    isDrag.value = false;
   };
 
-  const getCacWidth = ()=>{
+  const getCacWidth = () => {
     return (calculateDaysBetweenDates(selectStartRef.value.end, selectStartRef.value.start)) * 100 + '%';
   }
 
-  const handleKeyDown = (event)=> {
+  const handleKeyDown = (event) => {
     if (
       event.key === "Delete" ||
       event.key === "Backspace" ||
@@ -453,7 +422,7 @@ export function useDrapDropComposable() {
     }
   }
 
-  const calculateDaysBetweenDates=(d1, d2, exclusiveHolidayWeeken)=> {
+  const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
 
 
     let date1 = d1.i > d2.i ? d1 : d2;
@@ -482,9 +451,9 @@ export function useDrapDropComposable() {
 
   }
 
-  const locateCurSch = (event) =>{
+  const locateCurSch = (event) => {
 
-    if(moveType.value)return;
+    if (moveType.value) return;
     let title = event.target.classList.contains('sch');
     if (title) {
       let rowEl = event.target.closest('.row');
@@ -493,40 +462,40 @@ export function useDrapDropComposable() {
         rowEl.closest('#mainContent').scrollLeft = plantime.offsetLeft;
     }
   }
-  const dblclickHandle = (event)=>{
-    if(event.target.classList.contains('num')){
+  const dblclickHandle = (event) => {
+    if (event.target.classList.contains('num')) {
 
       const rowIndex = parseInt(event.target.closest('.row').dataset.rowIndex);
       let row = flatRows[rowIndex];
-      row._lock=!row._lock;
+      row._lock = !row._lock;
 
 
     }
   }
 
-  const downloadSch = ()=>{
+  const downloadSch = () => {
     let titleCol = config.cols.filter(e => e.show && e.cp == 'ColTitle');
     let row = flatRows[useTreeRowsStore().curRowIndex];
     console.log(row)
-    let titleProp = 'c'+titleCol[0].fn;
-    let fileName = row[titleProp].replace(/<.*?>/g,'').trim();
-    let dataList  = useTreeRowsStore().getRowRows(row);
-      // Create a download link
-      console.log(dataList);
-      const csvContent = dataList.map(e=>['" '.repeat(e._level-row._level)+`${e[titleProp].replace(/<.*?>/g,'').trim()}"`]).map(e => e.join(',')).join('\n');
+    let titleProp = 'c' + titleCol[0].fn;
+    let fileName = row[titleProp].replace(/<.*?>/g, '').trim();
+    let dataList = useTreeRowsStore().getRowRows(row);
+    // Create a download link
+    console.log(dataList);
+    const csvContent = dataList.map(e => ['" '.repeat(e._level - row._level) + `${e[titleProp].replace(/<.*?>/g, '').trim()}"`]).map(e => e.join(',')).join('\n');
 
-      const downloadLink = document.createElement('a');
-      downloadLink.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
-      downloadLink.setAttribute('download', `${fileName}.csv`);
+    const downloadLink = document.createElement('a');
+    downloadLink.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+    downloadLink.setAttribute('download', `${fileName}.csv`);
 
-      // Append the link to the document and click it
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
+    // Append the link to the document and click it
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
   }
-const calDiffDates = (firstDay)=>{
-  return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
-}
+  const calDiffDates = (firstDay) => {
+    return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
+  }
   return {
     calDiffDates,
     dragOver,
@@ -537,11 +506,11 @@ const calDiffDates = (firstDay)=>{
     isSelected,
     cellClass,
     dragstart,
-    drop,getCacWidth,handleKeyDown,
+    drop, getCacWidth, handleKeyDown,
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate,
-    inDragRang,downloadSch,selectDepths
+    isDrag, curRowIndex, moveType, locateCurSch, dragMode, dblclickHandle, getDate,
+    inDragRang, downloadSch, selectDepths
   };
 }
