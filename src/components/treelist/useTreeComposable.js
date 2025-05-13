@@ -252,40 +252,9 @@ export function useTreeComposable() {
     isDrag.value = isMouseDown = false;
     if (moveType.value) {
       event.stopPropagation();
-      console.log('event.stopPropagation();',event)
-      let orgDate = selectStartRef.value.row._tl.end;
-      let orgStartDate = selectStartRef.value.row._tl.start;
-
       selectStartRef.value.row._tl.start = selectStartRef.value.start;
       selectStartRef.value.row._tl.end = selectStartRef.value.end;
 
-      let newDate = selectStartRef.value.end;
-
-      if(newDate.i-orgDate.i!=0 && dragMode.value){
-        let workdays =(newDate.i-orgDate.i>0?1:-1)*new Array(Math.abs(newDate.i-orgDate.i))
-        .fill(0).map((e,index)=>Math.min(orgDate.i,newDate.i)+index+1)
-        .map(e=>getDate(e))
-        .filter(e=>!(e.isWeekend&&config.allowOptions&&config.allowOptions.indexOf('W')==-1||e.holiday&&config.allowOptions&&config.allowOptions.indexOf('H')==-1)).length;
-
-
-        const cell = event.target.closest(".row");
-
-        const rowIndex = parseInt(cell.dataset.rowIndex);
-
-        for(let j=rowIndex+1;j<flatRows.length;j++){
-          let row = flatRows[j];
-          if(row._lock)break;
-          if(row._tl){
-            if(row._tl.end.i<orgDate.i)break;
-            row._tl.end = plusWorkDays(row._tl.end.i,workdays);
-            if(row._tl.start.i>orgDate.i || moveType.value.type=='move'&&row._tl.start.i<=orgStartDate.i)
-              row._tl.start = plusWorkDays(row._tl.start.i,workdays);
-          }
-        }
-        console.log(workdays);
-      }
-
-      
       moveType.value = null;
 
     }else{
@@ -331,9 +300,6 @@ export function useTreeComposable() {
   const dragstart = (event) => {
     let interceptor = event.target.closest(".etype");
     if (interceptor) {
-      let rowIndex = parseInt(interceptor.closest(".row").dataset.rowIndex);
-      let row = flatRows[rowIndex];
-      console.log(event);
       dragStartClientX = event.clientX;
     }
   };

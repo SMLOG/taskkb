@@ -6,6 +6,7 @@ const weeksRef = ref([]);
 const weeks = weeksRef.value;
 const selectDepthsRef = ref([]);
 const selectDepths = selectDepthsRef.value;
+let selectStartRef =ref(null);
 
 const isDrag = ref(false);
 const dragMode = ref(false);
@@ -59,7 +60,9 @@ let dragStartClientX;
 
 export function useDrapDropComposable() {
   const flatRows = useTreeRowsStore().flatRows;
- config = useConfigStore().config;
+  const rootObj = useTreeRowsStore().dataRows;
+  
+  config = useConfigStore().config;
 
  // const selectDepths = useTreeRowsStore().selectDepths;
 
@@ -72,7 +75,6 @@ export function useDrapDropComposable() {
   let startcellIndex=ref(-1);
   let endRowIndex=ref(-1);
   let endcellIndex=ref(-1);
-  let selectStartRef =ref(null);
 
   const dragOver = (event) => {
     event.preventDefault();
@@ -122,7 +124,8 @@ export function useDrapDropComposable() {
       } else {
         selectDepths.length = 0;
         selectDetphStart = selectDetphEnd = null;
-        let row;
+        
+        let row = getRowFromDepth(rootObj,rowEl.dataset.depth) ;
         if (row&&row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
           if (event.target.classList.contains("selectStartRef")) {
             moveType.value = {
@@ -521,8 +524,11 @@ export function useDrapDropComposable() {
       downloadLink.click();
       document.body.removeChild(downloadLink);
   }
-
+const calDiffDates = (firstDay)=>{
+  return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
+}
   return {
+    calDiffDates,
     dragOver,
     handleMouseDown,
     handleMouseCellsMove,

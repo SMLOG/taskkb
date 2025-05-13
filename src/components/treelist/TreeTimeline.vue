@@ -67,7 +67,6 @@ import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import ColSeq from '@/components/ColSeq.vue';
-import { useTreeComposable } from './useTreeComposable';
 import TreeTime from '@/components/treelist/TreeTime.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
@@ -84,7 +83,7 @@ const {
   cellClass, getCacWidth, handleKeyDown, selectRowSch, selectStartRef,
   calculateDaysBetweenDates, isDrag, dragstart, drop, curRowIndex,
   moveType, dragMode, dblclickHandle, inDragRang, weeks
-} = useTreeComposable();
+} = useDrapDropComposable();
 
 // Reactive state
 const isMounted = ref(false);

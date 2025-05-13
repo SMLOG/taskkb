@@ -54,13 +54,12 @@ import ColDate from '@/components/ColDate.vue';
 import ColSeq from '@/components/ColSeq.vue';
 import { defineProps } from 'vue';
 import TreeTime from '@/components/treelist/TreeTime.vue';
-import { useTreeComposable } from './useTreeComposable';
 // Composable
 const {
   cellClass, getCacWidth, selectStartRef,
   calculateDaysBetweenDates, 
   moveType, dragMode, weeks,calDiffDates
-} = useTreeComposable();
+} = useDrapDropComposable();
 
 // Define props
 const props = defineProps({
