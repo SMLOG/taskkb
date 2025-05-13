@@ -66,29 +66,7 @@ export function useTreeComposable() {
     event.preventDefault();
   };
 
-  const selectRowSch = (row,event)=> {
-    if (!moveType.value && (!selectStartRef.value || selectStartRef.value.type != 2)){
-      selectStartRef.value = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
 
-      {
-  
-      const cell = event.target.closest(".row");
-
-      const rowIndex = parseInt(cell.dataset.rowIndex);
-      dragIndexRang.value.length=0;
-      let orgDate = selectStartRef.value.row._tl.end;
-      for(let j=rowIndex+1;j<flatRows.length;j++){
-        let row = flatRows[j];
-        if(row._lock)break;
-        if(row._tl){
-          if(row._tl.end.i<orgDate.i)break;
-             dragIndexRang.value.push(j);
-        }
-      }
-    }
-  }
-
-  }
 
   let curRowIndex = useTreeRowsStore().curRowIndex;
   const handleMouseDown = (event) => {
@@ -167,8 +145,6 @@ export function useTreeComposable() {
             if (selectStartRef.value && row != selectStartRef.value.row) {
               selectStartRef.value = null;
               console.log("delete selectStart");
-            }else{
-              selectRowSch(row,event);
             }
 
           } 
@@ -316,10 +292,7 @@ export function useTreeComposable() {
       locateCurSch(event);
     }
   };
-  const dragIndexRang = ref([]);
-  const inDragRang = (rowIndex)=>{
-      return dragIndexRang.value.indexOf(rowIndex)>-1;
-  };
+
 
   const isSelected = (rowIndex, cellIndex) => {
     const minRowIndex = Math.min(startRowIndex.value, endRowIndex.value);
@@ -484,10 +457,9 @@ const calDiffDates = (firstDay)=>{
     cellClass,
     dragstart,
     drop,getCacWidth,handleKeyDown,
-    selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag,curRowIndex,moveType,locateCurSch,dragMode,dblclickHandle,getDate,
-    inDragRang,downloadSch,calDiffDates
+    downloadSch,calDiffDates
   };
 }

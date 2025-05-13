@@ -20,7 +20,7 @@
                     <div v-if="row._tl && row._tl.end" :style="{
                         width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
                         marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
-                    }" class="plantime" @click="selectRowSch(row, $event)"
+                    }" class="plantime"
                         :class="{ dragMode: dragMode  }">{{
                             calculateDaysBetweenDates(row._tl.end,
                                 row._tl.start, true)
@@ -57,9 +57,9 @@ import TreeTime from '@/components/treelist/TreeTime.vue';
 import { useTreeComposable } from './useTreeComposable';
 // Composable
 const {
-  cellClass, getCacWidth, handleKeyDown, selectRowSch, selectStartRef,
+  cellClass, getCacWidth, selectStartRef,
   calculateDaysBetweenDates, 
-  moveType, dragMode, dblclickHandle, inDragRang, weeks,calDiffDates
+  moveType, dragMode, weeks,calDiffDates
 } = useTreeComposable();
 
 // Define props
