@@ -59,7 +59,6 @@ let config;
 let dragStartClientX;
 
 export function useDrapDropComposable() {
-  const flatRows = useTreeRowsStore().flatRows;
   const rootObj = useTreeRowsStore().dataRows;
 
   config = useConfigStore().config;
@@ -95,6 +94,8 @@ export function useDrapDropComposable() {
       isMouseDown = true;
       let depth = rowEl.dataset.depth;
       const depthMap = depthsToIndex();
+
+      useTreeRowsStore().curRowIndex = depth;
       if (event.target.classList.contains("num")) {
         if (selectDepths.indexOf(depth) > -1) {
           //drag
@@ -295,19 +296,7 @@ export function useDrapDropComposable() {
 
         const cell = event.target.closest(".row");
 
-        const rowIndex = parseInt(cell.dataset.rowIndex);
 
-        for (let j = rowIndex + 1; j < flatRows.length; j++) {
-          let row = flatRows[j];
-          if (row._lock) break;
-          if (row._tl) {
-            if (row._tl.end.i < orgDate.i) break;
-            row._tl.end = plusWorkDays(row._tl.end.i, workdays);
-            if (row._tl.start.i > orgDate.i || moveType.value.type == 'move' && row._tl.start.i <= orgStartDate.i)
-              row._tl.start = plusWorkDays(row._tl.start.i, workdays);
-          }
-        }
-        console.log(workdays);
       }
 
 
@@ -464,9 +453,7 @@ export function useDrapDropComposable() {
   }
   const dblclickHandle = (event) => {
     if (event.target.classList.contains('num')) {
-
-      const rowIndex = parseInt(event.target.closest('.row').dataset.rowIndex);
-      let row = flatRows[rowIndex];
+      let row = getRowFromDepth(rootObj, rowEl.dataset.depth);
       row._lock = !row._lock;
 
 
@@ -475,7 +462,7 @@ export function useDrapDropComposable() {
 
   const downloadSch = () => {
     let titleCol = config.cols.filter(e => e.show && e.cp == 'ColTitle');
-    let row = flatRows[useTreeRowsStore().curRowIndex];
+    let row = getRowFromDepth(rootObj,[useTreeRowsStore().curRowIndex]);
     console.log(row)
     let titleProp = 'c' + titleCol[0].fn;
     let fileName = row[titleProp].replace(/<.*?>/g, '').trim();
