@@ -101,9 +101,8 @@ const componentMap = {
   ColDate,
   ColSeq,
 };
-// Resolve component dynamically
 const resolveComponent = (cp) => {
-  return componentMap[cp] || null; // Fallback to null if component not found
+  return componentMap[cp] || null; 
 };
 
 // Holidays data
