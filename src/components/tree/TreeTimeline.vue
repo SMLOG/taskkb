@@ -58,7 +58,6 @@
 <script setup>
 import { ref, reactive, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useConfigStore } from '@/stores/config';
-import { useDataRowsStore } from '@/stores/dataRows';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import TimelineHeader from '@/components/TimelineHeader.vue';
@@ -80,29 +79,21 @@ const treeRowsStore = useTreeRowsStore();
 // Composable
 const {
   dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp,
-  cellClass, getCacWidth, handleKeyDown, selectRowSch, selectStartRef,
-  calculateDaysBetweenDates, isDrag, dragstart, drop, curRowIndex,
-  moveType, dragMode, dblclickHandle, inDragRang, weeks
+  cellClass,  handleKeyDown, selectStartRef,
+   dragstart, drop, curRowIndex,
+  moveType,  dblclickHandle,  weeks
 } = useDrapDropComposable();
 
 // Reactive state
 const isMounted = ref(false);
 const showMoveOverLayer = ref(false);
 const showDatePicker = ref(false);
-const isMouseDown = ref(0);
-const selectRowStart = ref(-1);
-const selectRowEnd = ref(-1);
-const selectCol = ref(null);
-const table = ref(null);
-const th = ref(null);
+
 const root = ref(null);
 
 // Store data
 const configStore = useConfigStore();
-const dataRowsStore = useDataRowsStore();
 const config = ref(configStore.config);
-const flatRows = ref(dataRowsStore.flatRows);
-const selectRowsIndex = ref(dataRowsStore.selectRowsIndex);
 
 const componentMap = {
   ColTitle,
@@ -157,9 +148,6 @@ const gridColumns = () => {
   return cols.value.map(e => e.width + 'px').join(' ') + ' 1fr';
 };
 
-const getAllRows = () => {
-  return flatRows.value;
-};
 
 const isCollapsed = (row) => {
   if (row && row._p) {
@@ -297,4 +285,4 @@ const cols = computed(() => config.value && config.value.cols ? config.value.col
 .lock {
   color: red;
 }
-</style>@/components/tree/useTreeDrapDropComposable@/components/tree/useTreeDrapDropComposable
+</style>

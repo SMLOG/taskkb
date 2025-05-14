@@ -56,9 +56,9 @@ import { defineProps } from 'vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 // Composable
 const {
-  cellClass, getCacWidth, selectStartRef,
+  getCacWidth, selectStartRef,
   calculateDaysBetweenDates, 
-  moveType, dragMode, weeks,calDiffDates
+   dragMode, weeks,calDiffDates
 } = useDrapDropComposable();
 
 // Define props

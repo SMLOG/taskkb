@@ -31,13 +31,11 @@ import { useTreeRowsStore } from '@/stores/treeRows';
 import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
 
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
-        cellClass, handleKeyDown, selectRowSch, selectStartRef, calculateDaysBetweenDates, isDrag,
+        cellClass, handleKeyDown, selectStartRef, 
         dragstart, drop } = useDrapDropComposable();
 
 // Reactive references
 const config = ref({});
-const selectCol = ref(null);
-const flatRows = ref(null);
 const root = ref(null);
 const selectRowsIndex = ref(null);
 const curRowIndex = ref(null);
@@ -54,12 +52,10 @@ const componentMap = {
   ColDate,
   ColSeq,
 };
-// Resolve component dynamically
 const resolveComponent = (cp) => {
-  return componentMap[cp] || null; // Fallback to null if component not found
+  return componentMap[cp] || null; 
 };
 
-// Computed properties
 const cols = computed(() => {
   if (!config.value.cols) config.value.cols = [];
   return config.value.cols.filter(e => e.show);
@@ -68,11 +64,6 @@ const cols = computed(() => {
 const gridColumns = computed(() => {
   return cols.value.map(e => e.width + 'px').join(' ');
 });
-
-// Methods
-const getAllRows = () => {
-  return flatRows.value;
-};
 
 const isCollapsed = (row) => {
   if (row && row._p) {
@@ -128,32 +119,9 @@ const copyTableToExcel = (data) => {
   }
 };
 
-const focusNext = (index, ids) => {
-  if (index + 1 < ids.length) {
-    console.log('focus' + (index + 1));
-    setTimeout(() => {
-      ids[index + 1].$el.querySelector('[contenteditable=true]').focus();
-    }, 100);
-  }
-};
-
-const moveCursorToEnd = (index, spanElement) => {
-  const span = spanElement.value[index];
-  if (span) {
-    const range = document.createRange();
-    const selection = window.getSelection();
-    range.selectNodeContents(span);
-    range.collapse(false);
-    selection.removeAllRanges();
-    selection.addRange(range);
-  }
-};
-
-// Lifecycle hooks
 onMounted(() => {
 
   config.value = configStore.config;
-  flatRows.value = treeRowsStore.flatRows;
   root.value = treeRowsStore.dataRows;
   selectRowsIndex.value = treeRowsStore.selectRowsIndex;
   curRowIndex.value = treeRowsStore.curRowIndex;
@@ -188,4 +156,4 @@ onMounted(() => {
 });
 </script>
 
-<style src="@/components/grid.css" scoped></style>@/components/tree/useTreeDrapDropComposable@/components/tree/useTreeDrapDropComposable
+<style src="@/components/grid.css" scoped></style>
