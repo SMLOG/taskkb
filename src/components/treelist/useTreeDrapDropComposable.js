@@ -48,8 +48,8 @@ function plusWorkDays(startIndex, days) {
 }
 
 const depthsToIndex = () => Array.from(document.querySelectorAll('.row')).reduce((acc, element, index) => {
-  const depth = element?.dataset?.depth ?? 'undefined'; // Handle missing depth
-  acc[depth] = index; // Store the latest index
+  const depth = element?.dataset?.depth ?? 'undefined'; 
+  acc[depth] = index; 
   return acc;
 }, {});
 
@@ -60,11 +60,7 @@ let dragStartClientX;
 
 export function useDrapDropComposable() {
   const rootObj = useTreeRowsStore().dataRows;
-
   config = useConfigStore().config;
-
-  // const selectDepths = useTreeRowsStore().selectDepths;
-
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;
@@ -86,7 +82,6 @@ export function useDrapDropComposable() {
 
   }
 
-  let curRowIndex = useTreeRowsStore().curRowIndex;
   const handleMouseDown = (event) => {
 
     let rowEl = event.target.closest(".row");
@@ -95,7 +90,6 @@ export function useDrapDropComposable() {
       let depth = rowEl.dataset.depth;
       const depthMap = depthsToIndex();
 
-      useTreeRowsStore().curRowIndex = depth;
       if (event.target.classList.contains("num")) {
         if (selectDepths.indexOf(depth) > -1) {
           //drag
@@ -460,26 +454,7 @@ export function useDrapDropComposable() {
     }
   }
 
-  const downloadSch = () => {
-    let titleCol = config.cols.filter(e => e.show && e.cp == 'ColTitle');
-    let row = getRowFromDepth(rootObj,[useTreeRowsStore().curRowIndex]);
-    console.log(row)
-    let titleProp = 'c' + titleCol[0].fn;
-    let fileName = row[titleProp].replace(/<.*?>/g, '').trim();
-    let dataList = useTreeRowsStore().getRowRows(row);
-    // Create a download link
-    console.log(dataList);
-    const csvContent = dataList.map(e => ['" '.repeat(e._level - row._level) + `${e[titleProp].replace(/<.*?>/g, '').trim()}"`]).map(e => e.join(',')).join('\n');
-
-    const downloadLink = document.createElement('a');
-    downloadLink.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
-    downloadLink.setAttribute('download', `${fileName}.csv`);
-
-    // Append the link to the document and click it
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-  }
+ 
   const calDiffDates = (firstDay) => {
     return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
   }
@@ -497,7 +472,7 @@ export function useDrapDropComposable() {
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag, curRowIndex, moveType, locateCurSch, dragMode, dblclickHandle, getDate,
-    inDragRang, downloadSch, selectDepths
+    isDrag, moveType, locateCurSch, dragMode, dblclickHandle, getDate,
+    inDragRang, selectDepths
   };
 }
