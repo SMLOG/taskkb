@@ -67,10 +67,10 @@ import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import ColSeq from '@/components/ColSeq.vue';
-import TreeTime from '@/components/treelist/TreeTime.vue';
+import TreeTime from '@/components/tree/TreeTime.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
-import { useDrapDropComposable } from '@/components/treelist/useTreeDrapDropComposable';
+import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -297,4 +297,4 @@ const cols = computed(() => config.value && config.value.cols ? config.value.col
 .lock {
   color: red;
 }
-</style>@/components/treelist/useTreeDrapDropComposable
+</style>@/components/tree/useTreeDrapDropComposable@/components/tree/useTreeDrapDropComposable

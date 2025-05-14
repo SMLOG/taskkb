@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { useDrapDropComposable } from '@/components/treelist/useTreeDrapDropComposable';
+import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
 import ColTitle from '@/components/ColTitle.vue';
 import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
@@ -109,4 +109,4 @@ const resolveComponent = (cp) => {
 </script>
 
 <style src="@/components/tree.css" scoped>
-</style>@/components/treelist/useTreeDrapDropComposable
+</style>@/components/tree/useTreeDrapDropComposable@/components/tree/useTreeDrapDropComposable

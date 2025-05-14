@@ -25,10 +25,10 @@ import ColTitle from '@/components/ColTitle.vue';
 import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
 import ColSeq from '@/components/ColSeq.vue';
-import Tree from '@/components/treelist/Tree.vue';
+import Tree from '@/components/tree/Tree.vue';
 import { useConfigStore } from '@/stores/config';
 import { useTreeRowsStore } from '@/stores/treeRows';
-import { useDrapDropComposable } from '@/components/treelist/useTreeDrapDropComposable';
+import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
 
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
         cellClass, handleKeyDown, selectRowSch, selectStartRef, calculateDaysBetweenDates, isDrag,
@@ -188,4 +188,4 @@ onMounted(() => {
 });
 </script>
 
-<style src="@/components/grid.css" scoped></style>@/components/treelist/useTreeDrapDropComposable
+<style src="@/components/grid.css" scoped></style>@/components/tree/useTreeDrapDropComposable@/components/tree/useTreeDrapDropComposable
