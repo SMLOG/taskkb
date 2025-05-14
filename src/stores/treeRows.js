@@ -30,9 +30,6 @@ for (let r of root._childs) {
 }
 
 const dataRows = ref(root);
-const flatRows = ref([]);
-const selectRowsIndex = ref([]);
-const curRowIndex = ref(-1);
 function save() {
   localStorage.setItem(
     "data",
@@ -45,25 +42,9 @@ function save() {
 }
 
 
-
-
-function remove() {
-  selectRowsIndex.value
-    .sort((a, b) => b - a)
-    .forEach((index) => {
-      let item = flatRows.value.splice(index, 1)[0];
-      if (item._p) item._p._childs.splice(item._p._childs.indexOf(item), 1);
-    });
-}
-
-
-
 export const useTreeRowsStore = defineStore("treeRows", () => {
   return {
     dataRows,
-    save,
-    selectRowsIndex,
-    remove,
-    curRowIndex,
+    save
   };
 });
