@@ -2,6 +2,7 @@ import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
 import { getRowFromDepth } from './treelib'
+import { addDatePeriod, deepCopy} from './schedule'
 const weeksRef = ref([]);
 const weeks = weeksRef.value;
 const selectDepthsRef = ref([]);
@@ -13,20 +14,7 @@ const dragMode = ref(false);
 
 
 
-function addDatePeriod(addPeriod) {
-  if (addPeriod) {
-    let newPeriod = {
-      start:
-        addPeriod.start.n > addPeriod.end.n ? addPeriod.end : addPeriod.start,
-      end:
-        addPeriod.start.n < addPeriod.end.n ? addPeriod.end : addPeriod.start,
-    };
-    return newPeriod;
-  }
-}
-function deepCopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
+
 function getDate(i) {
   return weeks[parseInt(i / 7)].dates[i % 7];
 
@@ -375,10 +363,8 @@ export function useDrapDropComposable() {
   }
   const dblclickHandle = (event) => {
     if (event.target.classList.contains('num')) {
-      let row = getRowFromDepth(rootObj, rowEl.dataset.depth);
+      let row = getRowFromDepth(rootObj, event.target.dataset.depth);
       row._lock = !row._lock;
-
-
     }
   }
 
@@ -399,7 +385,7 @@ export function useDrapDropComposable() {
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag, moveType, locateCurSch, dragMode, dblclickHandle, getDate,
+    isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
     inDragRang, selectDepths
   };
 }
