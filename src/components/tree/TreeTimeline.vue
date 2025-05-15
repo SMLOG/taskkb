@@ -69,7 +69,7 @@ import ColSeq from '@/components/ColSeq.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
-import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
+import { useTree } from '@/components/tree/useTree';
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -82,7 +82,7 @@ const {
   cellClass,  handleKeyDown, selectStartRef,
    dragstart, drop, curRowIndex,
   moveType,  dblclickHandle,  weeks
-} = useDrapDropComposable();
+} = useTree();
 
 // Reactive state
 const isMounted = ref(false);
@@ -284,4 +284,4 @@ const cols = computed(() => config.value && config.value.cols ? config.value.col
 .lock {
   color: red;
 }
-</style>
+</style>@/components/tree/useTree

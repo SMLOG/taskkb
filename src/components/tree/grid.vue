@@ -28,11 +28,11 @@ import ColSeq from '@/components/ColSeq.vue';
 import Tree from '@/components/tree/Tree.vue';
 import { useConfigStore } from '@/stores/config';
 import { useTreeRowsStore } from '@/stores/treeRows';
-import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
+import { useTree } from '@/components/tree/useTree';
 
 const { dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp, 
         cellClass, handleKeyDown, selectStartRef, 
-        dragstart, drop } = useDrapDropComposable();
+        dragstart, drop } = useTree();
 
 // Reactive references
 const config = ref({});
@@ -156,4 +156,4 @@ onMounted(() => {
 });
 </script>
 
-<style src="@/components/grid.css" scoped></style>
+<style src="@/components/grid.css" scoped></style>@/components/tree/useTree

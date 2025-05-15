@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { useDrapDropComposable } from '@/components/tree/useTreeDrapDropComposable';
+import { useTree } from '@/components/tree/useTree';
 import ColTitle from '@/components/ColTitle.vue';
 import ColDropText from '@/components/ColDropText.vue';
 import ColDate from '@/components/ColDate.vue';
@@ -82,7 +82,7 @@ const props = defineProps({
 });
 
 // Drag and drop composable
-const { dragOver, dragstart, drop, isDrag, selectDepths } = useDrapDropComposable();
+const { dragOver, dragstart, drop, isDrag, selectDepths } = useTree();
 
 // Column style function
 const colStyle = (col, isH, index) => {
@@ -109,4 +109,4 @@ const resolveComponent = (cp) => {
 </script>
 
 <style src="@/components/tree.css" scoped>
-</style>
+</style>@/components/tree/useTree
