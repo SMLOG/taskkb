@@ -47,13 +47,6 @@ function plusWorkDays(startIndex, days) {
 
 }
 
-const depthsToIndex = () => Array.from(document.querySelectorAll('.row')).reduce((acc, element, index) => {
-  const depth = element?.dataset?.depth ?? 'undefined'; 
-  acc[depth] = index; 
-  return acc;
-}, {});
-
-
 
 let config;
 let dragStartClientX;
@@ -177,7 +170,6 @@ export function useDrapDropComposable() {
     let rowEl = event.target.closest(".row");
     if (rowEl) {
       if (isMouseDown) {
-        const cell = event.target.closest("div.col");
         if (!isDrag.value && selectDepths.length) {
           selectDepths.length = 0;
           selectDetphEnd = rowEl.dataset.depth;
@@ -252,7 +244,6 @@ export function useDrapDropComposable() {
     isDrag.value = isMouseDown = false;
     if (moveType.value) {
       event.stopPropagation();
-      let orgDate = selectStartRef.value.row._tl.end;
 
       selectStartRef.value.row._tl.start = selectStartRef.value.start;
       selectStartRef.value.row._tl.end = selectStartRef.value.end;
