@@ -1,16 +1,18 @@
 import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
-import { getRowFromDepth } from './treelib'
-import { addDatePeriod, deepCopy} from './schedule'
+import { getRowFromDepth,moveNode } from './treelib'
+import { addDatePeriod, deepCopy, calcDaysBetween } from './schedule';
+
+
 const weeksRef = ref([]);
 const weeks = weeksRef.value;
 const selectDepthsRef = ref([]);
 const selectDepths = selectDepthsRef.value;
-let selectStartRef = ref(null);
-
+const selectStartRef = ref(null);
 const isDrag = ref(false);
 const dragMode = ref(false);
+const moveType = ref(null);
 
 
 
@@ -45,8 +47,6 @@ export function useDrapDropComposable() {
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;
-  let moveType = ref(null);
-  let resizeColumn;
 
   const dragOver = (event) => {
     event.preventDefault();
@@ -140,7 +140,7 @@ export function useDrapDropComposable() {
     }
 
     const cell = event.target.closest("div.col");
-    if (!cell || resizeColumn) {
+    if (!cell) {
       return null;
     }
     const activeElement = document.activeElement;
@@ -176,7 +176,7 @@ export function useDrapDropComposable() {
               (_, i) => Math.min(startIndex, endIndex) + i
             ).map(e => rowsDepth[e])
           );
-        } 
+        }
       }
     }
 
@@ -264,31 +264,7 @@ export function useDrapDropComposable() {
   };
 
 
-  function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
-    let targetNode = getRowFromDepth(rootTree, selectDetphEnd);
-    let xDiff = event.clientX - dragStartClientX;
 
-    for (let depth of selectDepths.sort((a, b) => b.localeCompare(a))) {
-      let srcNode = getRowFromDepth(rootTree, depth);
-      let index = parseInt(depth.split('.').pop());
-
-      // Remove srcNode from its current parent's children
-      srcNode._p._childs.splice(index, 1);
-
-      if (xDiff > 50) {
-        // Make srcNode a child of targetNode
-        if (!targetNode._childs) targetNode._childs = [];
-        targetNode._childs.push(srcNode);
-        srcNode._p = targetNode; // Update srcNode's parent
-      } else {
-        // Move srcNode next to targetNode at same level
-        let parentChilds = targetNode._p._childs;
-        let targetIndex = parentChilds.findIndex(node => node === targetNode);
-        parentChilds.splice(targetIndex + (xDiff < 0 ? 0 : 1), 0, srcNode);
-        srcNode._p = targetNode._p; // Update srcNode's parent to target's parent
-      }
-    }
-  }
 
   const drop = (event) => {
     let interceptor = event.target.closest(".row");
@@ -323,29 +299,7 @@ export function useDrapDropComposable() {
 
   const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
 
-
-    let date1 = d1.i > d2.i ? d1 : d2;
-    let date2 = d1.i > d2.i ? d2 : d1;
-    if (exclusiveHolidayWeeken) {
-      let weekIndex1 = parseInt(date1.i / 7);
-      let weekIndex2 = parseInt(date2.i / 7);
-
-      let i = date2.i % 7;
-      let count = 0;
-      for (let w = weekIndex2; w <= weekIndex1; w++) {
-
-        for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
-          let day = weeks[w].dates[i];
-          if (day.isWeekend || day.holiday) continue;
-          count++;
-
-        }
-        i = 0;
-      }
-      return count;
-
-    }
-    return date1.i - date2.i + 1;
+    return calcDaysBetween(weeks, d1, d2, exclusiveHolidayWeeken);
 
 
   }
@@ -368,7 +322,7 @@ export function useDrapDropComposable() {
     }
   }
 
- 
+
   const calDiffDates = (firstDay) => {
     return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
   }
