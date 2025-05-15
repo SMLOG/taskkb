@@ -167,76 +167,73 @@ const handleScheduleClick = (row, target, event) => {
   }
 };
 
-  const handleMouseCellsMove = (event) => {
-    let rowEl = event.target.closest(".row");
-    if (rowEl) {
-      if (isMouseDown) {
-        if (!isDrag.value && selectDepths.length) {
-          selectDepths.length = 0;
-          selectDetphEnd = rowEl.dataset.depth;
-          let rowsDepth = Array.from(document.querySelectorAll('.row')).map(e => e?.dataset?.depth ?? null);
+const handleMouseCellsMove = (event) => {
+  const rowEl = event.target.closest(".row");
+  if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
+    selectDepths.length = 0;
+    selectDetphEnd = rowEl.dataset.depth;
+    
+    const rows = document.querySelectorAll('.row');
+    const rowsDepthIndexMap = new Map();
+    rows.forEach((el, index) => {
+      if (el.dataset?.depth) rowsDepthIndexMap.set(el.dataset.depth, index);
+    });
 
-          let rowsDepthIndexMap = rowsDepth.reduce((acc, depth, index) => {
-            acc[depth] = index; // Store the latest index
-            return acc;
-          }, {});
-
-          let startIndex = rowsDepthIndexMap[selectDetphStart];
-          let endIndex = rowsDepthIndexMap[selectDetphEnd];
-          selectDepths.push(
-            ...Array.from(
-              { length: Math.abs(startIndex - endIndex) + 1 },
-              (_, i) => Math.min(startIndex, endIndex) + i
-            ).map(e => rowsDepth[e])
-          );
-        }
-      }
+    const startIndex = rowsDepthIndexMap.get(selectDetphStart);
+    const endIndex = rowsDepthIndexMap.get(selectDetphEnd);
+    
+    if (startIndex !== undefined && endIndex !== undefined) {
+      const minIndex = Math.min(startIndex, endIndex);
+      const length = Math.abs(startIndex - endIndex) + 1;
+      selectDepths.push(
+        ...Array.from({ length }, (_, i) => rows[minIndex + i].dataset.depth)
+      );
     }
+  }
 
-    let sch = event.target.closest(".sch");
-    if (sch) {
-      let x =
-        event.clientX -
-        event.target.closest(".sch").getBoundingClientRect().left;
-      let totalWidth = event.target.closest(".sch").offsetWidth;
-      let index = parseInt((x / totalWidth) * config.weekCount * 7);
-      let date = weeks[parseInt(index / 7)].dates[index % 7];
+  const sch = event.target.closest(".sch");
+  if (sch) {
+    const { left, width: totalWidth } = sch.getBoundingClientRect();
+    const x = event.clientX - left;
+    const index = Math.floor((x / totalWidth) * config.weekCount * 7);
+    const date = weeks[Math.floor(index / 7)]?.dates[index % 7];
 
-      if (selectStartRef.value != null) {
-        if (!selectStartRef.value.row._tl) selectStartRef.value.end = date;
-        else {
-          if (moveType.value) {
-            let ox = event.clientX - moveType.value.x;
+    if (selectStartRef.value && date) {
+      if (!selectStartRef.value.row._tl) {
+        selectStartRef.value.end = date;
+        return;
+      }
 
-            let totalWidth = event.target.closest(".sch").offsetWidth;
-            let unitWidth = totalWidth / config.weekCount / 7;
+      if (moveType.value) {
+        const unitWidth = totalWidth / (config.weekCount * 7);
+        const ox = event.clientX - moveType.value.x;
+        let newIndex = moveType.value._tl[moveType.value.type === "rightDrag" ? "end" : "start"].i +
+          Math.floor(ox / unitWidth);
+        
+        const newDate = weeks[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
+        if (!newDate) return;
 
-            let index =
-              moveType.value._tl[moveType.value.type == "rightDrag" ? "end" : "start"].i +
-              parseInt(ox / unitWidth);
-            let date = weeks[parseInt(index / 7)].dates[index % 7];
+        switch (moveType.value.type) {
+          case "rightDrag":
+            selectStartRef.value.end = newDate;
+            break;
+          case "leftDrag":
+            selectStartRef.value.start = newDate;
+            break;
+          default: {
+            const moveUnits = Math.floor(ox / unitWidth);
+            const startIndex = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
+            const endIndex = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
 
-            if (moveType.value.type == "rightDrag") {
-              selectStartRef.value.end = date;
-
-            }
-            else if (moveType.value.type == "leftDrag") selectStartRef.value.start = date;
-            else {
-              let moveUnits = parseInt(ox / unitWidth);
-              index = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
-
-              selectStartRef.value.start = weeks[parseInt(index / 7)].dates[index % 7];
-
-              index = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
-
-              selectStartRef.value.end = weeks[parseInt(index / 7)].dates[index % 7];
-              console.log("moveUnits", moveUnits);
-            }
+            selectStartRef.value.start = weeks[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
+            selectStartRef.value.end = weeks[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
+            console.log("moveUnits", moveUnits);
           }
         }
       }
     }
-  };
+  }
+};
 
   const handleMouseUp = (event) => {
     if (isDrag.value) {
