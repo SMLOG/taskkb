@@ -25,7 +25,7 @@
       <TimelineHeader />
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
         <template v-for="(col, key) in cols" :key="key">
-          <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(0, key + 1, col)" v-if="col.show">
+          <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
             <div class="cell" >
               <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>            </div>
           </div>

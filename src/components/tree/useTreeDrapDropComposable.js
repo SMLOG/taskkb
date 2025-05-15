@@ -243,13 +243,9 @@ export function useDrapDropComposable() {
       locateCurSch(event);
     }
   };
-  const dragIndexRang = ref([]);
-  const inDragRang = (rowIndex) => {
-    return dragIndexRang.value.indexOf(rowIndex) > -1;
-  };
 
 
-  const cellClass = (rowIndex, cellIndex, col) => {
+  const cellClass = ( col) => {
     return {
       sticky: col.sticky,
     };
@@ -340,6 +336,6 @@ export function useDrapDropComposable() {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-    inDragRang, selectDepths
+     selectDepths
   };
 }
