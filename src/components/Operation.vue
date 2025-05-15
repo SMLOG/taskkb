@@ -22,6 +22,8 @@
           <a @click="downloadSch">Export Sch</a>
           <a v-if="selectRowsIndex && selectRowsIndex.length === 1" @click="copyRow">Copy</a>
           <a v-if="selectRowsIndex && selectRowsIndex.length === 1" @click="exportCSV">Export CSV</a>
+          <a v-if="selectRowsIndex && selectRowsIndex.length === 1" @click="csvToMarkdown">MD</a>
+          
           <a v-if="selectRowsIndex && selectRowsIndex.length === 1" @click="copyClipboard">Clipboard</a>
         </div>
       </div>
@@ -129,6 +131,41 @@ function copyRow() {
 function exportCSV() {
   dataRowsStore.exportCSV(config.value);
 }
+function csvToMarkdown() {
+    // Split the CSV string into lines
+
+    let csvString = dataRowsStore.exportCSV(config.value,true);
+    const lines = csvString.trim().split('\n');
+    
+    // Split each line into columns
+    const table = lines.map(line => line.split(',').map(item => item.trim()));
+    
+    // Create the Markdown table
+    let markdown = [];
+    
+    // Header row
+    const header = table[0];
+    markdown.push('| ' + header.join(' | ') + ' |');
+    
+    // Separator row
+    markdown.push('|-' + '-|-' .repeat(header.length - 1) + '-|');
+    
+    // Data rows
+    for (let i = 1; i < table.length; i++) {
+        markdown.push('| ' + table[i].join(' | ') + ' |');
+    }
+    let md = markdown.join('\n');
+    console.log(md)
+
+    navigator.clipboard.writeText(md).then(function() {
+      console.log('Text copied to clipboard!');
+  }).catch(function(err) {
+      console.error('Could not copy text: ', err);
+  });
+
+    return markdown.join('\n');
+}
+
 
 function copyClipboard() {
   dataRowsStore.copyClipboard(config.value);

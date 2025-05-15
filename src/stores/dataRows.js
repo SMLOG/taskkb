@@ -183,7 +183,7 @@ function formatDate(date) {
 
   return `${day}-${month}-${year}`;
 }
-function exportCSV(config) {
+function exportCSV(config,onlyText=false) {
   let item = flatRows.value.slice(
     selectRowsIndex.value[0],
     selectRowsIndex.value[0] + 1
@@ -192,11 +192,15 @@ function exportCSV(config) {
   let rows = getRowRows(item);
   console.log(rows);
   let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
-  rows = rows.map((row) => 
-    cols.map((col,i) => (i==0?('  '.repeat(row._level-item._level) +(parseInt(row._rIndex.substr(item._rIndex.length+1,item._rIndex.length+2))-1)+'.'+row._rIndex.substr(item._rIndex.length+2)+" "):"")+(row["c" + col.fn]?row["c" + col.fn]:''))
+  rows = rows.filter((r,i)=>i!=0).map((row,rowIndex) => 
+    cols.map((col,i) => 
+    (i==0?('  '.repeat(row._level-item._level) +(rowIndex+1)+'.'+" "):"")
+    +(row["c" + col.fn]?row["c" + col.fn]:''))
   .concat([row._tl?formatDate(row._tl.start.date):'',row._tl?formatDate(row._tl.end.date):''])
 );
-  rows.unshift(cols.map((c) => c.name).concat(['Start Date','End Date']));
+let headers =cols.map((c) => c.name);
+if(!onlyText)headers = headers.concat(['Start Date','End Date']);
+  rows.unshift(headers);
 
   let text = rows
     .map((r) =>
@@ -216,11 +220,12 @@ function exportCSV(config) {
               ""
             }`
         )
-        .map((d, i) => `"${d}"`)
+        .map((d, i) => onlyText?`\`${d}\``:`"${d}"`)
         .join(",")
     )
     .join("\n");
-  dowloadText(text, "exportcsv.csv");
+  if(!onlyText)dowloadText(text, "exportcsv.csv");
+  else return text;
 }
 
 function remove() {
