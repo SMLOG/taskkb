@@ -43,7 +43,7 @@
   cursor: col-resize;
 }
 
-.selected,.selected > * {
+.selected,.selected .cell {
   background-color: #F0FFF0 !important;
 }
 

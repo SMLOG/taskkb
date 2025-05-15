@@ -66,10 +66,6 @@ export function useDrapDropComposable() {
   let selectDetphEnd;
   let moveType = ref(null);
   let resizeColumn;
-  let startRowIndex = ref(-1);
-  let startcellIndex = ref(-1);
-  let endRowIndex = ref(-1);
-  let endcellIndex = ref(-1);
 
   const dragOver = (event) => {
     event.preventDefault();
@@ -88,7 +84,6 @@ export function useDrapDropComposable() {
     if (rowEl) {
       isMouseDown = true;
       let depth = rowEl.dataset.depth;
-      const depthMap = depthsToIndex();
 
       if (event.target.classList.contains("num")) {
         if (selectDepths.indexOf(depth) > -1) {
@@ -165,10 +160,6 @@ export function useDrapDropComposable() {
 
     const cell = event.target.closest("div.col");
     if (!cell || resizeColumn) {
-      startRowIndex.value = -1;
-      startcellIndex.value = -1;
-      endRowIndex.value = -1;
-      endcellIndex.value = -1;
       return null;
     }
     const activeElement = document.activeElement;
@@ -179,13 +170,7 @@ export function useDrapDropComposable() {
     }
     isMouseDown = true;
     event.preventDefault();
-    const rowIndex = parseInt(cell.getAttribute("data-row"));
-    const cellIndex = parseInt(cell.getAttribute("data-col"));
 
-    startRowIndex.value = rowIndex;
-    startcellIndex.value = cellIndex;
-    endRowIndex.value = startRowIndex.value;
-    endcellIndex.value = startcellIndex.value;
   };
 
   const handleMouseCellsMove = (event) => {
@@ -211,13 +196,7 @@ export function useDrapDropComposable() {
               (_, i) => Math.min(startIndex, endIndex) + i
             ).map(e => rowsDepth[e])
           );
-        } else if (cell) {
-
-          const rowIndex = parseInt(cell.getAttribute("data-row"));
-          const cellIndex = parseInt(cell.getAttribute("data-col"));
-          endRowIndex.value = rowIndex;
-          endcellIndex.value = cellIndex;
-        }
+        } 
       }
     }
 
@@ -274,24 +253,9 @@ export function useDrapDropComposable() {
     if (moveType.value) {
       event.stopPropagation();
       let orgDate = selectStartRef.value.row._tl.end;
-      let orgStartDate = selectStartRef.value.row._tl.start;
 
       selectStartRef.value.row._tl.start = selectStartRef.value.start;
       selectStartRef.value.row._tl.end = selectStartRef.value.end;
-
-      let newDate = selectStartRef.value.end;
-
-      if (newDate.i - orgDate.i != 0 && dragMode.value) {
-        let workdays = (newDate.i - orgDate.i > 0 ? 1 : -1) * new Array(Math.abs(newDate.i - orgDate.i))
-          .fill(0).map((e, index) => Math.min(orgDate.i, newDate.i) + index + 1)
-          .map(e => getDate(e))
-          .filter(e => !(e.isWeekend && config.allowOptions && config.allowOptions.indexOf('W') == -1 || e.holiday && config.allowOptions && config.allowOptions.indexOf('H') == -1)).length;
-
-
-        const cell = event.target.closest(".row");
-
-
-      }
 
 
       moveType.value = null;
@@ -305,36 +269,9 @@ export function useDrapDropComposable() {
     return dragIndexRang.value.indexOf(rowIndex) > -1;
   };
 
-  const isSelected = (rowIndex, cellIndex) => {
-    const minRowIndex = Math.min(startRowIndex.value, endRowIndex.value);
-    const maxRowIndex = Math.max(startRowIndex.value, endRowIndex.value);
-    const mincellIndex = Math.min(startcellIndex.value, endcellIndex.value);
-    const maxcellIndex = Math.max(startcellIndex.value, endcellIndex.value);
-    return (
-      minRowIndex >= 0 &&
-      rowIndex >= minRowIndex &&
-      rowIndex <= maxRowIndex &&
-      mincellIndex >= 0 &&
-      cellIndex >= mincellIndex &&
-      cellIndex <= maxcellIndex
-    );
-  };
+
   const cellClass = (rowIndex, cellIndex, col) => {
-    const minRowIndex = Math.min(startRowIndex.value, endRowIndex.value);
-    const maxRowIndex = Math.max(startRowIndex.value, endRowIndex.value);
-    const mincellIndex = Math.min(startcellIndex.value, endcellIndex.value);
-    const maxcellIndex = Math.max(startcellIndex.value, endcellIndex.value);
-    let selected = isSelected(rowIndex, cellIndex);
     return {
-      selected: selected,
-      left: selected && cellIndex == mincellIndex,
-      right:
-        (selected && cellIndex == maxcellIndex) ||
-        (mincellIndex - 1 == cellIndex &&
-          rowIndex >= minRowIndex &&
-          rowIndex <= maxRowIndex),
-      top: selected && rowIndex == minRowIndex,
-      bottom: selected && rowIndex == maxRowIndex,
       sticky: col.sticky,
     };
   };
@@ -465,7 +402,6 @@ export function useDrapDropComposable() {
     handleMouseCellsMove,
     handleMouseUp,
     weeks,
-    isSelected,
     cellClass,
     dragstart,
     drop, getCacWidth, handleKeyDown,
