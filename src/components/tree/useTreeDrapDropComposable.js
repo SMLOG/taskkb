@@ -58,101 +58,114 @@ export function useDrapDropComposable() {
     }
 
   }
+const handleMouseDown = (event) => {
+  const rowEl = event.target.closest(".row");
+  const cell = event.target.closest("div.col");
+  
+  // Early exit if neither row nor cell is found
+  if (!rowEl && !cell) return;
 
-  const handleMouseDown = (event) => {
+  // Prevent default and blur active element
+  event.preventDefault();
+  if (document.activeElement && !cell?.querySelector("[contenteditable=true]")) {
+    document.activeElement.blur();
+  }
 
-    let rowEl = event.target.closest(".row");
-    if (rowEl) {
-      isMouseDown = true;
-      let depth = rowEl.dataset.depth;
+  isMouseDown = true;
 
-      if (event.target.classList.contains("num")) {
-        if (selectDepths.indexOf(depth) > -1) {
-          //drag
-          isDrag.value = true;
-        } else {
+  // Handle row-specific logic
+  if (rowEl) {
+    const { depth } = rowEl.dataset;
+    const target = event.target;
 
-          selectDepths.push(depth);
-          selectDetphStart = depth;
-        }
-      } else {
-        selectDepths.length = 0;
-        selectDetphStart = selectDetphEnd = null;
-
-        let row = getRowFromDepth(rootObj, rowEl.dataset.depth);
-        if (row && row._tl && row._tl.start && selectStartRef.value && selectStartRef.value.row == row) {
-          if (event.target.classList.contains("selectStartRef")) {
-            moveType.value = {
-              x: event.clientX,
-              type: "move",
-              _tl: deepCopy(row._tl),
-            };
-          } else if (event.target.classList.contains("rightDrag")) {
-            moveType.value = {
-              x: event.clientX,
-              type: "rightDrag",
-              initValue: deepCopy(row._tl.end),
-              _tl: deepCopy(row._tl),
-            };
-          } else if (event.target.classList.contains("leftDrag")) {
-            moveType.value = {
-              x: event.clientX,
-              type: "leftDrag",
-              initValue: deepCopy(row._tl.start),
-              _tl: deepCopy(row._tl),
-            };
-          }
-        } else if (event.target.closest(".sch")) {
-          let x =
-            event.clientX -
-            event.target.closest(".sch").getBoundingClientRect().left;
-          let totalWidth = event.target.closest(".sch").offsetWidth;
-          let index = parseInt((x / totalWidth) * config.weekCount * 7);
-          let date = weeks[parseInt(index / 7)].dates[index % 7];
-          if (!row._tl || !row._tl.start) {
-            if (selectStartRef.value == null) {
-              selectStartRef.value = { type: 2, row: row, start: date, end: date };
-
-
-
-            } else if (selectStartRef.value.row == row && selectStartRef.value.start) {
-              console.log('update');
-              row._tl = addDatePeriod({
-                start: selectStartRef.value.start,
-                end: date,
-              });
-            } else {
-              selectStartRef.value = null;
-              console.log("delete selectStart");
-            }
-          } else {
-
-            if (selectStartRef.value && row != selectStartRef.value.row) {
-              selectStartRef.value = null;
-              console.log("delete selectStart");
-            } else {
-              selectRowSch(row, event);
-            }
-
-          }
-        }
-      }
+    // Handle number cell click
+    if (target.classList.contains("num")) {
+      handleNumClick(depth);
+      return;
     }
 
-    const cell = event.target.closest("div.col");
-    if (!cell) {
-      return null;
-    }
-    const activeElement = document.activeElement;
+    // Clear selection if not a number cell
+    selectDepths.length = 0;
+    selectDetphStart = selectDetphEnd = null;
 
-    if (cell.querySelector("[contenteditable=true]")) return;
-    if (activeElement) {
-      activeElement.blur();
+    const row = getRowFromDepth(rootObj, depth);
+    if (!row || !row._tl?.start || !selectStartRef.value || selectStartRef.value.row !== row) {
+      handleScheduleClick(row, target, event);
+      return;
     }
-    isMouseDown = true;
-    event.preventDefault();
 
+    // Handle move or drag operations
+    handleMoveOrDrag(row, target, event);
+  }
+};
+
+// Helper function for number cell click
+const handleNumClick = (depth) => {
+  if (selectDepths.includes(depth)) {
+    isDrag.value = true;
+  } else {
+    selectDepths.push(depth);
+    selectDetphStart = depth;
+  }
+};
+
+// Helper function for move or drag operations
+const handleMoveOrDrag = (row, target, event) => {
+  const moveConfig = {
+    selectStartRef: { type: "move", x: event.clientX, _tl: deepCopy(row._tl) },
+    rightDrag: {
+      type: "rightDrag",
+      x: event.clientX,
+      initValue: deepCopy(row._tl.end),
+      _tl: deepCopy(row._tl),
+    },
+    leftDrag: {
+      type: "leftDrag",
+      x: event.clientX,
+      initValue: deepCopy(row._tl.start),
+      _tl: deepCopy(row._tl),
+    },
   };
+
+  const className = ["selectStartRef", "rightDrag", "leftDrag"].find((cls) =>
+    target.classList.contains(cls)
+  );
+  if (className) {
+    moveType.value = moveConfig[className];
+  }
+};
+
+const handleScheduleClick = (row, target, event) => {
+  const schEl = target.closest(".sch");
+  if (!schEl) return;
+
+  const { left, width: totalWidth } = schEl.getBoundingClientRect();
+  const x = event.clientX - left;
+  const index = Math.floor((x / totalWidth) * config.weekCount * 7);
+  const date = weeks[Math.floor(index / 7)].dates[index % 7];
+
+  if (!row._tl?.start) {
+    if (!selectStartRef.value) {
+      selectStartRef.value = { type: 2, row, start: date, end: date };
+    } else if (selectStartRef.value.row === row && selectStartRef.value.start) {
+      console.log("update");
+      row._tl = addDatePeriod({
+        start: selectStartRef.value.start,
+        end: date,
+      });
+    } else {
+      selectStartRef.value = null;
+      console.log("delete selectStart");
+    }
+  } else {
+    if (selectStartRef.value && row !== selectStartRef.value.row) {
+      selectStartRef.value = null;
+      console.log("delete selectStart");
+    } else {
+      selectRowSch(row, event);
+    }
+  }
+};
 
   const handleMouseCellsMove = (event) => {
     let rowEl = event.target.closest(".row");
