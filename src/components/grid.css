@@ -43,9 +43,7 @@
   cursor: col-resize;
 }
 
-.selected {
-  background-color: #F0FFF0 !important;
-}
+
 .header .selected {
   background-color: limegreen !important;
   }

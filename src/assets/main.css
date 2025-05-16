@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import './base.css';
+.selected > *,.selected .col,.row.selected .sticky{
+  @apply bg-blue-50	;
+}
+
 
 a,
 .green {
