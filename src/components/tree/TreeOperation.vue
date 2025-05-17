@@ -28,11 +28,11 @@
             class="px-3 py-1 bg-green-50 border border-green-200 rounded-md shadow-sm hover:bg-green-100 cursor-pointer text-sm text-green-600">
             Export
           </a>
-          <a @click="overImport"
+          <a @click="openFile"
             class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Import
+            Open
           </a>
-          <input type="file" ref="fileInput" @change="handleFileUpload" accept=".json" class="hidden" />
+          <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
           <a @click="downloadSch"
             class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
             Export Sch
@@ -84,16 +84,17 @@ function downloadJSON(jsonData, filename = 'data.json') {
   document.body.removeChild(downloadLink);
 }
 
-function overImport() {
+function openFile() {
   fileInput.value.click();
 }
 
-function handleFileUpload(event) {
+function loadFile(event) {
   const file = event.target.files[0];
   if (file && file.type === "application/json") {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
+        if(confirm("will overwrite current data,are you sure to continue?")){
         let data = JSON.parse(e.target.result);
         if (data && data.data && data.config) {
           localStorage.setItem('data', JSON.stringify(data.data));
@@ -102,6 +103,8 @@ function handleFileUpload(event) {
         } else {
           throw new Error("wrong format");
         }
+        }
+
       } catch (error) {
         console.error("Invalid JSON file", error);
       }
