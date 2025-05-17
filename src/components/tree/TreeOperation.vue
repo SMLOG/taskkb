@@ -1,30 +1,46 @@
 <template>
-  <div style="
-        bottom: 0;
-        left: 0;
-        z-index: 4;
-        background: white;
-        user-select: none;
-        position: sticky;
-      ">
-    <div style="display: grid;grid-template-columns: auto 1fr;">
-      <div style="display: flex;flex-direction: column; position: sticky;left: 0;bottom:0;">
+  <div class="sticky bottom-0 left-0 z-[4] bg-white select-none">
+    <div class="grid grid-cols-[auto_1fr]">
+      <div class="flex flex-col sticky left-0 bottom-0">
         <Config v-if="showConfig" :config="config"></Config>
-        <div style="display: flex;height: 30px;">
-          <a @click="addRow(1)">Add Row</a>
-          <a @click="deleteSelectedNodes()">Delete Row</a>
-          <a @click="saveData(0)">Save</a>
-          <a @click="showConfig = !showConfig">Configuration</a>
-          <a @click="showConfig = !showConfig">Team</a>
-          <a @click="download">Export</a>
-          <a @click="overImport">Import</a>
-          <input type="file" ref="fileInput" @change="handleFileUpload" accept=".json" style="display: none;" />
-          <a @click="downloadSch">Export Sch</a>
-          <a @click="copyNode">Copy</a>
-          <a @click="exportCSV">Export CSV</a>
-          <a @click="csvToMarkdown">MD</a>
-
-          <a @click="copyClipboard">Clipboard</a>
+        <div class="flex h-8 gap-2 p-1 bg-gray-50 border-t border-gray-200">
+          <a @click="addRow(1)" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Add Row
+          </a>
+          <a @click="deleteSelectedNodes()" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Delete Row
+          </a>
+          <a @click="saveData(0)" class="px-3 py-1 bg-blue-50 border border-blue-200 rounded-md shadow-sm hover:bg-blue-100 cursor-pointer text-sm text-blue-600">
+            Save
+          </a>
+          <a @click="showConfig = !showConfig" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Configuration
+          </a>
+          <a @click="showConfig = !showConfig" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Team
+          </a>
+          <a @click="download" class="px-3 py-1 bg-green-50 border border-green-200 rounded-md shadow-sm hover:bg-green-100 cursor-pointer text-sm text-green-600">
+            Export
+          </a>
+          <a @click="overImport" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Import
+          </a>
+          <input type="file" ref="fileInput" @change="handleFileUpload" accept=".json" class="hidden" />
+          <a @click="downloadSch" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Export Sch
+          </a>
+          <a @click="copyNode" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Copy
+          </a>
+          <a @click="exportCSV" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            Export CSV
+          </a>
+          <a @click="csvToMarkdown" class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
+            MD
+          </a>
+          <a @click="copyClipboard" class="px-3 py-1 bg-purple-50 border border-purple-200 rounded-md shadow-sm hover:bg-purple-100 cursor-pointer text-sm text-purple-600">
+            Clipboard
+          </a>
         </div>
       </div>
     </div>
