@@ -176,7 +176,13 @@ function csvToMarkdown() {
 
 
 function copyClipboard() {
-  treeRowsStore.copyClipboard(config.value);
+    let text = treeRowsStore.exportCSV(config.value,false,'\t');
+
+    navigator.clipboard.writeText(text).then(function() {
+      console.log('Text copied to clipboard!');
+  }).catch(function(err) {
+      console.error('Could not copy text: ', err);
+  });
 }
 
 // Watch for changes in dataRows

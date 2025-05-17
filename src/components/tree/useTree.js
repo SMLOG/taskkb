@@ -385,7 +385,7 @@ const handleMouseCellsMove = (event) => {
       }
   }
 
-  function exportCSV(config,onlyText=false) {
+  function exportCSV(config,onlyText=false,colSeperator=',') {
 
      if(selectDepths.length!=1){
         return;
@@ -425,7 +425,7 @@ if(!onlyText)headers = headers.concat(['Start Date','End Date']);
             }`
         )
         .map((d, i) => onlyText?`\`${d}\``:`"${d}"`)
-        .join(",")
+        .join(colSeperator)
     )
     .join("\n");
    return text;
