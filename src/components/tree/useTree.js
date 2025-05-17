@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
-import { getRowFromDepth,moveNode,deleteNode } from './treelib'
+import { getRowFromDepth,moveNode,deleteNode,copyNode } from './treelib'
 import { addDatePeriod, deepCopy, calcDaysBetween } from './schedule';
 
 
@@ -379,6 +379,11 @@ const handleMouseCellsMove = (event) => {
           deleteNode(rootObj,depth);
       }
   }
+  const copySelectedNode = ()=>{
+      if(selectDepths.length==1){
+        copyNode(rootObj,selectDepths[0]);
+      }
+  }
   return {
     calDiffDates,
     dragOver,
@@ -393,6 +398,6 @@ const handleMouseCellsMove = (event) => {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-     selectDepths,rootObj,insertNode,delSelectedNode
+     selectDepths,rootObj,insertNode,delSelectedNode,copySelectedNode
   };
 }

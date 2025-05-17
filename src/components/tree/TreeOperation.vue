@@ -20,11 +20,11 @@
           <a @click="overImport">Import</a>
           <input type="file" ref="fileInput" @change="handleFileUpload" accept=".json" style="display: none;" />
           <a @click="downloadSch">Export Sch</a>
-          <a  @click="copyRow">Copy</a>
-          <a  @click="exportCSV">Export CSV</a>
-          <a  @click="csvToMarkdown">MD</a>
-          
-          <a  @click="copyClipboard">Clipboard</a>
+          <a @click="copyNode">Copy</a>
+          <a @click="exportCSV">Export CSV</a>
+          <a @click="csvToMarkdown">MD</a>
+
+          <a @click="copyClipboard">Clipboard</a>
         </div>
       </div>
     </div>
@@ -102,8 +102,10 @@ function download() {
 
 function saveData(bool) {
   if (!bool || config.value.autoSave) {
-    treeRowsStore.save();
-    configStore.save();
+
+    localStorage.setItem('data', JSON.stringify(treeRoot.value));
+    localStorage.setItem('config', JSON.stringify(config.value));
+
   }
 }
 
@@ -118,46 +120,46 @@ function addRow(num) {
   treeRowsStore.insertNode({ _id: '' });
 }
 
-function copyRow() {
-  treeRowsStore.copyRow();
+function copyNode() {
+  treeRowsStore.copySelectedNode();
 }
 
 function exportCSV() {
   treeRowsStore.exportCSV(config.value);
 }
 function csvToMarkdown() {
-    // Split the CSV string into lines
+  // Split the CSV string into lines
 
-    let csvString = treeRowsStore.exportCSV(config.value,true);
-    const lines = csvString.trim().split('\n');
-    
-    // Split each line into columns
-    const table = lines.map(line => line.split(',').map(item => item.trim()));
-    
-    // Create the Markdown table
-    let markdown = [];
-    
-    // Header row
-    const header = table[0];
-    markdown.push('| ' + header.join(' | ') + ' |');
-    
-    // Separator row
-    markdown.push('|-' + '-|-' .repeat(header.length - 1) + '-|');
-    
-    // Data rows
-    for (let i = 1; i < table.length; i++) {
-        markdown.push('| ' + table[i].join(' | ') + ' |');
-    }
-    let md = markdown.join('\n');
-    console.log(md)
+  let csvString = treeRowsStore.exportCSV(config.value, true);
+  const lines = csvString.trim().split('\n');
 
-    navigator.clipboard.writeText(md).then(function() {
-      console.log('Text copied to clipboard!');
-  }).catch(function(err) {
-      console.error('Could not copy text: ', err);
+  // Split each line into columns
+  const table = lines.map(line => line.split(',').map(item => item.trim()));
+
+  // Create the Markdown table
+  let markdown = [];
+
+  // Header row
+  const header = table[0];
+  markdown.push('| ' + header.join(' | ') + ' |');
+
+  // Separator row
+  markdown.push('|-' + '-|-'.repeat(header.length - 1) + '-|');
+
+  // Data rows
+  for (let i = 1; i < table.length; i++) {
+    markdown.push('| ' + table[i].join(' | ') + ' |');
+  }
+  let md = markdown.join('\n');
+  console.log(md)
+
+  navigator.clipboard.writeText(md).then(function () {
+    console.log('Text copied to clipboard!');
+  }).catch(function (err) {
+    console.error('Could not copy text: ', err);
   });
 
-    return markdown.join('\n');
+  return markdown.join('\n');
 }
 
 

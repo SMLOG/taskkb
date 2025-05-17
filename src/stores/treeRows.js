@@ -26,7 +26,6 @@ root._level = 0;
 
 for (let r of root._childs) {
   loopToSetDate(r);
-  r._p = root;
 }
 
 const dataRows = ref(root);

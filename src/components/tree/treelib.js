@@ -13,8 +13,20 @@ export function getRowFromDepth(root,depth){
   export function deleteNode(rootTree,depth){
           let parentDepth = depth.replace(/\.\d+$/,'');
         let parentNode = getRowFromDepth(rootTree, parentDepth);
+        if(parentNode==undefined)return;
          let index = parseInt(depth.split('.').pop());
         return parentNode._childs.splice(index, 1);
+
+  }
+  function deepCopyObject(obj){
+  return JSON.parse(JSON.stringify(obj));
+}
+  export function copyNode(rootTree,depth){
+              let parentDepth = depth.replace(/\.\d+$/,'');
+        let parentNode = getRowFromDepth(rootTree, parentDepth);
+        let parentChilds = parentNode._childs;
+         let index = parseInt(depth.split('.').pop());
+          parentChilds.splice(index, 0, deepCopyObject(parentChilds[index]));
 
   }
   export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
