@@ -12,7 +12,7 @@
         <Config v-if="showConfig" :config="config"></Config>
         <div style="display: flex;height: 30px;">
           <a @click="addRow(1)">Add Row</a>
-          <a @click="deleteRow()">Delete Row</a>
+          <a @click="deleteSelectedNodes()">Delete Row</a>
           <a @click="saveData(0)">Save</a>
           <a @click="showConfig = !showConfig">Configuration</a>
           <a @click="showConfig = !showConfig">Team</a>
@@ -107,9 +107,9 @@ function saveData(bool) {
   }
 }
 
-function deleteRow() {
+function deleteSelectedNodes() {
   if (confirm("Please confirm to delete it?")) {
-    treeRowsStore.remove();
+    treeRowsStore.delSelectedNode();
     saveData(true);
   }
 }
