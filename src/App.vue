@@ -1,7 +1,14 @@
 <script setup>
 import Operation from '@/components/Operation.vue'
-import FormatTool from "@/components/FormatTool.vue";
+import TreeOperation from '@/components/tree/TreeOperation.vue'
 
+import FormatTool from "@/components/FormatTool.vue";
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
+
+const isTree = route.path === '/';
+console.log(isTree)
 </script>
 
 <template>
@@ -34,7 +41,8 @@ import FormatTool from "@/components/FormatTool.vue";
       <router-view>
       </router-view>
     </FormatTool>
-      <Operation />
+      <TreeOperation v-if="isTree"/>
+      <Operation v-else />
     </div>
   </main>
 </template>

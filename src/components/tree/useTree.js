@@ -366,6 +366,14 @@ const handleMouseCellsMove = (event) => {
   const calDiffDates = (firstDay) => {
     return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
   }
+  const insertNode=(node)=>{
+    let parent = rootObj;
+    if(selectDepths.length>0){
+      parent = getRowFromDepth(rootObj, selectDepths[0]);
+    }
+    if(!parent._childs)parent._childs=[]
+    parent._childs.push(node)
+  }
   return {
     calDiffDates,
     dragOver,
@@ -380,6 +388,6 @@ const handleMouseCellsMove = (event) => {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-     selectDepths
+     selectDepths,rootObj,insertNode
   };
 }
