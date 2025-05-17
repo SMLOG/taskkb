@@ -41,3 +41,12 @@ export function deepCopy(obj) {
 
 
   }
+  export function formatDate(date) {
+  const year = date.getFullYear(); // Get last two digits of the year
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const month = monthNames[date.getMonth()]; // Get month abbreviation
+  const day = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+
+  return `${day}-${month}-${year}`;
+}

@@ -1,8 +1,8 @@
 import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
-import { getRowFromDepth,moveNode,deleteNode,copyNode } from './treelib'
-import { addDatePeriod, deepCopy, calcDaysBetween } from './schedule';
+import { getRowFromDepth,moveNode,deleteNode,copyNode,getRows } from './treelib'
+import { addDatePeriod, deepCopy, calcDaysBetween,formatDate } from './schedule';
 
 
 const weeksRef = ref([]);
@@ -384,6 +384,52 @@ const handleMouseCellsMove = (event) => {
         copyNode(rootObj,selectDepths[0]);
       }
   }
+
+  function exportCSV(config,onlyText=false) {
+
+     if(selectDepths.length!=1){
+        return;
+     }
+
+  let item = getRowFromDepth(rootObj,selectDepths[0]);
+
+  let rows = getRows(item);
+  console.log(rows);
+  let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
+  rows = rows.filter((r,i)=>i!=0).map((row,rowIndex) => 
+    cols.map((col,i) => 
+    (i==0?('  '.repeat(row._level-item._level) +(rowIndex+1)+'.'+" "):"")
+    +(row["c" + col.fn]?row["c" + col.fn]:''))
+  .concat([row._tl?formatDate(row._tl.start.date):'',row._tl?formatDate(row._tl.end.date):''])
+);
+let headers =cols.map((c) => c.name);
+if(!onlyText)headers = headers.concat(['Start Date','End Date']);
+  rows.unshift(headers);
+
+  let text = rows
+    .map((r) =>
+      r
+        .map(
+          (d) =>
+            `${
+              (d &&
+                d
+                  .replace(/"/g, '""')
+                  .replace(/<.*?>/g, "")
+                  .replace(/&lt;/g, "<")
+                  .replace(/&gt;/g, ">")
+                  .replace(/&amp;/g, "&")
+                  .replace(/&nbsp;/g, " ")
+                  .replace(/\\n/g, "\\n")) ||
+              ""
+            }`
+        )
+        .map((d, i) => onlyText?`\`${d}\``:`"${d}"`)
+        .join(",")
+    )
+    .join("\n");
+   return text;
+}
   return {
     calDiffDates,
     dragOver,
@@ -398,6 +444,6 @@ const handleMouseCellsMove = (event) => {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-     selectDepths,rootObj,insertNode,delSelectedNode,copySelectedNode
+     selectDepths,rootObj,insertNode,delSelectedNode,copySelectedNode,exportCSV
   };
 }

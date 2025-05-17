@@ -123,9 +123,21 @@ function addRow(num) {
 function copyNode() {
   treeRowsStore.copySelectedNode();
 }
-
+function dowloadText(text, name) {
+  let link = document.createElement("a");
+  link.setAttribute("download", name);
+  link.setAttribute(
+    "href",
+    "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+  );
+  document.body.append(link);
+  link.click();
+  document.body.removeChild(link);
+}
 function exportCSV() {
-  treeRowsStore.exportCSV(config.value);
+  let text = treeRowsStore.exportCSV(config.value);
+    dowloadText(text, "exportcsv.csv");
+
 }
 function csvToMarkdown() {
   // Split the CSV string into lines

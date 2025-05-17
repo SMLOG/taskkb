@@ -52,3 +52,15 @@ export function getRowFromDepth(root,depth){
       }
     }
   }
+
+  export function getRows(rootRow) {
+  let list = [];
+
+  list.push(rootRow);
+  if (rootRow._childs) {
+    for (let row of rootRow._childs) {
+      list.push(...getRows(row));
+    }
+  }
+  return list;
+}
