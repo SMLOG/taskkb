@@ -1,8 +1,8 @@
 <template>
     <div class="row grid" :data-weeks="1" :class="{ selected: selectDepths.indexOf(depth) > -1 }" :data-depth="depth" v-if="depth !== ''"
-        :draggable="isDrag" :style="gridStyle" @dragstart="dragstart" @dragover="dragOver" @drop="drop">
+        :draggable="isDrag" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <component v-if="col.cp === 'ColSeq'" class="col td" :is="resolveComponent(col.cp)" :row="row" :col="col"
+            <component v-if="col.cp === 'ColSeq'" :isDrag="isDrag" class="col td" :is="resolveComponent(col.cp)" :row="row" :col="col"
                 :class="{ sticky: col.sticky }" :style="colStyle(col, 1, cellIndex)" :index="id">
 
 

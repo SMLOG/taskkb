@@ -9,7 +9,7 @@ import FormatTool from "@/components/FormatTool.vue";
 
     <div class="wrapper">
       <div>
-        <router-link to="./tree">Treetime</router-link>
+        <router-link to="./">Treetime</router-link>
         <router-link to="./grid">Grid</router-link>
         <router-link to="./timeline">Time</router-link>
       </div>

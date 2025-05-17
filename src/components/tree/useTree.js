@@ -11,6 +11,7 @@ const selectDepthsRef = ref([]);
 const selectDepths = selectDepthsRef.value;
 const selectStartRef = ref(null);
 const isDrag = ref(false);
+const isDraging = ref(false);
 const dragMode = ref(false);
 const moveType = ref(null);
 
@@ -66,7 +67,7 @@ const handleMouseDown = (event) => {
   if (!rowEl && !cell) return;
 
   // Prevent default and blur active element
-  event.preventDefault();
+//  event.preventDefault();
   if (document.activeElement && !cell?.querySelector("[contenteditable=true]")) {
     document.activeElement.blur();
   }
@@ -80,6 +81,7 @@ const handleMouseDown = (event) => {
 
     // Handle number cell click
     if (target.classList.contains("num")) {
+      console.log('handleNumClick')
       handleNumClick(depth);
       return;
     }
@@ -104,11 +106,40 @@ const handleNumClick = (depth) => {
   if (selectDepths.includes(depth)) {
     isDrag.value = true;
   } else {
+    selectDepths.length=0;
     selectDepths.push(depth);
-    selectDetphStart = depth;
+        selectDetphStart = depth;
+
   }
 };
 
+  const handleMouseUp = (event) => {
+
+    if(isDraging.value){
+      isDraging.value=false;
+      return;
+    }
+    const rowEl = event.target.closest(".row");
+    const { depth } = rowEl.dataset;
+    if (isDrag.value) {
+      selectDepths.length = 0;
+      selectDepths.push(depth);
+    }
+    isDrag.value = isMouseDown = false;
+    if (moveType.value) {
+      event.stopPropagation();
+
+      selectStartRef.value.row._tl.start = selectStartRef.value.start;
+      selectStartRef.value.row._tl.end = selectStartRef.value.end;
+
+
+      moveType.value = null;
+
+    } else {
+      locateCurSch(event);
+    }
+  };
+  
 const handleSchMoveOrDrag = (row, target, event) => {
   const { clientX } = event;
   let moveTypeConfig;
@@ -252,24 +283,7 @@ const handleMouseCellsMove = (event) => {
   }
 };
 
-  const handleMouseUp = (event) => {
-    if (isDrag.value) {
-      selectDepths.length = 0;
-    }
-    isDrag.value = isMouseDown = false;
-    if (moveType.value) {
-      event.stopPropagation();
 
-      selectStartRef.value.row._tl.start = selectStartRef.value.start;
-      selectStartRef.value.row._tl.end = selectStartRef.value.end;
-
-
-      moveType.value = null;
-
-    } else {
-      locateCurSch(event);
-    }
-  };
 
 
   const cellClass = ( col) => {
@@ -279,11 +293,14 @@ const handleMouseCellsMove = (event) => {
   };
 
   const dragstart = (event) => {
+    console.log('dragstart')
     let interceptor = event.target.closest(".row");
     if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
       console.log('dragStartClientX', dragStartClientX);
     }
+
+    isDraging.value=true;
   };
 
 
