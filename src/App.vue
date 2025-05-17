@@ -12,14 +12,6 @@ console.log(isTree)
 </script>
 
 <template>
-  <header>
-
-    <div class="wrapper">
-      <div>
-        <router-link to="./">App</router-link>
-      </div>
-    </div>
-  </header>
   <main class="flex-grow" style="position: relative;
     ">
     <div 

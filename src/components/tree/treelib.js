@@ -1,4 +1,5 @@
 export function getRowFromDepth(root,depth){
+  if(depth==undefined)return;
   const stack = depth.split('.');
   stack.shift();
   let obj = root;
