@@ -16,9 +16,7 @@ console.log(isTree)
 
     <div class="wrapper">
       <div>
-        <router-link to="./">Treetime</router-link>
-        <router-link to="./grid">Grid</router-link>
-        <router-link to="./timeline">Time</router-link>
+        <router-link to="./">App</router-link>
       </div>
     </div>
   </header>
