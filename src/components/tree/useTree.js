@@ -356,10 +356,7 @@ const handleMouseCellsMove = (event) => {
     }
   }
   const dblclickHandle = (event) => {
-    if (event.target.classList.contains('num')) {
-      let row = getRowFromDepth(rootObj, event.target.dataset.depth);
-      row._lock = !row._lock;
-    }
+
   }
 
 

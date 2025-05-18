@@ -17,7 +17,6 @@
 
 <script setup>
 import { useConfigStore } from '@/stores/config'
-import { useDataRowsStore } from '@/stores/dataRows'
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 </script>
@@ -34,24 +33,10 @@ export default {
       isDrag: 0,
       weeks: [],
       config: null,
-      dragRow: null,
-      selectedRowIndex: null,
-      moveType: null,
-      selectedcellIndex: null,
-      selectCol: null,
-      tableData: [],
-      isMouseDown: false,
-      startRowIndex: null,
-      startcellIndex: null,
-      endRowIndex: null,
-      endcellIndex: null,
-      wholeRowSelected: false,
-      selectWholeRowIndex: null,
     };
   },
   mounted() {
     this.config = useConfigStore().config;
-    this.tableData = useDataRowsStore().dataRows;
 
     if (!this.config.startDate) this.config.startDate = new Date();
     if (!this.config.weekCount) this.config.weekCount = 20;

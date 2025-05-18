@@ -1,5 +1,4 @@
 <script setup>
-import Operation from '@/components/Operation.vue'
 import TreeOperation from '@/components/tree/TreeOperation.vue'
 
 import FormatTool from "@/components/FormatTool.vue";
@@ -31,8 +30,7 @@ console.log(isTree)
       <router-view>
       </router-view>
     </FormatTool>
-      <TreeOperation v-if="isTree"/>
-      <Operation v-else />
+      <TreeOperation />
     </div>
   </main>
 </template>
