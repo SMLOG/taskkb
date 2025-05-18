@@ -4,7 +4,6 @@
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <Config v-if="showConfig" :config="config"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
-          <!-- Action Buttons -->
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
             <button @click="addRow(1)" class="btn-primary">
               ＋ Add Row
@@ -17,27 +16,21 @@
             </button>
           </div>
 
-          <!-- Save/Export -->
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
             <button @click="saveData(0)" class="btn-success">
               💾 Save
             </button>
-            <button @click="download" class="btn-info">
-              📤 Export
-            </button>
-          </div>
-
-          <!-- Configuration -->
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
             </button>
+          </div>
+
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
             <button v-if="false" @click="showConfig = !showConfig" class="btn-secondary">
               👥 Team
             </button>
           </div>
 
-          <!-- File Operations -->
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
             <button @click="openFile" class="btn-secondary">
               📂 Open
@@ -46,8 +39,10 @@
 
           </div>
 
-          <!-- Data Operations -->
           <div class="flex items-center gap-2">
+            <button @click="download" class="btn-info">
+              📤 Export
+            </button>
             <button @click="downloadSch" class="btn-secondary">
               📎 Export Sch
             </button>
