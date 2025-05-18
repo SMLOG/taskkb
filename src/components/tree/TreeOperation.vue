@@ -5,7 +5,7 @@
         <Config v-if="showConfig" :config="config"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
-            <button @click="addRow(1)" class="btn-primary">
+            <button @click="addRow(1)" class="btn-secondary">
               ＋ Add Row
             </button>
             <button @click="copyNode" class="btn-secondary">
@@ -45,7 +45,7 @@
               @mouseenter="handleShowDropdown"
               @focus="handleShowDropdown"
               @click="handleShowDropdown"
-              class="btn-info"
+              class="secondary"
             >
               ⋮ Export
             </button>
@@ -82,24 +82,15 @@
 @reference "@/assets/main.css";
 
 button {
-  @apply px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-200;
+  @apply px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200;
 }
 
-.btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
-}
 
 .btn-secondary {
   @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200;
 }
 
-.btn-danger {
-  @apply bg-red-600 text-white hover:bg-red-700;
-}
 
-.btn-success {
-  @apply bg-green-600 text-white hover:bg-green-700;
-}
 
 .btn-info {
   @apply bg-indigo-600 text-white hover:bg-indigo-700;
