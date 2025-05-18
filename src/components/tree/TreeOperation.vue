@@ -11,13 +11,13 @@
             <button @click="copyNode" class="btn-secondary">
               ⎘ Copy
             </button>
-            <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-danger">
+            <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-secondary">
               ✕ Delete {{ selectDepths.length }}
             </button>
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
-            <button @click="saveData(0)" class="btn-success">
+            <button @click="saveData(0)" class="btn-secondary">
               💾 Save
             </button>
             <button @click="showConfig = !showConfig" class="btn-secondary">
@@ -45,7 +45,7 @@
               @mouseenter="handleShowDropdown"
               @focus="handleShowDropdown"
               @click="handleShowDropdown"
-              class="secondary"
+              class="btn-secondary"
             >
               ⋮ Export
             </button>
