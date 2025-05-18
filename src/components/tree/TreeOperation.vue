@@ -1,63 +1,102 @@
 <template>
-  <div class="sticky bottom-0 left-0 z-[4] bg-white select-none">
-    <div class="grid grid-cols-[auto_1fr]">
-      <div class="flex flex-col sticky left-0 bottom-0">
+  <div class="sticky bottom-0 left-0 z-[4] bg-white border-t border-gray-200 shadow-lg">
+    <div class="max-w-screen-xl mx-auto px-4">
+      <div class="flex flex-col sticky left-0 bottom-0 active">
         <Config v-if="showConfig" :config="config"></Config>
-        <div class="flex h-8 gap-2 p-1 bg-gray-50 border-t border-gray-200">
-          <a @click="addRow(1)"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Add Row
-          </a>
-          <a @click="deleteSelectedNodes()"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Delete Row
-          </a>
-          <a @click="saveData(0)"
-            class="px-3 py-1 bg-blue-50 border border-blue-200 rounded-md shadow-sm hover:bg-blue-100 cursor-pointer text-sm text-blue-600">
-            Save
-          </a>
-          <a @click="showConfig = !showConfig"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Configuration
-          </a>
-          <a @click="showConfig = !showConfig"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Team
-          </a>
-          <a @click="download"
-            class="px-3 py-1 bg-green-50 border border-green-200 rounded-md shadow-sm hover:bg-green-100 cursor-pointer text-sm text-green-600">
-            Export
-          </a>
-          <a @click="openFile"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Open
-          </a>
-          <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
-          <a @click="downloadSch"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Export Sch
-          </a>
-          <a @click="copyNode"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Copy
-          </a>
-          <a @click="exportCSV"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            Export CSV
-          </a>
-          <a @click="csvToMarkdown"
-            class="px-3 py-1 bg-white border rounded-md shadow-sm hover:bg-gray-100 cursor-pointer text-sm">
-            MD
-          </a>
-          <a @click="copyClipboard"
-            class="px-3 py-1 bg-purple-50 border border-purple-200 rounded-md shadow-sm hover:bg-purple-100 cursor-pointer text-sm text-purple-600">
-            Clipboard
-          </a>
+        <div class="flex flex-wrap items-center gap-2 py-3">
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+            <button @click="addRow(1)" class="btn-primary">
+              ＋ Add Row
+            </button>
+            <button @click="deleteSelectedNodes()" class="btn-danger">
+              ✕ Delete Row
+            </button>
+          </div>
+
+          <!-- Save/Export -->
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+            <button @click="saveData(0)" class="btn-success">
+              💾 Save
+            </button>
+            <button @click="download" class="btn-info">
+              📤 Export
+            </button>
+          </div>
+
+          <!-- Configuration -->
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+            <button @click="showConfig = !showConfig" class="btn-secondary">
+              ⚙ Config
+            </button>
+            <button @click="showConfig = !showConfig" class="btn-secondary">
+              👥 Team
+            </button>
+          </div>
+
+          <!-- File Operations -->
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+            <button @click="openFile" class="btn-secondary">
+              📂 Open
+            </button>
+            <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
+            <button @click="downloadSch" class="btn-secondary">
+              📎 Export Sch
+            </button>
+          </div>
+
+          <!-- Data Operations -->
+          <div class="flex items-center gap-2">
+            <button @click="copyNode" class="btn-secondary">
+              ⎘ Copy
+            </button>
+            <button @click="exportCSV" class="btn-secondary">
+              📊 CSV
+            </button>
+            <button @click="csvToMarkdown" class="btn-secondary">
+              📝 Markdown
+            </button>
+            <button @click="copyClipboard" class="btn-warning">
+              📋 Clipboard
+            </button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style>
+@reference "@/assets/main.css";
+
+button {
+  @apply px-3 py-1.5 text-sm font-medium rounded-lg transition-colors duration-200;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700;
+}
+
+.btn-success {
+  @apply bg-green-600 text-white hover:bg-green-700;
+}
+
+.btn-info {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700;
+}
+
+.btn-warning {
+  @apply bg-purple-600 text-white hover:bg-purple-700;
+}
+</style>
 
 <script setup>
 import { ref, watch } from 'vue';
@@ -214,9 +253,3 @@ watch(
   { deep: true }
 );
 </script>
-
-<style scoped>
-a {
-  cursor: pointer;
-}
-</style>
