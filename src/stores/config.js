@@ -4,7 +4,7 @@ import { ref } from 'vue'
 
 
 export const useConfigStore = defineStore('config', () => {
-  let configData =localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {};
+  let configData =localStorage.getItem('config') ? JSON.parse(localStorage.getItem('config')) : {cols:[]};
   const config = ref(configData)
   const share = ref({})
 

@@ -32,15 +32,6 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { useCounterStore } from '@/stores/counter';
-
-// Access the store
-const store = useCounterStore();
-onMounted(() => {
-  setTimeout(() => {
-    store.increment();
-  }, 1000);
-});
 
 // Props
 const props = defineProps({
