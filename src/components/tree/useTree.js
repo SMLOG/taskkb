@@ -375,6 +375,7 @@ const handleMouseCellsMove = (event) => {
       for(let depth of selectDepths){
           deleteNode(rootObj,depth);
       }
+      selectDepths.length=0;
   }
   const copySelectedNode = ()=>{
       if(selectDepths.length==1){

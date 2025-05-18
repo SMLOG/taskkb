@@ -41,9 +41,10 @@
           <div class="relative"               @mouseleave="showDropdown = false"
               @blur="showDropdown = false">
             <button
-              @mouseenter="showDropdown = true"
-              @focus="showDropdown = true"
-              @click="showDropdown = true"
+              ref="moreButton"
+              @mouseenter="handleShowDropdown"
+              @focus="handleShowDropdown"
+              @click="handleShowDropdown"
               class="btn-info"
             >
               ⋮ Export
@@ -51,23 +52,22 @@
             <div
               v-show="showDropdown"
 
-              class="absolute bottom-full left-0 mb-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
-              tabindex="-1"
+              :class="[
+                'absolute left-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10',
+                dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
+              ]"              tabindex="-1"
             >
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
                 📤 Export
               </button>
-              <button @click="downloadSch" class="btn-link w-full text-left px-3 py-2">
-                📎 Export Sch
+              <button v-if="selectDepths.length" @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
+                📊 Selected to CSV
               </button>
-              <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
-                📊 CSV
+              <button v-if="selectDepths.length" @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
+                📝 Selected to Markdown
               </button>
-              <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
-                📝 Markdown
-              </button>
-              <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
-                📋 Clipboard
+              <button v-if="selectDepths.length" @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
+                📋 Selected to Clipboard
               </button>
             </div>
           </div>
@@ -140,6 +140,21 @@ function downloadJSON(jsonData, filename = 'data.json') {
   downloadLink.click();
   document.body.removeChild(downloadLink);
 }
+const moreButton = ref(null);
+const dropdownPosition = ref('top'); // Default to top (bottom-full)
+const DROPDOWN_HEIGHT = 200; // Adjust based on actual height if needed
+
+const handleShowDropdown = () => {
+  if (!moreButton.value) return;
+
+  const rect = moreButton.value.getBoundingClientRect();
+  const spaceAbove = rect.top;
+  const spaceBelow = window.innerHeight - rect.bottom;
+
+  // Show dropdown below if not enough space above
+  dropdownPosition.value = spaceAbove < DROPDOWN_HEIGHT && spaceBelow >= DROPDOWN_HEIGHT ? 'bottom' : 'top';
+  showDropdown.value = true;
+};
 
 function openFile() {
   fileInput.value.click();
@@ -216,6 +231,7 @@ function exportCSV() {
   dowloadText(text, "exportcsv.csv");
 
 }
+
 function csvToMarkdown() {
   // Split the CSV string into lines
 
