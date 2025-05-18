@@ -9,8 +9,11 @@
             <button @click="addRow(1)" class="btn-primary">
               ＋ Add Row
             </button>
-            <button @click="deleteSelectedNodes()" class="btn-danger">
-              ✕ Delete Row
+            <button @click="copyNode" class="btn-secondary">
+              ⎘ Copy
+            </button>
+            <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-danger">
+              ✕ Delete {{ selectDepths.length }}
             </button>
           </div>
 
@@ -29,7 +32,7 @@
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
             </button>
-            <button @click="showConfig = !showConfig" class="btn-secondary">
+            <button v-if="false" @click="showConfig = !showConfig" class="btn-secondary">
               👥 Team
             </button>
           </div>
@@ -40,15 +43,13 @@
               📂 Open
             </button>
             <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
-            <button @click="downloadSch" class="btn-secondary">
-              📎 Export Sch
-            </button>
+
           </div>
 
           <!-- Data Operations -->
           <div class="flex items-center gap-2">
-            <button @click="copyNode" class="btn-secondary">
-              ⎘ Copy
+            <button @click="downloadSch" class="btn-secondary">
+              📎 Export Sch
             </button>
             <button @click="exportCSV" class="btn-secondary">
               📊 CSV
@@ -107,6 +108,7 @@ import Config from '@/components/Config.vue';
 const configStore = useConfigStore();
 const treeRowsStore = useTree();
 
+const {selectDepths} =treeRowsStore;
 const showConfig = ref(false);
 const config = ref(configStore.config);
 const treeRoot = ref(treeRowsStore.rootObj);
