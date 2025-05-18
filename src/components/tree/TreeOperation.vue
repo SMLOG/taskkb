@@ -36,31 +36,47 @@
               📂 Open
             </button>
             <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
-
           </div>
 
-          <div class="flex items-center gap-2">
-            <button @click="download" class="btn-info">
-              📤 Export
+          <div class="relative"               @mouseleave="showDropdown = false"
+              @blur="showDropdown = false">
+            <button
+              @mouseenter="showDropdown = true"
+              @focus="showDropdown = true"
+              @click="showDropdown = true"
+              class="btn-info"
+            >
+              ⋮ Export
             </button>
-            <button @click="downloadSch" class="btn-secondary">
-              📎 Export Sch
-            </button>
-            <button @click="exportCSV" class="btn-secondary">
-              📊 CSV
-            </button>
-            <button @click="csvToMarkdown" class="btn-secondary">
-              📝 Markdown
-            </button>
-            <button @click="copyClipboard" class="btn-warning">
-              📋 Clipboard
-            </button>
+            <div
+              v-show="showDropdown"
+
+              class="absolute bottom-full left-0 mb-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10"
+              tabindex="-1"
+            >
+              <button @click="download" class="btn-link w-full text-left px-3 py-2">
+                📤 Export
+              </button>
+              <button @click="downloadSch" class="btn-link w-full text-left px-3 py-2">
+                📎 Export Sch
+              </button>
+              <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
+                📊 CSV
+              </button>
+              <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
+                📝 Markdown
+              </button>
+              <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
+                📋 Clipboard
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <style>
 @reference "@/assets/main.css";
@@ -92,6 +108,10 @@ button {
 .btn-warning {
   @apply bg-purple-600 text-white hover:bg-purple-700;
 }
+
+.btn-link {
+  @apply text-blue-600 underline hover:text-blue-800 hover:bg-gray-100 no-underline;
+}
 </style>
 
 <script setup>
@@ -108,6 +128,7 @@ const showConfig = ref(false);
 const config = ref(configStore.config);
 const treeRoot = ref(treeRowsStore.rootObj);
 const fileInput = ref(null);
+const showDropdown = ref(false);
 
 function downloadJSON(jsonData, filename = 'data.json') {
   const jsonString = JSON.stringify(jsonData);
