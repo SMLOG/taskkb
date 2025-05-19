@@ -1,7 +1,7 @@
 <template>
   <div v-if="row">
     <div style="display: flex">
-      <div style="margin-right:15px;z-index: 1;" :level="row._level" :style="{ paddingLeft: (level||row._level) * 15 + 'px' }">
+      <div style="margin-right:15px;z-index: 1;"  :style="{ paddingLeft: (level * 15) + 'px' }">
         <span>{{ row._id }}</span>
         <span @click="()=>clickRow(row)"
           :class="{ dot: !row._childs || !row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>
@@ -32,7 +32,8 @@ const props = defineProps({
     required: false
   },
   level:{
-    
+        type: Number,
+    required: false
   }
 });
 

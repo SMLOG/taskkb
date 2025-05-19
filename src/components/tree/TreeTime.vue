@@ -1,5 +1,5 @@
 <template>
-    <div class="row grid" :data-weeks="1" :class="{ selected: selectDepths.indexOf(depth) > -1 }" :data-depth="depth" v-if="depth !== ''"
+    <div class="row grid" :data-weeks="1" :class="{ selected: selectDepths.indexOf(depth) > -1 }" :data-depth="depth" :data-level="level" v-if="depth !== ''"
         :draggable="isDrag" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <component v-if="col.cp === 'ColSeq'" :isDrag="isDrag" class="col td" :is="resolveComponent(col.cp)" :row="row" :col="col"
