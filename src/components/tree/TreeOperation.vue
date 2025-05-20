@@ -1,8 +1,8 @@
 <template>
-  <div class="sticky bottom-0 left-0 z-[4] bg-white border-t border-gray-200 shadow-lg">
+  <div class="sticky bottom-0 left-0 z-[50] bg-white border-t border-gray-200 shadow-lg">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex flex-col sticky left-0 bottom-0 active">
-        <Config v-if="showConfig" :config="config"></Config>
+        <Config v-if="showConfig" :config="config" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
             <button @click="addRow(1)" class="btn-secondary">
