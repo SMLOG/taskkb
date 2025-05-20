@@ -23,9 +23,9 @@
         <!-- Columns List -->
         <div class="space-y-3 p-6">
           <div v-for="(col, index) in cols" :key="index"
-            class="flex flex-wrap items-center gap-3 rounded-md bg-gray-50 p-3 hover:bg-gray-100" draggable="true"
-            @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">
-            <div class="w-12 text-center text-gray-500">{{ index + 1 }}</div>
+            class="flex flex-wrap items-center gap-3 rounded-md bg-gray-50 p-3 hover:bg-gray-100" 
+           >
+            <div class="w-12 text-center text-gray-500" draggable="true"  @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
             <div class="w-32">
               <select v-model="col.cp"
                 class="w-full rounded border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
