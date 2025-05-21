@@ -7,11 +7,9 @@ export const useConfigStore = defineStore('config', () => {
   async function init() {
     try {
       const storedConfig = localStorage.getItem('config')
-      config.value = storedConfig ? JSON.parse(storedConfig) : { cols: [] }
-      console.log(config.value)
+      if(storedConfig)config.value =  JSON.parse(storedConfig) 
     } catch (error) {
       console.error('Failed to initialize config:', error)
-      config.value = { cols: [] } // Fallback to default
     }
   }
 
