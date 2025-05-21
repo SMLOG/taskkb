@@ -181,11 +181,13 @@ export default {
 .line .week-slot::after {
   height: var(--table-height);
   z-index: -1;
+
 }
 
 .line {
   z-index: -1 !important;
   height: 1px;
+  margin-top: -2px;
 }
 
 
