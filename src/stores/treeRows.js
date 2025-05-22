@@ -18,30 +18,33 @@ function loopToSetDate(row) {
   }
 }
 
-
-let root = localStorage.getItem("data")
-  ? JSON.parse(localStorage.getItem("data"))
-  : { _childs: [] };
-root._level = 0;
-
-for (let r of root._childs) {
-  loopToSetDate(r);
-}
-
-const dataRows = ref(root);
-function save() {
-  localStorage.setItem(
-    "data",
-    JSON.stringify(dataRows.value, function (key, value) {
-      if (key === "_p") {
-        return null;
-      } else return value;
-    })
-  );
-}
-
-
 export const useTreeRowsStore = defineStore("treeRows", () => {
+  const dataRows = ref({ _childs: [] });
+
+  async function init() {
+    try {
+      const storedConfig = localStorage.getItem('data')
+      if (storedConfig) dataRows.value = JSON.parse(storedConfig);
+      for (let r of dataRows.value._childs) {
+        loopToSetDate(r);
+      }
+
+    } catch (error) {
+      console.error('Failed to initialize config:', error)
+    }
+  }
+
+  async function save() {
+    try {
+      localStorage.setItem('data', JSON.stringify(dataRows.value))
+    } catch (error) {
+      console.error('Failed to save config:', error)
+    }
+  }
+
+  // Call init asynchronously and handle potential errors
+  init().catch(error => console.error('Init failed:', error))
+
   return {
     dataRows,
     save
