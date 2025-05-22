@@ -14,7 +14,7 @@
                 </div>
             </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length">
+        <div class="col" :colspan="7 * weeks.length" v-if="showSch">
             <div style="display: flex; flex-wrap: nowrap" class="sch">
                 <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                     <div v-if="row._tl && row._tl.end" :style="{
@@ -84,10 +84,11 @@ const props = defineProps({
     }, id: {
 
     }, weeks: {},days:{},firstDay:{}
+    ,showSch:{}
 });
 
 // Drag and drop composable
-const { dragOver, dragstart, drop, isDrag, selectDepths } = useTree();
+const {  isDrag, selectDepths } = useTree();
 
 // Column style function
 const colStyle = (col, isH, index) => {
@@ -106,11 +107,10 @@ const componentMap = {
     ColDate,
     ColSeq,
 };
-// Resolve component dynamically
 const resolveComponent = (cp) => {
-    return componentMap[cp] || null; // Fallback to null if component not found
+    return componentMap[cp] || null; 
 };
 
 </script>
 
-<style src="@/components/tree.css" scoped></style>@/components/tree/useTreeDrapDropComposable@/components/tree/useTreeDrapDropComposable@/components/tree/useTree
+<style src="@/components/tree.css" scoped></style>

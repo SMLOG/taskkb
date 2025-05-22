@@ -22,7 +22,7 @@
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
       <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" />
-      <TimelineHeader />
+      <TimelineHeader :weeks="weeks" :showSch="config.showSch" />
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
@@ -30,7 +30,7 @@
               <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>            </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length" style="user-select: none;">
+        <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="config.showSch">
           <div style="display: flex; flex-wrap: nowrap">
             <div v-for="(week, index) in weeks" :key="week" class="week-slot">
               <div>
@@ -50,7 +50,7 @@
           </div>
         </div>
       </div>
-      <TreeTime :row="root" :depth="''"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns()  }" v-if="root"></TreeTime>
+      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns()  }" v-if="root"></TreeTime>
     </div>
   </div>
 </template>

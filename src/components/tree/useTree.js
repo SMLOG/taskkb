@@ -275,7 +275,6 @@ export function useTree() {
 
               selectStartRef.value.start = weeks[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
               selectStartRef.value.end = weeks[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
-              console.log("moveUnits", moveUnits);
             }
           }
         }

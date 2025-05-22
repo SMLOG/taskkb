@@ -76,10 +76,6 @@
             <input type="checkbox" v-model="config.autoSave" class="rounded" />
             Auto Save
           </label>
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" v-model="config.fix" class="rounded" />
-            Fix
-          </label>
         </div>
       </div>
     </div>
