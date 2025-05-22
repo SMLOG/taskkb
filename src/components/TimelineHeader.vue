@@ -14,16 +14,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
-import { useConfigStore } from '@/stores/config';
 import '@vuepic/vue-datepicker/dist/main.css';
 
-const configStore = useConfigStore();
-const config = ref(configStore.config);
 
-// Computed properties
-const cols = computed(() => config.cols?.filter(e => e.show) ?? []);
-const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
 
 // Methods
 const colStyle = (col, isH, index) => {
@@ -37,6 +30,8 @@ const colStyle = (col, isH, index) => {
 };
 
 const props = defineProps({
+  cols:{},
+  gridColumns:{},
  weeks: {},days:{},firstDay:{},showSch:{}
 });
 

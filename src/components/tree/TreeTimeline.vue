@@ -21,8 +21,8 @@
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
-      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" />
-      <TimelineHeader :weeks="weeks" :showSch="config.showSch" />
+      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config.showSch" />
+      <TimelineHeader :cols="cols" :weeks="weeks" :showSch="config.showSch" :gridColumns="gridColumns()"/>
       <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
