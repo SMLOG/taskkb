@@ -1,22 +1,7 @@
 <template>
   <div class="table-container" style="position: relative;" :class="{ drag: isDragging, move: isMoving }">
-    <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
-      @mouseup.prevent="stopHandleMovement">
-    </div>
-    <a v-if="config" @mouseenter="showDatePicker = true" @mouseleave="showDatePicker = false"
-      style="position: fixed;top:20%;right:10px;z-index: 100;">
-      Start
-      <div v-show="showDatePicker" style="position: absolute;background: white;right:0;">
-        <VueDatePicker v-model="config.startDate"
-          @date-update="(d) => { config.startDate = d; showDatePicker = false }" :enable-time-picker="false"
-          type="date" inline auto-apply />
-        <div style="margin:10px;"> Weeks:<input type="number" v-model="config.weekCount" :min="20"
-            @mousedown.stop,
-          @mousedown.stop /></div>
-        <div style="margin:10px;"> Allow Options:<input v-model="config.allowOptions" :min="20"
-            @mousedown.stop /></div>
-      </div>
-    </a>
+
+    <DatePicker :config="config" />
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
@@ -57,7 +42,6 @@
 <script setup>
 import { ref,  computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useConfigStore } from '@/stores/config';
-import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
 import TimelineHeader from '@/components/TimelineHeader.vue';
 import ColTitle from '@/components/ColTitle.vue';
@@ -66,6 +50,7 @@ import ColDate from '@/components/ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import ColSeq from '@/components/ColSeq.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
+import DatePicker from '@/components/tree/DatePicker.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
 import { useTree } from '@/components/tree/useTree';
@@ -86,8 +71,6 @@ const {
 
 // Reactive state
 const isMounted = ref(false);
-const showMoveOverLayer = ref(false);
-const showDatePicker = ref(false);
 
 const root = ref(null);
 
