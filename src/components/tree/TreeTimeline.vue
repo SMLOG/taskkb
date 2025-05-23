@@ -11,7 +11,8 @@
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col,  key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
             <div class="cell" >
-              <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>            </div>
+              <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>
+            </div>
           </div>
         </template>
         <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="config.showSch">
@@ -63,8 +64,7 @@ const {
   moveType,  dblclickHandle,  weeks
 } = useTree();
 
-// Reactive state
-const isMounted = ref(false);
+
 
 const root = ref(null);
 
@@ -100,8 +100,6 @@ watch(
 // Lifecycle hooks
 onMounted(() => {
   root.value = treeRowsStore.dataRows;
-
-  nextTick(() => isMounted.value = true);
   document.addEventListener("keydown", handleKeyDown);
   if (!config.value.startDate) config.value.startDate = new Date();
   if (!config.value.weekCount) config.value.weekCount = 20;

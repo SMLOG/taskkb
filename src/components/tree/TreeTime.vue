@@ -2,14 +2,9 @@
     <div class="row grid" :data-weeks="1" :class="{ selected: selectDepths.indexOf(depth) > -1 }" :data-depth="depth" :data-level="level" v-if="depth !== ''"
         :draggable="isDrag" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <component v-if="col.cp === 'ColSeq'" :isDrag="isDrag" class="col td" :is="resolveComponent(col.cp)" :row="row" :col="col"
-                :class="{ sticky: col.sticky }" :style="colStyle(col, 1, cellIndex)" :index="id">
-
-
-            </component>
-            <div v-else class="col td" :class="{ sticky: col.sticky }" :style="colStyle(col, 1, cellIndex)">
+            <div  class="col td" :class="{ sticky: col.sticky }" :style="colStyle(col, 1, cellIndex)">
                 <div class="cell">
-                    <component :is="resolveComponent(col.cp)" :row="row" :col="col" :level="level">
+                    <component :is="resolveComponent(col.cp)" :row="row" :col="col" :level="level" :index="id">
                     </component>
                 </div>
             </div>
