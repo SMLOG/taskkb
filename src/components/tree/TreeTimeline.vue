@@ -22,8 +22,8 @@
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
       <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config.showSch" />
-      <TimelineHeader :cols="cols" :weeks="weeks" :showSch="config.showSch" :gridColumns="gridColumns()"/>
-      <div class="row header" :style="{ gridTemplateColumns: gridColumns() }">
+      <TimelineHeader :cols="cols" :weeks="weeks" :showSch="config.showSch" :gridColumns="gridColumns"/>
+      <div class="row header" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
             <div class="cell" >
@@ -50,7 +50,7 @@
           </div>
         </div>
       </div>
-      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns()  }" v-if="root"></TreeTime>
+      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="root"></TreeTime>
     </div>
   </div>
 </template>
@@ -116,9 +116,7 @@ const colStyle = (col, isH, index) => {
   return style;
 };
 
-const gridColumns = () => {
-  return cols.value.map(e => e.width + 'px').join(' ') + ' 1fr';
-};
+
 
 const isCollapsed = (row) => {
   if (row && row._p) {
@@ -165,7 +163,7 @@ if (!config.value.startDate) config.value.startDate = new Date();
 const firstDay = computed(() => weeks[0].dates[0]);
 const days = computed(() => config.value.weekCount * 7);
 const cols = computed(() => config.value && config.value.cols ? config.value.cols.filter(e => e.show) : []);
-
+const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
 
 </script>
 
