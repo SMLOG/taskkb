@@ -21,12 +21,7 @@
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
               <div style="display: flex; justify-content: space-between">
-                <span v-for="day in week.dates" :key="day" class="day" :class="{
-                  selected: selectStartRef && selectStartRef.start && isBetween(selectStartRef.start.i, selectStartRef.end.i, day.i),
-                  today: day.isCur,
-                  weekend: day.isWeekend,
-                  holiday: day.holiday
-                }">
+                <span v-for="day in week.dates" :key="day" class="day" :class="getDayClasses(day, selectStartRef)">
                   {{ day.label }}
                 </span>
               </div>
@@ -128,7 +123,12 @@ const cols = computed(() => config.value && config.value.cols ? config.value.col
 const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
 const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
 const isMoving = computed(() => moveType.value?.type === 'move');
-
+const getDayClasses = (day, selectStartRef) => ({
+  selected: selectStartRef?.start && isBetween(selectStartRef.start.i, selectStartRef.end.i, day.i),
+  today: day.isCur,
+  weekend: day.isWeekend,
+  holiday: day.holiday,
+});
 </script>
 
 <style src="@/components/grid.css" scoped></style>
