@@ -9,7 +9,7 @@
       <TimelineHeader :cols="cols" :weeks="weeks" :showSch="config.showSch" :gridColumns="gridColumns"/>
       <div class="row header" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
-          <div class="col" ref="thRefs" :style="colStyle(col, 1, key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
+          <div class="col" ref="thRefs" :style="colStyle(col,  key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
             <div class="cell" >
               <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>            </div>
           </div>
@@ -64,7 +64,7 @@ const treeRowsStore = useTreeRowsStore();
 const {
   dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp,
   cellClass,  handleKeyDown, selectStartRef,
-   dragstart, drop, curRowIndex,
+   dragstart, drop, 
   moveType,  dblclickHandle,  weeks
 } = useTree();
 
@@ -77,35 +77,14 @@ const root = ref(null);
 const configStore = useConfigStore();
 const config = ref(configStore.config);
 
-const componentMap = {
-  ColTitle,
-  ColDropText,
-  ColDate,
-  ColSeq,
-};
-const resolveComponent = (cp) => {
-  return componentMap[cp] || null; 
-};
+const componentMap = { ColTitle, ColDropText, ColDate, ColSeq };
+const resolveComponent = computed(() => (cp) => componentMap[cp] || null);
 
-const colStyle = (col, isH, index) => {
-  let style = {};
-  if (col.sticky) {
-    style.left = `var(--sticky-left-${index})`;
-  } else {
-    style.left = 'auto';
-  }
-  return style;
-};
+const colStyle = (col, index) => ({
+  left: col.sticky ? `var(--sticky-left-${index})` : 'auto'
+});
 
 
-
-const isCollapsed = (row) => {
-  if (row && row._p) {
-    if (row._p._collapsed) return true;
-    return isCollapsed(row._p);
-  }
-  return false;
-};
 
 watch(
   () => config.value.startDate,
@@ -129,16 +108,18 @@ onMounted(() => {
 
   nextTick(() => isMounted.value = true);
   document.addEventListener("keydown", handleKeyDown);
+  if (!config.value.startDate) config.value.startDate = new Date();
+  if (!config.value.weekCount) config.value.weekCount = 20;
+  weeks.length = 0;
+  weeks.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
+
 });
 
 onBeforeUnmount(() => {
   document.removeEventListener("keydown", handleKeyDown);
 });
 
-if (!config.value.startDate) config.value.startDate = new Date();
-  if (!config.value.weekCount) config.value.weekCount = 20;
-  weeks.length = 0;
-  weeks.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
+
   
 // Computed properties
 const firstDay = computed(() => weeks[0].dates[0]);
@@ -151,12 +132,3 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 </script>
 
 <style src="@/components/grid.css" scoped></style>
-<style scoped>
-.selectStartRef.dragMode,
-.dragMode {
-  background-color: green !important;
-}
-.lock {
-  color: red;
-}
-</style>
