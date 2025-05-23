@@ -1,6 +1,5 @@
 <template>
-  <div class="table-container" style="position: relative;"
-    :class="{ drag: moveType && (moveType.type == 'leftDrag' || moveType.type == 'rightDrag'), move: moveType && moveType.type == 'move' }">
+  <div class="table-container" style="position: relative;" :class="{ drag: isDragging, move: isMoving }">
     <div class="overlay" v-if="showMoveOverLayer" @mousemove.prevent="handleMovement"
       @mouseup.prevent="stopHandleMovement">
     </div>
@@ -164,6 +163,8 @@ const firstDay = computed(() => weeks[0].dates[0]);
 const days = computed(() => config.value.weekCount * 7);
 const cols = computed(() => config.value && config.value.cols ? config.value.cols.filter(e => e.show) : []);
 const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
+const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
+const isMoving = computed(() => moveType.value?.type === 'move');
 
 </script>
 
