@@ -18,6 +18,8 @@
 <script setup>
 import { defineProps,ref } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css';
+
 const showDatePicker = ref(false);
 
 defineProps({
