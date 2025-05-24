@@ -110,14 +110,15 @@ import { ref, watch } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import { useTree } from '@/components/tree/useTree';
 import Config from '@/components/Config.vue';
+import { useTreeRowsStore } from "@/stores/treeRows";
 
 const configStore = useConfigStore();
-const treeRowsStore = useTree();
+const tree = useTree();
 
-const {selectDepths} =treeRowsStore;
+const {selectDepths} =tree;
 const showConfig = ref(false);
 const config = ref(configStore.config);
-const treeRoot = ref(treeRowsStore.rootObj);
+const treeRoot = ref(tree.rootObj);
 const fileInput = ref(null);
 const showDropdown = ref(false);
 
@@ -186,25 +187,25 @@ function download() {
 function saveData(bool) {
   if (!bool || config.value.autoSave) {
 
-    localStorage.setItem('data', JSON.stringify(treeRoot.value));
-    localStorage.setItem('config', JSON.stringify(config.value));
+    configStore.save();
+    useTreeRowsStore().save();
 
   }
 }
 
 function deleteSelectedNodes() {
   if (confirm("Please confirm to delete it?")) {
-    treeRowsStore.delSelectedNode();
+    tree.delSelectedNode();
     saveData(true);
   }
 }
 
 function addRow(num) {
-  treeRowsStore.insertNode({ _id: '' });
+  tree.insertNode({ _id: '' });
 }
 
 function copyNode() {
-  treeRowsStore.copySelectedNode();
+  tree.copySelectedNode();
 }
 function dowloadText(text, name) {
   let link = document.createElement("a");
@@ -218,7 +219,7 @@ function dowloadText(text, name) {
   document.body.removeChild(link);
 }
 function exportCSV() {
-  let text = treeRowsStore.exportCSV(config.value);
+  let text = tree.exportCSV(config.value);
   dowloadText(text, "exportcsv.csv");
 
 }
@@ -226,7 +227,7 @@ function exportCSV() {
 function csvToMarkdown() {
   // Split the CSV string into lines
 
-  let csvString = treeRowsStore.exportCSV(config.value, true);
+  let csvString = tree.exportCSV(config.value, true);
   const lines = csvString.trim().split('\n');
 
   // Split each line into columns
@@ -260,7 +261,7 @@ function csvToMarkdown() {
 
 
 function copyClipboard() {
-  let text = treeRowsStore.exportCSV(config.value, false, '\t');
+  let text = tree.exportCSV(config.value, false, '\t');
 
   navigator.clipboard.writeText(text).then(function () {
     console.log('Text copied to clipboard!');
@@ -271,7 +272,7 @@ function copyClipboard() {
 
 // Watch for changes in dataRows
 watch(
-  () => treeRowsStore.dataRows,
+  () => tree.dataRows,
   () => {
     saveData();
   },
