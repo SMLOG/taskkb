@@ -39,17 +39,14 @@
 import { ref,  computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import TimelineHeader from '@/components/TimelineHeader.vue';
-import ColTitle from '@/components/ColTitle.vue';
-import ColDropText from '@/components/ColDropText.vue';
-import ColDate from '@/components/ColDate.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
-import ColSeq from '@/components/ColSeq.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
 import { useTree } from '@/components/tree/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
+import {resolveComponent} from '@/components/cpList';
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -72,8 +69,6 @@ const root = ref(null);
 const configStore = useConfigStore();
 const config = ref(configStore.config);
 
-const componentMap = { ColTitle, ColDropText, ColDate, ColSeq };
-const resolveComponent = computed(() => (cp) => componentMap[cp] || null);
 
 const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto'

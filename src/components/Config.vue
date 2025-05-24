@@ -83,7 +83,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue';
+import {cpList} from '@/components/cpList';
 
 // Interfaces
 interface Column {
@@ -114,7 +115,7 @@ const props = defineProps<{
 }>();
 
 // Reactive state
-const cpList = ref<string[]>(['ColTitle', 'ColDropText', 'ColDate', 'Time', 'ColSeq']);
+
 const dragStartIndex = ref<number | null>(null);
 
 // Computed properties

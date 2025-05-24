@@ -43,12 +43,10 @@
 
 <script setup>
 import { useTree } from '@/components/tree/useTree';
-import ColTitle from '@/components/ColTitle.vue';
-import ColDropText from '@/components/ColDropText.vue';
-import ColDate from '@/components/ColDate.vue';
-import ColSeq from '@/components/ColSeq.vue';
 import { defineProps } from 'vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
+import {resolveComponent} from '@/components/cpList';
+
 // Composable
 const {
   getCacWidth, selectStartRef,
@@ -96,15 +94,6 @@ const colStyle = (col, isH, index) => {
     return style;
 };
 
-const componentMap = {
-    ColTitle,
-    ColDropText,
-    ColDate,
-    ColSeq,
-};
-const resolveComponent = (cp) => {
-    return componentMap[cp] || null; 
-};
 
 </script>
 

@@ -50,11 +50,8 @@
 
 <script setup>
 import { useTree } from '@/components/tree/useTree';
-import ColTitle from '@/components/ColTitle.vue';
-import ColDropText from '@/components/ColDropText.vue';
-import ColDate from '@/components/ColDate.vue';
-import ColSeq from '@/components/ColSeq.vue';
 import { defineProps } from 'vue';
+import {resolveComponent} from '@/components/cpList';
 
 // Define props
 const props = defineProps({
@@ -95,18 +92,9 @@ const colStyle = (col, isH, index) => {
     return style;
 };
 
-const componentMap = {
-  ColTitle,
-  ColDropText,
-  ColDate,
-  ColSeq,
-};
-// Resolve component dynamically
-const resolveComponent = (cp) => {
-  return componentMap[cp] || null; // Fallback to null if component not found
-};
+
 
 </script>
 
 <style src="@/components/tree.css" scoped>
-</style>@/components/tree/useTree
+</style>
