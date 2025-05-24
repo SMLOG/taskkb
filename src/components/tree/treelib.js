@@ -66,14 +66,29 @@ export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStar
   }
 }
 
-export function getRows(rootRow) {
+export function getRows(rootRow,level,depth) {
   let list = [];
-
-  list.push(rootRow);
+  list.push({level:level,row:rootRow,depth:depth});
   if (rootRow._childs) {
-    for (let row of rootRow._childs) {
-      list.push(...getRows(row));
+    for (let i=0;i<rootRow._childs.length;i++) {
+      let  row =rootRow._childs[i]
+      list.push(...getRows(row,level+1,depth+"."+(i+1)));
     }
   }
   return list;
+}
+
+export function filterChildDepths(depths) {
+  return depths.filter(item => {
+    // Split the item into segments to check parent paths
+    const segments = item.split('.');
+    // Generate all possible parent paths by reducing segments
+    for (let i = 1; i < segments.length; i++) {
+      const parent = segments.slice(0, i).join('.');
+      if (depths.includes(parent)) {
+        return false; // Exclude item if its parent is in the array
+      }
+    }
+    return true; // Include item if no parent is found
+  });
 }

@@ -1,5 +1,5 @@
 <template>
-  <a v-if="row" class="etype num" :draggable="isDrag">{{ index||row._rIndex }}</a>
+  <a v-if="row" class="etype num" :draggable="isDrag">{{ index }}</a>
   <div v-else>#</div>
 </template>
 

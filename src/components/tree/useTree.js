@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { useTreeRowsStore } from "@/stores/treeRows";
 import { useConfigStore } from "@/stores/config";
-import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo } from './treelib'
+import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from './treelib'
 import { addDatePeriod, deepCopy, calcDaysBetween, formatDate } from './schedule';
 
 
@@ -390,20 +390,29 @@ export function useTree() {
 
   function exportCSV(config, onlyText = false, colSeperator = ',') {
 
-    if (selectDepths.length != 1) {
+    if (!selectDepths.length ) {
       return;
     }
 
-    let item = getRowFromDepth(rootObj, selectDepths[0]);
+      let items = [];
 
-    let rows = getRows(item);
-    console.log(rows);
+      let j=0;
+      for(let depth of filterChildDepths(selectDepths)){
+           let item = getRowFromDepth(rootObj, depth);
+           items.push(... getRows(item,0,++j) );
+      }
+
+
+    console.log(items);
     let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
-    rows = rows.filter((r, i) => i != 0).map((row, rowIndex) =>
-      cols.map((col, i) =>
-        (i == 0 ? ('  '.repeat(row._level - item._level) + (rowIndex + 1) + '.' + " ") : "")
+    let rows = items.map((item, rowIndex) =>
+    {
+      let row = item.row;
+      return cols.map((col, i) =>
+        (i == 0 ? ('  '.repeat(item.level) + item.depth + '.' + " ") : "")
         + (row["c" + col.fn] ? row["c" + col.fn] : ''))
         .concat([row._tl ? formatDate(row._tl.start.date) : '', row._tl ? formatDate(row._tl.end.date) : ''])
+}
     );
     let headers = cols.map((c) => c.name);
     if (!onlyText) headers = headers.concat(['Start Date', 'End Date']);
