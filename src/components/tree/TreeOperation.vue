@@ -8,7 +8,7 @@
             <button @click="addRow(1)" class="btn-secondary">
               ＋ Add Row
             </button>
-            <button @click="copyNode" class="btn-secondary">
+            <button v-if="selectDepths.length==1" @click="copyNode" class="btn-secondary">
               ⎘ Copy
             </button>
             <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-secondary">
