@@ -1,160 +1,150 @@
 <template>
-  <div class="editable-dropdown " style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
-    <VueDatePicker  v-model="date"  @update:modelValue="inputDate($event)" placeholder="Start Typing ..." text-input auto-apply>
+  <div class="editable-dropdown" style="width: 100%; min-width: 1em;" @dblclick="dblclick">
+    <VueDatePicker
+      v-model="date"
+      @update:modelValue="inputDate"
+      placeholder="Start Typing ..."
+      text-input
+      auto-apply
+    >
       <template #trigger>
-    <div  ref="contentEditable" :contenteditable="editable" @blur="stopEditing($event)"
-      @keydown.enter.prevent="handleEnter" @focus="startEditing" v-html="modelValue" class="text">
-    </div>
-    </template>
+        <div
+          ref="contentEditable"
+          :contenteditable="editable"
+          @blur="stopEditing"
+          @keydown.enter.prevent="handleEnter"
+          @focus="startEditing"
+          v-html="modelValue"
+          class="text"
+        ></div>
+      </template>
     </VueDatePicker>
-
   </div>
 </template>
 
-<script>
-
+<script setup>
+import { ref, watch, onMounted } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
-import { format } from 'date-fns'
-export default {
-  data() {
-    return {
-      showDatePicker: 0,
-      date: new Date(), left: "0",
-      editing: false,
-      showDropdown: false,
-      editable: false,
-    }
-  },
-  components: {
-    VueDatePicker,
-  },
-  mounted() {
-    try{
-      if(this.modelValue&&this.modelValue.trim()!==format(this.date, 'yyyy-MM-dd')){
-        this.date = new Date(this.modelValue.trim());
-      }
+import '@vuepic/vue-datepicker/dist/main.css';
+import { format } from 'date-fns';
 
-    }catch(ee){
-console.error(ee)
-    }
-    if (this.editing && this.$refs.contentEditable) {
-      this.$refs.contentEditable.focus();
-    }
+// Props
+const props = defineProps({
+  modelValue: {
+    type: String,
+    required: false,
   },
-  props: {
-    modelValue: {
-      type: String,
-      required: false,
-    },
-    isText: {
-      type: Boolean,
-      required: false,
-    },
-
-    dropdownItems: {
-      type: Array,
-      default: () => [],
-    },
+  isText: {
+    type: Boolean,
+    required: false,
   },
-watch:{
-  modelValue(){
-    try{
-      if(this.modelValue.trim()!==format(this.date, 'yyyy-MM-dd')){
-        this.date = new Date(this.modelValue.trim());
-      }
+  dropdownItems: {
+    type: Array,
+    default: () => [],
+  },
+});
 
-    }catch(ee){
-console.error(ee)
+// Emits
+const emit = defineEmits(['update:modelValue', 'change', 'enter']);
+
+// Reactive state
+const date = ref(new Date());
+const editable = ref(false);
+const editing = ref(false);
+const contentEditable = ref(null);
+
+// Initialize date from modelValue
+const initializeDate = () => {
+  try {
+    if (
+      props.modelValue &&
+      props.modelValue.trim() !== format(date.value, 'yyyy-MM-dd')
+    ) {
+      date.value = new Date(props.modelValue.trim());
     }
+  } catch (ee) {
+    console.error(ee);
   }
-},
-  methods: {
-    formatDateToYYYYMMDD(date) {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    },
-    inputDate(event) {
-
-      console.log(this.date)
-      if (event) {
-        console.log(event);
-        this.$refs.contentEditable.innerText = this.formatDateToYYYYMMDD(event);
-        this.startEditing();
-      }
-
-
-    },
-    moveCursorToEnd(element) {
-      element.focus(); // Set focus to the contentEditable div
-
-      var range = document.createRange();
-      range.selectNodeContents(element);
-      range.collapse(false); // Collapse the range to the end
-
-      var selection = window.getSelection();
-      selection.removeAllRanges(); // Clear any existing selection
-      selection.addRange(range); // Set the new range as the selection
-    },
-    dblclick() {
-      this.editable = true;
-      setTimeout(() => {
-        this.moveCursorToEnd(this.$refs.contentEditable);
-        //this.$refs.contentEditable.focus();
-      }, 100);
-
-    },
-    startEditing() {
-      this.editing = true;
-      this.$refs.contentEditable.focus();
-  
-
-    },
-    getValue() {
-      return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML
-
-    },
-    stopEditing() {
-
-      this.timer = setTimeout(() => {
-        this.editing = false;
-        this.editable = false;
-        this.$emit('update:modelValue', this.getValue());
-        if (this.getValue() !== this.modelValue) {
-          this.$emit('change', this.getValue());
-          console.log('changed', this.getValue());
-        }
-        console.log('stopEditing');
-      }, 200);
-
-    },
-    handleInput(event) {
-      if (event && event.target) {
-        console.log(event.target.innerHTML);
-        this.$emit('update:modelValue', event.target.innerHTML);
-      }
-    },
-    handleEnter() {
-      this.$refs.contentEditable.blur();
-      this.$emit('enter');
-      this.stopEditing();
-    },
-    selectItem(item) {
-      console.log('selectItem');
-      clearTimeout(this.timer);
-      if (this.$refs.contentEditable) {
-        console.log(item);
-        this.$refs.contentEditable.focus();
-        // document.execCommand('insertText', false, item);
-        this.$refs.contentEditable.innerHTML = item;
-        this.showDropdown = false;
-      }
-      this.stopEditing();
-    },
-  },
 };
+
+// Watch modelValue changes
+watch(
+  () => props.modelValue,
+  () => {
+    initializeDate();
+  },
+);
+
+// On component mount
+onMounted(() => {
+  initializeDate();
+  if (editing.value && contentEditable.value) {
+    contentEditable.value.focus();
+  }
+});
+
+// Methods
+const formatDateToYYYYMMDD = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+const inputDate = (event) => {
+  if (event) {
+    console.log(event);
+    contentEditable.value.innerText = formatDateToYYYYMMDD(event);
+    startEditing();
+    stopEditing();
+  }
+};
+
+const moveCursorToEnd = (element) => {
+  element.focus();
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+
+const dblclick = () => {
+  editable.value = true;
+  setTimeout(() => {
+    moveCursorToEnd(contentEditable.value);
+  }, 100);
+};
+
+const startEditing = () => {
+  editing.value = true;
+  contentEditable.value.focus();
+};
+
+const getValue = () => {
+  return props.isText
+    ? contentEditable.value.textContent.trim()
+    : contentEditable.value.innerHTML;
+};
+
+const stopEditing = () => {
+    editing.value = false;
+    editable.value = false;
+    emit('update:modelValue', getValue());
+    if (getValue() !== props.modelValue) {
+      emit('change', getValue());
+      console.log('changed', getValue());
+    }
+    console.log('stopEditing');
+};
+
+const handleEnter = () => {
+  contentEditable.value.blur();
+  emit('enter');
+  stopEditing();
+};
+
 </script>
 
 <style>
@@ -201,6 +191,7 @@ console.error(ee)
   min-height: 1em;
   word-break: break-all;
 }
+
 .dp__arrow_top {
   display: none;
 }
