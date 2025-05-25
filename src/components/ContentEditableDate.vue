@@ -3,6 +3,8 @@
     <VueDatePicker
       v-model="date"
       ref="datePicker"
+      @open="onOpen"
+      @blur="onClose"
       @update:model-value="handleDateChange"
       @calendar-close="stopEditing"
       placeholder="Select or type a date..."
@@ -11,7 +13,7 @@
       :enable-time-picker="false"
       format="yyyy-MM-dd"
       :clearable="false"
-      :class="{ 'is-editing': editable }"
+      :class="{ 'is-editing': editable||isOpen }"
     >
       <template #trigger>
         <div
@@ -23,7 +25,7 @@
           @keydown.esc="stopEditing"
           @input="handleInput"
           v-html="formattedValue"
-          class="text"
+          class="text min-h-6"
         ></div>
       </template>
     </VueDatePicker>
@@ -50,7 +52,14 @@ const date = ref(null);
 const editable = ref(false);
 const contentEditable = ref(null);
 const datePicker = ref(null);
-
+const isOpen = ref(false);
+const onOpen = () => {
+  isOpen.value = true;
+};
+const onClose = () => {
+  isOpen.value = false;
+  console.log(isOpen)
+};
 // Computed
 const formattedValue = computed(() => {
   return date.value ? format(date.value, 'yyyy-MM-dd') : '';
@@ -81,6 +90,8 @@ const handleDateChange = (newDate) => {
   }
   emit('update:modelValue', formatted);
   editable.value = false; // Reset editable after date selection
+    onClose();
+    
 };
 
 const handleInput = () => {
@@ -108,8 +119,11 @@ const startEditing = () => {
 };
 
 const stopEditing = () => {
+
+  onClose();
   if (!editable.value) return;
   editable.value = false;
+
   if (contentEditable.value) {
     const value = contentEditable.value.textContent.trim();
     emit('update:modelValue', value);
@@ -118,6 +132,7 @@ const stopEditing = () => {
 
 const handleEnter = () => {
   datePicker?.value?.closeMenu();
+  onClose();
   if (!editable.value || !contentEditable.value) {
     emit('enter');
     return;
@@ -178,7 +193,6 @@ onUnmounted(() => {
 }
 
 .text {
-  min-height: 1em;
   word-break: break-word;
   padding: 4px;
   border: 1px solid transparent;
