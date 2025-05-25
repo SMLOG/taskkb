@@ -1,20 +1,24 @@
 <template>
-  <div class="editable-dropdown" :style="{ width: '100%', minWidth: '1em' }" @dblclick="startEditing">
+  <div class="editable-dropdown" @dblclick="startEditing">
     <VueDatePicker
       v-model="date"
-      @update:modelValue="handleDateChange"
+      ref="datePicker"
+      @update:model-value="handleDateChange"
+      @calendar-close="stopEditing"
       placeholder="Select or type a date..."
       text-input
       auto-apply
       :enable-time-picker="false"
       format="yyyy-MM-dd"
       :clearable="false"
+      :class="{ 'is-editing': editable }"
     >
       <template #trigger>
         <div
           ref="contentEditable"
           :contenteditable="editable"
           @blur="stopEditing"
+          @focusout="stopEditing"
           @keydown.enter.prevent="handleEnter"
           @keydown.esc="stopEditing"
           @input="handleInput"
@@ -27,77 +31,65 @@
 </template>
 
 <script setup>
-import { ref, watch, computed, nextTick } from 'vue';
+import { ref, watch, computed, onMounted, onUnmounted } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-import { format, parse } from 'date-fns';
+import { format, parse, isValid } from 'date-fns';
 
 // Props
 const props = defineProps({
-  modelValue: {
-    type: String,
-    default: '',
-  },
-  isText: {
-    type: Boolean,
-    default: false,
-  },
+  modelValue: String,
+  isText: Boolean,
 });
 
 // Emits
-const emit = defineEmits(['update:modelValue',  'enter']);
+const emit = defineEmits(['update:modelValue', 'enter']);
 
 // Reactive state
 const date = ref(null);
 const editable = ref(false);
 const contentEditable = ref(null);
+const datePicker = ref(null);
 
 // Computed
 const formattedValue = computed(() => {
-  return date && date.value && formatDateToYYYYMMDD(date.value);
+  return date.value ? format(date.value, 'yyyy-MM-dd') : '';
 });
 
-// Initialize date from modelValue
-const initializeDate = () => {
-  if (!props.modelValue) return;
-  try {
-    const parsedDate = parse(props.modelValue, 'yyyy-MM-dd', new Date());
-    if (!isNaN(parsedDate.getTime())) {
-      date.value = parsedDate;
-    }
-  } catch (error) {
-    console.warn('Invalid date format:', error);
-  }
+// Parse date
+const parseDate = (value) => {
+  if (!value) return null;
+  const parsed = parse(value, 'yyyy-MM-dd', new Date());
+  return isValid(parsed) ? parsed : null;
 };
 
-// Watch modelValue changes
-watch(() => props.modelValue, initializeDate, { immediate: true });
+// Watch modelValue
+watch(
+  () => props.modelValue,
+  (value) => {
+    date.value = parseDate(value);
+  },
+  { immediate: true }
+);
 
 // Methods
-const formatDateToYYYYMMDD = (date) => {
-  return format(date, 'yyyy-MM-dd');
-};
-
 const handleDateChange = (newDate) => {
-  if (newDate) {
-    const formatted = formatDateToYYYYMMDD(newDate);
-    contentEditable.value.innerText = formatted;
-    emitUpdate(formatted);
+  if (!newDate) return;
+  const formatted = format(newDate, 'yyyy-MM-dd');
+  if (contentEditable.value) {
+    contentEditable.value.textContent = formatted;
   }
+  emit('update:modelValue', formatted);
+  editable.value = false; // Reset editable after date selection
 };
 
 const handleInput = () => {
-  if (props.isText) {
-    emitUpdate(contentEditable.value.textContent.trim());
-  }
-};
-
-const emitUpdate = (value) => {
+  if (!props.isText) return;
+  const value = contentEditable.value.textContent.trim();
   emit('update:modelValue', value);
 };
 
-const moveCursorToEnd = async (element) => {
-  await nextTick();
+const moveCursorToEnd = (element) => {
   element.focus();
   const range = document.createRange();
   range.selectNodeContents(element);
@@ -107,34 +99,82 @@ const moveCursorToEnd = async (element) => {
   selection.addRange(range);
 };
 
-const startEditing = async () => {
-  if (!editable.value) {
-    editable.value = true;
-    await nextTick();
-    if (contentEditable.value) {
-      moveCursorToEnd(contentEditable.value);
-    }
+const startEditing = () => {
+  if (editable.value) return;
+  editable.value = true;
+  if (contentEditable.value) {
+    moveCursorToEnd(contentEditable.value);
   }
 };
 
 const stopEditing = () => {
-  if (editable.value) {
-    editable.value = false;
+  if (!editable.value) return;
+  editable.value = false;
+  if (contentEditable.value) {
     const value = contentEditable.value.textContent.trim();
-    emitUpdate(value);
+    emit('update:modelValue', value);
   }
 };
 
 const handleEnter = () => {
-  emit('enter');
-  stopEditing();
+  datePicker?.value?.closeMenu();
+  if (!editable.value || !contentEditable.value) {
+    emit('enter');
+    return;
+  }
+
+  const value = contentEditable.value.textContent.trim();
+  if (props.isText) {
+    // In text mode, emit the raw input value
+    emit('update:modelValue', value);
+  } else {
+    // In date mode, validate the input as a date
+    const parsed = parseDate(value);
+    if (parsed) {
+      date.value = parsed;
+      const formatted = format(parsed, 'yyyy-MM-dd');
+      contentEditable.value.textContent = formatted;
+      emit('update:modelValue', formatted);
+    } else {
+      // If invalid date, emit the raw value or reset to previous valid date
+      emit('update:modelValue', date.value ? format(date.value, 'yyyy-MM-dd') : '');
+    }
+  }
+
+  editable.value = false; // Explicitly reset editable state
+  emit('enter'); // Emit enter event for parent component
 };
+
+// Handle clicks outside
+onMounted(() => {
+  const handleOutsideClick = (event) => {
+    if (
+      editable.value &&
+      contentEditable.value &&
+      !contentEditable.value.contains(event.target) &&
+      !event.target.closest('.dp__calendar') &&
+      !event.target.closest('.dp__input')
+    ) {
+      stopEditing();
+    }
+  };
+  document.addEventListener('mousedown', handleOutsideClick);
+  onUnmounted(() => document.removeEventListener('mousedown', handleOutsideClick));
+});
+
+// Cleanup on unmount
+onUnmounted(() => {
+  if (editable.value) {
+    stopEditing();
+  }
+});
 </script>
 
 <style scoped>
 .editable-dropdown {
-  position: relative;
   display: inline-block;
+  width: 100%;
+  min-width: 1em;
 }
 
 .text {
@@ -146,7 +186,7 @@ const handleEnter = () => {
   outline: none;
 }
 
-.text:focus {
+.is-editing .text {
   border-color: #007bff;
   background: #fff;
 }
