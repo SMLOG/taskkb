@@ -1,11 +1,14 @@
 <template>
-  <div class="editable-dropdown" style="width: 100%; min-width: 1em;" @dblclick="dblclick">
+  <div class="editable-dropdown" :style="{ width: '100%', minWidth: '1em' }" @dblclick="startEditing">
     <VueDatePicker
       v-model="date"
-      @update:modelValue="inputDate"
-      placeholder="Start Typing ..."
+      @update:modelValue="handleDateChange"
+      placeholder="Select or type a date..."
       text-input
       auto-apply
+      :enable-time-picker="false"
+      format="yyyy-MM-dd"
+      :clearable="false"
     >
       <template #trigger>
         <div
@@ -13,8 +16,9 @@
           :contenteditable="editable"
           @blur="stopEditing"
           @keydown.enter.prevent="handleEnter"
-          @focus="startEditing"
-          v-html="modelValue"
+          @keydown.esc="stopEditing"
+          @input="handleInput"
+          v-html="formattedValue"
           class="text"
         ></div>
       </template>
@@ -23,84 +27,77 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, computed, nextTick } from 'vue';
 import VueDatePicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css';
-import { format } from 'date-fns';
+import { format, parse } from 'date-fns';
 
 // Props
 const props = defineProps({
   modelValue: {
     type: String,
-    required: false,
+    default: '',
   },
   isText: {
     type: Boolean,
-    required: false,
-  },
-  dropdownItems: {
-    type: Array,
-    default: () => [],
+    default: false,
   },
 });
 
 // Emits
-const emit = defineEmits(['update:modelValue', 'change', 'enter']);
+const emit = defineEmits(['update:modelValue',  'enter']);
 
 // Reactive state
-const date = ref(new Date());
+const date = ref(null);
 const editable = ref(false);
-const editing = ref(false);
 const contentEditable = ref(null);
+
+// Computed
+const formattedValue = computed(() => {
+  return date && date.value && formatDateToYYYYMMDD(date.value);
+});
 
 // Initialize date from modelValue
 const initializeDate = () => {
+  if (!props.modelValue) return;
   try {
-    if (
-      props.modelValue &&
-      props.modelValue.trim() !== format(date.value, 'yyyy-MM-dd')
-    ) {
-      date.value = new Date(props.modelValue.trim());
+    const parsedDate = parse(props.modelValue, 'yyyy-MM-dd', new Date());
+    if (!isNaN(parsedDate.getTime())) {
+      date.value = parsedDate;
     }
-  } catch (ee) {
-    console.error(ee);
+  } catch (error) {
+    console.warn('Invalid date format:', error);
   }
 };
 
 // Watch modelValue changes
-watch(
-  () => props.modelValue,
-  () => {
-    initializeDate();
-  },
-);
-
-// On component mount
-onMounted(() => {
-  initializeDate();
-  if (editing.value && contentEditable.value) {
-    contentEditable.value.focus();
-  }
-});
+watch(() => props.modelValue, initializeDate, { immediate: true });
 
 // Methods
 const formatDateToYYYYMMDD = (date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  return format(date, 'yyyy-MM-dd');
 };
 
-const inputDate = (event) => {
-  if (event) {
-    console.log(event);
-    contentEditable.value.innerText = formatDateToYYYYMMDD(event);
-    startEditing();
-    stopEditing();
+const handleDateChange = (newDate) => {
+  if (newDate) {
+    const formatted = formatDateToYYYYMMDD(newDate);
+    contentEditable.value.innerText = formatted;
+    emitUpdate(formatted);
   }
 };
 
-const moveCursorToEnd = (element) => {
+const handleInput = () => {
+  if (props.isText) {
+    emitUpdate(contentEditable.value.textContent.trim());
+  }
+};
+
+const emitUpdate = (value) => {
+  emit('update:modelValue', value);
+};
+
+const moveCursorToEnd = async (element) => {
+  await nextTick();
   element.focus();
   const range = document.createRange();
   range.selectNodeContents(element);
@@ -110,89 +107,56 @@ const moveCursorToEnd = (element) => {
   selection.addRange(range);
 };
 
-const dblclick = () => {
-  editable.value = true;
-  setTimeout(() => {
-    moveCursorToEnd(contentEditable.value);
-  }, 100);
-};
-
-const startEditing = () => {
-  editing.value = true;
-  contentEditable.value.focus();
-};
-
-const getValue = () => {
-  return props.isText
-    ? contentEditable.value.textContent.trim()
-    : contentEditable.value.innerHTML;
+const startEditing = async () => {
+  if (!editable.value) {
+    editable.value = true;
+    await nextTick();
+    if (contentEditable.value) {
+      moveCursorToEnd(contentEditable.value);
+    }
+  }
 };
 
 const stopEditing = () => {
-    editing.value = false;
+  if (editable.value) {
     editable.value = false;
-    emit('update:modelValue', getValue());
-    if (getValue() !== props.modelValue) {
-      emit('change', getValue());
-      console.log('changed', getValue());
-    }
-    console.log('stopEditing');
+    const value = contentEditable.value.textContent.trim();
+    emitUpdate(value);
+  }
 };
 
 const handleEnter = () => {
-  contentEditable.value.blur();
   emit('enter');
   stopEditing();
 };
-
 </script>
 
-<style>
+<style scoped>
 .editable-dropdown {
   position: relative;
   display: inline-block;
 }
 
-.editable-dropdown .dropdown {
-  position: absolute;
-  z-index: 1;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-}
-
-.editable-dropdown .dropdown ul {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-
-.editable-dropdown .dropdown ul li {
-  padding: 8px 12px;
-  cursor: pointer;
-}
-
-.editable-dropdown .dropdown ul li:hover {
-  background-color: #e5e5e5;
-}
-
-.editable-dropdown input {
-  flex: 1;
-  margin-right: 10px;
-}
-
-.dropdown {
-  position: absolute;
-  background: #ccc;
-  border-left: 2px solid green !important;
-  padding: 0 10px;
-}
-
 .text {
   min-height: 1em;
-  word-break: break-all;
+  word-break: break-word;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  outline: none;
 }
 
-.dp__arrow_top {
+.text:focus {
+  border-color: #007bff;
+  background: #fff;
+}
+
+:deep(.dp__input) {
+  border: none;
+  padding: 0;
+}
+
+:deep(.dp__arrow_top) {
   display: none;
 }
 </style>
