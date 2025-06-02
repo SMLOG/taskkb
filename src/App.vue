@@ -11,7 +11,7 @@ console.log(isTree)
 </script>
 
 <template>
-  <main class="flex-grow" style="position: relative;
+  <main class="flex-grow " style="position: relative;
     ">
     <div 
     id="mainContent"

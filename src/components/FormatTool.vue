@@ -2,7 +2,7 @@
   <div @mouseup="checkSelection">
     <slot></slot>
   </div>
-  <div id="formatTool" v-show="isFormatToolVisible" :style="{ left: formatToolLeft, top: formatToolTop }">
+  <div id="formatTool" class="fixed bg-white dark:bg-black" style="z-index: var(--vt-index-tooltip);" v-show="isFormatToolVisible" :style="{ left: formatToolLeft, top: formatToolTop }">
     <button @click="applyBold">{{ isBoldNow ? 'Un' : '' }}Bold</button>
     <button class="indicative-element" ref="indicativeElement" @click.prevent.stop="toggleColorSelect" style="color:">
       Color
@@ -121,13 +121,3 @@ const applyBold = (event) => {
   }
 };
 </script>
-
-<style scoped>
-/* Add your custom styles here */
-#formatTool {
-  position: fixed;
-  background-color: white;
-  z-index: var(--vt-index-tooltip);
-  /* Define the position and style of the format tool */
-}
-</style>

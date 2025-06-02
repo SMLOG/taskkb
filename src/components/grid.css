@@ -89,7 +89,6 @@
   position: sticky;
   top: 0;
   z-index: var(--vt-index-sticky-header);
-  background-color: white
 }
 
 .header .col {

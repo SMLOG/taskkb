@@ -1,6 +1,6 @@
 <template>
   <div v-if="row">
-    <div style="display: flex">
+    <div  class="flex">
       <div style="margin-right:15px;z-index: 1;"  :style="{ paddingLeft: (level * 15) + 'px' }">
         <span>{{ row._id }}</span>
         <span @click="()=>clickRow(row)"

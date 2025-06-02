@@ -2,7 +2,7 @@
 
 
   <!-- Popup Modal -->
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-gray-500 bg-opacity-10"
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-opacity-10"
     @click.self="close()">
     <button class="absolute right-4 top-4 text-white hover:text-white" @click="close()">
       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -10,11 +10,11 @@
       </svg>
     </button>
     <div
-      class="relative mx-4 max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-lg border-2 border-gray-300 bg-white  shadow-lg">
+      class="relative mx-4 max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-lg border-2 border-gray-300 bg-white dark:bg-black dark:border-black dark:text-color-white   shadow-lg">
         
       <div class="flex flex-col h-full min-h-0">
-        <div class="sticky top-0 z-10 bg-white pb-4 border-b border-gray-200 p-6 flex justify-between">
-          <h3 class="text-lg font-semibold text-gray-700">Columns Configuration</h3>
+        <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 p-6 flex justify-between">
+          <h3 class="text-lg font-semibold">Columns Configuration</h3>
           <button class="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600" @click="addCol">
             + Add Column
           </button>
@@ -23,7 +23,7 @@
         <!-- Columns List -->
         <div class="space-y-3 p-6">
           <div v-for="(col, index) in cols" :key="index"
-            class="flex flex-wrap items-center gap-3 rounded-md bg-gray-50 p-3 hover:bg-gray-100" 
+            class="flex flex-wrap items-center gap-3 rounded-md  p-3 hover:bg-gray-100 dark:hover:bg-gray-500" 
            >
             <div class="w-12 text-center text-gray-500" draggable="true"  @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
             <div class="w-32">
@@ -67,7 +67,7 @@
         </div>
 
         <!-- General Settings -->
-        <div class="mt-6 flex gap-6 sticky bottom-0 p-6 bg-white">
+        <div class="mt-6 flex gap-6 sticky bottom-0 p-6 ">
           <label class="flex items-center gap-2 text-sm">
             <input type="checkbox" v-model="config.showSch" class="rounded" />
             Show Schedule
