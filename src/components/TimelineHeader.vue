@@ -71,7 +71,6 @@ const props = defineProps({
 .sticky {
   position: sticky;
   z-index: 3;
-  background: white;
 }
 
 .row {

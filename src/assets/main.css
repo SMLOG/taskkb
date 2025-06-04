@@ -19,4 +19,9 @@ a,
   }
 }
 
+.sticky{
+  @apply bg-white dark:bg-black	;
+}
+
+
 

@@ -63,7 +63,6 @@
 .sticky {
   position: sticky;
   z-index: 3;
-  background: white;
 }
 
 .cell {
@@ -99,14 +98,12 @@
 .sticky {
   position: sticky;
   z-index: var(--vt-index-sticky);
-  background: white;
 }
 
 .lsticky {
   position: sticky;
   z-index: var(--vt-index-sticky);
   left: 0;
-  background: white;
 
 }
 
