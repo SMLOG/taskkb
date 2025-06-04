@@ -6,7 +6,6 @@
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
       <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config.showSch" />
-      <TimelineHeader :cols="cols" :weeks="weeks" :showSch="config.showSch" :gridColumns="gridColumns"/>
       <div class="row header bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col,  key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
@@ -124,4 +123,4 @@ const getDayClasses = (day, selectStartRef) => ({
 });
 </script>
 
-<style src="@/components/grid.css" scoped></style>
+<style src="@/components/tree.css" scoped></style>
