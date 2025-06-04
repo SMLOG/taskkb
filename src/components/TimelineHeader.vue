@@ -87,14 +87,12 @@ const props = defineProps({
   position: sticky;
   top: 0;
   z-index: var(--vt-index-sticky-header);
-  background-color: white;
 }
 
 .lsticky {
   position: sticky;
   z-index: var(--vt-index-sticky);
   left: 0;
-  background: white;
   text-align: center;
 }
 
