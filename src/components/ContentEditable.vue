@@ -9,7 +9,7 @@
         <span>T</span>
       </div>
     </div>
-    <div v-show="showDropdown && !isText && dropdownItems&&dropdownItems.length" class="dropdown">
+    <div v-show="showDropdown && !isText && dropdownItems&&dropdownItems.length" class="dropdown bg-white dark:bg-gray-800">
       <ul>
         <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
           {{ item }}
@@ -223,7 +223,6 @@ export default {
 .editable-dropdown .dropdown {
   position: absolute;
   z-index: 4;
-  background-color: #f9f9f9;
   border: 1px solid #ccc;
 }
 
@@ -239,7 +238,7 @@ export default {
 }
 
 .editable-dropdown .dropdown ul li:hover {
-  background-color: #e5e5e5;
+  font-weight: bold;
 }
 
 .editable-dropdown input {
@@ -249,7 +248,6 @@ export default {
 
 .dropdown {
   position: absolute;
-  background: #ccc;
   border-left: 2px solid green !important;
   padding: 0 10px;
 }
