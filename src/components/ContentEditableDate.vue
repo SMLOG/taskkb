@@ -1,5 +1,5 @@
 <template>
-  <div class="editable-dropdown" @dblclick="startEditing">
+  <div class="editable-dropdown flex" @dblclick="startEditing">
     <VueDatePicker
       v-model="date"
       ref="datePicker"

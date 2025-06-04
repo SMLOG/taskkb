@@ -1,5 +1,5 @@
 <template>
-  <div v-if="row">
+  <div v-if="row" class="flex grow-1">
     <ContentEditableDate v-model="row['c' + col.fn]" :dropdownItems="col.field.options"></ContentEditableDate>
   </div>
   <div v-else-if="col">
