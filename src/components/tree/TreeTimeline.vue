@@ -37,7 +37,6 @@
 <script setup>
 import { ref,  computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useConfigStore } from '@/stores/config';
-import TimelineHeader from '@/components/TimelineHeader.vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
