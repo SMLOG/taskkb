@@ -1,15 +1,14 @@
 <template>
-  <div class="editable-dropdown h-full" :style="{zIndex:showDropdown?3:2}" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick()">
-    <div style="display: flex; justify-content: space-between;" class="h-full">
-      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste($event)"  @keydown.enter.prevent="handleEnter"
-        @focus="showDropdown = 1" class="text" v-html="renderToHtml(modelValue)">
-
+  <div class="editable-dropdown h-full" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick">
+    <div  class="flex-1 h-full">
+      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste" @keydown.enter.prevent="handleEnter"
+        @focus="showDropdown = true" class="text h-full" v-html="renderToHtml(modelValue)">
       </div>
       <div v-if="isText">
         <span>T</span>
       </div>
     </div>
-    <div v-show="showDropdown && !isText && dropdownItems&&dropdownItems.length" class="dropdown bg-white dark:bg-gray-800 z-9999">
+    <div v-show="showDropdown && !isText && dropdownItems && dropdownItems.length" class="dropdown bg-white dark:bg-gray-800 z-9999">
       <ul>
         <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
           {{ item }}
@@ -17,11 +16,11 @@
       </ul>
     </div>
   </div>
-  <div style="position:absolute;inset: 0;" @dblclick="dblclick()" v-if="!editable"></div>
+  <div style="position:absolute;inset: 0;" @dblclick="dblclick" v-if="!editable"></div>
 </template>
 
-<script>
-//import {marked} from 'marked';
+<script setup>
+import { ref, watch, onMounted, nextTick } from 'vue';
 import { Marked } from "marked";
 import { markedHighlight } from "marked-highlight";
 import hljs from 'highlight.js';
@@ -29,200 +28,178 @@ import hljs from 'highlight.js';
 const marked = new Marked(
   markedHighlight({
     langPrefix: 'hljs language-',
-    highlight(code, lang, info) {
+    highlight(code, lang) {
       const language = hljs.getLanguage(lang) ? lang : 'plaintext';
       return hljs.highlight(code, { language }).value;
     }
   })
 );
-export default {
-  components: {
-  },
-  emits: ["change",'update:modelValue'],
-  mounted() {
-    if (this.editing && this.$refs.contentEditable) {
-      this.$refs.contentEditable.focus();
-    }
-  },
-  props: {
-    modelValue: {
-      type: String,
-      required: false,
-    },
-    isText: {
-      type: Boolean,
-      required: false,
-    },
 
-    dropdownItems: {
-      type: Array,
-      default: () => [],
-    },
+// Props
+const props = defineProps({
+  modelValue: {
+    type: String,
+    required: false,
   },
-  data() {
-    return {
-      editing: false,
-      showDropdown: false,
-      editable: false,
-    };
+  isText: {
+    type: Boolean,
+    required: false,
   },
-  watch:{
-           showDropdown(bool){
-            if(bool)this.$refs.contentEditable.closest('.col').classList.add('promote');
-            else if(bool)this.$refs.contentEditable.closest('.col').classList.remove('promote');
-
-
-           }
-
+  dropdownItems: {
+    type: Array,
+    default: () => [],
   },
-  methods: {
-    sanitizePaste(e) {
-            e.preventDefault();
-            var text = e.clipboardData.getData('text/plain');
-            document.execCommand('insertText', false, text);
-        },
-    convertMarkdownToHtml(markdown) {
-      var tempElement = document.createElement("div");
+});
+
+// Emits
+const emit = defineEmits(['change', 'update:modelValue', 'enter']);
+
+// Refs
+const container = ref(null);
+const contentEditable = ref(null);
+const editing = ref(false);
+const showDropdown = ref(false);
+const editable = ref(false);
+const timer = ref(null);
+
+// Watchers
+watch(showDropdown, (bool) => {
+  if (bool) {
+    contentEditable.value?.closest('.col')?.classList.add('promote');
+  } else {
+    contentEditable.value?.closest('.col')?.classList.remove('promote');
+  }
+});
+
+// Methods
+const sanitizePaste = (e) => {
+  e.preventDefault();
+  const text = e.clipboardData.getData('text/plain');
+  document.execCommand('insertText', false, text);
+};
+
+const convertMarkdownToHtml = (markdown) => {
+  const tempElement = document.createElement("div");
   tempElement.innerHTML = marked.parse(markdown);
-  var links = tempElement.getElementsByTagName('a');
-      for (var i = 0; i < links.length; i++) {
-        links[i].setAttribute('target', '_blank');
-      }
-  return tempElement.innerHTML.replaceAll(/<\/?p>/g,'').replace(/>\n/g,'>');
+  const links = tempElement.getElementsByTagName('a');
+  for (let i = 0; i < links.length; i++) {
+    links[i].setAttribute('target', '_blank');
+  }
+  return tempElement.innerHTML.replaceAll(/<\/?p>/g, '').replace(/>\n/g, '>');
+};
 
-    },
-   isHTMLSegment(string) {
+const isHTMLSegment = (string) => {
   const parser = new DOMParser();
   const parsedDocument = parser.parseFromString(string, 'text/html');
-  
-  // Check if the parsed document has any elements
   return parsedDocument.body.children.length > 0;
-},
-    renderToHtml(modelValue) {
-      if (!this.editable ) {
-        if(modelValue){
-            let replacedText = this.convertMarkdownToHtml(modelValue/*.replace(/<br>/g,'\n')*/);
-            /*var urlRegex = /(https?:\/\/[^\s]+)/g;
-            var replacedText = str.replace(urlRegex, function (url) {
-              return '<a target="_blank" href="' + url + '">' + url + '</a>';
-            });*/
-            return replacedText.replace(/\n/g, '<br>');
-       
-
-        }
-
-      }
-
-      return modelValue? modelValue.replace(/\n/g,'<br>'):modelValue;
-    },
-    moveCursorToEnd(element) {
-      element.focus(); // Set focus to the contentEditable div
-
-      var range = document.createRange();
-      range.selectNodeContents(element);
-      range.collapse(false); // Collapse the range to the end
-
-      var selection = window.getSelection();
-      selection.removeAllRanges(); // Clear any existing selection
-      selection.addRange(range); // Set the new range as the selection
-    },
-    handlerBlur(event) {
-      var isClickInsideElement = this.$refs.container.contains(event.target);
-
-      if (!isClickInsideElement) {
-        this.stopEditing();
-      }
-    },
-    dblclick() {
-      if (!this.editable) {
-        this.editable = true;
-        setTimeout(() => {
-          this.moveCursorToEnd(this.$refs.contentEditable);
-          this.$refs.contentEditable.focus();
-        }, 100);
-
-        document.addEventListener("click", this.handlerBlur);
-      }
-
-
-    },
-    startEditing() {
-      this.editing = true;
-    },
-    getValue() {
-      return this.isText ? this.$refs.contentEditable.textContent.trim() : this.$refs.contentEditable.innerHTML.replace(/<[/]?div>/g,'').replace(/\r/g,'\n');
-
-    },
-    stopEditing(event) {
-      document.removeEventListener("click", this.handlerBlur);
-      console.log('remove evnet listener');
-      this.$nextTick(() => {
-        this.timer = setTimeout(() => {
-          this.showDropdown = false;
-          this.editing = false;
-          this.editable = false;
-          console.log('stop editing')
-          this.$emit('update:modelValue', this.getValue());//.replace(/<[/]?b\s*>/ig,'**').replace(/\s*<[/]?strong.*?>/ig,'**'));
-          if (this.getValue() !== this.modelValue) {
-            this.$emit('change', this.getValue());
-            console.log('changed', this.getValue());
-          }
-          console.log('stopEditing');
-        }, 500);
-      });
-
-
-    },
-
-    insertNewLine(event) {
-      // Prevent the default "Enter" key behavior
-      event.preventDefault();
-
-      const selection = window.getSelection();
-
-      // Insert a new line at the current position
-      const textNode = document.createElement('br');
-      selection.getRangeAt(0).insertNode(textNode);
-
-      // Move the cursor to the next line
-      selection.collapseToEnd();
-    },
-    handleEnter(event) {
-      if (event.key === 'Enter' && event.shiftKey) {
-        this.insertNewLine(event)
-        //this.$refs.contentEditable.innerHTML =  this.$refs.contentEditable.innerHTML+"<br />";
-      } else {
-        this.$refs.contentEditable.blur();
-        this.$emit('enter');
-      }
-
-    },
-    selectItem(item) {
-      console.log('selectItem');
-      clearTimeout(this.timer);
-      if (this.$refs.contentEditable) {
-        console.log(item);
-        this.$refs.contentEditable.focus();
-        // document.execCommand('insertText', false, item);
-        this.$refs.contentEditable.innerHTML = item;
-        this.showDropdown = false;
-      }
-      this.stopEditing();
-    },
-  },
 };
+
+const renderToHtml = (modelValue) => {
+  if (!editable.value) {
+    if (modelValue) {
+      return convertMarkdownToHtml(modelValue).replace(/\n/g, '<br>');
+    }
+  }
+  return modelValue ? modelValue.replace(/\n/g, '<br>') : modelValue;
+};
+
+const moveCursorToEnd = (element) => {
+  element.focus();
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  const selection = window.getSelection();
+  selection.removeAllRanges();
+  selection.addRange(range);
+};
+
+const handlerBlur = (event) => {
+  const isClickInsideElement = container.value?.contains(event.target);
+  if (!isClickInsideElement) {
+    stopEditing();
+  }
+};
+
+const dblclick = () => {
+  if (!editable.value) {
+    editable.value = true;
+    setTimeout(() => {
+      moveCursorToEnd(contentEditable.value);
+      contentEditable.value?.focus();
+    }, 100);
+    document.addEventListener("click", handlerBlur);
+  }
+};
+
+const startEditing = () => {
+  editing.value = true;
+};
+
+const getValue = () => {
+  return props.isText 
+    ? contentEditable.value?.textContent.trim() 
+    : contentEditable.value?.innerHTML.replace(/<[/]?div>/g, '').replace(/\r/g, '\n');
+};
+
+const stopEditing = () => {
+  document.removeEventListener("click", handlerBlur);
+  nextTick(() => {
+    timer.value = setTimeout(() => {
+      showDropdown.value = false;
+      editing.value = false;
+      editable.value = false;
+      const newValue = getValue();
+      emit('update:modelValue', newValue);
+      if (newValue !== props.modelValue) {
+        emit('change', newValue);
+      }
+    }, 500);
+  });
+};
+
+const insertNewLine = (event) => {
+  event.preventDefault();
+  const selection = window.getSelection();
+  const textNode = document.createElement('br');
+  selection.getRangeAt(0).insertNode(textNode);
+  selection.collapseToEnd();
+};
+
+const handleEnter = (event) => {
+  if (event.key === 'Enter' && event.shiftKey) {
+    insertNewLine(event);
+  } else {
+    contentEditable.value?.blur();
+    emit('enter');
+  }
+};
+
+const selectItem = (item) => {
+  clearTimeout(timer.value);
+  if (contentEditable.value) {
+    contentEditable.value.focus();
+    contentEditable.value.innerHTML = item;
+    showDropdown.value = false;
+  }
+  stopEditing();
+};
+
+// Lifecycle
+onMounted(() => {
+  if (editing.value && contentEditable.value) {
+    contentEditable.value.focus();
+  }
+});
 </script>
 
 <style scoped>
 .editable-dropdown {
   position: relative;
   display: inline-block;
-  z-index: 2;
 }
 
 .editable-dropdown .dropdown {
   position: absolute;
-  z-index: 4;
   border: 1px solid #ccc;
 }
 
@@ -256,7 +233,5 @@ export default {
   min-height: 1em;
   word-break: break-all;
   outline: none;
-  flex-grow: 1;
 }
-
 </style>
