@@ -1,5 +1,5 @@
 <template>
-  <div class="editable-dropdown flex" @dblclick="startEditing">
+  <div class="editable-dropdown flex-1" @dblclick="startEditing">
     <VueDatePicker
       v-model="date"
       ref="datePicker"
@@ -13,7 +13,7 @@
       :enable-time-picker="false"
       format="yyyy-MM-dd"
       :clearable="false"
-      :class="{ 'is-editing': editable||isOpen }"
+      :class="{ 'is-editing': editable || isOpen }"
     >
       <template #trigger>
         <div
@@ -25,7 +25,7 @@
           @keydown.esc="stopEditing"
           @input="handleInput"
           v-html="formattedValue"
-          class="text min-h-6"
+          class="text min-h-6 flex-1"
         ></div>
       </template>
     </VueDatePicker>
@@ -58,8 +58,8 @@ const onOpen = () => {
 };
 const onClose = () => {
   isOpen.value = false;
-  console.log(isOpen)
 };
+
 // Computed
 const formattedValue = computed(() => {
   return date.value ? format(date.value, 'yyyy-MM-dd') : '';
@@ -89,9 +89,8 @@ const handleDateChange = (newDate) => {
     contentEditable.value.textContent = formatted;
   }
   emit('update:modelValue', formatted);
-  editable.value = false; // Reset editable after date selection
-    onClose();
-    
+  editable.value = false;
+  onClose();
 };
 
 const handleInput = () => {
@@ -119,7 +118,6 @@ const startEditing = () => {
 };
 
 const stopEditing = () => {
-
   onClose();
   if (!editable.value) return;
   editable.value = false;
@@ -140,10 +138,8 @@ const handleEnter = () => {
 
   const value = contentEditable.value.textContent.trim();
   if (props.isText) {
-    // In text mode, emit the raw input value
     emit('update:modelValue', value);
   } else {
-    // In date mode, validate the input as a date
     const parsed = parseDate(value);
     if (parsed) {
       date.value = parsed;
@@ -151,13 +147,12 @@ const handleEnter = () => {
       contentEditable.value.textContent = formatted;
       emit('update:modelValue', formatted);
     } else {
-      // If invalid date, emit the raw value or reset to previous valid date
       emit('update:modelValue', date.value ? format(date.value, 'yyyy-MM-dd') : '');
     }
   }
 
-  editable.value = false; // Explicitly reset editable state
-  emit('enter'); // Emit enter event for parent component
+  editable.value = false;
+  emit('enter');
 };
 
 // Handle clicks outside
@@ -186,31 +181,45 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.editable-dropdown {
-  display: inline-block;
-  width: 100%;
-  min-width: 1em;
-}
+@reference "@/assets/main.css";
 
 .text {
-  word-break: break-word;
-  padding: 4px;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  min-height: 1em;
+  word-break: break-all;
   outline: none;
+  flex-grow: 1;
 }
 
-.is-editing .text {
-  border-color: #007bff;
-  background: #fff;
+.editable-dropdown {
+  @apply inline-block w-full min-w-[1em];
 }
 
 :deep(.dp__input) {
-  border: none;
-  padding: 0;
+  @apply border-none p-0 bg-transparent text-gray-900 dark:text-gray-100;
+}
+
+:deep(.dp__calendar) {
+  @apply bg-white text-gray-900 dark:bg-gray-800 dark:text-gray-100;
+  @apply border-gray-300 dark:border-gray-600;
+}
+
+:deep(.dp__menu) {
+  @apply bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600;
+}
+
+:deep(.dp__calendar_item) {
+  @apply text-gray-900 dark:text-gray-100;
+}
+
+:deep(.dp__active_date) {
+  @apply bg-blue-500 text-white dark:bg-blue-600;
+}
+
+:deep(.dp__today) {
+  @apply border-blue-500 dark:border-blue-400;
 }
 
 :deep(.dp__arrow_top) {
-  display: none;
+  @apply hidden;
 }
 </style>
