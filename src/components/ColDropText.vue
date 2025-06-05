@@ -1,44 +1,38 @@
 <template>
-
   <div v-if="row" class="h-full">
-    <ContentEditable v-model="row['c'+col.fn]"  :dropdownItems="col.options&&col.options.split(',')" @change="change" ></ContentEditable>
+    <ContentEditable 
+      v-model="row['c' + col.fn]" 
+      :dropdownItems="col.options && col.options.split(',')" 
+      @change="change" 
+    />
   </div>
   <div v-else-if="col" class="h-full">
-    <ContentEditable v-model="col.name"  ></ContentEditable>
+    <ContentEditable v-model="col.name" />
   </div>
 </template>
 
 <script setup>
 import ContentEditable from './ContentEditable.vue';
-</script>
-<script>
-export default {
+import { defineProps, defineEmits } from 'vue';
 
-  props: {
-    col:{
-      type:Object
-    },
-    row: {
-      type: Object,
-      required: false,
-    },
+const props = defineProps({
+  col: {
+    type: Object,
+    required: true
   },
-  data() {
-    return {
+  row: {
+    type: Object,
+    required: false
+  }
+});
 
-    };
-  },
-  methods: {
+const emit = defineEmits(['change']);
 
-    change(oldVal,newVal){
-      console.log(oldVal,newVal,'...')
-      this.$emit('change',oldVal,newVal);
-
-    }
-  },
+const change = (oldVal, newVal) => {
+  console.log(oldVal, newVal, '...');
+  emit('change', oldVal, newVal);
 };
 </script>
 
 <style>
-
 </style>
