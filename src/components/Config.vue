@@ -1,21 +1,19 @@
 <template>
-
-
   <!-- Popup Modal -->
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-opacity-10"
+  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center"
     @click.self="close()">
-    <button class="absolute right-4 top-4 text-white hover:text-white" @click="close()">
+    <button class="absolute right-4 top-4 text-gray-600 hover:text-gray-800 dark:text-gray-200 dark:hover:text-white" @click="close()">
       <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
     <div
-      class="relative mx-4 max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-lg border-2 border-gray-300 bg-white dark:bg-black dark:border-black dark:text-color-white   shadow-lg">
+      class="relative mx-4 max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-lg border-2 border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 shadow-lg">
         
       <div class="flex flex-col h-full min-h-0">
-        <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 p-6 flex justify-between">
-          <h3 class="text-lg font-semibold">Columns Configuration</h3>
-          <button class="rounded bg-blue-500 px-3 py-1 text-white hover:bg-blue-600" @click="addCol">
+        <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between bg-white dark:bg-gray-800">
+          <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Columns Configuration</h3>
+          <button class="rounded bg-blue-500 px-3 py-1.5 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700" @click="addCol">
             + Add Column
           </button>
         </div>
@@ -23,57 +21,56 @@
         <!-- Columns List -->
         <div class="space-y-3 p-6">
           <div v-for="(col, index) in cols" :key="index"
-            class="flex flex-wrap items-center gap-3 rounded-md  p-3 hover:bg-gray-100 dark:hover:bg-gray-500" 
-           >
-            <div class="w-12 text-center text-gray-500" draggable="true"  @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
+            class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+            <div class="w-12 text-center text-gray-500 dark:text-gray-400" draggable="true" @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
             <div class="w-32">
               <select v-model="col.cp"
-                class="w-full rounded border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500">
+                class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400">
                 <option v-for="cp in cpList" :key="cp" :value="cp">{{ cp }}</option>
               </select>
             </div>
             <div class="min-w-[80px] flex-1">
               <input v-model="col.name"
-                class="w-full rounded border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+                class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                 placeholder="Column Name" />
             </div>
             <div v-if="col.cp === 'ColDropText'" class="flex-1">
               <input v-model="col.options"
-                class="w-full rounded border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+                class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                 placeholder="Options" />
             </div>
             <div class="flex items-center gap-2">
-              <label class="flex items-center gap-1 text-sm">
-                <input type="checkbox" v-model="col.sticky" class="rounded" />
+              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
+                <input type="checkbox" v-model="col.sticky" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Sticky
               </label>
-              <label class="flex items-center gap-1 text-sm">
-                <input type="checkbox" v-model="col.show" class="rounded" />
+              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
+                <input type="checkbox" v-model="col.show" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Show
               </label>
-              <label class="flex items-center gap-1 text-sm">
-                <input type="checkbox" v-model="col.group" class="rounded" />
+              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
+                <input type="checkbox" v-model="col.group" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Group
               </label>
-              <label class="flex items-center gap-1 text-sm">
-                <input type="checkbox" v-model="col.formula" class="rounded" />
+              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
+                <input type="checkbox" v-model="col.formula" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Formula
               </label>
             </div>
-            <button class="text-red-500 hover:text-red-700" @click="delCol(col, index)">
+            <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" @click="delCol(col, index)">
               Remove
             </button>
           </div>
         </div>
 
         <!-- General Settings -->
-        <div class="mt-6 flex gap-6 sticky bottom-0 p-6 ">
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" v-model="config.showSch" class="rounded" />
+        <div class="mt-6 flex gap-6 sticky bottom-0 p-6 bg-white dark:bg-gray-800">
+          <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
+            <input type="checkbox" v-model="config.showSch" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
             Show Schedule
           </label>
-          <label class="flex items-center gap-2 text-sm">
-            <input type="checkbox" v-model="config.autoSave" class="rounded" />
+          <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
+            <input type="checkbox" v-model="config.autoSave" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
             Auto Save
           </label>
         </div>
@@ -84,7 +81,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import {cpList} from '@/components/cpList';
+import { cpList } from '@/components/cpList';
 
 // Interfaces
 interface Column {
@@ -115,7 +112,6 @@ const props = defineProps<{
 }>();
 
 // Reactive state
-
 const dragStartIndex = ref<number | null>(null);
 
 // Computed properties
@@ -188,9 +184,10 @@ const delCol = (col: Column, index: number) => {
   max-width: 1200px;
 }
 
-/* Ensure inputs and selects have consistent styling */
+/* Ensure inputs, selects, and checkboxes have consistent styling */
 input[type="text"],
-select {
+select,
+input[type="checkbox"] {
   transition: all 0.2s ease-in-out;
 }
 
@@ -208,7 +205,6 @@ select {
   from {
     opacity: 0;
   }
-
   to {
     opacity: 1;
   }
