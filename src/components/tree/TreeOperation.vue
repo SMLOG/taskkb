@@ -1,10 +1,10 @@
 <template>
-  <div class="sticky bottom-0 left-0 z-[50] bg-white dark:bg-black shadow-lg">
+  <div class="sticky bottom-0 left-0 z-[50] bg-white dark:bg-gray-900 shadow-lg">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <Config v-if="showConfig" :config="config" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="addRow(1)" class="btn-secondary">
               ＋ Add Row
             </button>
@@ -16,7 +16,7 @@
             </button>
           </div>
 
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="saveData(0)" class="btn-secondary">
               💾 Save
             </button>
@@ -25,21 +25,20 @@
             </button>
           </div>
 
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button v-if="false" @click="showConfig = !showConfig" class="btn-secondary">
               👥 Team
             </button>
           </div>
 
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200">
+          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="openFile" class="btn-secondary">
               📂 Open
             </button>
             <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
           </div>
 
-          <div class="relative"               @mouseleave="showDropdown = false"
-              @blur="showDropdown = false">
+          <div class="relative" @mouseleave="showDropdown = false" @blur="showDropdown = false">
             <button
               ref="moreButton"
               @mouseenter="handleShowDropdown"
@@ -51,11 +50,11 @@
             </button>
             <div
               v-show="showDropdown"
-
               :class="[
-                'absolute left-0 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10',
+                'absolute left-0 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
                 dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
-              ]"              tabindex="-1"
+              ]"
+              tabindex="-1"
             >
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
                 📤 Export
@@ -77,7 +76,6 @@
   </div>
 </template>
 
-
 <style>
 @reference "@/assets/main.css";
 
@@ -85,23 +83,24 @@ button {
   @apply px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200;
 }
 
-
 .btn-secondary {
-  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200;
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200
+         dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600;
 }
 
-
-
 .btn-info {
-  @apply bg-indigo-600 text-white hover:bg-indigo-700;
+  @apply bg-indigo-600 text-white hover:bg-indigo-700
+         dark:bg-indigo-500 dark:hover:bg-indigo-600;
 }
 
 .btn-warning {
-  @apply bg-purple-600 text-white hover:bg-purple-700;
+  @apply bg-purple-600 text-white hover:bg-purple-700
+         dark:bg-purple-500 dark:hover:bg-purple-600;
 }
 
 .btn-link {
-  @apply text-blue-600 underline hover:text-blue-800 hover:bg-gray-100 no-underline;
+  @apply text-blue-600 hover:text-blue-800 hover:bg-gray-100
+         dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-gray-700 no-underline;
 }
 </style>
 
@@ -115,7 +114,7 @@ import { useTreeRowsStore } from "@/stores/treeRows";
 const configStore = useConfigStore();
 const tree = useTree();
 
-const {selectDepths} =tree;
+const { selectDepths } = tree;
 const showConfig = ref(false);
 const config = ref(configStore.config);
 const treeRoot = ref(tree.rootObj);
@@ -133,8 +132,8 @@ function downloadJSON(jsonData, filename = 'data.json') {
   document.body.removeChild(downloadLink);
 }
 const moreButton = ref(null);
-const dropdownPosition = ref('top'); // Default to top (bottom-full)
-const DROPDOWN_HEIGHT = 200; // Adjust based on actual height if needed
+const dropdownPosition = ref('top');
+const DROPDOWN_HEIGHT = 200;
 
 const handleShowDropdown = () => {
   if (!moreButton.value) return;
@@ -143,7 +142,6 @@ const handleShowDropdown = () => {
   const spaceAbove = rect.top;
   const spaceBelow = window.innerHeight - rect.bottom;
 
-  // Show dropdown below if not enough space above
   dropdownPosition.value = spaceAbove < DROPDOWN_HEIGHT && spaceBelow >= DROPDOWN_HEIGHT ? 'bottom' : 'top';
   showDropdown.value = true;
 };
@@ -158,17 +156,16 @@ function loadFile(event) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        if(confirm("will overwrite current data,are you sure to continue?")){
-        let data = JSON.parse(e.target.result);
-        if (data && data.data && data.config) {
-          localStorage.setItem('data', JSON.stringify(data.data));
-          localStorage.setItem('config', JSON.stringify(data.config));
-          location.reload();
-        } else {
-          throw new Error("wrong format");
+        if (confirm("Will overwrite current data, are you sure to continue?")) {
+          let data = JSON.parse(e.target.result);
+          if (data && data.data && data.config) {
+            localStorage.setItem('data', JSON.stringify(data.data));
+            localStorage.setItem('config', JSON.stringify(data.config));
+            location.reload();
+          } else {
+            throw new Error("wrong format");
+          }
         }
-        }
-
       } catch (error) {
         console.error("Invalid JSON file", error);
       }
@@ -186,10 +183,8 @@ function download() {
 
 function saveData(bool) {
   if (!bool || config.value.autoSave) {
-
     configStore.save();
     useTreeRowsStore().save();
-
   }
 }
 
@@ -207,6 +202,7 @@ function addRow(num) {
 function copyNode() {
   tree.copySelectedNode();
 }
+
 function dowloadText(text, name) {
   let link = document.createElement("a");
   link.setAttribute("download", name);
@@ -218,51 +214,34 @@ function dowloadText(text, name) {
   link.click();
   document.body.removeChild(link);
 }
+
 function exportCSV() {
   let text = tree.exportCSV(config.value);
   dowloadText(text, "exportcsv.csv");
-
 }
 
 function csvToMarkdown() {
-  // Split the CSV string into lines
-
   let csvString = tree.exportCSV(config.value, true);
   const lines = csvString.trim().split('\n');
-
-  // Split each line into columns
   const table = lines.map(line => line.split(',').map(item => item.trim()));
-
-  // Create the Markdown table
   let markdown = [];
-
-  // Header row
   const header = table[0];
   markdown.push('| ' + header.join(' | ') + ' |');
-
-  // Separator row
   markdown.push('|-' + '-|-'.repeat(header.length - 1) + '-|');
-
-  // Data rows
   for (let i = 1; i < table.length; i++) {
     markdown.push('| ' + table[i].join(' | ') + ' |');
   }
   let md = markdown.join('\n');
-  console.log(md)
-
   navigator.clipboard.writeText(md).then(function () {
     console.log('Text copied to clipboard!');
   }).catch(function (err) {
     console.error('Could not copy text: ', err);
   });
-
   return markdown.join('\n');
 }
 
-
 function copyClipboard() {
   let text = tree.exportCSV(config.value, false, '\t');
-
   navigator.clipboard.writeText(text).then(function () {
     console.log('Text copied to clipboard!');
   }).catch(function (err) {
@@ -270,7 +249,6 @@ function copyClipboard() {
   });
 }
 
-// Watch for changes in dataRows
 watch(
   () => tree.dataRows,
   () => {
