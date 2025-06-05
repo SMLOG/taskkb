@@ -30,7 +30,6 @@
 }
 .col .dropdown{display: none;}
 .col.promote .dropdown{display: block;}
-.col.promote .editable-dropdown{z-index: 6!important;}
 /* semantic color variables for this project */
 :root {
   --color-background: var(--vt-c-white);

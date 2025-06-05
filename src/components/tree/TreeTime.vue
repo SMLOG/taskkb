@@ -3,7 +3,7 @@
         :draggable="isDrag" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
             <div  class="col td flex" :class="{ sticky: col.sticky }" :style="colStyle(col, 1, cellIndex)">
-                <div class="cell flex grow-1">
+                <div class="cell flex-1">
                     <component :is="resolveComponent(col.cp)" :row="row" :col="col" :level="level" :index="id">
                     </component>
                 </div>
