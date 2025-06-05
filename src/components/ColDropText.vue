@@ -1,9 +1,9 @@
 <template>
 
-  <div v-if="row">
+  <div v-if="row" class="h-full">
     <ContentEditable v-model="row['c'+col.fn]"  :dropdownItems="col.options&&col.options.split(',')" @change="change" ></ContentEditable>
   </div>
-  <div v-else-if="col">
+  <div v-else-if="col" class="h-full">
     <ContentEditable v-model="col.name"  ></ContentEditable>
   </div>
 </template>

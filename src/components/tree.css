@@ -64,9 +64,7 @@
   z-index: 3;
 }
 
-.cell {
-  line-height: 2em;
-}
+
 
 .row {
   display: grid;
@@ -104,10 +102,6 @@
   z-index: var(--vt-index-sticky);
   left: 0;
 
-}
-
-.cell {
-  line-height: 2em;
 }
 
 .sch {

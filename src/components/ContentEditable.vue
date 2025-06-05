@@ -1,6 +1,6 @@
 <template>
-  <div class="editable-dropdown" ref="containerRef" style="width: 100%; min-width: 1em;" @dblclick="handleDoubleClick">
-    <div style="display: flex; justify-content: space-between;">
+  <div class="editable-dropdown h-full" ref="containerRef" style="width: 100%; min-width: 1em;" @dblclick="handleDoubleClick">
+    <div style="display: flex; justify-content: space-between;" class="h-full">
       <div
         ref="contentEditableRef"
         :contenteditable="editable"
@@ -173,6 +173,7 @@ const stopEditing = () => {
     editable.value = false;
     const newValue = getValue();
     emit('update:modelValue', newValue);
+    console.log(newValue)
     
     if (newValue !== props.modelValue) {
       emit('change', newValue);

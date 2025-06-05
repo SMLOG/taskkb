@@ -120,6 +120,7 @@ export function useTree() {
       return;
     }
     const rowEl = event.target.closest(".row");
+    if(!rowEl)return;
     const { depth } = rowEl.dataset;
     if (isDrag.value) {
       selectDepths.length = 0;
