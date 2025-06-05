@@ -24,5 +24,16 @@ a,
   @apply bg-white dark:bg-black	;
 }
 
+/* Set default caret color for specific elements */
+input, 
+textarea, 
+[contenteditable="true"] {
+    caret-color: initial; /* Uses the default caret color */
+}
+
+/* Hide caret in all other elements */
+body * {
+    caret-color: transparent; /* Makes caret invisible */
+}
 
 

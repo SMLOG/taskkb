@@ -16,7 +16,7 @@
       </ul>
     </div>
   </div>
-  <div style="position:absolute;inset: 0;" @dblclick="dblclick" v-if="!editable"></div>
+  <div style="position:absolute;inset: 0;" @dblclick="dblclick" v-if="!editable" @click="blur"></div>
 </template>
 
 <script setup>
@@ -35,6 +35,9 @@ const marked = new Marked(
   })
 );
 
+const blur = (event)=>{
+  event.target.blur();
+}
 // Props
 const props = defineProps({
   modelValue: {
