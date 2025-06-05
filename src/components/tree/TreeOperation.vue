@@ -59,13 +59,13 @@
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
                 📤 Export
               </button>
-              <button v-if="selectDepths.length" @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
+              <button  @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
                 📊 Selected to CSV
               </button>
-              <button v-if="selectDepths.length" @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
+              <button  @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
                 📝 Selected to Markdown
               </button>
-              <button v-if="selectDepths.length" @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
+              <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
                 📋 Selected to Clipboard
               </button>
             </div>
@@ -105,11 +105,13 @@ button {
 </style>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch,inject } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import { useTree } from '@/components/tree/useTree';
 import Config from '@/components/Config.vue';
 import { useTreeRowsStore } from "@/stores/treeRows";
+
+const showNotification = inject('showNotification');
 
 const configStore = useConfigStore();
 const tree = useTree();
@@ -218,6 +220,7 @@ function dowloadText(text, name) {
 function exportCSV() {
   let text = tree.exportCSV(config.value);
   dowloadText(text, "exportcsv.csv");
+  showNotification('export CSV', 'success');
 }
 
 function csvToMarkdown() {
@@ -234,6 +237,8 @@ function csvToMarkdown() {
   let md = markdown.join('\n');
   navigator.clipboard.writeText(md).then(function () {
     console.log('Text copied to clipboard!');
+    showNotification('copied to clipboard!', 'success');
+
   }).catch(function (err) {
     console.error('Could not copy text: ', err);
   });
@@ -244,6 +249,8 @@ function copyClipboard() {
   let text = tree.exportCSV(config.value, false, '\t');
   navigator.clipboard.writeText(text).then(function () {
     console.log('Text copied to clipboard!');
+    showNotification('copied to clipboard!', 'success');
+
   }).catch(function (err) {
     console.error('Could not copy text: ', err);
   });

@@ -1,8 +1,10 @@
 <script setup>
+
 import TreeOperation from '@/components/tree/TreeOperation.vue'
 
 import FormatTool from "@/components/FormatTool.vue";
 import { useRoute } from 'vue-router';
+import NotificationProvider from '@/components/NotificationProvider.vue';
 
 const route = useRoute();
 
@@ -26,11 +28,13 @@ console.log(isTree)
       grid-template-columns: 1fr;
       grid-template-rows: auto 1fr;
     ">
+     <NotificationProvider>
     <FormatTool>
       <router-view>
       </router-view>
     </FormatTool>
-      <TreeOperation />
+    <TreeOperation />
+  </NotificationProvider>
     </div>
   </main>
 </template>
