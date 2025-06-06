@@ -109,7 +109,7 @@ import { ref, watch,inject } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
-import { useTreeRowsStore } from "@/stores/treeRows";
+import { useTreeRowsStore } from "@/stores/tree";
 
 const showNotification = inject('showNotification');
 
