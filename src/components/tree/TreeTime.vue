@@ -97,4 +97,4 @@ const colStyle = (col, isH, index) => {
 
 </script>
 
-<style src="@/components/tree.css" scoped></style>
+<style src="@/components/tree/tree.css" scoped></style>
