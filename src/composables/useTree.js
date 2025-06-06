@@ -2,7 +2,7 @@ import { ref } from "vue";
 import { useTreeStore } from "@/stores/tree";
 import { useConfigStore } from "@/stores/config";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
-import { addDatePeriod, deepCopy, calcDaysBetween, formatDate } from '../components/tree/schedule';
+import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2 } from '@/lib/schedule';
 
 
 const weeksRef = ref([]);
@@ -412,7 +412,7 @@ export function useTree() {
       return cols.map((col, i) =>
         (i == 0 ? ('  '.repeat(item.level) + item.depth + '.' + " ") : "")
         + (row["c" + col.fn] ? row["c" + col.fn] : ''))
-        .concat([row._tl ? formatDate(row._tl.start.date) : '', row._tl ? formatDate(row._tl.end.date) : ''])
+        .concat([row._tl ? formatDate2(row._tl.start.date) : '', row._tl ? formatDate2(row._tl.end.date) : ''])
 }
     );
     let headers = cols.map((c) => c.name);
