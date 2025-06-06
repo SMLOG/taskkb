@@ -1,10 +1,10 @@
 
 import { ref } from 'vue';
-import ColTitle from '@/components/ColTitle.vue';
-import ColDropText from '@/components/ColDropText.vue';
-import ColDate from '@/components/ColDate.vue';
-import StartDate from '@/components/StartDate.vue';
-import ColSeq from '@/components/ColSeq.vue';
+import ColTitle from '@/components/field/ColTitle.vue';
+import ColDropText from '@/components/field/ColDropText.vue';
+import ColDate from '@/components/field/ColDate.vue';
+import StartDate from '@/components/field/StartDate.vue';
+import ColSeq from '@/components/field/ColSeq.vue';
 const componentMap = {
   ColTitle,
   ColDropText,

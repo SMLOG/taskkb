@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import { useTree } from '@/components/tree/useTree';
+import { useTree } from '@/composables/useTree';
 import { defineProps } from 'vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import {resolveComponent} from '@/components/cpList';

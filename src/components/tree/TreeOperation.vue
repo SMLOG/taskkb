@@ -107,7 +107,7 @@ button {
 <script setup>
 import { ref, watch,inject } from 'vue';
 import { useConfigStore } from '@/stores/config';
-import { useTree } from '@/components/tree/useTree';
+import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useTreeRowsStore } from "@/stores/treeRows";
 

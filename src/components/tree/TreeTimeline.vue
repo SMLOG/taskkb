@@ -42,7 +42,7 @@ import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
 import { useTreeRowsStore } from '@/stores/treeRows';
-import { useTree } from '@/components/tree/useTree';
+import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';
 
