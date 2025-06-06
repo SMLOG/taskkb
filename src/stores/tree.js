@@ -20,13 +20,13 @@ function loopToSetDate(row) {
 
 export const useTreeStore = defineStore("tree", () => {
   const treeRef = ref({ _childs: [] });
-  const config = ref({ cols: [] })
+  const configRef = ref({ cols: [] })
 
   async function init() {
     try {
 
       const storedConfig = localStorage.getItem('config')
-      if(storedConfig)config.value =  JSON.parse(storedConfig) 
+      if(storedConfig)configRef.value =  JSON.parse(storedConfig) 
 
 
       const storedData = localStorage.getItem('data')
@@ -49,7 +49,7 @@ export const useTreeStore = defineStore("tree", () => {
   }
   async function saveConfig() {
     try {
-      localStorage.setItem('config', JSON.stringify(config.value))
+      localStorage.setItem('config', JSON.stringify(configRef.value))
     } catch (error) {
       console.error('Failed to save config:', error)
     }
@@ -59,7 +59,7 @@ export const useTreeStore = defineStore("tree", () => {
 
   return {
     treeRef,
-    config,
+    configRef,
     saveData,
     saveConfig
   };

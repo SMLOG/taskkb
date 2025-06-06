@@ -30,7 +30,7 @@ function plusWorkDays(startIndex, days) {
   for (; true;) {
     start += inc;
     let date = getDate(start);
-    if (date.isWeekend && config.allowOptions && config.allowOptions.indexOf('W') == -1 || date.holiday && config.allowOptions && config.allowOptions.indexOf('H') == -1) continue;
+    if (date.isWeekend && configRef.allowOptions && configRef.allowOptions.indexOf('W') == -1 || date.holiday && configRef.allowOptions && configRef.allowOptions.indexOf('H') == -1) continue;
     k++;
     if (k == total) return getDate(start);
   }
@@ -43,7 +43,7 @@ let dragStartClientX;
 
 export function useTree() {
   const rootObj = useTreeStore().treeRef;
-  config = useTreeStore().config;
+  config = useTreeStore().configRef;
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;

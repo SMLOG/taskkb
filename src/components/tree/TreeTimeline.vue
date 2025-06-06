@@ -48,7 +48,7 @@ import {resolveComponent} from '@/components/cpList';
 const tableRef = ref(null);
 const thRefs = ref([]);
         
-const treeRowsStore = useTreeStore();
+const treeStore = useTreeStore();
 
 // Composable
 const {
@@ -63,7 +63,7 @@ const {
 const root = ref(null);
 
 // Store data
-const configRef = ref(treeRowsStore.config);
+const configRef = ref(treeStore.configRef);
 
 
 const colStyle = (col, index) => ({
@@ -90,7 +90,7 @@ watch(
 
 // Lifecycle hooks
 onMounted(() => {
-  root.value = treeRowsStore.treeRef;
+  root.value = treeStore.treeRef;
   document.addEventListener("keydown", handleKeyDown);
   if (!configRef.value.startDate) configRef.value.startDate = new Date();
   if (!configRef.value.weekCount) configRef.value.weekCount = 20;
