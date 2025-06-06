@@ -1,10 +1,10 @@
 <template>
   <div class="editable-dropdown h-full" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick">
-    <div  class="flex-1 h-full">
+    <div  class="flex flex-1 h-full justify-between">
       <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste" @keydown.enter.prevent="handleEnter"
-        @focus="showDropdown = true" class="text h-full" v-html="renderToHtml(modelValue)">
+        @focus="showDropdown = true" class="text h-full flex-1" v-html="renderToHtml(modelValue)">
       </div>
-      <div v-if="isText">
+      <div v-if="isText" class="h-full">
         <span>T</span>
       </div>
     </div>
@@ -16,7 +16,7 @@
       </ul>
     </div>
   </div>
-  <div style="position:absolute;inset: 0;" @dblclick="dblclick" v-if="!editable" @click="blur"></div>
+  <div style="position:absolute;inset: 0;" @dblclick="dblclick" v-if="!editable" ></div>
 </template>
 
 <script setup>
@@ -35,9 +35,7 @@ const marked = new Marked(
   })
 );
 
-const blur = (event)=>{
-  event.target.blur();
-}
+
 // Props
 const props = defineProps({
   modelValue: {
