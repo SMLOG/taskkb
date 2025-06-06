@@ -1,12 +1,12 @@
 <template>
-  <div v-if="row">
+  <div v-if="row" class="h-full">
     <ContentEditableDate
       v-model="date"
       :dropdownItems="col.field.options"
       @change="handleChange"
     ></ContentEditableDate>
   </div>
-  <div v-else-if="col">
+  <div v-else-if="col" class="h-full">
     <ContentEditable v-model="col.name" :isText="true"></ContentEditable>
   </div>
 </template>
