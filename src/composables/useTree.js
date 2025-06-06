@@ -1,6 +1,5 @@
 import { ref } from "vue";
 import { useTreeStore } from "@/stores/tree";
-import { useConfigStore } from "@/stores/config";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
 import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2 } from '@/lib/schedule';
 
@@ -44,7 +43,7 @@ let dragStartClientX;
 
 export function useTree() {
   const rootObj = useTreeStore().treeRef;
-  config = useConfigStore().config;
+  config = useTreeStore().config;
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;

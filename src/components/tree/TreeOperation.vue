@@ -106,19 +106,17 @@ button {
 
 <script setup>
 import { ref, watch,inject } from 'vue';
-import { useConfigStore } from '@/stores/config';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useTreeStore } from "@/stores/tree";
 
 const showNotification = inject('showNotification');
 
-const configStore = useConfigStore();
 const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const config = ref(configStore.config);
+const config = ref(useTreeStore().config);
 const treeRoot = ref(tree.rootObj);
 const fileInput = ref(null);
 const showDropdown = ref(false);
@@ -185,7 +183,7 @@ function download() {
 
 function saveData(bool) {
   if (!bool || config.value.autoSave) {
-    configStore.save();
+    useTreeStore().saveConfig();
     useTreeStore().save();
   }
 }

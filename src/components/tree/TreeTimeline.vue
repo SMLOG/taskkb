@@ -36,7 +36,6 @@
 
 <script setup>
 import { ref,  computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { useConfigStore } from '@/stores/config';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
@@ -64,8 +63,7 @@ const {
 const root = ref(null);
 
 // Store data
-const configStore = useConfigStore();
-const config = ref(configStore.config);
+const config = ref(treeRowsStore.config);
 
 
 const colStyle = (col, index) => ({
