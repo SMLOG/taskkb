@@ -2,7 +2,7 @@
 
 import TreeOperation from '@/components/tree/TreeOperation.vue'
 
-import FormatTool from "@/components/FormatTool.vue";
+import FormatTool from "@/components/tools/FormatTool.vue";
 import { useRoute } from 'vue-router';
 import NotificationProvider from '@/components/NotificationProvider.vue';
 
