@@ -17,17 +17,13 @@ console.log(isTree)
     ">
     <div 
     id="mainContent"
-    style="
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      overflow: auto;
-      right: 0;
-      left: 0;
+    style="    
       display: grid;
       grid-template-columns: 1fr;
       grid-template-rows: auto 1fr;
-    ">
+    "
+    class="absolute inset-0 overflow-auto" 
+    >
      <NotificationProvider>
     <FormatTool>
       <router-view>
