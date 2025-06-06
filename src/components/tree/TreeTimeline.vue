@@ -1,11 +1,11 @@
 <template>
   <div class="table-container" style="position: relative;" :class="{ drag: isDragging, move: isMoving }">
 
-    <DatePicker :config="config" />
+    <DatePicker :config="configRef" />
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
-      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
+      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" 
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
-      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config?.showSch" />
+      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="configRef?.showSch" />
       <div class="row header bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col,  key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
@@ -14,7 +14,7 @@
             </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="config?.showSch">
+        <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="configRef?.showSch">
           <div style="display: flex; flex-wrap: nowrap">
             <div v-for="(week, index) in weeks" :key="week" class="week-slot">
               <div>
@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="root"></TreeTime>
+      <TreeTime :row="treeRef" :depth="''" :showSch="configRef.showSch"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="treeRef"></TreeTime>
     </div>
   </div>
 </template>
@@ -60,33 +60,34 @@ const {
 
 
 
-const root = ref(null);
+const treeRef = ref(null);
 
 const tabsStore = useTabsStore();
 
 const {tabsState} = storeToRefs(tabsStore);
-const config =  ref(tabsState.value.tabs[tabsState.value.curTab].config)//ref(tabsStore.getCurTabData().config);
+const configRef =  ref(null)//ref(tabsStore.getCurTabData().config);
 
 
 const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto'
 });
 
-
+const updateWeeks = ()=>{
+  weeks.length = 0;
+  weeks.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+}
 
 watch(
-  () => config.value?.startDate,
+  () => configRef.value?.startDate,
   () => {
-    weeks.length = 0;
-    weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+    updateWeeks();
   }
 );
 
 watch(
-  () => config.value?.weekCount,
+  () => configRef.value?.weekCount,
   () => {
-    weeks.length = 0;
-    weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+    updateWeeks();
   }
 );
 
@@ -94,8 +95,8 @@ watch(
   () => tabsState.value.curTab,
   () => {
     console.log(tabsState.value.curTab)
-    root.value = tabsStore.getCurTabData().data;
-     config.value=  tabsState.value.tabs[tabsState.value.curTab].config
+    treeRef.value = tabsState.value.tabs[tabsState.value.curTab].data
+     configRef.value=  tabsState.value.tabs[tabsState.value.curTab].config
 
   }
 );
@@ -103,13 +104,14 @@ watch(
 // Lifecycle hooks
 onMounted(() => {
   console.log('mount')
-  root.value = tabsStore.getCurTabData().data;
-  
+  treeRef.value = tabsStore.getCurTabData().data;
+  configRef.value = tabsStore.getCurTabData().config;
+
   document.addEventListener("keydown", handleKeyDown);
-  if (!config.value?.startDate) config.value.startDate = new Date();
-  if (!config.value?.weekCount) config.value.weekCount = 20;
+  if (!configRef.value?.startDate) configRef.value.startDate = new Date();
+  if (!configRef.value?.weekCount) configRef.value.weekCount = 20;
   weeks.length = 0;
-  weeks.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
+  weeks.push(...generateWeeks(configRef.value.startDate || new Date(), configRef.value.weekCount));
 
 });
 
@@ -121,8 +123,8 @@ onBeforeUnmount(() => {
   
 // Computed properties
 const firstDay = computed(() => weeks[0].dates[0]);
-const days = computed(() => config.value.weekCount * 7);
-const cols = computed(() => config.value && config.value.cols ? config.value.cols.filter(e => e.show) : []);
+const days = computed(() => configRef.value.weekCount * 7);
+const cols = computed(() => configRef.value && configRef.value.cols ? configRef.value.cols.filter(e => e.show) : []);
 const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
 const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
 const isMoving = computed(() => moveType.value?.type === 'move');
