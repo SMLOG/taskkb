@@ -44,6 +44,7 @@ import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';
 import { useTabsStore } from '@/stores/tabs';
+import { storeToRefs } from 'pinia'
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -62,7 +63,9 @@ const {
 const root = ref(null);
 
 const tabsStore = useTabsStore();
-const config = ref(tabsStore.getCurTabData().config);
+
+const {tabsState} = storeToRefs(tabsStore);
+const config =  ref(tabsState.value.tabs[tabsState.value.curTab].config)//ref(tabsStore.getCurTabData().config);
 
 
 const colStyle = (col, index) => ({
@@ -84,6 +87,16 @@ watch(
   () => {
     weeks.length = 0;
     weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+  }
+);
+
+watch(
+  () => tabsState.value.curTab,
+  () => {
+    console.log(tabsState.value.curTab)
+    root.value = tabsStore.getCurTabData().data;
+     config.value=  tabsState.value.tabs[tabsState.value.curTab].config
+
   }
 );
 
