@@ -5,7 +5,7 @@
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
-      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config.showSch" />
+      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config?.showSch" />
       <div class="row header bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col,  key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
@@ -14,7 +14,7 @@
             </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="config.showSch">
+        <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="config?.showSch">
           <div style="display: flex; flex-wrap: nowrap">
             <div v-for="(week, index) in weeks" :key="week" class="week-slot">
               <div>
@@ -72,7 +72,7 @@ const colStyle = (col, index) => ({
 
 
 watch(
-  () => config.value.startDate,
+  () => config.value?.startDate,
   () => {
     weeks.length = 0;
     weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
@@ -80,7 +80,7 @@ watch(
 );
 
 watch(
-  () => config.value.weekCount,
+  () => config.value?.weekCount,
   () => {
     weeks.length = 0;
     weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
@@ -89,10 +89,12 @@ watch(
 
 // Lifecycle hooks
 onMounted(() => {
+  console.log('mount')
   root.value = tabsStore.getCurTabData().data;
+  
   document.addEventListener("keydown", handleKeyDown);
-  if (!config.value.startDate) config.value.startDate = new Date();
-  if (!config.value.weekCount) config.value.weekCount = 20;
+  if (!config.value?.startDate) config.value.startDate = new Date();
+  if (!config.value?.weekCount) config.value.weekCount = 20;
   weeks.length = 0;
   weeks.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
 
