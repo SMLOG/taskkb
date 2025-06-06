@@ -5,7 +5,6 @@ import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2 } from '@/lib/sch
 
 
 const weeksRef = ref([]);
-const weeksValue = weeksRef.value;
 const selectDepthsRef = ref([]);
 const selectDepths = selectDepthsRef.value;
 const selectStartRef = ref(null);
@@ -18,7 +17,7 @@ const moveType = ref(null);
 
 
 function getDate(i) {
-  return weeksValue[parseInt(i / 7)].dates[i % 7];
+  return weeksRef.value[parseInt(i / 7)].dates[i % 7];
 
 }
 function plusWorkDays(startIndex, days) {
@@ -190,7 +189,7 @@ export function useTree() {
     const { left, width: totalWidth } = schEl.getBoundingClientRect();
     const x = event.clientX - left;
     const index = Math.floor((x / totalWidth) * config.weekCount * 7);
-    const date = weeksValue[Math.floor(index / 7)].dates[index % 7];
+    const date = weeksRef.value[Math.floor(index / 7)].dates[index % 7];
 
     if (!row._tl?.start) {
       if (!selectStartRef.value) {
@@ -244,7 +243,7 @@ export function useTree() {
       const { left, width: totalWidth } = sch.getBoundingClientRect();
       const x = event.clientX - left;
       const index = Math.floor((x / totalWidth) * config.weekCount * 7);
-      const date = weeksValue[Math.floor(index / 7)]?.dates[index % 7];
+      const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
       if (selectStartRef.value && date) {
         if (!selectStartRef.value.row._tl) {
@@ -258,7 +257,7 @@ export function useTree() {
           let newIndex = moveType.value._tl[moveType.value.type === "rightDrag" ? "end" : "start"].i +
             Math.floor(ox / unitWidth);
 
-          const newDate = weeksValue[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
+          const newDate = weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
           if (!newDate) return;
 
           switch (moveType.value.type) {
@@ -273,8 +272,8 @@ export function useTree() {
               const startIndex = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
               const endIndex = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
 
-              selectStartRef.value.start = weeksValue[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
-              selectStartRef.value.end = weeksValue[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
+              selectStartRef.value.start = weeksRef.value[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
+              selectStartRef.value.end = weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
             }
           }
         }
@@ -338,7 +337,7 @@ export function useTree() {
 
   const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
 
-    return calcDaysBetween(weeksValue, d1, d2, exclusiveHolidayWeeken);
+    return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
 
 
   }
@@ -447,7 +446,7 @@ export function useTree() {
     handleMouseDown,
     handleMouseCellsMove,
     handleMouseUp,
-    weeksValue,
+    weeksRef,
     cellClass,
     dragstart,
     drop, getCacWidth, handleKeyDown,
