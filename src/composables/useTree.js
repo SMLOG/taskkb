@@ -43,7 +43,7 @@ let config;
 let dragStartClientX;
 
 export function useTree() {
-  const rootObj = useTreeStore().dataRows;
+  const rootObj = useTreeStore().treeRef;
   config = useConfigStore().config;
   let isMouseDown;
   let selectDetphStart;
@@ -313,7 +313,7 @@ export function useTree() {
     }
     selectDetphEnd = interceptor.dataset.depth;
     if (selectDepths.indexOf(selectDetphEnd) > -1) return;
-    const rootTree = useTreeStore().dataRows;
+    const rootTree = useTreeStore().treeRef;
     moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
     selectDepths.length = 0;
     isDrag.value = false;

@@ -257,7 +257,7 @@ function copyClipboard() {
 }
 
 watch(
-  () => tree.dataRows,
+  () => tree.treeRef,
   () => {
     saveData();
   },

@@ -92,7 +92,7 @@ watch(
 
 // Lifecycle hooks
 onMounted(() => {
-  root.value = treeRowsStore.dataRows;
+  root.value = treeRowsStore.treeRef;
   document.addEventListener("keydown", handleKeyDown);
   if (!config.value.startDate) config.value.startDate = new Date();
   if (!config.value.weekCount) config.value.weekCount = 20;
