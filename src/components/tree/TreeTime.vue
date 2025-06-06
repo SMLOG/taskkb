@@ -9,7 +9,7 @@
                 </div>
             </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length" v-if="showSch">
+        <div class="col" :colspan="7 * weeksValue.length" v-if="showSch">
             <div style="display: flex; flex-wrap: nowrap" class="sch">
                 <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                     <div v-if="row._tl && row._tl.end" :style="{
@@ -37,7 +37,7 @@
     </div>
     <template v-if="row && row._childs && row._childs.length && !row._collapsed">
         <TreeTime v-for="(child, index) in row._childs" :depth="depth + '.' + index" :key="index" :row="child"
-            :cols="cols" :showSch="showSch" :days="days" :firstDay="firstDay" :level="level + 1" :id="(id ? id + '.' : '') + (index + 1)" :gridStyle="gridStyle" :weeks="weeks" />
+            :cols="cols" :showSch="showSch" :days="days" :firstDay="firstDay" :level="level + 1" :id="(id ? id + '.' : '') + (index + 1)" :gridStyle="gridStyle" :weeks="weeksValue" />
     </template>
 </template>
 
@@ -51,7 +51,7 @@ import {resolveComponent} from '@/components/cpList';
 const {
   getCacWidth, selectStartRef,
   calculateDaysBetweenDates, 
-   dragMode, weeks,calDiffDates
+   dragMode, weeksValue,calDiffDates
 } = useTree();
 
 // Define props

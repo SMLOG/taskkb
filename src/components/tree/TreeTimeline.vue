@@ -14,9 +14,9 @@
             </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeks.length" style="user-select: none;" v-if="config.showSch">
+        <div class="col" :colspan="7 * weeksValue.length" style="user-select: none;" v-if="config.showSch">
           <div style="display: flex; flex-wrap: nowrap">
-            <div v-for="(week, index) in weeks" :key="week" class="week-slot">
+            <div v-for="(week, index) in weeksValue" :key="week" class="week-slot">
               <div>
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeks" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="root"></TreeTime>
+      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeksValue" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="root"></TreeTime>
     </div>
   </div>
 </template>
@@ -56,7 +56,7 @@ const {
   dragOver, handleMouseDown, handleMouseCellsMove, handleMouseUp,
   cellClass,  handleKeyDown, selectStartRef,
    dragstart, drop, 
-  moveType,  dblclickHandle,  weeks
+  moveType,  dblclickHandle,  weeksValue
 } = useTree();
 
 
@@ -77,16 +77,16 @@ const colStyle = (col, index) => ({
 watch(
   () => config.value.startDate,
   () => {
-    weeks.length = 0;
-    weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+    weeksValue.length = 0;
+    weeksValue.push(...generateWeeks(config.value.startDate, config.value.weekCount));
   }
 );
 
 watch(
   () => config.value.weekCount,
   () => {
-    weeks.length = 0;
-    weeks.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+    weeksValue.length = 0;
+    weeksValue.push(...generateWeeks(config.value.startDate, config.value.weekCount));
   }
 );
 
@@ -96,8 +96,8 @@ onMounted(() => {
   document.addEventListener("keydown", handleKeyDown);
   if (!config.value.startDate) config.value.startDate = new Date();
   if (!config.value.weekCount) config.value.weekCount = 20;
-  weeks.length = 0;
-  weeks.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
+  weeksValue.length = 0;
+  weeksValue.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
 
 });
 
@@ -108,7 +108,7 @@ onBeforeUnmount(() => {
 
   
 // Computed properties
-const firstDay = computed(() => weeks[0].dates[0]);
+const firstDay = computed(() => weeksValue[0].dates[0]);
 const days = computed(() => config.value.weekCount * 7);
 const cols = computed(() => config.value && config.value.cols ? config.value.cols.filter(e => e.show) : []);
 const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
