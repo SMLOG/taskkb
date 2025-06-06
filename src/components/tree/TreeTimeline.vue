@@ -1,11 +1,11 @@
 <template>
   <div class="table-container" style="position: relative;" :class="{ drag: isDragging, move: isMoving }">
 
-    <DatePicker :config="config" />
+    <DatePicker :config="configRef" />
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
       @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
-      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="config.showSch" />
+      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="configRef.showSch" />
       <div class="row header bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div class="col" ref="thRefs" :style="colStyle(col,  key)" :data-row="0" :data-col="key + 1" :class="cellClass(col)" v-if="col.show">
@@ -14,7 +14,7 @@
             </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeksValue.length" style="user-select: none;" v-if="config.showSch">
+        <div class="col" :colspan="7 * weeksValue.length" style="user-select: none;" v-if="configRef.showSch">
           <div style="display: flex; flex-wrap: nowrap">
             <div v-for="(week, index) in weeksValue" :key="week" class="week-slot">
               <div>
@@ -29,7 +29,7 @@
           </div>
         </div>
       </div>
-      <TreeTime :row="root" :depth="''" :showSch="config.showSch"  :weeks="weeksValue" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="root"></TreeTime>
+      <TreeTime :row="root" :depth="''" :showSch="configRef.showSch"  :weeks="weeksValue" :days="days" :firstDay="firstDay"  :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns  }" v-if="root"></TreeTime>
     </div>
   </div>
 </template>
@@ -63,7 +63,7 @@ const {
 const root = ref(null);
 
 // Store data
-const config = ref(treeRowsStore.config);
+const configRef = ref(treeRowsStore.config);
 
 
 const colStyle = (col, index) => ({
@@ -73,18 +73,18 @@ const colStyle = (col, index) => ({
 
 
 watch(
-  () => config.value.startDate,
+  () => configRef.value.startDate,
   () => {
     weeksValue.length = 0;
-    weeksValue.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+    weeksValue.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
   }
 );
 
 watch(
-  () => config.value.weekCount,
+  () => configRef.value.weekCount,
   () => {
     weeksValue.length = 0;
-    weeksValue.push(...generateWeeks(config.value.startDate, config.value.weekCount));
+    weeksValue.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
   }
 );
 
@@ -92,10 +92,10 @@ watch(
 onMounted(() => {
   root.value = treeRowsStore.treeRef;
   document.addEventListener("keydown", handleKeyDown);
-  if (!config.value.startDate) config.value.startDate = new Date();
-  if (!config.value.weekCount) config.value.weekCount = 20;
+  if (!configRef.value.startDate) configRef.value.startDate = new Date();
+  if (!configRef.value.weekCount) configRef.value.weekCount = 20;
   weeksValue.length = 0;
-  weeksValue.push(...generateWeeks(config.value.startDate || new Date(), config.value.weekCount));
+  weeksValue.push(...generateWeeks(configRef.value.startDate || new Date(), configRef.value.weekCount));
 
 });
 
@@ -107,8 +107,8 @@ onBeforeUnmount(() => {
   
 // Computed properties
 const firstDay = computed(() => weeksValue[0].dates[0]);
-const days = computed(() => config.value.weekCount * 7);
-const cols = computed(() => config.value && config.value.cols ? config.value.cols.filter(e => e.show) : []);
+const days = computed(() => configRef.value.weekCount * 7);
+const cols = computed(() => configRef.value && configRef.value.cols ? configRef.value.cols.filter(e => e.show) : []);
 const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
 const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
 const isMoving = computed(() => moveType.value?.type === 'move');
