@@ -41,7 +41,7 @@ import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
-import { useTreeRowsStore } from '@/stores/tree';
+import { useTreeStore } from '@/stores/tree';
 import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';
@@ -49,7 +49,7 @@ import {resolveComponent} from '@/components/cpList';
 const tableRef = ref(null);
 const thRefs = ref([]);
         
-const treeRowsStore = useTreeRowsStore();
+const treeRowsStore = useTreeStore();
 
 // Composable
 const {

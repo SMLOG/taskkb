@@ -18,7 +18,7 @@ function loopToSetDate(row) {
   }
 }
 
-export const useTreeRowsStore = defineStore("tree", () => {
+export const useTreeStore = defineStore("tree", () => {
   const dataRows = ref({ _childs: [] });
 
   async function init() {

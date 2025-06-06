@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { useTreeRowsStore } from "@/stores/tree";
+import { useTreeStore } from "@/stores/tree";
 import { useConfigStore } from "@/stores/config";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '../components/tree/treelib'
 import { addDatePeriod, deepCopy, calcDaysBetween, formatDate } from '../components/tree/schedule';
@@ -43,7 +43,7 @@ let config;
 let dragStartClientX;
 
 export function useTree() {
-  const rootObj = useTreeRowsStore().dataRows;
+  const rootObj = useTreeStore().dataRows;
   config = useConfigStore().config;
   let isMouseDown;
   let selectDetphStart;
@@ -313,7 +313,7 @@ export function useTree() {
     }
     selectDetphEnd = interceptor.dataset.depth;
     if (selectDepths.indexOf(selectDetphEnd) > -1) return;
-    const rootTree = useTreeRowsStore().dataRows;
+    const rootTree = useTreeStore().dataRows;
     moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
     selectDepths.length = 0;
     isDrag.value = false;

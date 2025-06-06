@@ -109,7 +109,7 @@ import { ref, watch,inject } from 'vue';
 import { useConfigStore } from '@/stores/config';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
-import { useTreeRowsStore } from "@/stores/tree";
+import { useTreeStore } from "@/stores/tree";
 
 const showNotification = inject('showNotification');
 
@@ -186,7 +186,7 @@ function download() {
 function saveData(bool) {
   if (!bool || config.value.autoSave) {
     configStore.save();
-    useTreeRowsStore().save();
+    useTreeStore().save();
   }
 }
 
