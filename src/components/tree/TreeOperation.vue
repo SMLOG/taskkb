@@ -184,7 +184,7 @@ function download() {
 function saveData(bool) {
   if (!bool || config.value.autoSave) {
     useTreeStore().saveConfig();
-    useTreeStore().save();
+    useTreeStore().saveData();
   }
 }
 

@@ -60,7 +60,7 @@ export const useTreeStore = defineStore("tree", () => {
   return {
     treeRef,
     config,
-    save: saveData,
+    saveData,
     saveConfig
   };
 });
