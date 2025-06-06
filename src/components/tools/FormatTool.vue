@@ -16,7 +16,7 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import ColorSelector from './ColorSelector.vue';
+import ColorSelector from '@/components/tools/ColorSelector.vue';
 
 const props = defineProps({
   editable: {
