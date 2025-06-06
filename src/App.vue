@@ -13,25 +13,20 @@ console.log(isTree)
 </script>
 
 <template>
-  <main class="flex-grow " style="position: relative;
-    ">
+  <main class="flex-grow relative">
     <div 
     id="mainContent"
-    style="    
-      display: grid;
-      grid-template-columns: 1fr;
-      grid-template-rows: auto 1fr;
-    "
-    class="absolute inset-0 overflow-auto" 
+    class="absolute inset-0 overflow-auto flex flex-col min-h-full" 
     >
      <NotificationProvider>
     <FormatTool>
       <router-view>
       </router-view>
     </FormatTool>
-    <TreeOperation />
   </NotificationProvider>
-    </div>
+  <TreeOperation />
+  </div>
+
   </main>
 </template>
 
