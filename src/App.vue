@@ -1,6 +1,5 @@
 <script setup>
 
-import TreeOperation from '@/components/tree/TreeOperation.vue'
 
 import FormatTool from "@/components/FormatTool.vue";
 import { useRoute } from 'vue-router';
@@ -33,7 +32,6 @@ console.log(isTree)
       <router-view>
       </router-view>
     </FormatTool>
-    <TreeOperation />
   </NotificationProvider>
     </div>
   </main>

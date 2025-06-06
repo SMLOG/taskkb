@@ -35,21 +35,19 @@
 </template>
 
 <script setup>
-import { ref,  computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { useConfigStore } from '@/stores/config';
+import { ref,  computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
-import { useTreeRowsStore } from '@/stores/treeRows';
-import { useTree } from '@/components/tree/useTree';
+import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';
+import { useTabsStore } from '@/stores/tabs';
 
 const tableRef = ref(null);
 const thRefs = ref([]);
         
-const treeRowsStore = useTreeRowsStore();
 
 // Composable
 const {
@@ -63,9 +61,8 @@ const {
 
 const root = ref(null);
 
-// Store data
-const configStore = useConfigStore();
-const config = ref(configStore.config);
+const tabsStore = useTabsStore();
+const config = ref(tabsStore.getCurTabData().config);
 
 
 const colStyle = (col, index) => ({
@@ -92,7 +89,7 @@ watch(
 
 // Lifecycle hooks
 onMounted(() => {
-  root.value = treeRowsStore.dataRows;
+  root.value = tabsStore.getCurTabData().data;
   document.addEventListener("keydown", handleKeyDown);
   if (!config.value.startDate) config.value.startDate = new Date();
   if (!config.value.weekCount) config.value.weekCount = 20;

@@ -1,8 +1,7 @@
 import { ref } from "vue";
-import { useTreeRowsStore } from "@/stores/treeRows";
-import { useConfigStore } from "@/stores/config";
-import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from './treelib'
-import { addDatePeriod, deepCopy, calcDaysBetween, formatDate } from './schedule';
+import { useTabsStore } from '@/stores/tabs';
+import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '../components/tree/treelib'
+import { addDatePeriod, deepCopy, calcDaysBetween, formatDate } from '../components/tree/schedule';
 
 
 const weeksRef = ref([]);
@@ -43,8 +42,10 @@ let config;
 let dragStartClientX;
 
 export function useTree() {
-  const rootObj = useTreeRowsStore().dataRows;
-  config = useConfigStore().config;
+  const tabsStore = useTabsStore();
+  const rootObj = tabsStore.getCurTabData().data;
+  config = ref(tabsStore.getCurTabData().config);
+
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;
@@ -313,7 +314,7 @@ export function useTree() {
     }
     selectDetphEnd = interceptor.dataset.depth;
     if (selectDepths.indexOf(selectDetphEnd) > -1) return;
-    const rootTree = useTreeRowsStore().dataRows;
+    const rootTree = rootObj;
     moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
     selectDepths.length = 0;
     isDrag.value = false;
@@ -364,6 +365,7 @@ export function useTree() {
     return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
   }
   const insertNode = (node) => {
+    console.log(node)
     let parentNode = rootObj;
     if (selectDepths.length ) {
       let lastDepth = selectDepths[selectDepths.length - 1];
@@ -456,6 +458,6 @@ export function useTree() {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-    selectDepths, rootObj, insertNode, delSelectedNode, copySelectedNode, exportCSV
+    selectDepths, insertNode, delSelectedNode, copySelectedNode, exportCSV
   };
 }

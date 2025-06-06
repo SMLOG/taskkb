@@ -1,10 +1,11 @@
 <template>
   <div class="sticky bottom-0 left-0 z-[50] bg-white dark:bg-gray-900 shadow-lg">
     <div class="max-w-screen-xl mx-auto px-4">
+      <Config v-if="showConfig" :config="config" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
       <div class="flex flex-col sticky left-0 bottom-0 active">
-        <Config v-if="showConfig" :config="config" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
+            <button>{{ tabId }}:{{ tabIndex }}</button>
             <button @click="addRow(1)" class="btn-secondary">
               ＋ Add Row
             </button>
@@ -36,6 +37,9 @@
               📂 Open
             </button>
             <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
+            <button @click="openFile" class="btn-secondary">
+              📂 New
+            </button>
           </div>
 
           <div class="relative" @mouseleave="showDropdown = false" @blur="showDropdown = false">
@@ -106,20 +110,24 @@ button {
 
 <script setup>
 import { ref, watch,inject } from 'vue';
-import { useConfigStore } from '@/stores/config';
-import { useTree } from '@/components/tree/useTree';
+import { useTree } from '@/composables/useTree';
+import { useTabsStore } from '@/stores/tabs';
 import Config from '@/components/Config.vue';
+
 import { useTreeRowsStore } from "@/stores/treeRows";
+
+
+const props = defineProps(['tabId',"tabIndex"]);
 
 const showNotification = inject('showNotification');
 
-const configStore = useConfigStore();
 const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const config = ref(configStore.config);
-const treeRoot = ref(tree.rootObj);
+
+const tabsStore = useTabsStore();
+const config = ref(tabsStore.getCurTabData().config);
 const fileInput = ref(null);
 const showDropdown = ref(false);
 
@@ -179,14 +187,13 @@ function loadFile(event) {
 }
 
 function download() {
-  let data = JSON.parse(JSON.stringify(treeRoot.value));
-  downloadJSON({ data, config: config.value, timestamp: new Date().getTime() });
+
 }
 
 function saveData(bool) {
+  console.log('ye')
   if (!bool || config.value.autoSave) {
-    configStore.save();
-    useTreeRowsStore().save();
+    tabsStore.saveToStorage();
   }
 }
 
