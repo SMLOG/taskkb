@@ -44,6 +44,7 @@ import { useTreeStore } from '@/stores/tree';
 import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';
+import { storeToRefs } from 'pinia'
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -62,8 +63,7 @@ const {
 
 const root = ref(null);
 
-// Store data
-const configRef = ref(treeStore.configRef);
+const {configRef,treeRef} = storeToRefs(treeStore);
 
 
 const colStyle = (col, index) => ({
@@ -90,7 +90,7 @@ watch(
 
 // Lifecycle hooks
 onMounted(() => {
-  root.value = treeStore.treeRef;
+  root.value = treeRef.value;
   document.addEventListener("keydown", handleKeyDown);
   if (!configRef.value.startDate) configRef.value.startDate = new Date();
   if (!configRef.value.weekCount) configRef.value.weekCount = 20;
