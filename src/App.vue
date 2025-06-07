@@ -18,6 +18,7 @@ const isTree = route.path === '/';
     <NotificationProvider class="h-full">
       <div class="flex flex-col h-full">
         <div> <TabsContainer /></div>
+        <div class="flex-1  flex ">
 
         <div class="flex-1 relative flex">
           <div id="mainContent" class="absolute inset-0 overflow-auto flex flex-col min-h-full">
@@ -27,6 +28,7 @@ const isTree = route.path === '/';
             </FormatTool>
             <TreeOperation />
           </div>
+        </div>
         </div>
       </div>
     </NotificationProvider>

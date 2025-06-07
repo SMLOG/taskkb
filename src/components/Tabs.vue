@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-end bg-gray-200 rounded-t-lg shadow-sm" style="height: 40px;">
+  <div class="flex items-end bg-gray-200 rounded-lg shadow-sm" style="height: 40px;">
     <Tab 
       v-for="(tab, index) in tabs" 
       :key="index" 
@@ -29,7 +29,6 @@ export default {
     return {
       tabs: [
         { title: 'Tab 1', content: 'Content for Tab 1' },
-        { title: 'Tab 2', content: 'Content for Tab 2' },
       ],
       activeTab: 0,
     };
