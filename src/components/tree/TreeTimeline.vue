@@ -72,7 +72,7 @@ const colStyle = (col, index) => ({
 
 const updateWeeks=()=>{
   weeksRef.value.length = 0;
-  weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+  weeksRef.value.push(...generateWeeks(configRef.value.startDate|| new Date(), configRef.value.weekCount));
 }
 
 
@@ -96,8 +96,7 @@ onMounted(() => {
   document.addEventListener("keydown", handleKeyDown);
   if (!configRef.value.startDate) configRef.value.startDate = new Date();
   if (!configRef.value.weekCount) configRef.value.weekCount = 20;
-  weeksRef.value.length = 0;
-  weeksRef.value.push(...generateWeeks(configRef.value.startDate || new Date(), configRef.value.weekCount));
+  updateWeeks();
 
 });
 
