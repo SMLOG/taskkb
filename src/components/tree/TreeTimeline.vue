@@ -70,21 +70,23 @@ const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto'
 });
 
+const updateWeeks=()=>{
+  weeksRef.value.length = 0;
+  weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+}
 
 
 watch(
   () => configRef.value.startDate,
   () => {
-    weeksRef.value.length = 0;
-    weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+    updateWeeks();
   }
 );
 
 watch(
   () => configRef.value.weekCount,
   () => {
-    weeksRef.value.length = 0;
-    weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+    updateWeeks();
   }
 );
 
@@ -100,7 +102,7 @@ onMounted(() => {
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener("keydown", handleKeyDown);
+  document.removeEventListener("keydown", handleKeyDown);``
 });
 
 
