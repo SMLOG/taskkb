@@ -2,7 +2,7 @@
   <div id="operation" class="sticky bottom-0 left-0 z-[50] bg-white dark:bg-gray-900 shadow-lg">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex flex-col sticky left-0 bottom-0 active">
-        <Config v-if="showConfig" :config="config" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
+        <Config v-if="showConfig" :config="configRef" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="addRow(1)" class="btn-secondary">
@@ -109,6 +109,7 @@ import { ref, watch,inject } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useTreeStore } from "@/stores/tree";
+import { storeToRefs } from 'pinia'
 
 const showNotification = inject('showNotification');
 
@@ -116,7 +117,8 @@ const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const config = ref(useTreeStore().config);
+const {configRef} = storeToRefs(useTreeStore());
+
 const treeRoot = ref(tree.rootObj);
 const fileInput = ref(null);
 const showDropdown = ref(false);
@@ -178,11 +180,11 @@ function loadFile(event) {
 
 function download() {
   let data = JSON.parse(JSON.stringify(treeRoot.value));
-  downloadJSON({ data, config: config.value, timestamp: new Date().getTime() });
+  downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() });
 }
 
 function saveData(bool) {
-  if (!bool || config.value.autoSave) {
+  if (!bool || configRef.value.autoSave) {
     useTreeStore().saveConfig();
     useTreeStore().saveData();
   }
@@ -216,13 +218,13 @@ function dowloadText(text, name) {
 }
 
 function exportCSV() {
-  let text = tree.exportCSV(config.value);
+  let text = tree.exportCSV(configRef.value);
   dowloadText(text, "exportcsv.csv");
   showNotification('export CSV', 'success');
 }
 
 function csvToMarkdown() {
-  let csvString = tree.exportCSV(config.value, true);
+  let csvString = tree.exportCSV(configRef.value, true);
   const lines = csvString.trim().split('\n');
   const table = lines.map(line => line.split(',').map(item => item.trim()));
   let markdown = [];
@@ -244,7 +246,7 @@ function csvToMarkdown() {
 }
 
 function copyClipboard() {
-  let text = tree.exportCSV(config.value, false, '\t');
+  let text = tree.exportCSV(configRef.value, false, '\t');
   navigator.clipboard.writeText(text).then(function () {
     console.log('Text copied to clipboard!');
     showNotification('copied to clipboard!', 'success');

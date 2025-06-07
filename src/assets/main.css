@@ -28,7 +28,7 @@ a,
 input, 
 textarea, 
 [contenteditable="true"] {
-    caret-color: initial; /* Uses the default caret color */
+    caret-color: initial !important; /* Uses the default caret color */
 }
 
 /* Hide caret in all other elements */
