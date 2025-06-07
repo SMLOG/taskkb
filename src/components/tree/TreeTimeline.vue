@@ -94,25 +94,26 @@ watch(
 // Lifecycle hooks
 onMounted(() => {
   root.value = treeRef.value;
-  document.addEventListener("keydown", handleKeyDown);
-
   updateWeeks();
+  document.addEventListener("keydown", handleKeyDown);
 
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener("keydown", handleKeyDown);``
+  document.removeEventListener("keydown", handleKeyDown);
+  debouncedUpdateWeeks.cancel(); // Clean up pending debounced calls
 });
 
 
   
-// Computed properties
-const firstDay = computed(() => weeksRef.value[0].dates[0]);
-const days = computed(() => configRef.value.weekCount * 7);
-const cols = computed(() => configRef.value && configRef.value.cols ? configRef.value.cols.filter(e => e.show) : []);
-const gridColumns = computed(() => cols.value.map(e => `${e.width}px`).join(' ') + ' 1fr');
+// Computed properties with enhanced readability and null checks
+const firstDay = computed(() => weeksRef.value?.[0]?.dates?.[0] ?? null);
+const days = computed(() => configRef.value?.weekCount ? configRef.value.weekCount * 7 : 0);
+const cols = computed(() => configRef.value?.cols?.filter(col => col.show) ?? []);
+const gridColumns = computed(() => cols.value.length > 0 ? cols.value.map(col => `${col.width}px`).join(' ') + ' 1fr' : '1fr');
 const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
 const isMoving = computed(() => moveType.value?.type === 'move');
+
 const getDayClasses = (day, selectStartRef) => ({
   selected: selectStartRef?.start && isBetween(selectStartRef.start.i, selectStartRef.end.i, day.i),
   today: day.isCur,
