@@ -10,35 +10,31 @@ import TabsContainer from './components/TabsContainer.vue';
 const route = useRoute();
 
 const isTree = route.path === '/';
-console.log(isTree)
 </script>
 
 <template>
 
   <main class="flex-grow relative">
-    <NotificationProvider>
-      <div >
-<TabsContainer/>
-<div>
-    <div 
-    id="mainContent"
-    class="absolute inset-0 overflow-auto flex flex-col min-h-full" 
-    >
-    <FormatTool>
-      <router-view>
-      </router-view>
-    </FormatTool>
-  <TreeOperation />
-  </div>
-</div>
-</div>
-</NotificationProvider>
+    <NotificationProvider class="h-full">
+      <div class="flex flex-col h-full">
+        <div> <TabsContainer /></div>
+
+        <div class="flex-1 relative flex">
+          <div id="mainContent" class="absolute inset-0 overflow-auto flex flex-col min-h-full">
+            <FormatTool>
+              <router-view>
+              </router-view>
+            </FormatTool>
+            <TreeOperation />
+          </div>
+        </div>
+      </div>
+    </NotificationProvider>
 
   </main>
 </template>
 
 <style scoped>
-
 header {
   line-height: 1.5;
 }
