@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { useTreeStore } from "@/stores/tree";
+import { useTreeStore } from "@/stores/treeStore";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
 import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2 } from '@/lib/schedule';
 

@@ -40,7 +40,7 @@ import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
-import { useTreeStore } from '@/stores/tree';
+import { useTreeStore } from '@/stores/treeStore';
 import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';

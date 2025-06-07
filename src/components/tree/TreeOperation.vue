@@ -108,7 +108,7 @@ button {
 import { ref, watch,inject } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
-import { useTreeStore } from "@/stores/tree";
+import { useTreeStore } from "@/stores/treeStore";
 import { storeToRefs } from 'pinia'
 
 const showNotification = inject('showNotification');

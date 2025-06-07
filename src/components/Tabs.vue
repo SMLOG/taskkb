@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { useTabsStore } from '@/stores/tabs';
+import { useTabsStore } from '@/stores/tabsStore';
 import Tab from './Tab.vue';
 
 export default {
