@@ -79,18 +79,16 @@ const updateWeeks=()=>{
 }
 
 
-watch(
-  () => configRef.value.startDate,
-  () => {
-    updateWeeks();
-  }
-);
+import { debounce } from 'lodash'; 
+
+const debouncedUpdateWeeks = debounce(updateWeeks, 300);
 
 watch(
-  () => configRef.value.weekCount,
+  () => [configRef.value.startDate, configRef.value.weekCount],
   () => {
-    updateWeeks();
-  }
+    debouncedUpdateWeeks();
+  },
+  { immediate: true }
 );
 
 // Lifecycle hooks
