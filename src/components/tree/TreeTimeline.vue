@@ -14,7 +14,7 @@
             </div>
           </div>
         </template>
-        <div class="col" :colspan="7 * weeksRef.length" style="user-select: none;" v-if="configRef.showSch">
+        <div class="col select-none" :colspan="7 * weeksRef.length" v-if="configRef.showSch">
           <div class="flex flex-nowrap">
             <div v-for="(week, index) in weeksRef" :key="week" class="week-slot">
               <div>
