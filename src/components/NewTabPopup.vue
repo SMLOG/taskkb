@@ -1,5 +1,8 @@
 <template>
-  <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" v-if="showPopup">
+  <div 
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" 
+    v-if="showPopup"
+  >
     <div class="bg-white rounded-lg p-6 w-96 shadow-xl">
       <h2 class="text-xl font-bold mb-4">Choose an option</h2>
       
@@ -55,59 +58,60 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      showPopup: true,
-      templates: [
-        {
-          id: 1,
-          name: 'Todo',
-          icon: '✓',
-          description: 'Task list template',
-          color: 'bg-blue-500'
-        },
-        {
-          id: 2,
-          name: 'Plan',
-          icon: '🗓',
-          description: 'Planning template',
-          color: 'bg-green-500'
-        },
-        {
-          id: 3,
-          name: 'Record',
-          icon: '📝',
-          description: 'Note-taking template',
-          color: 'bg-purple-500'
-        }
-      ]
-    }
+<script setup>
+import { ref } from 'vue';
+
+const showPopup = ref(true);
+
+const templates = ref([
+  {
+    id: 1,
+    name: 'Todo',
+    icon: '✓',
+    description: 'Task list template',
+    color: 'bg-blue-500'
   },
-  methods: {
-    openFile() {
-      // Implement file opening logic
-      console.log('Opening file...');
-      this.showPopup = false;
-      
-      // For actual file selection, you might use:
-      // const input = document.createElement('input');
-      // input.type = 'file';
-      // input.click();
-      // input.onchange = (e) => { /* handle file */ };
-    },
-    selectTemplate(template) {
-      // Handle template selection
-      console.log('Selected template:', template.name);
-      this.showPopup = false;
-      
-      // You would typically emit an event or call a callback here
-      // this.$emit('template-selected', template);
-    },
-    closePopup() {
-      this.showPopup = false;
-    }
+  {
+    id: 2,
+    name: 'Plan',
+    icon: '🗓',
+    description: 'Planning template',
+    color: 'bg-green-500'
+  },
+  {
+    id: 3,
+    name: 'Record',
+    icon: '📝',
+    description: 'Note-taking template',
+    color: 'bg-purple-500'
   }
-}
+]);
+
+const openFile = () => {
+  // Implement file opening logic
+  console.log('Opening file...');
+  showPopup.value = false;
+  
+  // For actual file selection:
+  // const input = document.createElement('input');
+  // input.type = 'file';
+  // input.click();
+  // input.onchange = (e) => { /* handle file */ };
+};
+
+const selectTemplate = (template) => {
+  // Handle template selection
+  console.log('Selected template:', template.name);
+  showPopup.value = false;
+  
+  // You would typically emit an event here:
+  // emit('template-selected', template);
+};
+
+const closePopup = () => {
+  showPopup.value = false;
+};
+
+// If you need to emit events:
+// const emit = defineEmits(['template-selected']);
 </script>
