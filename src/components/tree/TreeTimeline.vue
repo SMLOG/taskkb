@@ -3,7 +3,7 @@
 
     <DatePicker :config="configRef" />
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
-      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" @click="handleClick"
+      @dragstart="dragstart" @dragover="dragOver" @drop="drop" @mousemove="handleMouseCellsMove" 
       @mouseup.left="handleMouseUp" @dblclick="dblclickHandle">
       <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols" :showSch="configRef.showSch" />
       <div class="row header bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
