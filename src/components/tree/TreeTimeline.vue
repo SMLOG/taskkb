@@ -15,12 +15,12 @@
           </div>
         </template>
         <div class="col" :colspan="7 * weeksRef.length" style="user-select: none;" v-if="configRef.showSch">
-          <div style="display: flex; flex-wrap: nowrap">
+          <div class="flex flex-nowrap">
             <div v-for="(week, index) in weeksRef" :key="week" class="week-slot">
               <div>
                 <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
               </div>
-              <div style="display: flex; justify-content: space-between">
+              <div class="flex justify-between" >
                 <span v-for="day in week.dates" :key="day" class="day" :class="getDayClasses(day, selectStartRef)">
                   {{ day.label }}
                 </span>
