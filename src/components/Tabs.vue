@@ -9,7 +9,7 @@
       @click="tabsStore.setActiveTab(index)"
     />
     <button
-      @click="tabsStore.addTab"
+      @click="addTab"
       class="plus-button text-gray-500 hover:text-blue-600 hover:bg-gray-300 rounded-full transition-all duration-200"
       title="Add New Tab"
     >
@@ -18,13 +18,22 @@
       </svg>
     </button>
   </div>
+  <NewTabPopup v-if="showNewTabPopup"/>
 </template>
 
 <script setup>
-import { useTabsStore } from '@/stores/tabsStore';
-import Tab from './Tab.vue';
+import { ref } from 'vue';
 
+import { useTabsStore } from "@/stores/tabsStore";
+import Tab from '@/components/Tab.vue';
+import NewTabPopup from '@/components/NewTabPopup.vue';
+
+const showNewTabPopup = ref(false);
 const tabsStore = useTabsStore();
+const addTab = () => {
+  showNewTabPopup.value=true;
+};
+
 </script>
 
 <style scoped>
