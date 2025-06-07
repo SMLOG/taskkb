@@ -1,16 +1,16 @@
 <template>
   <div class="flex items-end bg-gray-200 rounded-lg shadow-sm" style="height: 40px;">
-    <Tab 
-      v-for="(tab, index) in tabs" 
-      :key="index" 
-      :tab="tab" 
-      :isActive="activeTab === index" 
-      @removeTab="removeTab(index)" 
-      @click="setActiveTab(index)"
+    <Tab
+      v-for="(tab, index) in tabsStore.tabs"
+      :key="index"
+      :tab="tab"
+      :isActive="tabsStore.activeTab === index"
+      @removeTab="tabsStore.removeTab(index)"
+      @click="tabsStore.setActiveTab(index)"
     />
-    <button 
-      @click="addTab" 
-      class="plus-button text-gray-500 hover:text-blue-600 hover:bg-gray-300 rounded-full transition-all duration-200" 
+    <button
+      @click="tabsStore.addTab"
+      class="plus-button text-gray-500 hover:text-blue-600 hover:bg-gray-300 rounded-full transition-all duration-200"
       title="Add New Tab"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -21,41 +21,14 @@
 </template>
 
 <script>
+import { useTabsStore } from '@/stores/tabs';
 import Tab from './Tab.vue';
 
 export default {
   components: { Tab },
-  data() {
-    return {
-      tabs: [
-        { title: 'Tab 1', content: 'Content for Tab 1' },
-      ],
-      activeTab: 0,
-    };
-  },
-  methods: {
-    addTab() {
-      const newTabNumber = this.tabs.length + 1;
-      this.tabs.push({
-        title: `Tab ${newTabNumber}`,
-        content: `Content for Tab ${newTabNumber}`,
-      });
-      this.activeTab = this.tabs.length - 1; // Switch to the new tab
-    },
-    removeTab(index) {
-      this.tabs.splice(index, 1);
-      // Adjust activeTab if necessary
-      if (this.tabs.length === 0) {
-        this.activeTab = 0;
-      } else if (this.activeTab >= this.tabs.length) {
-        this.activeTab = this.tabs.length - 1;
-      } else if (this.activeTab > index) {
-        this.activeTab--;
-      }
-    },
-    setActiveTab(index) {
-      this.activeTab = index;
-    },
+  setup() {
+    const tabsStore = useTabsStore();
+    return { tabsStore };
   },
 };
 </script>
