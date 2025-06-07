@@ -5,6 +5,7 @@ import TreeOperation from '@/components/tree/TreeOperation.vue'
 import FormatTool from "@/components/tools/FormatTool.vue";
 import { useRoute } from 'vue-router';
 import NotificationProvider from '@/components/NotificationProvider.vue';
+import TabsContainer from './components/TabsContainer.vue';
 
 const route = useRoute();
 
@@ -16,7 +17,9 @@ console.log(isTree)
 
   <main class="flex-grow relative">
     <NotificationProvider>
-
+      <div >
+<TabsContainer/>
+<div>
     <div 
     id="mainContent"
     class="absolute inset-0 overflow-auto flex flex-col min-h-full" 
@@ -27,6 +30,8 @@ console.log(isTree)
     </FormatTool>
   <TreeOperation />
   </div>
+</div>
+</div>
 </NotificationProvider>
 
   </main>

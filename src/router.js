@@ -4,7 +4,7 @@ import TreeTimeline from './components/tree/TreeTimeline.vue';
 import TabsContainer from './components/TabsContainer.vue';
 
 const routes = [
-  { path: '/', component: TabsContainer },
+  { path: '/', component: TreeTimeline },
 ];
 
 const router = createRouter({
