@@ -20,17 +20,11 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { useTabsStore } from '@/stores/tabsStore';
 import Tab from './Tab.vue';
 
-export default {
-  components: { Tab },
-  setup() {
-    const tabsStore = useTabsStore();
-    return { tabsStore };
-  },
-};
+const tabsStore = useTabsStore();
 </script>
 
 <style scoped>
