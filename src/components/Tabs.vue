@@ -18,7 +18,9 @@
       </svg>
     </button>
   </div>
-  <NewTabPopup v-if="showNewTabPopup"/>
+  <NewTabPopup v-if="showNewTabPopup"   
+  v-model="showNewTabPopup" 
+ />
 </template>
 
 <script setup>

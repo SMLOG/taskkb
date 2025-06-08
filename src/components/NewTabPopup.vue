@@ -1,7 +1,7 @@
 <template>
   <div 
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" 
-    v-if="showPopup"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-9999" 
+    v-if="modelValue"
   >
     <div class="bg-white rounded-lg p-6 w-96 shadow-xl">
       <h2 class="text-xl font-bold mb-4">Choose an option</h2>
@@ -61,7 +61,14 @@
 <script setup>
 import { ref } from 'vue';
 
-const showPopup = ref(true);
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    required: true
+  }
+});
+
+const emit = defineEmits(['update:modelValue', 'select-file', 'select-template']);
 
 const templates = ref([
   {
@@ -88,30 +95,25 @@ const templates = ref([
 ]);
 
 const openFile = () => {
-  // Implement file opening logic
-  console.log('Opening file...');
-  showPopup.value = false;
+  emit('select-file');
+  emit('update:modelValue', false);
   
-  // For actual file selection:
+  // Or implement actual file selection:
   // const input = document.createElement('input');
   // input.type = 'file';
   // input.click();
-  // input.onchange = (e) => { /* handle file */ };
+  // input.onchange = (e) => {
+  //   emit('file-selected', e.target.files[0]);
+  //   emit('update:modelValue', false);
+  // };
 };
 
 const selectTemplate = (template) => {
-  // Handle template selection
-  console.log('Selected template:', template.name);
-  showPopup.value = false;
-  
-  // You would typically emit an event here:
-  // emit('template-selected', template);
+  emit('select-template', template);
+  emit('update:modelValue', false);
 };
 
 const closePopup = () => {
-  showPopup.value = false;
+  emit('update:modelValue', false);
 };
-
-// If you need to emit events:
-// const emit = defineEmits(['template-selected']);
 </script>
