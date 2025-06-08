@@ -3,17 +3,16 @@ import { defineStore } from 'pinia';
 
 export const useTabsStore = defineStore('tabs', {
   state: () => ({
-    tabs: [
-      { title: 'Tab 1', content: 'Content for Tab 1' },
-    ],
-    activeTab: 0,
+    tabs: [],
+    activeTab: -1,
   }),
   actions: {
-    addTab() {
-      const newTabNumber = this.tabs.length + 1;
+    addTab(tabId,title) {
       this.tabs.push({
-        title: `Tab ${newTabNumber}`,
-        content: `Content for Tab ${newTabNumber}`,
+      id: tabId,
+      title,
+      config: {cols:[]}, // Empty config
+      data: {}, // Initial data
       });
       this.activeTab = this.tabs.length - 1;
     },

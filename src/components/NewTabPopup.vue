@@ -58,9 +58,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref,computed } from 'vue';
 import { useTabsStore } from "@/stores/tabsStore";
+import { v4 as uuidv4 } from 'uuid';
+
 const tabsStore = useTabsStore();
+const tabs = computed(() => tabsStore.tabs);
 
 const props = defineProps({
   modelValue: {
@@ -103,7 +106,11 @@ const openFile = () => {
 const selectTemplate = (template) => {
   emit('select-template', template);
   emit('update:modelValue', false);
-  tabsStore.addTab();
+    const tabName =  `Tab ${tabs.value.length + 1}`;
+    console.log(tabs);
+  const newTabId = uuidv4();
+  tabsStore.addTab(newTabId, tabName);
+  
 };
 
 const closePopup = () => {
