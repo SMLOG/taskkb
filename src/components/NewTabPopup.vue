@@ -19,12 +19,8 @@
         </button>
       </div>
       
-      <!-- Or divider -->
-      <div class="flex items-center my-4">
-        <div class="flex-grow border-t border-white/30 dark:border-gray-600/50"></div>
-        <span class="mx-3 text-gray-500 dark:text-gray-400">or</span>
-        <div class="flex-grow border-t border-white/30 dark:border-gray-600/50"></div>
-      </div>
+      <!-- Beautiful "OR" Divider -->
+<div class="flex items-center my-4"><div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div><span class="mx-3 text-gray-500 dark:text-gray-400">or</span><div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div></div>
       
       <!-- Template Selection -->
       <div>
@@ -34,7 +30,7 @@
             v-for="template in templates" 
             :key="template.id"
             @click="selectTemplate(template)"
-            class="w-full text-left p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20"
+            class="w-full flex text-left p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20"
           >
             <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" :class="template.color">
               <span class="text-white font-medium">{{ template.icon }}</span>
@@ -47,11 +43,14 @@
         </div>
       </div>
       
-      <!-- Close button -->
+      <!-- Enhanced Cancel Button -->
       <button 
         @click="closePopup"
-        class="mt-4 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition"
+        class="mt-6  w-full py-2 px-4 rounded-lg border border-red-400 dark:border-red-500 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all flex items-center justify-center gap-2 font-medium"
       >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
         Cancel
       </button>
     </div>
