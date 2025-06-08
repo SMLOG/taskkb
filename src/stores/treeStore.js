@@ -57,10 +57,15 @@ export const useTreeStore = defineStore("tree", () => {
   // Call init asynchronously and handle potential errors
   init().catch(error => console.error('Init failed:', error))
 
+  async function loadTabData(tab){
+       treeRef.value = tab.data;
+      configRef.value = tab.config;
+  }
   return {
     treeRef,
     configRef,
     saveData,
-    saveConfig
+    saveConfig,
+    loadTabData
   };
 });
