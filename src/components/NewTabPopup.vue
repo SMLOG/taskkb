@@ -59,6 +59,8 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useTabsStore } from "@/stores/tabsStore";
+const tabsStore = useTabsStore();
 
 const props = defineProps({
   modelValue: {
@@ -101,6 +103,7 @@ const openFile = () => {
 const selectTemplate = (template) => {
   emit('select-template', template);
   emit('update:modelValue', false);
+  tabsStore.addTab();
 };
 
 const closePopup = () => {
