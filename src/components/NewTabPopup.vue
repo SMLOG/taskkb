@@ -1,16 +1,16 @@
 <template>
   <div 
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50" 
+    class="fixed inset-0 flex items-center justify-center z-50" 
     v-if="modelValue"
   >
-    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-96 shadow-xl">
+    <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-lg p-6 w-96 shadow-xl border border-white/20 dark:border-gray-700/30">
       <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Choose an option</h2>
       
       <!-- Open File Option -->
       <div class="mb-4">
         <button 
           @click="openFile"
-          class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition border-gray-200 dark:border-gray-600"
+          class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20"
         >
           <span class="text-gray-800 dark:text-gray-200">Open existing file</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -21,9 +21,9 @@
       
       <!-- Or divider -->
       <div class="flex items-center my-4">
-        <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+        <div class="flex-grow border-t border-white/30 dark:border-gray-600/50"></div>
         <span class="mx-3 text-gray-500 dark:text-gray-400">or</span>
-        <div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div>
+        <div class="flex-grow border-t border-white/30 dark:border-gray-600/50"></div>
       </div>
       
       <!-- Template Selection -->
@@ -34,7 +34,7 @@
             v-for="template in templates" 
             :key="template.id"
             @click="selectTemplate(template)"
-            class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition border-gray-200 dark:border-gray-600"
+            class="w-full text-left p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20"
           >
             <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" :class="template.color">
               <span class="text-white font-medium">{{ template.icon }}</span>
