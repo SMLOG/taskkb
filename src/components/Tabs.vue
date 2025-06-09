@@ -1,12 +1,12 @@
 <template>
   <div class="flex items-end bg-gray-200 rounded-lg shadow-sm" style="height: 40px;">
     <Tab
-      v-for="(tab, index) in tabsStore.tabs"
+      v-for="(tab, index) in appStore.tabs"
       :key="index"
       :tab="tab"
-      :isActive="tabsStore.activeTab === index"
-      @removeTab="tabsStore.removeTab(index)"
-      @click="tabsStore.setActiveTab(index)"
+      :isActive="appStore.activeTabRef === index"
+      @removeTab="appStore.removeTab(index)"
+      @click="appStore.setActiveTab(index)"
     />
     <button
       @click="addTab"
@@ -26,12 +26,12 @@
 <script setup>
 import { ref } from 'vue';
 
-import { useTabsStore } from "@/stores/tabsStore";
+import { useAppStore } from "@/stores/appStore";
 import Tab from '@/components/Tab.vue';
 import NewTabPopup from '@/components/NewTabPopup.vue';
 
 const showNewTabPopup = ref(false);
-const tabsStore = useTabsStore();
+const appStore = useAppStore();
 const addTab = () => {
   showNewTabPopup.value=true;
 };

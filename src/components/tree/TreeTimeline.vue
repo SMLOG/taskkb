@@ -40,7 +40,7 @@ import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
-import { useTreeStore } from '@/stores/treeStore';
+import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';
 import { generateWeeks,isBetween } from '@/lib/schedule';
 import {resolveComponent} from '@/components/cpList';
@@ -49,7 +49,7 @@ import { storeToRefs } from 'pinia'
 const tableRef = ref(null);
 const thRefs = ref([]);
         
-const treeStore = useTreeStore();
+const appStore = useAppStore();
 
 // Composable
 const {
@@ -63,7 +63,7 @@ const {
 
 const root = ref(null);
 
-const {configRef,treeRef} = storeToRefs(treeStore);
+const {configRef,treeRef,activeTabRef} = storeToRefs(appStore);
 
 
 const colStyle = (col, index) => ({
@@ -87,6 +87,14 @@ watch(
   () => [configRef.value.startDate, configRef.value.weekCount],
   () => {
     debouncedUpdateWeeks();
+  },
+  { immediate: true }
+);
+
+watch(
+  () => [activeTabRef?.value],
+  () => {
+    root.value = treeRef.value;
   },
   { immediate: true }
 );

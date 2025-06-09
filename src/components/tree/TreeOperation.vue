@@ -108,7 +108,7 @@ button {
 import { ref, watch,inject } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
-import { useTreeStore } from "@/stores/treeStore";
+import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
 
 const showNotification = inject('showNotification');
@@ -117,7 +117,7 @@ const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const {configRef} = storeToRefs(useTreeStore());
+const {configRef} = storeToRefs(useAppStore());
 
 const treeRoot = ref(tree.rootObj);
 const fileInput = ref(null);
@@ -185,8 +185,8 @@ function download() {
 
 function saveData(bool) {
   if (!bool || configRef.value.autoSave) {
-    useTreeStore().saveConfig();
-    useTreeStore().saveData();
+    useAppStore().saveConfig();
+    useAppStore().saveData();
   }
 }
 

@@ -59,10 +59,10 @@
 
 <script setup>
 import { ref,computed } from 'vue';
-import { useTabsStore } from "@/stores/tabsStore";
+import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 
-const tabsStore = useTabsStore();
+const tabsStore = useAppStore();
 const tabs = computed(() => tabsStore.tabs);
 
 const props = defineProps({

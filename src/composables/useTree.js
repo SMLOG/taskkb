@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { useTreeStore } from "@/stores/treeStore";
+import { useAppStore } from "@/stores/appStore";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
 import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2 } from '@/lib/schedule';
 
@@ -41,8 +41,7 @@ let config;
 let dragStartClientX;
 
 export function useTree() {
-  const rootObj = useTreeStore().treeRef;
-  config = useTreeStore().configRef;
+  config = useAppStore().configRef;
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;
@@ -88,7 +87,7 @@ export function useTree() {
       selectDepths.length = 0;
       selectDetphStart = selectDetphEnd = null;
 
-      const row = getRowFromDepth(rootObj, depth);
+      const row = getRowFromDepth(useAppStore().treeRef, depth);
       if (!row || !row._tl?.start || !selectStartRef.value || selectStartRef.value.row !== row) {
         handleScheduleClick(row, target, event);
         return;
@@ -311,7 +310,7 @@ export function useTree() {
     }
     selectDetphEnd = interceptor.dataset.depth;
     if (selectDepths.indexOf(selectDetphEnd) > -1) return;
-    const rootTree = useTreeStore().treeRef;
+    const rootTree = useAppStore().treeRef;
     moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
     selectDepths.length = 0;
     isDrag.value = false;
@@ -362,6 +361,7 @@ export function useTree() {
     return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
   }
   const insertNode = (node) => {
+    let rootObj = useAppStore().treeRef
     let parentNode = rootObj;
     if (selectDepths.length ) {
       let lastDepth = selectDepths[selectDepths.length - 1];
@@ -376,18 +376,22 @@ export function useTree() {
 
   }
   const delSelectedNode = () => {
+    let rootObj = useAppStore().treeRef
     for (let depth of selectDepths) {
       deleteNode(rootObj, depth);
     }
     selectDepths.length = 0;
   }
   const copySelectedNode = () => {
+    let rootObj = useAppStore().treeRef
+
     if (selectDepths.length == 1) {
       copyNode(rootObj, selectDepths[0]);
     }
   }
 
   function exportCSV(config, onlyText = false, colSeperator = ',') {
+    let rootObj = useAppStore().treeRef
 
     if (!selectDepths.length ) {
       return;
@@ -454,6 +458,6 @@ export function useTree() {
     selectStartRef,
     calculateDaysBetweenDates,
     isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-    selectDepths, rootObj, insertNode, delSelectedNode, copySelectedNode, exportCSV
+    selectDepths,  insertNode, delSelectedNode, copySelectedNode, exportCSV
   };
 }
