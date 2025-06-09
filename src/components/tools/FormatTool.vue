@@ -1,5 +1,5 @@
 <template>
-  <div @mouseup="checkSelection">
+  <div @mouseup="checkSelection" class="pl-[8px]">
     <slot></slot>
   </div>
   <div id="formatTool" class="fixed bg-white dark:bg-black" style="z-index: var(--vt-index-tooltip);" v-show="isFormatToolVisible" :style="{ left: formatToolLeft, top: formatToolTop }">
