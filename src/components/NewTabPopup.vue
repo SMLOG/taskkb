@@ -18,6 +18,8 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
         </button>
+        <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
+
       </div>
       
       <!-- Beautiful "OR" Divider -->
@@ -99,10 +101,36 @@ const templates = ref([
   }
 ]);
 
+const fileInput =ref(null)
 const openFile = () => {
-  emit('select-file');
-  emit('update:modelValue', false);
+  fileInput.value.click();
+
 };
+
+function loadFile(event) {
+  const file = event.target.files[0];
+  if (file && file.type === "application/json") {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        if (confirm("Will overwrite current data, are you sure to continue?")) {
+          let data = JSON.parse(e.target.result);
+          if (data && data.data && data.config) {
+            emit('select-file');
+            emit('update:modelValue', false);
+          } else {
+            throw new Error("wrong format");
+          }
+        }
+      } catch (error) {
+        console.error("Invalid JSON file", error);
+      }
+    };
+    reader.readAsText(file);
+  } else {
+    alert("Please select a valid JSON file.");
+  }
+}
 
 const selectTemplate = (template) => {
   emit('select-template', template);

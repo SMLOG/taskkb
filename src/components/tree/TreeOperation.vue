@@ -31,13 +31,6 @@
             </button>
           </div>
 
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="openFile" class="btn-secondary">
-              📂 Open
-            </button>
-            <input type="file" ref="fileInput" @change="loadFile" accept=".json" class="hidden" />
-          </div>
-
           <div class="relative" @mouseleave="showDropdown = false" @blur="showDropdown = false">
             <button
               ref="moreButton"
@@ -117,10 +110,9 @@ const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const {configRef} = storeToRefs(useAppStore());
+const {configRef,treeRef} = storeToRefs(useAppStore());
 
-const treeRoot = ref(tree.rootObj);
-const fileInput = ref(null);
+
 const showDropdown = ref(false);
 
 function downloadJSON(jsonData, filename = 'data.json') {
@@ -148,38 +140,11 @@ const handleShowDropdown = () => {
   showDropdown.value = true;
 };
 
-function openFile() {
-  fileInput.value.click();
-}
 
-function loadFile(event) {
-  const file = event.target.files[0];
-  if (file && file.type === "application/json") {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        if (confirm("Will overwrite current data, are you sure to continue?")) {
-          let data = JSON.parse(e.target.result);
-          if (data && data.data && data.config) {
-            localStorage.setItem('data', JSON.stringify(data.data));
-            localStorage.setItem('config', JSON.stringify(data.config));
-            location.reload();
-          } else {
-            throw new Error("wrong format");
-          }
-        }
-      } catch (error) {
-        console.error("Invalid JSON file", error);
-      }
-    };
-    reader.readAsText(file);
-  } else {
-    alert("Please select a valid JSON file.");
-  }
-}
 
 function download() {
-  let data = JSON.parse(JSON.stringify(treeRoot.value));
+
+  let data = JSON.parse(JSON.stringify(treeRef.value));
   downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() });
 }
 
