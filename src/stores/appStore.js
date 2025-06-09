@@ -85,7 +85,7 @@ export const useAppStore = defineStore('app', () => {
 
       };
       const tabData={        
-        config: { cols: [] },
+        config: { cols: [] ,title},
       data: { _childs: [] }
     }
 
@@ -99,11 +99,19 @@ export const useAppStore = defineStore('app', () => {
       
       // Save to localStorage
       await saveCurrentTabData();
+      return tab;
     } catch (error) {
       console.error('Failed to add tab:', error);
     }
   }
 
+ async function importToNewTab(tabId,data){
+     let tab = await addTab(tabId,data.config.title);
+    await loadTabData(tab,data);
+  }
+  function getCurrentTab(){
+   return  tabs.value[activeTabRef.value];
+  }
   async function removeTab(index) {
     try {
         let tab = tabs.value[index];
@@ -126,10 +134,18 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  async function  loadTabData(tab){
-    let data = JSON.parse(localStorage.getItem(`${tab.id}-data`));
-    let config = JSON.parse(localStorage.getItem(`${tab.id}-config`));
-    tabsDataMapRef.value[tab.id]= {data,config};
+  async function  loadTabData(tab,external){
+    if(external){
+        let {data,config} = external;
+        tabsDataMapRef.value[tab.id]= {data,config};
+
+    }else{
+        let data = JSON.parse(localStorage.getItem(`${tab.id}-data`));
+        let config = JSON.parse(localStorage.getItem(`${tab.id}-config`));
+        tabsDataMapRef.value[tab.id]= {data,config};
+
+    }
+
   }
 
   async function setActiveTab(index) {
@@ -182,6 +198,6 @@ export const useAppStore = defineStore('app', () => {
     setActiveTab,
     saveData,
     saveConfig,
-    saveCurrentTabData,loadActiveTab
+    saveCurrentTabData,loadActiveTab,getCurrentTab,importToNewTab
   };
 });

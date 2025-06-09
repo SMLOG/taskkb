@@ -116,6 +116,9 @@ function loadFile(event) {
         if (confirm("Will overwrite current data, are you sure to continue?")) {
           let data = JSON.parse(e.target.result);
           if (data && data.data && data.config) {
+            const newTabId = uuidv4();
+
+            useAppStore().importToNewTab(newTabId,data);
             emit('select-file');
             emit('update:modelValue', false);
           } else {

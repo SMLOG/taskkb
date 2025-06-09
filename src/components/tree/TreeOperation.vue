@@ -145,7 +145,8 @@ const handleShowDropdown = () => {
 function download() {
 
   let data = JSON.parse(JSON.stringify(treeRef.value));
-  downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() });
+  configRef.value.title=useAppStore().getCurrentTab().title;
+  downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() },useAppStore().getCurrentTab().title+".json");
 }
 
 function saveData(bool) {
