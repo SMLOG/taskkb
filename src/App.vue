@@ -26,7 +26,7 @@ const isTree = route.path === '/';
         <div class="flex-1  flex ">
 
         <div class="flex-1 relative flex">
-          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full">
+          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full ">
             <FormatTool>
               <router-view>
               </router-view>

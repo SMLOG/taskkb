@@ -21,7 +21,7 @@ a,
 }
 
 .sticky{
-  @apply bg-white dark:bg-black	;
+ @apply bg-white dark:bg-black	;
 }
 
 /* Set default caret color for specific elements */
