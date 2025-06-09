@@ -101,8 +101,8 @@ watch(
 
 // Lifecycle hooks
 onMounted(() => {
-  root.value = treeRef.value;
   updateWeeks();
+  appStore.loadActiveTab();
   document.addEventListener("keydown", handleKeyDown);
 
 });

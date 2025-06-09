@@ -44,14 +44,18 @@ export const useAppStore = defineStore('app', () => {
         });
       }
 
-      const activeTab = localStorage.getItem('activeTab');
-      if(activeTab<tabs.value.length&&tabs.value>=0){
-        activeTabRef.value = activeTab;
-      }
+
 
 
     } catch (error) {
       console.error('Failed to initialize store:', error);
+    }
+  }
+
+  async function  loadActiveTab(){
+    const activeTab = parseInt(localStorage.getItem('activeTab')||"-1");
+    if(activeTab<tabs.value.length&&activeTab>=0){
+      setActiveTab(activeTab)
     }
   }
 
@@ -178,6 +182,6 @@ export const useAppStore = defineStore('app', () => {
     setActiveTab,
     saveData,
     saveConfig,
-    saveCurrentTabData
+    saveCurrentTabData,loadActiveTab
   };
 });
