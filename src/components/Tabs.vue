@@ -39,6 +39,7 @@ const addTab = () => {
 </script>
 
 <style scoped>
+@reference "@/assets/main.css";
 /* Custom styles remain the same */
 .tab {
   position: relative;
@@ -46,13 +47,12 @@ const addTab = () => {
   transition: all 0.2s ease-in-out;
 }
 .tab.active {
-  background-color: #ffffff;
-  color: #1f2a44;
+  @apply bg-white text-black dark:bg-gray-700 dark:text-white;
   z-index: 10;
 }
 .tab:not(.active) {
-  background-color: #e5e7eb;
-  color: #6b7280;
+  @apply bg-white text-black dark:bg-gray-700 dark:text-white;
+
 }
 .tab:not(.active):hover {
   background-color: #d1d5db;
