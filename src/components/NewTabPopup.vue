@@ -2,7 +2,8 @@
   <div 
     class="fixed inset-0 flex items-center justify-center z-50" 
     v-if="modelValue"
-  >
+    @click.self="closePopup()">
+ 
     <div class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-lg p-6 w-96 shadow-xl border border-white/20 dark:border-gray-700/30">
       <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Choose an option</h2>
       
