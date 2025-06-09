@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="tab flex items-center justify-between px-4 py-2 cursor-pointer text-sm font-medium relative" 
+    class="tab flex flex-1 items-center justify-between px-4 py-1 cursor-pointer text-sm font-medium relative" 
     :class="{ 'active': isActive }" 
     @click="$emit('click')"
     @dblclick="startEditing"
@@ -93,7 +93,6 @@ export default {
 
 <style scoped>
 .tab {
-  min-width: 100px;
   max-width: 200px;
 }
 

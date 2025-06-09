@@ -1,5 +1,5 @@
 <template>
-  <div class="flex items-end bg-gray-200 rounded-lg shadow-sm" style="height: 40px;">
+  <div class="flex items-end" style="height: 30px;">
     <Tab
       v-for="(tab, index) in appStore.tabs"
       :key="index"
@@ -65,6 +65,7 @@ const addTab = () => {
   height: 80%;
   width: 1px;
   background-color: #d1d5db;
+  z-index: 1;
 }
 .close-btn {
   opacity: 0;
