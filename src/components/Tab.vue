@@ -24,8 +24,7 @@
       type="text"
     >
     <button 
-      class="close-btn absolute top-1 right-1 w-2 h-2 flex items-center justify-center text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-red-100 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0" 
-      style="padding: 0;"
+    class="close-btn absolute top-1 right-1 w-2 h-2 flex items-center justify-center text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900 dark:text-gray-300 dark:hover:text-red-400 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0"      style="padding: 0;"
       @click.stop="$emit('removeTab')"
       aria-label="Close tab"
     >

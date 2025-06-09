@@ -10,7 +10,7 @@
     />
     <button
       @click="addTab"
-      class="plus-button text-gray-500 hover:text-blue-600 hover:bg-gray-300 rounded-full transition-all duration-200"
+      class="plus-button text-gray-500 hover:text-blue-600 hover:bg-gray-200 dark:text-gray-400 dark:hover:text-blue-400 dark:hover:bg-gray-700 rounded-full transition-all duration-200"
       title="Add New Tab"
     >
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -18,14 +18,11 @@
       </svg>
     </button>
   </div>
-  <NewTabPopup v-if="showNewTabPopup"   
-  v-model="showNewTabPopup" 
- />
+  <NewTabPopup v-if="showNewTabPopup" v-model="showNewTabPopup" />
 </template>
 
 <script setup>
 import { ref } from 'vue';
-
 import { useAppStore } from "@/stores/appStore";
 import Tab from '@/components/Tab.vue';
 import NewTabPopup from '@/components/NewTabPopup.vue';
@@ -33,30 +30,31 @@ import NewTabPopup from '@/components/NewTabPopup.vue';
 const showNewTabPopup = ref(false);
 const appStore = useAppStore();
 const addTab = () => {
-  showNewTabPopup.value=true;
+  showNewTabPopup.value = true;
 };
-
 </script>
 
 <style scoped>
 @reference "@/assets/main.css";
-/* Custom styles remain the same */
+
 .tab {
   position: relative;
- /*clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);*/
   transition: all 0.2s ease-in-out;
 }
+
 .tab.active {
-  @apply bg-white text-black dark:bg-gray-700 dark:text-white;
+  @apply bg-white text-gray-900 dark:bg-black dark:text-white;
   z-index: 10;
 }
-.tab:not(.active) {
-  @apply bg-white text-black dark:bg-gray-700 dark:text-white;
 
+.tab:not(.active) {
+  @apply bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300;
 }
+
 .tab:not(.active):hover {
-  background-color: #d1d5db;
+  @apply bg-gray-200 dark:bg-gray-700;
 }
+
 .tab:not(:last-child)::after {
   content: '';
   position: absolute;
@@ -64,17 +62,20 @@ const addTab = () => {
   top: 10%;
   height: 80%;
   width: 1px;
-  background-color: #d1d5db;
+  @apply bg-gray-300 dark:bg-gray-600;
   z-index: 1;
 }
+
 .close-btn {
   opacity: 0;
   transition: opacity 0.2s ease-in-out;
 }
+
 .tab:hover .close-btn,
 .tab.active .close-btn {
   opacity: 1;
 }
+
 .plus-button {
   display: flex;
   align-items: center;
