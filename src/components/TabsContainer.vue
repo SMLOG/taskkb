@@ -1,5 +1,5 @@
 <template>
-  <div  class="bg-gray-100">
+  <div >
     <div class="container mx-auto p-0 pb-0 min-w-full">
       <Tabs />
     </div>
