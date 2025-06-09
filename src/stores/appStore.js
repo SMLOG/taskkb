@@ -106,7 +106,7 @@ export const useAppStore = defineStore('app', () => {
 
   async function removeTab(index) {
     try {
-        let tab = tabs.value[id];
+        let tab = tabs.value[index];
         tabs.value.splice(index, 1);
         delete tabsDataMapRef.value[tab.id];
         
