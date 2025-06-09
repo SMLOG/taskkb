@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative"  :class="{ drag: isDragging, move: isMoving }">
+  <div class="table-container relative pl-[8px]"  :class="{ drag: isDragging, move: isMoving }">
 
     <DatePicker :config="configRef" />
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;"  @mousedown.left="handleMouseDown"
