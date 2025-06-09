@@ -23,7 +23,7 @@
           <div v-for="(col, index) in cols" :key="index"
             class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
             <div class="w-12 text-center text-gray-500 dark:text-gray-400" draggable="true" @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
-            <div class="w-32">
+            <div class="w-20">
               <select v-model="col.cp"
                 class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400">
                 <option v-for="cp in cpList" :key="cp" :value="cp">{{ cp }}</option>
@@ -34,13 +34,15 @@
                 class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                 placeholder="Column Name" />
             </div>
-            <div v-if="col.cp === 'ColDropText'" class="flex-1">
+
+            <div class="flex gap-2 flex-col flex-1">
+              <div v-if="col.cp === 'ColDropText'" >
               <input v-model="col.options"
                 class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                 placeholder="Drop down options,separate by [,]" />
             </div>
-            <div class="flex items-center gap-2">
-              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
+              <div class="flex">
+                <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
                 <input type="checkbox" v-model="col.sticky" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Sticky
               </label>
@@ -48,10 +50,12 @@
                 <input type="checkbox" v-model="col.show" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Show
               </label>
+              </div>
+
 
             </div>
-            <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" @click="delCol(col, index)">
-              Remove
+            <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" title="Click to delete this item." @click="delCol(col, index)">
+              x
             </button>
           </div>
         </div>
