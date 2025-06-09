@@ -1,7 +1,6 @@
 <!-- Original Component (e.g., TreeTable.vue) -->
 <template>
   <div class="table-container relative" :class="{ drag: isDragging, move: isMoving }">
-    <DatePicker :config="configRef" />
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
@@ -37,7 +36,7 @@
             </div>
           </div>
         </template>
-        <WeekHeader :weeks="weeksRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" />
+        <WeekHeader :weeks="weeksRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" :config="configRef" />
       </div>
       <TreeTime
         :row="root"
@@ -59,7 +58,6 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
-import DatePicker from '@/components/tree/DatePicker.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
 import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';

@@ -17,12 +17,14 @@
         </div>
       </div>
     </div>
+    <DatePicker :config="config" />
   </div>
 </template>
 
 <script setup>
 import { defineProps } from 'vue';
 import { isBetween } from '@/lib/schedule';
+import DatePicker from '@/components/tree/DatePicker.vue';
 
 defineProps({
   weeks: {
@@ -35,6 +37,7 @@ defineProps({
   selectStartRef: {
     type: Object,
   },
+  config:{}
 });
 
 const getDayClasses = (day, selectStartRef) => ({
