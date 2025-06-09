@@ -6,7 +6,12 @@ import FormatTool from "@/components/tools/FormatTool.vue";
 import { useRoute } from 'vue-router';
 import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
+import { useAppStore } from '@/stores/appStore';
 
+import { storeToRefs } from 'pinia'
+const appStore = useAppStore();
+
+const {activeTabRef} = storeToRefs(appStore);
 const route = useRoute();
 
 const isTree = route.path === '/';
@@ -26,7 +31,7 @@ const isTree = route.path === '/';
               <router-view>
               </router-view>
             </FormatTool>
-            <TreeOperation />
+            <TreeOperation v-if="activeTabRef!=-1" />
           </div>
         </div>
         </div>

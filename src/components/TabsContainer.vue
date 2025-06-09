@@ -1,6 +1,6 @@
 <template>
   <div  class="bg-gray-100">
-    <div class="container mx-auto p-4 min-w-full">
+    <div class="container mx-auto p-4 pb-0 min-w-full">
       <Tabs />
     </div>
   </div>
