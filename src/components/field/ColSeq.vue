@@ -22,4 +22,8 @@ defineProps({
 
 </script>
 
-<style></style>
+<style>
+.selected .num{
+  cursor: move;
+}
+</style>
