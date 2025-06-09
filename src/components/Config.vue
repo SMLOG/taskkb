@@ -37,7 +37,7 @@
             <div v-if="col.cp === 'ColDropText'" class="flex-1">
               <input v-model="col.options"
                 class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-                placeholder="Options" />
+                placeholder="Drop down options,separate by [,]" />
             </div>
             <div class="flex items-center gap-2">
               <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
@@ -48,14 +48,7 @@
                 <input type="checkbox" v-model="col.show" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
                 Show
               </label>
-              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
-                <input type="checkbox" v-model="col.group" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-                Group
-              </label>
-              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
-                <input type="checkbox" v-model="col.formula" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-                Formula
-              </label>
+
             </div>
             <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" @click="delCol(col, index)">
               Remove
@@ -92,8 +85,7 @@ interface Column {
   fn: number;
   show: boolean;
   sticky?: boolean;
-  group?: boolean;
-  formula?: boolean;
+
   options?: string;
 }
 
@@ -168,9 +160,7 @@ const addCol = () => {
     name: text,
     fn: nextCid,
     show: true,
-    sticky: false,
-    group: false,
-    formula: false,
+    sticky: false
   });
 };
 
