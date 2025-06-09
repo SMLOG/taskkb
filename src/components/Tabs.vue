@@ -42,7 +42,7 @@ const addTab = () => {
 /* Custom styles remain the same */
 .tab {
   position: relative;
-  clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);
+ /*clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%);*/
   transition: all 0.2s ease-in-out;
 }
 .tab.active {

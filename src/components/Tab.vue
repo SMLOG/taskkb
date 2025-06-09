@@ -6,13 +6,15 @@
   >
     <span class="truncate max-w-[130px]">{{ tab.title }}</span>
     <button 
-      class="close-btn absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-gray-300" 
-      @click.stop="$emit('removeTab')"
-    >
-      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-      </svg>
-    </button>
+  class="close-btn absolute top-1 right-1 w-2 h-2 flex items-center justify-center text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-red-100 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0" 
+  style="padding: 0;"
+  @click.stop="$emit('removeTab')"
+  aria-label="Close tab"
+>
+  <svg class="w-full h-full" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+  </svg>
+</button>
   </div>
 </template>
 

@@ -18,7 +18,12 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, reactive } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, reactive,watch } from 'vue';
+import { useAppStore } from '@/stores/appStore';
+import { storeToRefs } from 'pinia'
+const appStore = useAppStore();
+
+const {activeTabRef} = storeToRefs(appStore);
 
 // Props
 const props = defineProps(['table', 'th', 'cols']);
@@ -80,6 +85,14 @@ const winResize = debounce(() => {
   }
   nextTick(() => reAdjustBars());
 }, 100);
+
+watch(
+  () => [activeTabRef?.value],
+  () => {
+    winResize();
+  },
+  { immediate: true }
+);
 
 const handleResize = (event) => {
   if (state.resizeColumn) {
