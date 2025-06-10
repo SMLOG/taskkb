@@ -147,7 +147,7 @@ export function useTree() {
     const className = ["selectStartRef", "rightDrag", "leftDrag"].find(cls =>
       target.classList.contains(cls)
     );
-
+console.log(clientX)
     switch (className) {
       case "selectStartRef":
         moveTypeConfig = {
@@ -216,15 +216,15 @@ export function useTree() {
 
   const handleMouseCellsMove = (event) => {
     const rowEl = event.target.closest(".row");
-    if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
+  //  if(!isMouseDown)return;
+    if (rowEl  && !isDrag.value && selectDepths.length) {
       handleSelection(rowEl);
     }
 
     const sch = event.target.closest(".sch");
-    if (isMouseDown&&sch) {
+    if (sch) {
       const { left, width: totalWidth } = sch.getBoundingClientRect();
       const x = event.clientX - left;
-      console.log(event.clientX,x)
       const index = Math.floor((x / totalWidth) * config.weekCount * 7);
       const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
@@ -241,7 +241,13 @@ export function useTree() {
             Math.floor(ox / unitWidth);
 
           const newDate = weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
-          if (!newDate) return;
+          if (!newDate) {
+
+            debouncedIncreaseWeeks(ox<0)
+
+            return;
+
+          }
 
           switch (moveType.value.type) {
             case "rightDrag":
@@ -252,16 +258,12 @@ export function useTree() {
               break;
             default: {
               const moveUnits = Math.floor(ox / unitWidth);
-              console.log(moveUnits)
               const startIndex = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
               const endIndex = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
 
               selectStartRef.value.start = weeksRef.value[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
               selectStartRef.value.end = weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
-
-              if(ox<0&&selectStartRef.value.start.i==0){
-                debouncedIncreaseWeeks();
-              }
+          
             }
           }
         }
@@ -269,9 +271,8 @@ export function useTree() {
     }
   };
 
-  const debouncedIncreaseWeeks = debounce(()=>{
-    console.log(useAppStore().configRef.startDate)
-    useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
+  const debouncedIncreaseWeeks = debounce((backwalk)=>{
+    if(backwalk)useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
     
     useAppStore().configRef.weekCount++;
   }, 300);
