@@ -154,7 +154,6 @@ export function useTree() {
     const className = ["selectStartRef", "rightDrag", "leftDrag"].find(cls =>
       target.classList.contains(cls)
     );
-console.log(clientX)
     switch (className) {
       case "selectStartRef":
         moveTypeConfig = {
@@ -286,6 +285,8 @@ console.log(clientX)
     }
     
     useAppStore().configRef.weekCount++;
+
+    weeksRef.value= generateWeeks(useAppStore().configRef.startDate, useAppStore().configRef.weekCount);
   }, 300);
 
 
