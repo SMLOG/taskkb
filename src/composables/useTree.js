@@ -216,7 +216,7 @@ console.log(clientX)
 
   const handleMouseCellsMove = (event) => {
     const rowEl = event.target.closest(".row");
-  //  if(!isMouseDown)return;
+   if(!isMouseDown)return;
     if (rowEl  && !isDrag.value && selectDepths.length) {
       handleSelection(rowEl);
     }
@@ -244,7 +244,7 @@ console.log(clientX)
           if (!newDate) {
 
             debouncedIncreaseWeeks(ox<0)
-
+   
             return;
 
           }
@@ -272,7 +272,11 @@ console.log(clientX)
   };
 
   const debouncedIncreaseWeeks = debounce((backwalk)=>{
-    if(backwalk)useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
+    if(backwalk){
+      useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
+      selectStartRef.value.start.i+=7
+      selectStartRef.value.end.i+=7
+    }
     
     useAppStore().configRef.weekCount++;
   }, 300);
