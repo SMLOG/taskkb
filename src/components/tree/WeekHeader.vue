@@ -46,13 +46,7 @@ const getDayClasses = (day, selectStartRef) => ({
   weekend: day.isWeekend,
   holiday: day.holiday,
 });
-watch(
-  () => [props.selectStartRef?.start],
-  () => {
-   console.log(props.selectStartRef?.start)
-  },
-  { immediate: true }
-);
+
 </script>
 
 <style scoped>
