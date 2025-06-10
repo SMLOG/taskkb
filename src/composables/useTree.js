@@ -1,9 +1,23 @@
 import { ref } from "vue";
 import { useAppStore } from "@/stores/appStore";
-import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
-import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2,getPreviousWeekDate,generateWeeks } from '@/lib/schedule';
-import { debounce } from 'lodash';
-
+import {
+  getRowFromDepth,
+  moveNode,
+  deleteNode,
+  copyNode,
+  getRows,
+  appendNodeNextTo,
+  filterChildDepths,
+} from "@/lib/treelib";
+import {
+  addDatePeriod,
+  deepCopy,
+  calcDaysBetween,
+  formatDate2,
+  getPreviousWeekDate,
+  generateWeeks,
+} from "@/lib/schedule";
+import { debounce } from "lodash";
 
 const weeksRef = ref([]);
 const selectDepthsRef = ref([]);
@@ -14,19 +28,17 @@ const isDraging = ref(false);
 const dragMode = ref(false);
 const moveType = ref(null);
 
-
-
-
 function getDate(i) {
   const weekIndex = parseInt(i / 7);
-  if(weeksRef.value.length<=weekIndex)
-  {
-    useAppStore().configRef.weekCount=weekIndex+1;
+  if (weeksRef.value.length <= weekIndex) {
+    useAppStore().configRef.weekCount = weekIndex + 1;
 
-    weeksRef.value= generateWeeks(useAppStore().configRef.startDate, weekIndex+1);
+    weeksRef.value = generateWeeks(
+      useAppStore().configRef.startDate,
+      weekIndex + 1
+    );
   }
   return weeksRef.value[weekIndex].dates[i % 7];
-
 }
 function plusWorkDays(startIndex, days) {
   let start = startIndex;
@@ -34,16 +46,22 @@ function plusWorkDays(startIndex, days) {
   let total = Math.abs(days);
   let inc = days > 0 ? 1 : -1;
   if (days == 0) return getDate(start);
-  for (; true;) {
+  for (; true; ) {
     start += inc;
     let date = getDate(start);
-    if (date.isWeekend && config.allowOptions && config.allowOptions.indexOf('W') == -1 || date.holiday && config.allowOptions && config.allowOptions.indexOf('H') == -1) continue;
+    if (
+      (date.isWeekend &&
+        config.allowOptions &&
+        config.allowOptions.indexOf("W") == -1) ||
+      (date.holiday &&
+        config.allowOptions &&
+        config.allowOptions.indexOf("H") == -1)
+    )
+      continue;
     k++;
     if (k == total) return getDate(start);
   }
-
 }
-
 
 let config;
 let dragStartClientX;
@@ -59,11 +77,18 @@ export function useTree() {
   };
 
   const selectRowSch = (row, event) => {
-    if (!moveType.value && (!selectStartRef.value || selectStartRef.value.type != 2)) {
-      selectStartRef.value = { type: 1, row: row, start: row._tl.start, end: row._tl.end };
+    if (
+      !moveType.value &&
+      (!selectStartRef.value || selectStartRef.value.type != 2)
+    ) {
+      selectStartRef.value = {
+        type: 1,
+        row: row,
+        start: row._tl.start,
+        end: row._tl.end,
+      };
     }
-
-  }
+  };
   const handleMouseDown = (event) => {
     const rowEl = event.target.closest(".row");
     const cell = event.target.closest("div.col");
@@ -73,7 +98,10 @@ export function useTree() {
 
     // Prevent default and blur active element
     //  event.preventDefault();
-    if (document.activeElement && !cell?.querySelector("[contenteditable=true]")) {
+    if (
+      document.activeElement &&
+      !cell?.querySelector("[contenteditable=true]")
+    ) {
       document.activeElement.blur();
     }
 
@@ -86,7 +114,7 @@ export function useTree() {
 
       // Handle number cell click
       if (target.classList.contains("num")) {
-        console.log('handleNumClick')
+        console.log("handleNumClick");
         handleNumClick(depth);
         return;
       }
@@ -96,7 +124,12 @@ export function useTree() {
       selectDetphStart = selectDetphEnd = null;
 
       const row = getRowFromDepth(useAppStore().treeRef, depth);
-      if (!row || !row._tl?.start || !selectStartRef.value || selectStartRef.value.row !== row) {
+      if (
+        !row ||
+        !row._tl?.start ||
+        !selectStartRef.value ||
+        selectStartRef.value.row !== row
+      ) {
         handleScheduleClick(row, target, event);
         return;
       }
@@ -114,18 +147,16 @@ export function useTree() {
       selectDepths.length = 0;
       selectDepths.push(depth);
       selectDetphStart = depth;
-
     }
   };
 
   const handleMouseUp = (event) => {
-
     if (isDraging.value) {
       isDraging.value = false;
       return;
     }
     const rowEl = event.target.closest(".row");
-    if(!rowEl)return;
+    if (!rowEl) return;
     const { depth } = rowEl.dataset;
     if (isDrag.value) {
       selectDepths.length = 0;
@@ -138,9 +169,7 @@ export function useTree() {
       selectStartRef.value.row._tl.start = selectStartRef.value.start;
       selectStartRef.value.row._tl.end = selectStartRef.value.end;
 
-
       moveType.value = null;
-
     } else {
       locateCurSch(event);
     }
@@ -151,7 +180,7 @@ export function useTree() {
     let moveTypeConfig;
 
     // Find the matching class
-    const className = ["selectStartRef", "rightDrag", "leftDrag"].find(cls =>
+    const className = ["selectStartRef", "rightDrag", "leftDrag"].find((cls) =>
       target.classList.contains(cls)
     );
     switch (className) {
@@ -200,7 +229,10 @@ export function useTree() {
     if (!row._tl?.start) {
       if (!selectStartRef.value) {
         selectStartRef.value = { type: 2, row, start: date, end: date };
-      } else if (selectStartRef.value.row === row && selectStartRef.value.start) {
+      } else if (
+        selectStartRef.value.row === row &&
+        selectStartRef.value.start
+      ) {
         console.log("update");
         row._tl = addDatePeriod({
           start: selectStartRef.value.start,
@@ -222,8 +254,7 @@ export function useTree() {
 
   const handleMouseCellsMove = (event) => {
     const rowEl = event.target.closest(".row");
-   if(!isMouseDown)return;
-    if (rowEl  && !isDrag.value && selectDepths.length) {
+    if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
       handleSelection(rowEl);
     }
 
@@ -243,16 +274,17 @@ export function useTree() {
         if (moveType.value) {
           const unitWidth = totalWidth / (config.weekCount * 7);
           const ox = event.clientX - moveType.value.x;
-          let newIndex = moveType.value._tl[moveType.value.type === "rightDrag" ? "end" : "start"].i +
-            Math.floor(ox / unitWidth);
+          let newIndex =
+            moveType.value._tl[
+              moveType.value.type === "rightDrag" ? "end" : "start"
+            ].i + Math.floor(ox / unitWidth);
 
-          const newDate = weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
+          const newDate =
+            weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
           if (!newDate) {
+            debouncedIncreaseWeeks(ox < 0);
 
-            debouncedIncreaseWeeks(ox<0)
-   
             return;
-
           }
 
           switch (moveType.value.type) {
@@ -264,12 +296,21 @@ export function useTree() {
               break;
             default: {
               const moveUnits = Math.floor(ox / unitWidth);
-              const startIndex = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
-              const endIndex = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
+              const startIndex = plusWorkDays(
+                moveType.value._tl.start.i,
+                moveUnits
+              ).i;
+              const endIndex = plusWorkDays(
+                moveType.value._tl.end.i,
+                moveUnits
+              ).i;
 
-              selectStartRef.value.start = weeksRef.value[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
-              selectStartRef.value.end = weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
-          
+              selectStartRef.value.start =
+                weeksRef.value[Math.floor(startIndex / 7)]?.dates[
+                  startIndex % 7
+                ];
+              selectStartRef.value.end =
+                weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
             }
           }
         }
@@ -277,20 +318,23 @@ export function useTree() {
     }
   };
 
-  const debouncedIncreaseWeeks = debounce((backwalk)=>{
-    console.log('debouncedIncreaseWeeks')
-    if(backwalk){
-      useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
-      selectStartRef.value.start.i+=7
-      selectStartRef.value.end.i+=7
+  const debouncedIncreaseWeeks = debounce((backwalk) => {
+    console.log("debouncedIncreaseWeeks");
+    if (backwalk) {
+      useAppStore().configRef.startDate = getPreviousWeekDate(
+        new Date(useAppStore().configRef.startDate)
+      );
+      selectStartRef.value.start.i += 7;
+      selectStartRef.value.end.i += 7;
     }
-    
+
     useAppStore().configRef.weekCount++;
 
-    weeksRef.value= generateWeeks(useAppStore().configRef.startDate, useAppStore().configRef.weekCount);
+    weeksRef.value = generateWeeks(
+      useAppStore().configRef.startDate,
+      useAppStore().configRef.weekCount
+    );
   }, 600);
-
-
 
   const cellClass = (col) => {
     return {
@@ -299,18 +343,15 @@ export function useTree() {
   };
 
   const dragstart = (event) => {
-    console.log('dragstart')
+    console.log("dragstart");
     let interceptor = event.target.closest(".row");
     if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
-      console.log('dragStartClientX', dragStartClientX);
+      console.log("dragStartClientX", dragStartClientX);
     }
 
     isDraging.value = true;
   };
-
-
-
 
   const drop = (event) => {
     let interceptor = event.target.closest(".row");
@@ -326,8 +367,15 @@ export function useTree() {
   };
 
   const getCacWidth = () => {
-    return (calculateDaysBetweenDates(selectStartRef.value.end, selectStartRef.value.start)) * 100 + '%';
-  }
+    return (
+      calculateDaysBetweenDates(
+        selectStartRef.value.end,
+        selectStartRef.value.start
+      ) *
+        100 +
+      "%"
+    );
+  };
 
   const handleKeyDown = (event) => {
     if (
@@ -341,69 +389,65 @@ export function useTree() {
         selectStartRef.value = null;
       }
     }
-  }
+  };
 
   const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
-
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
-
-
-  }
+  };
 
   const locateCurSch = (event) => {
-
     if (moveType.value) return;
-    let title = event.target.classList.contains('sch');
+    let title = event.target.classList.contains("sch");
     if (title) {
-      let rowEl = event.target.closest('.row');
-      let plantime = rowEl.querySelector('.plantime');
+      let rowEl = event.target.closest(".row");
+      let plantime = rowEl.querySelector(".plantime");
       if (plantime)
-        rowEl.closest('#mainContent').scrollLeft = plantime.offsetLeft;
+        rowEl.closest("#mainContent").scrollLeft = plantime.offsetLeft;
     }
-  }
-  const dblclickHandle = (event) => {
-
-  }
-
+  };
+  const dblclickHandle = (event) => {};
 
   const calDiffDates = (firstDay) => {
-    return (calculateDaysBetweenDates(selectStartRef.value.start.n < selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end, firstDay) - 1);
-  }
+    return (
+      calculateDaysBetweenDates(
+        selectStartRef.value.start.n < selectStartRef.value.end.n
+          ? selectStartRef.value.start
+          : selectStartRef.value.end,
+        firstDay
+      ) - 1
+    );
+  };
   const insertNode = (node) => {
-    let rootObj = useAppStore().treeRef
+    let rootObj = useAppStore().treeRef;
     let parentNode = rootObj;
-    if (selectDepths.length ) {
+    if (selectDepths.length) {
       let lastDepth = selectDepths[selectDepths.length - 1];
-      selectDepths.forEach(()=>appendNodeNextTo(rootObj, lastDepth, node))
-      
+      selectDepths.forEach(() => appendNodeNextTo(rootObj, lastDepth, node));
     } else {
-      if (!parentNode._childs) parentNode._childs = []
-      parentNode._childs.push(node)
+      if (!parentNode._childs) parentNode._childs = [];
+      parentNode._childs.push(node);
     }
-
-
-
-  }
+  };
   const delSelectedNode = () => {
-    let rootObj = useAppStore().treeRef
+    let rootObj = useAppStore().treeRef;
     for (let depth of selectDepths) {
       deleteNode(rootObj, depth);
     }
     selectDepths.length = 0;
-  }
+  };
   const copySelectedNode = () => {
-    let rootObj = useAppStore().treeRef
+    let rootObj = useAppStore().treeRef;
 
     if (selectDepths.length == 1) {
       copyNode(rootObj, selectDepths[0]);
     }
-  }
+  };
 
   function handleSelection(rowEl) {
     selectDepths.length = 0;
     selectDetphEnd = rowEl.dataset.depth;
 
-    const rows = document.querySelectorAll('.row');
+    const rows = document.querySelectorAll(".row");
     const rowsDepthIndexMap = new Map();
     rows.forEach((el, index) => {
       if (el.dataset?.depth) rowsDepthIndexMap.set(el.dataset.depth, index);
@@ -421,35 +465,38 @@ export function useTree() {
     }
   }
 
-  function exportCSV(config, onlyText = false, colSeperator = ',') {
-    let rootObj = useAppStore().treeRef
+  function exportCSV(config, onlyText = false, colSeperator = ",") {
+    let rootObj = useAppStore().treeRef;
 
-    if (!selectDepths.length ) {
+    if (!selectDepths.length) {
       return;
     }
 
-      let items = [];
+    let items = [];
 
-      let j=0;
-      for(let depth of filterChildDepths(selectDepths)){
-           let item = getRowFromDepth(rootObj, depth);
-           items.push(... getRows(item,0,++j) );
-      }
-
+    let j = 0;
+    for (let depth of filterChildDepths(selectDepths)) {
+      let item = getRowFromDepth(rootObj, depth);
+      items.push(...getRows(item, 0, ++j));
+    }
 
     console.log(items);
     let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
-    let rows = items.map((item, rowIndex) =>
-    {
+    let rows = items.map((item, rowIndex) => {
       let row = item.row;
-      return cols.map((col, i) =>
-        (i == 0 ? ('  '.repeat(item.level) + item.depth + '.' + " ") : "")
-        + (row["c" + col.fn] ? row["c" + col.fn] : ''))
-        .concat([row._tl ? formatDate2(row._tl.start.date) : '', row._tl ? formatDate2(row._tl.end.date) : ''])
-}
-    );
+      return cols
+        .map(
+          (col, i) =>
+            (i == 0 ? "  ".repeat(item.level) + item.depth + "." + " " : "") +
+            (row["c" + col.fn] ? row["c" + col.fn] : "")
+        )
+        .concat([
+          row._tl ? formatDate2(row._tl.start.date) : "",
+          row._tl ? formatDate2(row._tl.end.date) : "",
+        ]);
+    });
     let headers = cols.map((c) => c.name);
-    if (!onlyText) headers = headers.concat(['Start Date', 'End Date']);
+    if (!onlyText) headers = headers.concat(["Start Date", "End Date"]);
     rows.unshift(headers);
 
     let text = rows
@@ -457,19 +504,20 @@ export function useTree() {
         r
           .map(
             (d) =>
-              `${(d &&
-                d
-                  .replace(/"/g, '""')
-                  .replace(/<.*?>/g, "")
-                  .replace(/&lt;/g, "<")
-                  .replace(/&gt;/g, ">")
-                  .replace(/&amp;/g, "&")
-                  .replace(/&nbsp;/g, " ")
-                  .replace(/\\n/g, "\\n")) ||
-              ""
+              `${
+                (d &&
+                  d
+                    .replace(/"/g, '""')
+                    .replace(/<.*?>/g, "")
+                    .replace(/&lt;/g, "<")
+                    .replace(/&gt;/g, ">")
+                    .replace(/&amp;/g, "&")
+                    .replace(/&nbsp;/g, " ")
+                    .replace(/\\n/g, "\\n")) ||
+                ""
               }`
           )
-          .map((d, i) => onlyText ? `\`${d}\`` : `"${d}"`)
+          .map((d, i) => (onlyText ? `\`${d}\`` : `"${d}"`))
           .join(colSeperator)
       )
       .join("\n");
@@ -484,11 +532,21 @@ export function useTree() {
     weeksRef,
     cellClass,
     dragstart,
-    drop, getCacWidth, handleKeyDown,
+    drop,
+    getCacWidth,
+    handleKeyDown,
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag, moveType, locateCurSch, dragMode, dblclickHandle,
-    selectDepths,  insertNode, delSelectedNode, copySelectedNode, exportCSV
+    isDrag,
+    moveType,
+    locateCurSch,
+    dragMode,
+    dblclickHandle,
+    selectDepths,
+    insertNode,
+    delSelectedNode,
+    copySelectedNode,
+    exportCSV,
   };
 }
