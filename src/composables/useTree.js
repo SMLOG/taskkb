@@ -278,6 +278,7 @@ export function useTree() {
   };
 
   const debouncedIncreaseWeeks = debounce((backwalk)=>{
+    console.log('debouncedIncreaseWeeks')
     if(backwalk){
       useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
       selectStartRef.value.start.i+=7
@@ -287,7 +288,7 @@ export function useTree() {
     useAppStore().configRef.weekCount++;
 
     weeksRef.value= generateWeeks(useAppStore().configRef.startDate, useAppStore().configRef.weekCount);
-  }, 300);
+  }, 600);
 
 
 
