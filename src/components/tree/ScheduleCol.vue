@@ -64,6 +64,8 @@ const props = defineProps({
 
 // Reactive state for drag handling
 const isMouseDown = ref(1);
+
+
 </script>
 
 

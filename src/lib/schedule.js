@@ -50,6 +50,14 @@ function findTheDateInWeeks(weeks, date) {
 
   return null; // No matching week found
 }
+
+export function getPreviousWeekDate(date) {
+  // Create a new Date object to avoid modifying the original
+  const result = new Date(date);
+  // Subtract 7 days
+  result.setDate(date.getDate() - 7);
+  return result;
+}
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
 

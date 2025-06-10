@@ -1,7 +1,8 @@
 import { ref } from "vue";
 import { useAppStore } from "@/stores/appStore";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
-import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2 } from '@/lib/schedule';
+import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2,getPreviousWeekDate } from '@/lib/schedule';
+import { debounce } from 'lodash';
 
 
 const weeksRef = ref([]);
@@ -94,7 +95,7 @@ export function useTree() {
       }
 
       // Handle move or drag operations
-      handleSchMoveOrDrag(row, target, event);
+      setMoveType(row, target, event);
     }
   };
 
@@ -138,7 +139,7 @@ export function useTree() {
     }
   };
 
-  const handleSchMoveOrDrag = (row, target, event) => {
+  const setMoveType = (row, target, event) => {
     const { clientX } = event;
     let moveTypeConfig;
 
@@ -216,31 +217,14 @@ export function useTree() {
   const handleMouseCellsMove = (event) => {
     const rowEl = event.target.closest(".row");
     if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
-      selectDepths.length = 0;
-      selectDetphEnd = rowEl.dataset.depth;
-
-      const rows = document.querySelectorAll('.row');
-      const rowsDepthIndexMap = new Map();
-      rows.forEach((el, index) => {
-        if (el.dataset?.depth) rowsDepthIndexMap.set(el.dataset.depth, index);
-      });
-
-      const startIndex = rowsDepthIndexMap.get(selectDetphStart);
-      const endIndex = rowsDepthIndexMap.get(selectDetphEnd);
-
-      if (startIndex !== undefined && endIndex !== undefined) {
-        const minIndex = Math.min(startIndex, endIndex);
-        const length = Math.abs(startIndex - endIndex) + 1;
-        selectDepths.push(
-          ...Array.from({ length }, (_, i) => rows[minIndex + i].dataset.depth)
-        );
-      }
+      handleSelection(rowEl);
     }
 
     const sch = event.target.closest(".sch");
-    if (sch) {
+    if (isMouseDown&&sch) {
       const { left, width: totalWidth } = sch.getBoundingClientRect();
       const x = event.clientX - left;
+      console.log(event.clientX,x)
       const index = Math.floor((x / totalWidth) * config.weekCount * 7);
       const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
@@ -268,11 +252,16 @@ export function useTree() {
               break;
             default: {
               const moveUnits = Math.floor(ox / unitWidth);
+              console.log(moveUnits)
               const startIndex = plusWorkDays(moveType.value._tl.start.i, moveUnits).i;
               const endIndex = plusWorkDays(moveType.value._tl.end.i, moveUnits).i;
 
               selectStartRef.value.start = weeksRef.value[Math.floor(startIndex / 7)]?.dates[startIndex % 7];
               selectStartRef.value.end = weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
+
+              if(ox<0&&selectStartRef.value.start.i==0){
+                debouncedIncreaseWeeks();
+              }
             }
           }
         }
@@ -280,6 +269,12 @@ export function useTree() {
     }
   };
 
+  const debouncedIncreaseWeeks = debounce(()=>{
+    console.log(useAppStore().configRef.startDate)
+    useAppStore().configRef.startDate = getPreviousWeekDate(new Date(useAppStore().configRef.startDate));
+    
+    useAppStore().configRef.weekCount++;
+  }, 300);
 
 
 
@@ -387,6 +382,28 @@ export function useTree() {
 
     if (selectDepths.length == 1) {
       copyNode(rootObj, selectDepths[0]);
+    }
+  }
+
+  function handleSelection(rowEl) {
+    selectDepths.length = 0;
+    selectDetphEnd = rowEl.dataset.depth;
+
+    const rows = document.querySelectorAll('.row');
+    const rowsDepthIndexMap = new Map();
+    rows.forEach((el, index) => {
+      if (el.dataset?.depth) rowsDepthIndexMap.set(el.dataset.depth, index);
+    });
+
+    const startIndex = rowsDepthIndexMap.get(selectDetphStart);
+    const endIndex = rowsDepthIndexMap.get(selectDetphEnd);
+
+    if (startIndex !== undefined && endIndex !== undefined) {
+      const minIndex = Math.min(startIndex, endIndex);
+      const length = Math.abs(startIndex - endIndex) + 1;
+      selectDepths.push(
+        ...Array.from({ length }, (_, i) => rows[minIndex + i].dataset.depth)
+      );
     }
   }
 
