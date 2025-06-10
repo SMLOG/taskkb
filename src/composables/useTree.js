@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { useAppStore } from "@/stores/appStore";
 import { getRowFromDepth, moveNode, deleteNode, copyNode, getRows, appendNodeNextTo,filterChildDepths  } from '@/lib/treelib'
-import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2,getPreviousWeekDate } from '@/lib/schedule';
+import { addDatePeriod, deepCopy, calcDaysBetween, formatDate2,getPreviousWeekDate,generateWeeks } from '@/lib/schedule';
 import { debounce } from 'lodash';
 
 
@@ -18,7 +18,14 @@ const moveType = ref(null);
 
 
 function getDate(i) {
-  return weeksRef.value[parseInt(i / 7)].dates[i % 7];
+  const weekIndex = parseInt(i / 7);
+  if(weeksRef.value.length<=weekIndex)
+  {
+    useAppStore().configRef.weekCount=weekIndex+1;
+
+    weeksRef.value= generateWeeks(useAppStore().configRef.startDate, weekIndex+1);
+  }
+  return weeksRef.value[weekIndex].dates[i % 7];
 
 }
 function plusWorkDays(startIndex, days) {
