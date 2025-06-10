@@ -22,11 +22,11 @@
 </template>
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps,watch } from 'vue';
 import { isBetween } from '@/lib/schedule';
 import DatePicker from '@/components/tree/DatePicker.vue';
 
-defineProps({
+const props=defineProps({
   weeks: {
     type: Array,
     required: true,
@@ -46,6 +46,13 @@ const getDayClasses = (day, selectStartRef) => ({
   weekend: day.isWeekend,
   holiday: day.holiday,
 });
+watch(
+  () => [props.selectStartRef?.start],
+  () => {
+   console.log(props.selectStartRef?.start)
+  },
+  { immediate: true }
+);
 </script>
 
 <style scoped>

@@ -92,12 +92,17 @@ const { configRef, treeRef, activeTabRef } = storeToRefs(appStore);
 const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto',
 });
+//const firstDay = computed(() => weeksRef.value?.[0]?.dates?.[0] ?? null);
+
+const firstDay = ref(weeksRef.value?.[0]?.dates?.[0] ?? null);
 
 const updateWeeks = () => {
   if (!configRef.value.startDate) configRef.value.startDate = new Date();
   if (!configRef.value.weekCount) configRef.value.weekCount = 20;
   weeksRef.value.length = 0;
   weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+  firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;
+  console.log(firstDay.value)
 };
 
 const debouncedUpdateWeeks = debounce(updateWeeks, 300);
@@ -129,7 +134,10 @@ onBeforeUnmount(() => {
   debouncedUpdateWeeks.cancel();
 });
 
-const firstDay = computed(() => weeksRef.value?.[0]?.dates?.[0] ?? null);
+
+
+
+
 const days = computed(() => (configRef.value?.weekCount ? configRef.value.weekCount * 7 : 0));
 const cols = computed(() => configRef.value?.cols?.filter((col) => col.show) ?? []);
 const gridColumns = computed(() =>

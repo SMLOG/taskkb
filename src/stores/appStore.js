@@ -35,13 +35,6 @@ export const useAppStore = defineStore('app', () => {
       const storedTabs = localStorage.getItem('tabs');
       if (storedTabs) {
         tabs.value = JSON.parse(storedTabs);
-        tabs.value.forEach(tab => {
-          if (tab.data && tab.data._childs) {
-            for (let r of tab.data._childs) {
-              loopToSetDate(r);
-            }
-          }
-        });
       }
 
 
@@ -141,6 +134,7 @@ export const useAppStore = defineStore('app', () => {
 
     }else{
         let data = JSON.parse(localStorage.getItem(`${tab.id}-data`));
+        loopToSetDate(data);
         let config = JSON.parse(localStorage.getItem(`${tab.id}-config`));
         tabsDataMapRef.value[tab.id]= {data,config};
 

@@ -12,12 +12,51 @@ export function addDatePeriod(addPeriod) {
 export function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
+function findTheDateInWeeks(weeks, date) {
+  // Early validation
+  if (!Array.isArray(weeks) || weeks.length === 0 || !(date instanceof Date)) return null;
 
+  // Normalize the input date to midnight
+  const normalizedDate = new Date(date);
+  normalizedDate.setHours(0, 0, 0, 0); // Set to midnight
+  const dateTime = normalizedDate.getTime();
+  
+  // Check for valid date
+  if (isNaN(dateTime)) return null; // Invalid date
+
+  // Calculate approximate week index
+  const startOfFirstWeek = new Date(weeks[0].start);
+  startOfFirstWeek.setHours(0, 0, 0, 0); // Set to midnight to avoid time issues
+  const startDateTime = startOfFirstWeek.getTime();
+  const daysDiff = (dateTime - startDateTime) / 86400000; // msPerDay
+  const estimatedWeekIndex = Math.floor(daysDiff / 7);
+
+  // Check estimated week
+  if (estimatedWeekIndex >= 0 && estimatedWeekIndex < weeks.length) {
+    const week = weeks[estimatedWeekIndex];
+    
+    // Normalize week start and end to midnight
+    const weekStart = new Date(week.start);
+    weekStart.setHours(0, 0, 0, 0); // Normalize to midnight
+    const weekEnd = new Date(week.end);
+    weekEnd.setHours(0, 0, 0, 0); // Normalize to midnight
+
+    if (dateTime >= weekStart.getTime() && dateTime <= weekEnd.getTime()) {
+      let n = getDateAsInteger(date);
+      const foundDate = week.dates.find(d => d.n === n);
+      return foundDate || null; // Return null if not found
+    }
+  }
+
+  return null; // No matching week found
+}
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
 
-    let date1 = d1.i > d2.i ? d1 : d2;
-    let date2 = d1.i > d2.i ? d2 : d1;
+    ;
+
+    let date1 = d1.i > d2.i ? findTheDateInWeeks(weeks,d1.date) : findTheDateInWeeks(weeks,d2.date);
+    let date2 = d1.i > d2.i ? findTheDateInWeeks(weeks,d2.date) : findTheDateInWeeks(weeks,d1.date);
     if (exclusiveHolidayWeeken) {
       let weekIndex1 = parseInt(date1.i / 7);
       let weekIndex2 = parseInt(date2.i / 7);
@@ -59,34 +98,45 @@ function getDateAsInteger  (dateObj)  {
   return parseInt(`${year}${month}${day}`, 10);
 };
 
-export function generateWeeks  (startDate, n)  {
-  const weeks1 = [];
-  let startOfWeek = new Date(startDate);
-  const startDayOfWeek = (startOfWeek.getDay() + 6) % 7;
+export function generateWeeks(startDate, n) {
+  const weeks = [];
+  const startOfWeek = new Date(startDate);
+  const startDayOfWeek = (startOfWeek.getDay() + 6) % 7; // Adjust for Monday start
   startOfWeek.setDate(startOfWeek.getDate() - startDayOfWeek);
+  const msPerDay = 86400000; // Cache milliseconds per day
+  const msPerWeek = msPerDay * 7; // Cache milliseconds per week
+
+  // Cache first day of year for initial week number calculation
+  const year = startOfWeek.getFullYear();
+  const firstDayOfYear = new Date(year, 0, 1);
+  const firstDayOffset = firstDayOfYear.getDay();
 
   for (let i = 0; i < n; i++) {
-    const endOfWeek = new Date(startOfWeek);
-    endOfWeek.setDate(endOfWeek.getDate() + 6);
+    const weekStartTime = startOfWeek.getTime();
+    const month = startOfWeek.getMonth() + 1;
 
-    weeks1.push({
-      start: new Date(startOfWeek),
-      end: new Date(endOfWeek),
-      i: i,
+    // Approximate week number using precomputed offset
+    const daysSinceYearStart = (weekStartTime - firstDayOfYear) / msPerDay;
+    const weekNumber = Math.floor((daysSinceYearStart + firstDayOffset + 1) / 7) + 1;
+
+    weeks.push({
+      start: new Date(weekStartTime), // Direct reference (assumes immutability not required)
+      end: new Date(weekStartTime + msPerDay * 6),
+      i,
       startn: getDateAsInteger(startOfWeek),
-      endn: getDateAsInteger(endOfWeek),
-      label: formatDate(startOfWeek, {
-        month: "short",
-        year: "2-digit",
-      }),
-      dates: getDatesBetween(startOfWeek, endOfWeek, i)
+      endn: getDateAsInteger(new Date(weekStartTime + msPerDay * 6)),
+      label: formatDate(startOfWeek, { month: "short", year: "2-digit" }),
+      dates: getDatesBetween(startOfWeek, new Date(weekStartTime + msPerDay * 6), i,year,month,weekNumber),
+      year,
+      month,
+      weekNumber
     });
 
-    startOfWeek.setDate(startOfWeek.getDate() + 7);
+    startOfWeek.setTime(weekStartTime + msPerWeek); // Advance by one week
   }
 
-  return weeks1;
-};
+  return weeks;
+}
 const isWeekend = (date) => {
   const dayOfWeek = date.getDay();
   return dayOfWeek === 0 || dayOfWeek === 6;
@@ -106,7 +156,7 @@ const formatDate = (date, format) => {
   return date.toLocaleDateString("en-US", { ...format });
 };
 
-const getDatesBetween = (startDate, endDate, weekIndex) => {
+const getDatesBetween = (startDate, endDate, weekIndex,year,month,weekNumber) => {
   const dates = [];
   const currentDate = new Date(startDate);
   const lastDate = new Date(endDate);
@@ -121,7 +171,8 @@ const getDatesBetween = (startDate, endDate, weekIndex) => {
       isCur: isToday(currentDate),
       isWeekend: isWeekend(currentDate),
       label: formatDate(currentDate, { day: "2-digit" }),
-      holiday: holiday.length && holiday[0]
+      holiday: holiday.length && holiday[0],
+      year,month,weekNumber
     };
     dates.push(dateWrap);
     currentDate.setDate(currentDate.getDate() + 1);
