@@ -1,5 +1,5 @@
 <template>
-    <div class="col" :colspan="7 * weeks.length" v-if="showSch">
+    <div class="col" v-if="showSch">
         <div style="display: flex; flex-wrap: nowrap" class="sch">
             <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
