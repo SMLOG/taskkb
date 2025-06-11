@@ -52,8 +52,9 @@ const getDayClasses = (day, selectStartRef) => ({
 </script>
 
 <style scoped>
+@reference "@/assets/main.css"
 .col {
-  border-right: 1px solid #ccc;
+  @apply border-r border-gray-500;
   position: relative;
 }
 
@@ -68,7 +69,7 @@ const getDayClasses = (day, selectStartRef) => ({
   position: absolute;
   top: 0;
   height: 100%;
-  border-left: 1px solid #ddd;
+  @apply border-r border-gray-500;
   right: 0;
 }
 
@@ -99,5 +100,8 @@ const getDayClasses = (day, selectStartRef) => ({
 .sch {
   user-select: none;
   height: 100%;
+}
+.week-slot:last-child:after {
+  border-right: none;
 }
 </style>

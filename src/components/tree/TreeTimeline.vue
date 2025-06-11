@@ -19,7 +19,7 @@
         :cols="cols"
         :showSch="configRef.showSch"
       />
-      <div class="row header bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
+      <div class="row header border-t border-gray-500 bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div
             class="col"
@@ -158,3 +158,9 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 </script>
 
 <style src="@/components/tree/tree.css" scoped></style>
+
+<style scoped>
+@reference "@/assets/main.css"
+
+
+</style>
