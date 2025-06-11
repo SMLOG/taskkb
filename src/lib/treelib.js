@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid';
 export function getRowFromDepth(root, depth) {
   if (depth == undefined) return;
   const stack = depth.split('.');
@@ -18,7 +19,10 @@ export function appendNodeNextTo(rootTree,depth,node){
       
       let parentChilds = parent._childs;
          let index = parseInt(depth.split('.').pop());
-        parentChilds.splice(index+1, 0, deepCopyObject(node));
+         let newNode  = deepCopyObject(node);
+         newNode.id = uuidv4();
+
+        parentChilds.splice(index+1, 0, newNode);
 }
 export function getParentNode(rootTree, depth) {
   let parentDepth = depth.replace(/\.\d+$/, '');

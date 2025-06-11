@@ -1,5 +1,7 @@
 import { ref } from "vue";
 import { useAppStore } from "@/stores/appStore";
+import { v4 as uuidv4 } from 'uuid';
+
 import {
   getRowFromDepth,
   moveNode,
@@ -428,6 +430,7 @@ export function useTree() {
   };
   const insertNode = (node) => {
     let rootObj = useAppStore().treeRef;
+    node.id = uuidv4();
     let parentNode = rootObj;
     if (selectDepths.length) {
       let lastDepth = selectDepths[selectDepths.length - 1];
