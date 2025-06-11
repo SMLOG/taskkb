@@ -63,6 +63,7 @@ export const useAppStore = defineStore('app', () => {
         localStorage.setItem('activeTab', activeTabRef.value);
         localStorage.setItem(`${tab.id}-data`, JSON.stringify(treeRef.value));
         localStorage.setItem(`${tab.id}-config`, JSON.stringify(configRef.value));
+        tab.saved=true;
       }
     } catch (error) {
       console.error('Failed to save current tab data:', error);
