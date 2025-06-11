@@ -22,7 +22,6 @@ const isTree = route.path === '/';
 
   <main class="flex-grow relative">
     <NotificationProvider class="h-full">
-      <SchConfigProvider></SchConfigProvider>
       <div class="flex flex-col h-full">
         <div> <TabsContainer /></div>
         <div class="flex-1  flex ">
