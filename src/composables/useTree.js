@@ -480,17 +480,24 @@ export function useTree() {
   function exportCSV(config, onlyText = false, colSeperator = ",") {
     let rootObj = useAppStore().treeRef;
 
-    if (!selectDepths.length) {
-      return;
-    }
+
 
     let items = [];
 
     let j = 0;
+    if (selectDepths.length) {
+    
     for (let depth of filterChildDepths(selectDepths)) {
       let item = getRowFromDepth(rootObj, depth);
       items.push(...getRows(item, 0, ++j));
     }
+  }else{
+
+    for (let item of rootObj._childs) {
+      items.push(...getRows(item, 0, ++j));
+    }
+
+  }
 
     let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
     let rows = items.map((item, rowIndex) => {
