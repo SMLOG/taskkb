@@ -17,7 +17,7 @@
        type="date" 
        inline 
        auto-apply 
-       class="border border-gray-200 rounded-md" />
+       class="border-none" />
      <div class="mt-3 flex items-center gap-2">
        <label class="text-sm text-gray-700">Weeks:</label>
        <input type="number" v-model="config.weekCount" :min="20"
