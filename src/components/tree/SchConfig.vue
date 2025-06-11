@@ -20,12 +20,6 @@
         inline 
         auto-apply 
         class="border-none text-gray-900 dark:text-gray-100 text-gray-900 bg-white dark:text-gray-100 dark:bg-gray-800" />
-      <div class="mt-3 flex items-center gap-2">
-        <label class="text-sm text-gray-700 dark:text-gray-300">Weeks:</label>
-        <input type="number" v-model="config.weekCount" :min="20"
-               class="w-20 p-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors duration-200"
-               @mousedown.stop />
-      </div>
       <div class="border-t border-gray-200 dark:border-gray-700 mt-3"></div>
       <div class="mt-3 flex items-center gap-2">
         <label class="text-sm text-gray-700 dark:text-gray-300">Manday:</label>
@@ -57,7 +51,7 @@ defineProps({
 </script>
 <style lang="css" scoped>
 @reference "@/assets/main.css"
-@reference "@/assets/main.css"
+
 :deep(.dp__menu) {
   border: none !important;
   outline: none !important;
