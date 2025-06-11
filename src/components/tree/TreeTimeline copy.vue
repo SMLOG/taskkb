@@ -38,7 +38,7 @@
 import { ref,  computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
-import DatePicker from '@/components/tree/DatePicker.vue';
+import DatePicker from '@/components/tree/SchConfig.vue';
 
 import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';

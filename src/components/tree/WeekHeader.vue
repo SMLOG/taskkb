@@ -17,14 +17,12 @@
         </div>
       </div>
     </div>
-    <DatePicker :config="config" />
   </div>
 </template>
 
 <script setup>
 import { defineProps,watch } from 'vue';
 import { isBetween } from '@/lib/schedule';
-import DatePicker from '@/components/tree/DatePicker.vue';
 
 const props=defineProps({
   weeks: {

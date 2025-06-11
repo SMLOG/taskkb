@@ -9,6 +9,7 @@ import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 
 import { storeToRefs } from 'pinia'
+import SchConfigProvider from './components/SchConfigProvider.vue';
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
@@ -21,6 +22,7 @@ const isTree = route.path === '/';
 
   <main class="flex-grow relative">
     <NotificationProvider class="h-full">
+      <SchConfigProvider></SchConfigProvider>
       <div class="flex flex-col h-full">
         <div> <TabsContainer /></div>
         <div class="flex-1  flex ">
