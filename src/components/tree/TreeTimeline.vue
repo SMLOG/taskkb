@@ -98,7 +98,7 @@ const firstDay = ref(weeksRef.value?.[0]?.dates?.[0] ?? null);
 
 const updateWeeks = () => {
   if (!configRef.value.startDate) configRef.value.startDate = new Date();
-  if (!configRef.value.weekCount) configRef.value.weekCount = 20;
+  if (!configRef.value.weekCount) configRef.value.weekCount = 5;
   weeksRef.value.length = 0;
   weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
   firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;

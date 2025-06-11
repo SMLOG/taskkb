@@ -276,6 +276,7 @@ export function useTree() {
 
             return;
           }
+          autoExpanedWeeksIfNeed([newDate.i]);
 
           switch (moveType.value.type) {
             case "rightDrag":
