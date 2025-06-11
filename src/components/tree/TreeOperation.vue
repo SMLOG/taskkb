@@ -44,23 +44,23 @@
             <div
               v-show="showDropdown"
               :class="[
-                'absolute left-0 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
+                'absolute left-0 w-55 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
                 dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
               ]"
               tabindex="-1"
               @mouseleave="showDropdown = false"
             >
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
-                📤 Export
+                📤 Export(JSON)
               </button>
               <button  @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
-                📊 Selected to CSV
+                📊 Export <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> (CSV)
               </button>
               <button  @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
-                📝 Selected to Markdown
+                📝 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(Markdown)
               </button>
               <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
-                📋 Selected to Clipboard
+                📋 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(CSV)
               </button>
             </div>
           </div>
@@ -200,7 +200,7 @@ function dowloadText(text, name) {
 
 function exportCSV() {
   let text = tree.exportCSV(configRef.value);
-  dowloadText(text, "exportcsv.csv");
+  dowloadText(text, configRef.value.title+".csv");
   showNotification('export CSV', 'success');
 }
 
