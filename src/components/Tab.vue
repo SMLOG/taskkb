@@ -32,6 +32,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
+    <div v-if="!tab.saved" class="absolute top-4 right-2 w-1 h-1 flex items-center justify-center text-gray-600 hover:text-red-600 bg-blue-300 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900 dark:text-gray-300 dark:hover:text-red-400 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0"></div>
   </div>
 </template>
 
