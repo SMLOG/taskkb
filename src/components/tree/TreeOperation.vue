@@ -31,7 +31,7 @@
             </button>
           </div>
 
-          <div class="relative" @mouseleave="showDropdown = false" @blur="showDropdown = false">
+          <div class="relative"  @blur="showDropdown = false">
             <button
               ref="moreButton"
               @mouseenter="handleShowDropdown"
@@ -48,6 +48,7 @@
                 dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
               ]"
               tabindex="-1"
+              @mouseleave="showDropdown = false"
             >
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
                 📤 Export
