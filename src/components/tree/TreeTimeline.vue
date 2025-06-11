@@ -35,7 +35,7 @@
             </div>
           </div>
         </template>
-        <WeekHeader :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" :config="configRef" />
+        <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" :config="configRef" />
       </div>
       <TreeTime
         :row="root"
@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount,nextTick } from 'vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
@@ -117,10 +117,13 @@ watch(
 watch(
   () => [activeTabRef.value],
   () => {
-    if(configRef.value.showSch)
-      updateWeeks();
-     schReadyRef.value=true;
-     selectStartRef.value=null
+    console.log(activeTabRef.value,configRef.value.showSch,schReadyRef.value)
+    if(configRef.value.showSch)updateWeeks();
+      selectStartRef.value=null
+      nextTick(()=>{
+        schReadyRef.value=true;
+
+      })
 
   },
   { immediate: true }

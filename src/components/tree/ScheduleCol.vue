@@ -18,8 +18,8 @@
                     calculateDaysBetweenDates(selectStartRef.end,
                         selectStartRef.start, true)
                 }}d
-                    <div class="leftDrag" @mousedown="isMouseDown = 1"></div>
-                    <div class="rightDrag" @mousedown="isMouseDown = 1"></div>
+                    <div class="leftDrag"></div>
+                    <div class="rightDrag"></div>
                 </div>
             </div>
         </div>
@@ -62,8 +62,7 @@ const props = defineProps({
     }
 });
 
-// Reactive state for drag handling
-const isMouseDown = ref(1);
+
 
 
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="col select-none"  v-if="schReady&&showSch">
+  <div class="col select-none"  v-if="showSch">
     <div class="flex flex-nowrap">
       <div v-for="(week, index) in weeks" :key="week" class="week-slot">
         <div>
