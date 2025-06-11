@@ -64,6 +64,7 @@
 import { ref,computed } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
+import sample from '@/assets/sample';
 
 const tabsStore = useAppStore();
 const tabs = computed(() => tabsStore.tabs);
@@ -83,20 +84,20 @@ const templates = ref([
     name: 'Todo',
     icon: '✓',
     description: 'Task list template',
-    color: 'bg-blue-500'
+    color: 'bg-blue-500',
   },
   {
     id: 2,
-    name: 'Plan',
+    name: 'Task',
     icon: '🗓',
-    description: 'Planning template',
+    description: 'Task Plan',
     color: 'bg-green-500'
   },
   {
     id: 3,
-    name: 'Record',
+    name: 'Blank',
     icon: '📝',
-    description: 'Note-taking template',
+    description: 'A blank template',
     color: 'bg-purple-500'
   }
 ]);
@@ -135,13 +136,34 @@ function loadFile(event) {
   }
 }
 
+function loopTree(tree, callback) {
+  if (tree.id) {
+    callback(tree);
+  }
+  
+  if (tree._childs && Array.isArray(tree._childs)) {
+    tree._childs.forEach(child => loopTree(child, callback));
+  }
+}
+
 const selectTemplate = (template) => {
   emit('select-template', template);
   emit('update:modelValue', false);
-  const tabName =  `Tab ${tabs.value.length + 1}`;
+  const tabName =  `${template.name} ${tabs.value.length + 1}`;
   const newTabId = uuidv4();
-  tabsStore.addTab(newTabId, tabName);
-  
+
+  let data = sample[template.name.toLowerCase()];
+  if(data){
+    data.config.startDate = new Date().toDateString();
+    data.config.title = tabName;
+    data.config.cols.map(col=>col.id=uuidv4())
+    loopTree(data.data,(node)=>node.id=uuidv4());
+    console.log(data)
+    useAppStore().importToNewTab(newTabId,data);
+  }else{
+    tabsStore.addTab(newTabId, tabName);
+  }
+
 };
 
 const closePopup = () => {

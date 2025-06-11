@@ -100,7 +100,10 @@ export const useAppStore = defineStore('app', () => {
 
  async function importToNewTab(tabId,data){
      let tab = await addTab(tabId,data.config.title);
+     await setActiveTab(-1);
+
     await loadTabData(tab,data);
+    await setActiveTab(tabs.value.length-1);
   }
   function getCurrentTab(){
    return  tabs.value[activeTabRef.value];
@@ -156,7 +159,11 @@ export const useAppStore = defineStore('app', () => {
         treeRef.value = tabData.data;
         configRef.value = tabData.config;
         schReadyRef.value =false;
-      }
+      } 
+
+      schReadyRef.value =false;
+      activeTabRef.value = index;
+
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
