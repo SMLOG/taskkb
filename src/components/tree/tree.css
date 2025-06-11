@@ -93,6 +93,10 @@
 
 }
 
+.row .col:first-child{
+  @apply border-l border-gray-500;
+}
+
 .sticky {
   position: sticky;
   z-index: var(--vt-index-sticky);
