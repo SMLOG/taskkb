@@ -79,9 +79,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { cpList } from '@/components/cpList';
+import { v4 as uuidv4 } from 'uuid';
 
 // Interfaces
 interface Column {
+  id:string,
   field: Record<string, any>;
   cp: string;
   width: number;
@@ -158,6 +160,7 @@ const addCol = () => {
   const text = 'New Column';
   const width = calculateTextWidth(text + '  ');
   cols.value.push({
+    id:uuidv4(),
     field: {},
     cp: 'ColDropText',
     width,
