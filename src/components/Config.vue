@@ -174,6 +174,7 @@ const delCol = (col: Column, index: number) => {
 </script>
 
 <style scoped>
+@reference '@/assets/main.css'
 .config-container {
   max-width: 1200px;
 }
@@ -185,6 +186,9 @@ input[type="checkbox"] {
   transition: all 0.2s ease-in-out;
 }
 
+input{
+  @apply rounded-none border-b border-gray-500 
+}
 /* Add hover effects for draggable items */
 [draggable="true"]:hover {
   cursor: move;
