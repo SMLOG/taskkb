@@ -30,14 +30,7 @@ const moveType = ref(null);
 
 function getDate(i) {
   const weekIndex = parseInt(i / 7);
-  if (weeksRef.value.length <= weekIndex) {
-    useAppStore().configRef.weekCount = weekIndex + 1;
 
-    weeksRef.value = generateWeeks(
-      useAppStore().configRef.startDate,
-      weekIndex + 1
-    );
-  }
   return weeksRef.value[weekIndex].dates[i % 7];
 }
 function plusWorkDays(startIndex, days) {
@@ -263,6 +256,7 @@ export function useTree() {
       if (selectStartRef.value && date) {
         if (!selectStartRef.value.row._tl) {
           selectStartRef.value.end = date;
+          autoExpanedWeeksIfNeed([date.i])
           return;
         }
 
@@ -292,6 +286,11 @@ export function useTree() {
               break;
             default: {
               const moveUnits = Math.floor(ox / unitWidth);
+
+
+
+              autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
+              
               const startIndex = plusWorkDays(
                 moveType.value._tl.start.i,
                 moveUnits
@@ -313,6 +312,22 @@ export function useTree() {
       }
     }
   };
+
+   function autoExpanedWeeksIfNeed(indexs){
+    for(let i=0;i<indexs.length;i++){
+      let weekIndex = parseInt((indexs[i]+1)/7);
+
+      if (weeksRef.value.length <= weekIndex) {
+        useAppStore().configRef.weekCount = weekIndex + 1;
+    
+        weeksRef.value = generateWeeks(
+          useAppStore().configRef.startDate,
+          weekIndex + 1
+        );
+      }
+    }
+
+  }
 
   const debouncedIncreaseWeeks = debounce((backwalk) => {
     if (backwalk) {

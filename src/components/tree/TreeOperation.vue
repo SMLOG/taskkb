@@ -31,7 +31,7 @@
             </button>
           </div>
 
-          <div class="relative"  @blur="showDropdown = false">
+          <div class="relative"  @blur="showDropdown = false" ref="menuRef">
             <button
               ref="moreButton"
               @mouseenter="handleShowDropdown"
@@ -99,7 +99,7 @@ button {
 </style>
 
 <script setup>
-import { ref, watch,inject } from 'vue';
+import { ref, watch,inject,onMounted ,onBeforeUnmount} from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useAppStore } from "@/stores/appStore";
@@ -113,8 +113,22 @@ const { selectDepths } = tree;
 const showConfig = ref(false);
 const {configRef,treeRef} = storeToRefs(useAppStore());
 
+const menuRef = ref(null);
+
 
 const showDropdown = ref(false);
+const handleClickOutside = (event) => {
+      if (menuRef.value && !menuRef.value.contains(event.target)) {
+        showDropdown.value = false;
+      }
+    };
+    onMounted(() => {
+      document.addEventListener('click', handleClickOutside);
+    });
+
+    onBeforeUnmount(() => {
+      document.removeEventListener('click', handleClickOutside);
+    });
 
 function downloadJSON(jsonData, filename = 'data.json') {
   const jsonString = JSON.stringify(jsonData);
