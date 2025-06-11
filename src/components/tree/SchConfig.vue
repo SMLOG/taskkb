@@ -9,7 +9,9 @@
     </svg>
     <div v-show="showDatePicker" 
          class="absolute bg-white dark:bg-gray-900 top-0 right-full mr-2 p-3 rounded-md shadow-lg dark:shadow-gray-800/50 min-w-[200px] transition-all duration-200"
-         :class="{ 'opacity-100 translate-y-0': showDatePicker, 'opacity-0 -translate-y-2 pointer-events-none': !showDatePicker }">
+         :class="{ 'opacity-100 translate-y-0': showDatePicker, 'opacity-0 -translate-y-2 pointer-events-none': !showDatePicker }"
+         @mouseleave="showDatePicker=false" 
+         >
       <VueDatePicker v-model="config.startDate"
         @date-update="(d) => { config.startDate = d; showDatePicker = false }"
         :enable-time-picker="false"
@@ -55,18 +57,19 @@ defineProps({
 </script>
 <style lang="css" scoped>
 @reference "@/assets/main.css"
-:deep .dp__menu {
+@reference "@/assets/main.css"
+:deep(.dp__menu) {
   border: none !important;
   outline: none !important;
   @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
 }
-:deep .dp__calendar_item {
+:deep(.dp__calendar_item) {
   @apply text-gray-900 dark:text-gray-100;
 }
-:deep .dp__active_date {
+:deep(.dp__active_date) {
   @apply bg-blue-500 dark:bg-blue-600 text-white;
 }
-:deep .dp__today {
+:deep(.dp__today) {
   @apply border-blue-500 dark:border-blue-400;
 }
 </style>
