@@ -210,7 +210,6 @@ export function useTree() {
         // No matching class, moveTypeConfig remains undefined
         break;
     }
-
     if (moveTypeConfig) {
       moveType.value = moveTypeConfig;
     }
@@ -222,7 +221,7 @@ export function useTree() {
 
     const { left, width: totalWidth } = schEl.getBoundingClientRect();
     const x = event.clientX - left;
-    const index = Math.floor((x / totalWidth) * config.weekCount * 7);
+    const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
     const date = weeksRef.value[Math.floor(index / 7)].dates[index % 7];
 
     if (!row._tl?.start) {
@@ -258,7 +257,7 @@ export function useTree() {
     if (sch) {
       const { left, width: totalWidth } = sch.getBoundingClientRect();
       const x = event.clientX - left;
-      const index = Math.floor((x / totalWidth) * config.weekCount * 7);
+      const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount* 7);
       const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
       if (selectStartRef.value && date) {
@@ -268,8 +267,9 @@ export function useTree() {
         }
 
         if (moveType.value) {
-          const unitWidth = totalWidth / (config.weekCount * 7);
+          const unitWidth = totalWidth / (useAppStore().configRef.weekCount * 7);
           const ox = event.clientX - moveType.value.x;
+
           let newIndex =
             moveType.value._tl[
               moveType.value.type === "rightDrag" ? "end" : "start"

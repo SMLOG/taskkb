@@ -120,6 +120,7 @@ watch(
     if(configRef.value.showSch)
       updateWeeks();
      schReadyRef.value=true;
+     selectStartRef.value=null
 
   },
   { immediate: true }

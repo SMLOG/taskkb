@@ -25,8 +25,12 @@
                class="w-20 p-1.5 border border-gray-200 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                @mousedown.stop />
       </div>
+      <div class="border-top"></div>
       <div class="mt-3 flex items-center gap-2">
-        <label class="text-sm text-gray-700 dark:text-gray-300">Allow Options:</label>
+        <label class="text-sm text-gray-700 dark:text-gray-300">Manday:</label>
+        <div>
+          
+        </div>
         <input v-model="config.allowOptions" :min="20"
                class="w-20 p-1.5 border border-gray-200 dark:border-gray-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                @mousedown.stop />
