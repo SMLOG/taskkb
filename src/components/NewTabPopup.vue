@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="fixed inset-0 flex items-center justify-center z-50" 
+    class="fixed inset-0 flex items-center justify-center z-9999" 
     v-if="modelValue"
     @click.self="closePopup()">
  
