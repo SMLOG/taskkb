@@ -1,6 +1,7 @@
 <template>
   <a v-if="config" 
      @mouseenter="showDatePicker=true" 
+     ref="menuRef"
      title="Configure settings"
      class="fixed top-[20%] right-2 z-[100] p-3 rounded-md bg-white dark:bg-gray-900 shadow-lg dark:shadow-gray-800/50 cursor-pointer flex items-center justify-center transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-gray-700 dark:text-gray-300">
@@ -32,11 +33,28 @@
 </template>
 
 <script setup>
-import { defineProps, ref } from 'vue'
+import { defineProps, ref,onMounted,onBeforeUnmount } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css';
 
 const showDatePicker = ref(false);
+
+
+const menuRef = ref(null);
+
+
+const handleClickOutside = (event) => {
+      if (menuRef.value && !menuRef.value.contains(event.target)) {
+        showDatePicker.value = false;
+      }
+    };
+    onMounted(() => {
+      document.addEventListener('click', handleClickOutside);
+    });
+
+    onBeforeUnmount(() => {
+      document.removeEventListener('click', handleClickOutside);
+    });
 
 // Function to disable all non-Monday dates
 const disableNonMondays = (date) => {
