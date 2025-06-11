@@ -43,7 +43,6 @@ export function copyNode(rootTree, depth) {
 
 }
 export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
-  console.log('movenode')
   let targetNode = getRowFromDepth(rootTree, selectDetphEnd);
   let xDiff = event.clientX - dragStartClientX;
 

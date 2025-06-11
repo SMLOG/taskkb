@@ -23,7 +23,7 @@ export const useAppStore = defineStore('app', () => {
   const tabs = ref([]);
   const tabsDataMapRef = ref({});
   const activeTabRef = ref(-1);
-  
+  const schReadyRef = ref(false);
   // Tree and config state
   const treeRef = ref({ _childs: [] });
   const configRef = ref({ cols: [] });
@@ -155,6 +155,7 @@ export const useAppStore = defineStore('app', () => {
 
         treeRef.value = tabData.data;
         configRef.value = tabData.config;
+        schReadyRef.value =false;
       }
     } catch (error) {
       console.error('Failed to set active tab:', error);
@@ -187,11 +188,12 @@ export const useAppStore = defineStore('app', () => {
     activeTabRef,
     treeRef,
     configRef,
+    schReadyRef,
     addTab,
     removeTab,
     setActiveTab,
     saveData,
     saveConfig,
-    saveCurrentTabData,loadActiveTab,getCurrentTab,importToNewTab
+    saveCurrentTabData,loadActiveTab,getCurrentTab,importToNewTab,
   };
 });

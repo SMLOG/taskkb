@@ -91,7 +91,6 @@ const applyFontColor2 = () => {
     span.style.color = fontColor.value;
     range.surroundContents(span);
   }
-  console.log('apply color');
 };
 
 const checkSelection = () => {

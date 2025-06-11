@@ -114,7 +114,6 @@ export function useTree() {
 
       // Handle number cell click
       if (target.classList.contains("num")) {
-        console.log("handleNumClick");
         handleNumClick(depth);
         return;
       }
@@ -233,19 +232,16 @@ export function useTree() {
         selectStartRef.value.row === row &&
         selectStartRef.value.start
       ) {
-        console.log("update");
         row._tl = addDatePeriod({
           start: selectStartRef.value.start,
           end: date,
         });
       } else {
         selectStartRef.value = null;
-        console.log("delete selectStart");
       }
     } else {
       if (selectStartRef.value && row !== selectStartRef.value.row) {
         selectStartRef.value = null;
-        console.log("delete selectStart");
       } else {
         selectRowSch(row, event);
       }
@@ -319,7 +315,6 @@ export function useTree() {
   };
 
   const debouncedIncreaseWeeks = debounce((backwalk) => {
-    console.log("debouncedIncreaseWeeks");
     if (backwalk) {
       useAppStore().configRef.startDate = getPreviousWeekDate(
         new Date(useAppStore().configRef.startDate)
@@ -343,11 +338,9 @@ export function useTree() {
   };
 
   const dragstart = (event) => {
-    console.log("dragstart");
     let interceptor = event.target.closest(".row");
     if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
-      console.log("dragStartClientX", dragStartClientX);
     }
 
     isDraging.value = true;
@@ -480,7 +473,6 @@ export function useTree() {
       items.push(...getRows(item, 0, ++j));
     }
 
-    console.log(items);
     let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
     let rows = items.map((item, rowIndex) => {
       let row = item.row;

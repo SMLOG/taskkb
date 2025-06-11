@@ -202,7 +202,6 @@ function csvToMarkdown() {
   }
   let md = markdown.join('\n');
   navigator.clipboard.writeText(md).then(function () {
-    console.log('Text copied to clipboard!');
     showNotification('copied to clipboard!', 'success');
 
   }).catch(function (err) {
@@ -214,7 +213,6 @@ function csvToMarkdown() {
 function copyClipboard() {
   let text = tree.exportCSV(configRef.value, false, '\t');
   navigator.clipboard.writeText(text).then(function () {
-    console.log('Text copied to clipboard!');
     showNotification('copied to clipboard!', 'success');
 
   }).catch(function (err) {

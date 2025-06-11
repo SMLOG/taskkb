@@ -119,11 +119,9 @@ export default {
               
               const nextTh = ths[movingIndex + 1];
              // nextTh.style.width = cutPx(nextTh.style.width) - e.movementX + 'px';
-             console.log(th.offsetLeft,e.movementX,width);
 
               bar.style.left = cutPx(bar.style.left)+e.movementX + 'px';
             }else{
-              console.log(ths[0].offsetLeft+table.offsetWidth,e.movementX,width);
 
               bar.style.left = ths[0].offsetLeft+table.offsetWidth - 4 + e.movementX + 'px';
 

@@ -9,7 +9,7 @@
                 </div>
             </div>
         </template>
-        <ScheduleCol :row="row" :days="days" :firstDay="firstDay" :showSch="showSch" :weeks="weeksRef" />
+        <ScheduleCol :row="row" :days="days" :firstDay="firstDay" :showSch="showSch" :weeks="weeksRef"  />
     </div>
     <template v-if="row && row._childs && row._childs.length && !row._collapsed">
         <TreeTime v-for="(child, index) in row._childs" :depth="depth + '.' + index" :key="index" :row="child"
@@ -64,7 +64,9 @@ const props = defineProps({
     showSch: {
         type: Boolean,
         default: false
-    }
+    },  schReady: {
+    type: Boolean,
+  },
 });
 
 // Drag and drop composable

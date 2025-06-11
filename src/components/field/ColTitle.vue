@@ -20,7 +20,6 @@ const clickRow =(row)=>{
   try{
   row._collapsed = !row._collapsed
   }catch(error){
-    console.log(error)
   }
 }
 const props = defineProps({

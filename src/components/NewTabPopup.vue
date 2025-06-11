@@ -138,8 +138,7 @@ function loadFile(event) {
 const selectTemplate = (template) => {
   emit('select-template', template);
   emit('update:modelValue', false);
-    const tabName =  `Tab ${tabs.value.length + 1}`;
-    console.log(tabs);
+  const tabName =  `Tab ${tabs.value.length + 1}`;
   const newTabId = uuidv4();
   tabsStore.addTab(newTabId, tabName);
   

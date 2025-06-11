@@ -5,7 +5,6 @@ const useSchConfig = () => {
   const {configRef} = storeToRefs(useAppStore());
 
   const showSchCoonfig = (message, type) => {
-    console.log(message,type)
     notification.value = { message, type };
     setTimeout(() => {
       notification.value = null;

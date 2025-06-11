@@ -29,7 +29,6 @@ const props = defineProps({
 const emit = defineEmits(['change']);
 
 const change = (oldVal, newVal) => {
-  console.log(oldVal, newVal, '...');
   emit('change', oldVal, newVal);
 };
 </script>

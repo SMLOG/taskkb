@@ -4,7 +4,6 @@ const useNotification = () => {
   const notification = ref(null);
 
   const showNotification = (message, type) => {
-    console.log(message,type)
     notification.value = { message, type };
     setTimeout(() => {
       notification.value = null;

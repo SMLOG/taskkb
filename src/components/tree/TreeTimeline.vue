@@ -1,4 +1,3 @@
-<!-- Original Component (e.g., TreeTable.vue) -->
 <template>
   <div class="table-container relative" :class="{ drag: isDragging, move: isMoving }">
     <div
@@ -36,7 +35,7 @@
             </div>
           </div>
         </template>
-        <WeekHeader :weeks="weeksRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" :config="configRef" />
+        <WeekHeader :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" :config="configRef" />
       </div>
       <TreeTime
         :row="root"
@@ -48,6 +47,7 @@
         :level="0"
         :cols="cols"
         :gridStyle="{ gridTemplateColumns: gridColumns }"
+        :schReady="schReadyRef"
         v-if="root"
       ></TreeTime>
     </div>
@@ -87,7 +87,7 @@ const {
 } = useTree();
 
 const root = ref(null);
-const { configRef, treeRef, activeTabRef } = storeToRefs(appStore);
+const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
 
 const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto',
@@ -102,7 +102,6 @@ const updateWeeks = () => {
   weeksRef.value.length = 0;
   weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
   firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;
-  console.log(firstDay.value)
 };
 
 const debouncedUpdateWeeks = debounce(updateWeeks, 300);
@@ -116,6 +115,16 @@ watch(
 );
 
 watch(
+  () => [activeTabRef.value],
+  () => {
+    if(configRef.value.showSch)
+      updateWeeks();
+     schReadyRef.value=true;
+
+  },
+  { immediate: true }
+);
+watch(
   () => [activeTabRef?.value],
   () => {
     root.value = treeRef.value;
@@ -124,8 +133,8 @@ watch(
 );
 
 onMounted(() => {
-  updateWeeks();
   appStore.loadActiveTab();
+  updateWeeks();
   document.addEventListener('keydown', handleKeyDown);
 });
 
