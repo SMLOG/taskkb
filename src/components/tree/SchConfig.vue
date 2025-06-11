@@ -1,7 +1,6 @@
 <template>
   <a v-if="config" 
      @mouseenter="showDatePicker=true" 
-     @mouseleave="showDatePicker=false"
      title="Configure settings"
      class="fixed top-[20%] right-2 z-[100] p-2 rounded-md bg-gradient-to-br from-white to-gray-100 shadow-md cursor-pointer flex items-center justify-center transition-all duration-200 hover:bg-gradient-to-br hover:from-gray-100 hover:to-white focus:outline-none focus:ring-2 focus:ring-blue-500">
    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2">
@@ -12,7 +11,7 @@
         class="absolute bg-white top-0 right-full p-3 rounded-md shadow-lg min-w-[200px] transition-all duration-200"
         :class="{ 'opacity-100 translate-y-0': showDatePicker, 'opacity-0 -translate-y-2 pointer-events-none': !showDatePicker }">
      <VueDatePicker v-model="config.startDate"
-       @date-update="(d) => { config.startDate = d; showDatePicker = false }" 
+       @date-update="(d) => { config.startDate = d;  }" 
        :enable-time-picker="false"
        type="date" 
        inline 
@@ -47,3 +46,9 @@ type: Object
 }
 })
 </script>
+<style lang="css" scoped>
+::v-deep .dp__menu {
+  border: none !important;
+  outline: none !important;
+}
+</style>
