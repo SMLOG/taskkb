@@ -72,7 +72,7 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   line-height: 24px;
-  @apply border-b border-gray-500 
+  @apply border-b border-gray-500 border-r
 }
 .table-container{width:0px;}
 .col {

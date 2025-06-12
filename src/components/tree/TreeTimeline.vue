@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative" :class="{ drag: isDragging, move: isMoving }">
+  <div class="table-container relative min-w-full" :class="{ drag: isDragging, move: isMoving }">
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"

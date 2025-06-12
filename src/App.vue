@@ -9,7 +9,6 @@ import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 
 import { storeToRefs } from 'pinia'
-import SchConfigProvider from './components/SchConfigProvider.vue';
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
@@ -27,7 +26,7 @@ const isTree = route.path === '/';
         <div class="flex-1  flex ">
 
         <div class="flex-1 relative flex">
-          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full">
+          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full px-1">
             <FormatTool>
               <router-view>
               </router-view>
