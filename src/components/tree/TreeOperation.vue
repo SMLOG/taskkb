@@ -188,10 +188,10 @@ function download() {
   downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() }, useAppStore().getCurrentTab().title + ".json");
 }
 
-function saveData(bool) {
+async function  saveData(bool) {
   if (!bool || configRef.value.autoSave) {
-    useAppStore().saveConfig();
-    useAppStore().saveData();
+   await useAppStore().saveConfig();
+   await useAppStore().saveData();
   }
 }
 

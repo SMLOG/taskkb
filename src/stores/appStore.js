@@ -40,27 +40,25 @@ export const useAppStore = defineStore('app', () => {
         return;
       }
 
-      const appState = await readJsonAttachment('app-state.json');
+      const {attachmentId,content:appState} = await readJsonAttachment('perfecttdo.json');
+      attachmentIdRef.value = attachmentId;
       if (appState) {
         tabs.value = appState.tabs || [];
-        activeTabRef.value = appState.activeTab !== undefined ? appState.activeTab : -1;
       } else {
-        console.log('No app-state.json found, using default state');
+        console.log('No perfecttdo.json found, using default state');
       }
 
       // Load data for each tab
       for (const tab of tabs.value) {
-        const data = await readJsonAttachment(`${tab.id}-data.json`);
-        const config = await readJsonAttachment(`${tab.id}-config.json`);
+        let {config,data} = appState.datas[tab.id];
         if (data && config) {
-          loopToSetDate(data);
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
 
       // Load active tab data if valid
       if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
-        await setActiveTab(activeTabRef.value);
+        await setActiveTab(0);
       }
     } catch (error) {
       console.error('Failed to initialize store:', error);
@@ -85,14 +83,14 @@ export const useAppStore = defineStore('app', () => {
         const tab = tabs.value[activeTabRef.value];
 
         // Save tab data and config
-        const dataSaved = await writeObjectToJsonAttachment(treeRef.value, `${tab.id}-data.json`);
-        const configSaved = await writeObjectToJsonAttachment(configRef.value, `${tab.id}-config.json`);
+        tabsDataMapRef.value[tab.id]={config:configRef.value,data:treeRef.value}
         const appStateSaved = await writeObjectToJsonAttachment(
-          { tabs: tabs.value, activeTab: activeTabRef.value },
-          'app-state.json'
+          { tabs: tabs.value, activeTab: activeTabRef.value,datas:tabsDataMapRef.value },
+          'perfecttdo.json',attachmentIdRef.value
         );
-
-        if (dataSaved && configSaved && appStateSaved) {
+        attachmentIdRef.value = appStateSaved.id
+        console.log('attachment id',attachmentIdRef.value)
+        if (appStateSaved) {
           tab.saved = true;
           console.log(`Saved data for tab ${tab.id}`);
         } else {
@@ -209,9 +207,11 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  // Save tree data
+  const attachmentIdRef = ref(-1);
   async function saveData() {
     try {
+      console.error('saveData');
+
       await saveCurrentTabData();
     } catch (error) {
       console.error('Failed to save data:', error);
@@ -221,7 +221,10 @@ export const useAppStore = defineStore('app', () => {
   // Save config
   async function saveConfig() {
     try {
-      await saveCurrentTabData();
+      console.error('saveConfig');
+
+      await saveCurrentTabData(attachmentIdRef.value);
+
     } catch (error) {
       console.error('Failed to save config:', error);
     }
@@ -241,7 +244,6 @@ export const useAppStore = defineStore('app', () => {
     setActiveTab,
     saveData,
     saveConfig,
-    saveCurrentTabData,
     loadActiveTab,
     getCurrentTab,
     importToNewTab
