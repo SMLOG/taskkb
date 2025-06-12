@@ -94,11 +94,6 @@ const convertMarkdownToHtml = (markdown) => {
   return tempElement.innerHTML.replaceAll(/<\/?p>/g, '').replace(/>\n/g, '>');
 };
 
-const isHTMLSegment = (string) => {
-  const parser = new DOMParser();
-  const parsedDocument = parser.parseFromString(string, 'text/html');
-  return parsedDocument.body.children.length > 0;
-};
 
 const renderToHtml = (modelValue) => {
   if (!editable.value) {
@@ -137,9 +132,7 @@ const dblclick = () => {
   }
 };
 
-const startEditing = () => {
-  editing.value = true;
-};
+
 
 const getValue = () => {
   return props.isText 
@@ -150,7 +143,6 @@ const getValue = () => {
 const stopEditing = () => {
   document.removeEventListener("click", handlerBlur);
   nextTick(() => {
-    timer.value = setTimeout(() => {
       showDropdown.value = false;
       editing.value = false;
       editable.value = false;
@@ -159,7 +151,6 @@ const stopEditing = () => {
       if (newValue !== props.modelValue) {
         emit('change', newValue);
       }
-    }, 500);
   });
 };
 
