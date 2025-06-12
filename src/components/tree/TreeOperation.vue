@@ -6,7 +6,7 @@
         <div class="flex flex-wrap items-center gap-2 py-3">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="addRow(1)" class="btn-secondary">
-              ＋{{ selectDepths.length>0?selectDepths.length:'' }} Row
+              ＋{{ selectDepths.length>0?selectDepths.length:'' }}
             </button>
             <button v-if="selectDepths.length==1" @click="copyNode" class="btn-secondary">
               ⎘ Copy
