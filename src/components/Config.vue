@@ -51,10 +51,8 @@
                 Show
               </label>
               </div>
-
-
             </div>
-            <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" title="Click to delete this item." @click="delCol(col, index)">
+            <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" title="Click to delete this item." @click="showConfirmDelete(col, index)">
               x
             </button>
           </div>
@@ -73,6 +71,37 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <div
+  v-if="showConfirm"
+  class="fixed inset-0 z-60 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300"
+>
+  <div
+    class="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-4 shadow-lg dark:shadow-gray-950/50 transform transition-all duration-300 scale-100 hover:scale-[1.02]"
+  >
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4 tracking-tight">
+      Confirm Delete
+    </h3>
+    <p class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
+      Are you sure you want to delete the column "{{ confirmColName }}"?
+    </p>
+    <div class="flex justify-end gap-3">
+      <button
+        class="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:focus:ring-gray-500"
+        @click="cancelDelete"
+      >
+        Cancel
+      </button>
+      <button
+        class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400"
+        @click="confirmDelete"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
+</div>
   </div>
 </template>
 
@@ -83,7 +112,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Interfaces
 interface Column {
-  id:string,
+  id: string,
   field: Record<string, any>;
   cp: string;
   width: number;
@@ -91,7 +120,6 @@ interface Column {
   fn: number;
   show: boolean;
   sticky?: boolean;
-
   options?: string;
 }
 
@@ -111,6 +139,9 @@ const props = defineProps<{
 
 // Reactive state
 const dragStartIndex = ref<number | null>(null);
+const showConfirm = ref(false);
+const confirmColIndex = ref<number | null>(null);
+const confirmColName = ref<string>('');
 
 // Computed properties
 const cols = computed(() => props.config.cols);
@@ -160,7 +191,7 @@ const addCol = () => {
   const text = 'New Column';
   const width = calculateTextWidth(text + '  ');
   cols.value.push({
-    id:uuidv4(),
+    id: uuidv4(),
     field: {},
     cp: 'ColDropText',
     width,
@@ -171,8 +202,29 @@ const addCol = () => {
   });
 };
 
+const showConfirmDelete = (col: Column, index: number) => {
+  showConfirm.value = true;
+  confirmColIndex.value = index;
+  confirmColName.value = col.name;
+};
+
+const confirmDelete = () => {
+  if (confirmColIndex.value !== null) {
+    cols.value.splice(confirmColIndex.value, 1);
+  }
+  showConfirm.value = false;
+  confirmColIndex.value = null;
+  confirmColName.value = '';
+};
+
+const cancelDelete = () => {
+  showConfirm.value = false;
+  confirmColIndex.value = null;
+  confirmColName.value = '';
+};
+
 const delCol = (col: Column, index: number) => {
-  cols.value.splice(index, 1);
+  showConfirmDelete(col, index);
 };
 </script>
 
@@ -189,9 +241,10 @@ input[type="checkbox"] {
   transition: all 0.2s ease-in-out;
 }
 
-input{
+input {
   @apply rounded-none border-b border-gray-500 
 }
+
 /* Add hover effects for draggable items */
 [draggable="true"]:hover {
   cursor: move;
