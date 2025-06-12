@@ -80,11 +80,11 @@
   <div
     class="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-4 shadow-lg dark:shadow-gray-950/50 transform transition-all duration-300 scale-100 hover:scale-[1.02]"
   >
-    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4 tracking-tight">
+    <h3 id="modal-title" class="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4 tracking-tight">
       Confirm Delete
     </h3>
-    <p class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
-      Are you sure you want to delete the column "{{ confirmColName }}"?
+    <p id="modal-description" class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
+      Are you sure you want to delete the column "<b>{{ confirmColName }}</b>"? <span class="font-semibold text-red-500 dark:text-red-400">This action cannot be undone.</span>
     </p>
     <div class="flex justify-end gap-3">
       <button
