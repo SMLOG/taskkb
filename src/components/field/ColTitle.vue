@@ -1,7 +1,7 @@
 <template>
   <div v-if="row" class="h-full">
     <div  class="flex h-full">
-      <div style="margin-right:15px;z-index: 1;"  :style="{ paddingLeft: (level * 15) + 'px' }" class="h-full">
+      <div   :style="{ paddingLeft: ((level-1) * 15) + 'px' }" class="h-full mr-2 z-1">
         <span>{{ row._id }}</span>
         <span @click="()=>clickRow(row)"
           :class="{ dot: !row._childs || !row._childs.length, arrow: row._childs && row._childs.length, collapsed: row._childs && row._childs.length && row._collapsed }"></span>
