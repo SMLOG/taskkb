@@ -40,7 +40,6 @@ export const useAppStore = defineStore('app', () => {
         return;
       }
 
-      // Load tabs and activeTab from app-state.json
       const appState = await readJsonAttachment('app-state.json');
       if (appState) {
         tabs.value = appState.tabs || [];
@@ -118,12 +117,9 @@ export const useAppStore = defineStore('app', () => {
       tabsDataMapRef.value[tab.id] = tabData;
       activeTabRef.value = tabs.value.length - 1;
 
-      // Update current tree and config
       treeRef.value = tabData.data;
       configRef.value = tabData.config;
 
-      // Save to Jira attachments
-      await saveCurrentTabData();
       return tab;
     } catch (error) {
       console.error('Failed to add tab:', error);
@@ -163,8 +159,6 @@ export const useAppStore = defineStore('app', () => {
         await setActiveTab(activeTabRef.value);
       }
 
-      // Save updated state
-      await saveCurrentTabData();
     } catch (error) {
       console.error('Failed to remove tab:', error);
     }
@@ -210,8 +204,6 @@ export const useAppStore = defineStore('app', () => {
         schReadyRef.value = false;
       }
 
-      // Save updated active tab
-      await saveCurrentTabData();
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
