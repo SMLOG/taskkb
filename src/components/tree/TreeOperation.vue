@@ -23,9 +23,6 @@
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
             </button>
-            <button @click="toggleFullscreen" class="btn-secondary">
-              {{ isFullscreen ? '⤡ Exit Fullscreen' : '⤢ Fullscreen' }}
-            </button>
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
@@ -66,6 +63,12 @@
                 📋 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(CSV)
               </button>
             </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button @click="toggleFullscreen" class="btn-secondary">
+              {{ isFullscreen ? '⤣ Exit Fullscreen' : '⤢ Fullscreen' }}
+            </button>
           </div>
         </div>
       </div>
