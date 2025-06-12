@@ -113,7 +113,6 @@ import { v4 as uuidv4 } from 'uuid';
 // Interfaces
 interface Column {
   id: string,
-  field: Record<string, any>;
   cp: string;
   width: number;
   name: string;
@@ -192,7 +191,6 @@ const addCol = () => {
   const width = calculateTextWidth(text + '  ');
   cols.value.push({
     id: uuidv4(),
-    field: {},
     cp: 'ColDropText',
     width,
     name: text,
@@ -223,9 +221,7 @@ const cancelDelete = () => {
   confirmColName.value = '';
 };
 
-const delCol = (col: Column, index: number) => {
-  showConfirmDelete(col, index);
-};
+
 </script>
 
 <style scoped>
