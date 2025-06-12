@@ -19,7 +19,7 @@
       @keyup.esc="cancelEditing"
       @input="updateInputWidth"
       ref="titleInput"
-      class="px-1 py-0 text-sm font-medium border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+      class="px-1 py-0 text-sm font-medium border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 min-w-full"
       :style="{ width: inputWidth + 'px' }"
       type="text"
     >
