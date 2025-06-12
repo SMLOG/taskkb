@@ -148,6 +148,8 @@ export const useAppStore = defineStore('app', () => {
 
   async function setActiveTab(index) {
     try {
+
+      if(activeTabRef.value == index)return;
       if (index >= 0 && index < tabs.value.length) {
         activeTabRef.value = index;
         const tab = tabs.value[index];
