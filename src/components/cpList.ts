@@ -17,4 +17,10 @@ export function resolveComponent(cp) {
   return componentMap[cp] || null; // Fallback to null if component not found
 };
 
-export const cpList = ref<string[]>(['ColTitle', 'ColDropText', 'ColDate', 'Time', 'ColSeq','StartDate']);
+export const cpList = ref([
+  { type: 'ColSeq', name: "SN" },
+  { type: 'ColTitle', name: "Title" },
+  { type: 'ColDropText', name: "Text" },
+  { type: 'ColDate', name: "Date" },
+  { type: 'StartDate', name: "Start date" }
+]);
