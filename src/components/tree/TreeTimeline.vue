@@ -30,7 +30,7 @@
             :class="cellClass(col)"
             v-if="col.show"
           >
-            <div class="cell flex">
+            <div class="cell flex flex-1">
               <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>
             </div>
           </div>

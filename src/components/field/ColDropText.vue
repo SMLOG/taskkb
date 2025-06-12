@@ -1,12 +1,12 @@
 <template>
-  <div v-if="row" class="h-full">
+  <div v-if="row" class="h-full flex flex-1">
     <ContentEditable 
       v-model="row['c' + col.fn]" 
       :dropdownItems="col.options && col.options.split(',')" 
       @change="change" 
     />
   </div>
-  <div v-else-if="col" class="h-full">
+  <div v-else-if="col" class="h-full  flex flex-1">
     <ContentEditable v-model="col.name" />
   </div>
 </template>
