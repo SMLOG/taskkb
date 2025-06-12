@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { requestJira, getContext } from '@forge/bridge';
+import { view } from '@forge/bridge';
+import { readJsonAttachment, writeObjectToJsonAttachment } from '@/api/jira';
 
 // Helper function to convert dates in tree data
 function loopToSetDate(row) {
@@ -20,86 +21,6 @@ function loopToSetDate(row) {
   }
 }
 
-// Read JSON attachment from issue
-async function readJsonAttachment(filename) {
-  try {
-    const context = await getContext();
-    const issueKey = context.extension.issue.key;
-    if (!issueKey) {
-      throw new Error('Issue key not found in context');
-    }
-
-    // Fetch issue attachments
-    const attachmentsResponse = await requestJira(`/rest/api/3/issue/${issueKey}?fields=attachment`, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
-
-    if (attachmentsResponse.status !== 200) {
-      throw new Error(`Failed to fetch attachments: ${attachmentsResponse.status}`);
-    }
-
-    const issueData = await attachmentsResponse.json();
-    const attachments = issueData.fields.attachment || [];
-
-    // Find attachment by filename
-    const jsonAttachment = attachments.find(attachment => attachment.filename === filename);
-    if (!jsonAttachment) {
-      return null; // No attachment found
-    }
-
-    // Download the JSON file content
-    const fileResponse = await requestJira(jsonAttachment.content, {
-      method: 'GET',
-      headers: { 'Accept': 'application/json' }
-    });
-
-    if (fileResponse.status !== 200) {
-      throw new Error(`Failed to download JSON file: ${fileResponse.status}`);
-    }
-
-    return await fileResponse.json();
-  } catch (error) {
-    console.error(`Error reading JSON attachment ${filename}:`, error.message);
-    throw error;
-  }
-}
-
-// Write object to JSON file as issue attachment
-async function writeObjectToJsonAttachment(dataObject, filename) {
-  try {
-    const context = await getContext();
-    const issueKey = context.extension.issue.key;
-    if (!issueKey) {
-      throw new Error('Issue key not found in context');
-    }
-
-    // Convert object to JSON string
-    const jsonString = JSON.stringify(dataObject, null, 2);
-    const blob = new Blob([jsonString], { type: 'application/json' });
-    const formData = new FormData();
-    formData.append('file', blob, filename);
-
-    // Attach the file
-    const response = await requestJira(`/rest/api/3/issue/${issueKey}/attachments`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'X-Atlassian-Token': 'no-check'
-      },
-      body: formData
-    });
-
-    if (response.status !== 200) {
-      throw new Error(`Failed to attach JSON file: ${response.status}`);
-    }
-    return true;
-  } catch (error) {
-    console.error(`Error attaching JSON file ${filename}:`, error.message);
-    throw error;
-  }
-}
-
 export const useAppStore = defineStore('app', () => {
   // Tabs state
   const tabs = ref([]);
@@ -113,11 +34,19 @@ export const useAppStore = defineStore('app', () => {
   // Initialize store
   async function init() {
     try {
+      console.log('Initializing store...');
+      if (!view || typeof view.getContext !== 'function') {
+        console.error('view.getContext is not available. Running outside Forge custom UI context?');
+        return;
+      }
+
       // Load tabs and activeTab from app-state.json
       const appState = await readJsonAttachment('app-state.json');
       if (appState) {
         tabs.value = appState.tabs || [];
         activeTabRef.value = appState.activeTab !== undefined ? appState.activeTab : -1;
+      } else {
+        console.log('No app-state.json found, using default state');
       }
 
       // Load data for each tab
@@ -157,14 +86,19 @@ export const useAppStore = defineStore('app', () => {
         const tab = tabs.value[activeTabRef.value];
 
         // Save tab data and config
-        await writeObjectToJsonAttachment(treeRef.value, `${tab.id}-data.json`);
-        await writeObjectToJsonAttachment(configRef.value, `${tab.id}-config.json`);
+        const dataSaved = await writeObjectToJsonAttachment(treeRef.value, `${tab.id}-data.json`);
+        const configSaved = await writeObjectToJsonAttachment(configRef.value, `${tab.id}-config.json`);
+        const appStateSaved = await writeObjectToJsonAttachment(
+          { tabs: tabs.value, activeTab: activeTabRef.value },
+          'app-state.json'
+        );
 
-        // Save tabs and activeTab
-        const appState = { tabs: tabs.value, activeTab: activeTabRef.value };
-        await writeObjectToJsonAttachment(appState, 'app-state.json');
-
-        tab.saved = true;
+        if (dataSaved && configSaved && appStateSaved) {
+          tab.saved = true;
+          console.log(`Saved data for tab ${tab.id}`);
+        } else {
+          console.error('Failed to save some or all attachments');
+        }
       }
     } catch (error) {
       console.error('Failed to save current tab data:', error);
