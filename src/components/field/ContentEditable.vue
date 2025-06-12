@@ -13,13 +13,21 @@
         <span>T</span>
       </div>
     </div>
-    <div v-show="showDropdown && !isText && dropdownItems && dropdownItems.length" class="dropdown bg-white dark:bg-gray-800 z-9999">
-      <ul>
-        <li v-for="item in dropdownItems" :key="item" @click="selectItem(item)">
-          {{ item }}
-        </li>
-      </ul>
-    </div>
+    <div
+  v-show="showDropdown && !isText && dropdownItems && dropdownItems.length"
+  class="absolute w-full max-w-md mx-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-6 transition-all duration-300 ease-in-out"
+>
+  <ul class="py-2">
+    <li
+      v-for="item in dropdownItems"
+      :key="item"
+      @click="selectItem(item)"
+      class="px-4 py-2 text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors duration-200"
+    >
+      {{ item }}
+    </li>
+  </ul>
+</div>
   </div>
   <div style="position:absolute;inset: 0;" @dblclick="dblclick" v-if="!editable" ></div>
 </template>
