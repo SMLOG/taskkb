@@ -23,6 +23,9 @@
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
             </button>
+            <button @click="toggleFullscreen" class="btn-secondary">
+              {{ isFullscreen ? '⤡ Exit Fullscreen' : '⤢ Fullscreen' }}
+            </button>
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
@@ -31,7 +34,7 @@
             </button>
           </div>
 
-          <div class="relative"  @blur="showDropdown = false" ref="menuRef">
+          <div class="relative" @blur="showDropdown = false" ref="menuRef">
             <button
               ref="moreButton"
               @mouseenter="handleShowDropdown"
@@ -53,10 +56,10 @@
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
                 📤 Export(JSON)
               </button>
-              <button  @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
+              <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
                 📊 Export <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> (CSV)
               </button>
-              <button  @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
+              <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
                 📝 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(Markdown)
               </button>
               <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
@@ -99,7 +102,7 @@ button {
 </style>
 
 <script setup>
-import { ref, watch,inject,onMounted ,onBeforeUnmount} from 'vue';
+import { ref, watch, inject, onMounted, onBeforeUnmount } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useAppStore } from "@/stores/appStore";
@@ -111,24 +114,48 @@ const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const {configRef,treeRef} = storeToRefs(useAppStore());
+const { configRef, treeRef } = storeToRefs(useAppStore());
 
 const menuRef = ref(null);
-
-
 const showDropdown = ref(false);
-const handleClickOutside = (event) => {
-      if (menuRef.value && !menuRef.value.contains(event.target)) {
-        showDropdown.value = false;
-      }
-    };
-    onMounted(() => {
-      document.addEventListener('click', handleClickOutside);
-    });
+const moreButton = ref(null);
+const dropdownPosition = ref('top');
+const DROPDOWN_HEIGHT = 200;
+const isFullscreen = ref(false);
 
-    onBeforeUnmount(() => {
-      document.removeEventListener('click', handleClickOutside);
+const handleClickOutside = (event) => {
+  if (menuRef.value && !menuRef.value.contains(event.target)) {
+    showDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+  document.addEventListener('fullscreenchange', handleFullscreenChange);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('fullscreenchange', handleFullscreenChange);
+});
+
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement;
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch((err) => {
+      console.error('Error entering fullscreen:', err);
+      showNotification('Failed to enter fullscreen', 'error');
     });
+  } else {
+    document.exitFullscreen().catch((err) => {
+      console.error('Error exiting fullscreen:', err);
+      showNotification('Failed to exit fullscreen', 'error');
+    });
+  }
+}
 
 function downloadJSON(jsonData, filename = 'data.json') {
   const jsonString = JSON.stringify(jsonData);
@@ -140,9 +167,6 @@ function downloadJSON(jsonData, filename = 'data.json') {
   downloadLink.click();
   document.body.removeChild(downloadLink);
 }
-const moreButton = ref(null);
-const dropdownPosition = ref('top');
-const DROPDOWN_HEIGHT = 200;
 
 const handleShowDropdown = () => {
   if (!moreButton.value) return;
@@ -155,13 +179,10 @@ const handleShowDropdown = () => {
   showDropdown.value = true;
 };
 
-
-
 function download() {
-
   let data = JSON.parse(JSON.stringify(treeRef.value));
-  configRef.value.title=useAppStore().getCurrentTab().title;
-  downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() },useAppStore().getCurrentTab().title+".json");
+  configRef.value.title = useAppStore().getCurrentTab().title;
+  downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() }, useAppStore().getCurrentTab().title + ".json");
 }
 
 function saveData(bool) {
@@ -200,7 +221,7 @@ function dowloadText(text, name) {
 
 function exportCSV() {
   let text = tree.exportCSV(configRef.value);
-  dowloadText(text, configRef.value.title+".csv");
+  dowloadText(text, configRef.value.title + ".csv");
   showNotification('export CSV', 'success');
 }
 
@@ -218,7 +239,6 @@ function csvToMarkdown() {
   let md = markdown.join('\n');
   navigator.clipboard.writeText(md).then(function () {
     showNotification('copied to clipboard!', 'success');
-
   }).catch(function (err) {
     console.error('Could not copy text: ', err);
   });
@@ -229,7 +249,6 @@ function copyClipboard() {
   let text = tree.exportCSV(configRef.value, false, '\t');
   navigator.clipboard.writeText(text).then(function () {
     showNotification('copied to clipboard!', 'success');
-
   }).catch(function (err) {
     console.error('Could not copy text: ', err);
   });
