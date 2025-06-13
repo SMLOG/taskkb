@@ -67,12 +67,13 @@ export const useAppStore = defineStore('app', () => {
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
           attachFileName, attachmentIdRef.value
         );
+        let org = attachmentIdRef.value;
         attachmentIdRef.value = result.attachmentId
         tabs.value.map(tab=>tab.saved=true);
 
         console.log('attachment id', attachmentIdRef.value)
         if (result) {
-          console.log(`Saved data for tab ${tab.id}`);
+          console.log(`Saved data  attachment from ${org}  to ${attachmentIdRef.value}`);
         } else {
           throw new Error("Save Error");
         }
