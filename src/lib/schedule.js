@@ -231,7 +231,7 @@ const formatDate = (date, format) => {
   return date.toLocaleDateString("en-US", { ...format });
 };
 
-const getDatesBetween = (startDate, endDate, weekIndex,year,month,weekNumber) => {
+const getDatesBetween = (startDate, endDate, weekIndex,year,weekNumber) => {
   const dates = [];
   const currentDate = new Date(startDate);
   const lastDate = new Date(endDate);
@@ -246,8 +246,8 @@ const getDatesBetween = (startDate, endDate, weekIndex,year,month,weekNumber) =>
       isCur: isToday(currentDate),
       isWeekend: isWeekend(currentDate),
       label: formatDate(currentDate, { day: "2-digit" }),
-      holiday: holiday.length && holiday[0],
-      year,month,weekNumber
+      h: holiday.length && holiday[0],
+      y:year,w:weekNumber
     };
     dates.push(dateWrap);
     currentDate.setDate(currentDate.getDate() + 1);
