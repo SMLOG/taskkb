@@ -1,4 +1,5 @@
 import { view, requestJira } from '@forge/bridge';
+import { jsonParse } from '@/lib/parse';
 
 // Helper function to resolve issue ID from context
 async function resolveIssueId(context) {
@@ -50,7 +51,7 @@ export async function readJsonAttachment(filename) {
             return { error: `Failed to fetch attachments: ${attachmentsResponse.status}` };
         }
 
-        const attachmentData = await attachmentsResponse.json();
+        const attachmentData = jsonParse(await attachmentsResponse.text());
         const attachments = attachmentData.fields?.attachment || [];
         const jsonAttachment = attachments.find(attachment => attachment.filename === filename);
 

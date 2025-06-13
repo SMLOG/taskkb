@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { readJsonAttachment, writeObjectToJsonAttachment } from '@/api/jira';
-import { loopToSetDate,forEachTree } from '../lib/row-utils';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -10,8 +9,8 @@ export const useAppStore = defineStore('app', () => {
   const activeTabRef = ref(-1);
   const schReadyRef = ref(false);
   // Tree and config state
-  const treeRef = ref({ _childs: [] });
-  const configRef = ref({ cols: [] });
+  const treeRef = ref(null);
+  const configRef = ref(null);
   const attachFileName = 'perfecttdo.json';
 
   // Initialize store
@@ -31,7 +30,7 @@ export const useAppStore = defineStore('app', () => {
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
-      let activeTabIndex = appState.activeTab >= 0 && appState.activeTab < tabs.value.length ? appState.activeTab : tabs.length > 0 ? 0 : -1;
+      let activeTabIndex = appState&&appState.activeTab >= 0 && appState.activeTab < tabs.value.length ? appState.activeTab : tabs.length > 0 ? 0 : -1;
       await setActiveTab(activeTabIndex);
 
     } catch (error) {
@@ -111,6 +110,10 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Failed to import to new tab:', error);
     }
+  }
+
+  async function loadTabData(tab,data){
+    tabsDataMapRef.value[tab.id] = data;
   }
 
   function getCurrentTab() {

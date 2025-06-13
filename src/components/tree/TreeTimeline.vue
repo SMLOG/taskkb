@@ -17,7 +17,7 @@
         data="rbar"
         :table="tableRef"
         :cols="cols"
-        :showSch="configRef.showSch"
+        :showSch="configRef?.showSch"
       />
       <div class="row header border-t border-gray-500 bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
@@ -35,12 +35,12 @@
             </div>
           </div>
         </template>
-        <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef.showSch" :selectStartRef="selectStartRef" :config="configRef" />
+        <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch" :selectStartRef="selectStartRef" :config="configRef" />
       </div>
       <TreeTime
         :row="root"
         :depth="''"
-        :showSch="configRef.showSch"
+        :showSch="configRef?.showSch"
         :weeks="weeksRef"
         :days="days"
         :firstDay="firstDay"
@@ -61,7 +61,7 @@ import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
 import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';
-import { generateWeeks } from '@/lib/schedule';
+import { generateWeeksBetween } from '@/lib/schedule';
 import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
@@ -93,21 +93,24 @@ const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto',
 });
 
-const firstDay = ref(weeksRef.value?.[0]?.dates?.[0] ?? null);
+const firstDay = ref(null);
 
 const updateWeeks = () => {
-  if (!configRef.value.startDate) configRef.value.startDate = new Date();
-  if (!configRef.value.weekCount) configRef.value.weekCount = 5;
+  if (!configRef.value?.startDate) {
+    configRef.value.startDate = new Date();
+    configRef.value.endDate = new Date();
+  }
   weeksRef.value.length = 0;
-  weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+  weeksRef.value.push(...generateWeeksBetween(configRef.value.startDate, configRef.value.endDate));
   firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;
 };
 
 const debouncedUpdateWeeks = debounce(updateWeeks, 300);
 
 watch(
-  () => [configRef.value.startDate, configRef.value.weekCount],
+  () => [configRef.value?.startDate, configRef.value?.endDate],
   () => {
+   if( configRef.value?.startDate && configRef.value?.endDate)
     debouncedUpdateWeeks();
   },
   { immediate: true }
@@ -116,11 +119,10 @@ watch(
 watch(
   () => [activeTabRef.value],
   () => {
-    if(configRef.value.showSch)updateWeeks();
+    if(configRef.value?.showSch)updateWeeks();
       selectStartRef.value=null
       nextTick(()=>{
         schReadyRef.value=true;
-
       })
 
   },
@@ -136,7 +138,6 @@ watch(
 
 onMounted(() => {
   appStore.loadActiveTab();
-  updateWeeks();
   document.addEventListener('keydown', handleKeyDown);
 });
 
@@ -146,11 +147,9 @@ onBeforeUnmount(() => {
 });
 
 
-
-
-
-const days = computed(() => (configRef.value?.weekCount ? configRef.value.weekCount * 7 : 0));
+const days = computed(() => (weeksRef.value ? weeksRef.value.length * 7 : 0));
 const cols = computed(() => configRef.value?.cols?.filter((col) => col.show) ?? []);
+
 const gridColumns = computed(() =>
   cols.value.length > 0 ? cols.value.map((col) => `${col.width}px`).join(' ') + ' 1fr' : '1fr'
 );
