@@ -17,7 +17,7 @@ import {
   calcDaysBetween,
   formatDate2,
   getPreviousWeekDate,
-  generateWeeks,getDateIndexAtWeeks,getDateByIndexAtWeeks
+  generateWeeks,
 } from "@/lib/schedule";
 import { debounce } from "lodash";
 
@@ -258,7 +258,7 @@ export function useTree() {
       if (selectStartRef.value && date) {
         if (!selectStartRef.value.row._tl) {
           selectStartRef.value.end = date;
-          autoExpanedWeeksIfNeed([getDateByIndexAtWeeks(date)])
+          autoExpanedWeeksIfNeed([date.i])
           return;
         }
 
@@ -278,7 +278,7 @@ export function useTree() {
 
             return;
           }
-          autoExpanedWeeksIfNeed([getDateByIndexAtWeeks(newDate)]);
+          autoExpanedWeeksIfNeed([newDate.i]);
 
           switch (moveType.value.type) {
             case "rightDrag":
@@ -292,15 +292,23 @@ export function useTree() {
 
 
 
-             autoExpanedWeeksIfNeed([ getDateByIndexAtWeeks(moveType.value._tl.start), getDateByIndexAtWeeks(moveType.value._tl.end) ]);
-             
-              const startIndex = getDateIndexAtWeeks(weeksRef.value,moveType.value._tl.start)+moveUnits;
+              autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
+              
+              const startIndex = plusWorkDays(
+                moveType.value._tl.start.i,
+                moveUnits
+              ).i;
+              const endIndex = plusWorkDays(
+                moveType.value._tl.end.i,
+                moveUnits
+              ).i;
 
-              const endIndex = getDateIndexAtWeeks(weeksRef.value,moveType.value._tl.end)+moveUnits;
-
-              selectStartRef.value.start = getDateByIndexAtWeeks(weeksRef.value,startIndex);
-        
-              selectStartRef.value.end = getDateByIndexAtWeeks(weeksRef.value,endIndex);
+              selectStartRef.value.start =
+                weeksRef.value[Math.floor(startIndex / 7)]?.dates[
+                  startIndex % 7
+                ];
+              selectStartRef.value.end =
+                weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
             }
           }
         }
