@@ -61,7 +61,7 @@ import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
 import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';
-import { generateWeeksBetween } from '@/lib/schedule';
+import { generateWeeks } from '@/lib/schedule';
 import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
@@ -98,26 +98,28 @@ const firstDay = ref(null);
 const updateWeeks = () => {
   if (!configRef.value?.startDate) {
     configRef.value.startDate = new Date();
-    configRef.value.endDate = new Date();
+  }
+  if (!configRef.value?.weekCount) {
+    configRef.value.weekCount = 1;
   }
   weeksRef.value.length = 0;
-  weeksRef.value.push(...generateWeeksBetween(configRef.value.startDate, configRef.value.endDate));
+  weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
   firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;
 };
 
 const debouncedUpdateWeeks = debounce(updateWeeks, 300);
 
 watch(
-  () => [configRef.value?.startDate, configRef.value?.endDate],
+  () => [configRef.value?.startDate,configRef.value?.weekCount],
   () => {
-   if( configRef.value?.startDate && configRef.value?.endDate)
+   if( configRef.value?.startDate )
     debouncedUpdateWeeks();
   },
   { immediate: true }
 );
 
 watch(
-  () => [activeTabRef.value],
+  () => [activeTabRef.value,configRef.value?.showSch],
   () => {
     if(configRef.value?.showSch)updateWeeks();
       selectStartRef.value=null

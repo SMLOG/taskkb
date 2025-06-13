@@ -153,11 +153,10 @@ const selectTemplate = (template) => {
 
   let data = sample[template.name.toLowerCase()];
   if(data){
-    data.config.startDate = new Date().toDateString();
+    data.config.startDate = new Date();
     data.config.title = tabName;
     data.config.cols.map(col=>col.id=uuidv4())
     loopTree(data.data,(node)=>node.id=uuidv4());
-    console.log(data)
     useAppStore().importToNewTab(newTabId,data);
   }else{
     tabsStore.addTab(newTabId, tabName);
