@@ -160,8 +160,8 @@ export function useTree() {
     if (moveType.value) {
       event.stopPropagation();
 
-     // selectStartRef.value.row._tl.start = selectStartRef.value.start;
-     // selectStartRef.value.row._tl.end = selectStartRef.value.end;
+      selectStartRef.value.row._tl.start = selectStartRef.value.end.n>selectStartRef.value.start.n?selectStartRef.value.start:selectStartRef.value.end;
+      selectStartRef.value.row._tl.end = selectStartRef.value.start.n>selectStartRef.value.end.n?selectStartRef.value.start:selectStartRef.value.end;;
 
       moveType.value = null;
     } else {
