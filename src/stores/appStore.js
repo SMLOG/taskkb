@@ -1,25 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { view } from '@forge/bridge';
 import { readJsonAttachment, writeObjectToJsonAttachment } from '@/api/jira';
-
-// Helper function to convert dates in tree data
-function loopToSetDate(row) {
-  if (row._tl) {
-    let peroid = row._tl;
-    if (!peroid.start || !peroid.end) {
-      peroid.start = peroid.end = null;
-    } else {
-      peroid.start.date = new Date(peroid.start.date);
-      peroid.end.date = new Date(peroid.end.date);
-    }
-  }
-  if (row._childs) {
-    for (let ch of row._childs) {
-      loopToSetDate(ch);
-    }
-  }
-}
+import { loopToSetDate } from '../lib/row-utils';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -35,12 +17,8 @@ export const useAppStore = defineStore('app', () => {
   async function init() {
     try {
       console.log('Initializing store...');
-      if (!view || typeof view.getContext !== 'function') {
-        console.error('view.getContext is not available. Running outside Forge custom UI context?');
-        return;
-      }
 
-      const {attachmentId,content:appState} = await readJsonAttachment('perfecttdo.json');
+      const { attachmentId, content: appState } = await readJsonAttachment('perfecttdo.json');
       attachmentIdRef.value = attachmentId;
       if (appState) {
         tabs.value = appState.tabs || [];
@@ -48,18 +26,15 @@ export const useAppStore = defineStore('app', () => {
         console.log('No perfecttdo.json found, using default state');
       }
 
-      // Load data for each tab
       for (const tab of tabs.value) {
-        let {config,data} = appState.datas[tab.id];
+        let { config, data } = appState.datas[tab.id];
         if (data && config) {
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
+      let activeTabIndex= appState.activeTab >= 0 && appState.activeTab < tabs.value.length ? appState.activeTab : tabs.length > 0 ? 0: -1;
+      await setActiveTab(activeTabIndex);
 
-      // Load active tab data if valid
-      if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
-        await setActiveTab(0);
-      }
     } catch (error) {
       console.error('Failed to initialize store:', error);
     }
@@ -76,20 +51,18 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  // Save current tab's tree and config data
   async function saveCurrentTabData() {
     try {
       if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
         const tab = tabs.value[activeTabRef.value];
 
-        // Save tab data and config
-        tabsDataMapRef.value[tab.id]={config:configRef.value,data:treeRef.value}
+        tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
         const appStateSaved = await writeObjectToJsonAttachment(
-          { tabs: tabs.value, activeTab: activeTabRef.value,datas:tabsDataMapRef.value },
-          'perfecttdo.json',attachmentIdRef.value
+          { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
+          'perfecttdo.json', attachmentIdRef.value
         );
         attachmentIdRef.value = appStateSaved.id
-        console.log('attachment id',attachmentIdRef.value)
+        console.log('attachment id', attachmentIdRef.value)
         if (appStateSaved) {
           tab.saved = true;
           console.log(`Saved data for tab ${tab.id}`);
@@ -102,7 +75,6 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  // Tab management actions
   async function addTab(tabId, title) {
     try {
       const tab = { id: tabId, title };
