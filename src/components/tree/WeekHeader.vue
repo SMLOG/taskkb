@@ -3,7 +3,7 @@
     <div class="flex flex-nowrap">
       <div v-for="(week, index) in weeks" :key="week" class="week-slot">
         <div>
-          <span>{{ week.label }}</span><span>({{ week.i + 1 }})</span>
+          <span>{{ week.label }}</span><span>({{ index + 1 }})</span>
         </div>
         <div class="flex justify-between">
           <span

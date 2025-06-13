@@ -106,6 +106,37 @@ function getDateAsInteger  (dateObj)  {
   return parseInt(`${year}${month}${day}`, 10);
 };
 
+export function generateWeeks2(startDate, n) {
+  const weeks = [];
+  const startOfWeek = new Date(startDate);
+  const startDayOfWeek = (startOfWeek.getDay() + 6) % 7; // Adjust for Monday start
+  startOfWeek.setDate(startOfWeek.getDate() - startDayOfWeek);
+  const msPerDay = 86400000; // Cache milliseconds per day
+  const msPerWeek = msPerDay * 7; // Cache milliseconds per week
+
+  const year = startOfWeek.getFullYear();
+  const firstDayOfYear = new Date(year, 0, 1);
+  const firstDayOffset = firstDayOfYear.getDay();
+
+  for (let i = 0; i < n; i++) {
+    const weekStartTime = startOfWeek.getTime();
+
+    const daysSinceYearStart = (weekStartTime - firstDayOfYear) / msPerDay;
+    const weekNumber = Math.floor((daysSinceYearStart + firstDayOffset + 1) / 7) + 1;
+
+    weeks.push({
+      dates: getWeekDates(startOfWeek, year,weekNumber),
+      label: formatDate(startOfWeek, { month: "short", year: "2-digit" }),
+      year,
+      weekNumber
+    });
+
+    startOfWeek.setTime(weekStartTime + msPerWeek); // Advance by one week
+  }
+
+  return weeks;
+}
+
 export function generateWeeks(startDate, n) {
   const weeks = [];
   const startOfWeek = new Date(startDate);

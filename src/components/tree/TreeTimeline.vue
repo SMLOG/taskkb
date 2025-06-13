@@ -61,7 +61,7 @@ import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
 import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';
-import { generateWeeks } from '@/lib/schedule';
+import { generateWeeks2 } from '@/lib/schedule';
 import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
@@ -103,7 +103,7 @@ const updateWeeks = () => {
     configRef.value.weekCount = 1;
   }
   weeksRef.value.length = 0;
-  weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
+  weeksRef.value.push(...generateWeeks2(configRef.value.startDate, configRef.value.weekCount));
   firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;
 };
 
