@@ -58,33 +58,19 @@ export function getPreviousWeekDate(date) {
   result.setDate(date.getDate() - 7);
   return result;
 }
+
+  function getDateIndexAtWeeks(weeks,d){
+    let startWeekNumber = weeks[0].i;
+    let targetWeekNum = d.w;
+   return (targetWeekNum - startWeekNumber)*7+d.i;
+
+  }
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
+    let i1=findTheDateInWeeks(weeks,d1);
+    let i2=findTheDateInWeeks(weeks,d2);
 
-    ;
-
-    let date1 = d1.i > d2.i ? findTheDateInWeeks(weeks,d1.date) : findTheDateInWeeks(weeks,d2.date);
-    let date2 = d1.i > d2.i ? findTheDateInWeeks(weeks,d2.date) : findTheDateInWeeks(weeks,d1.date);
-    if (exclusiveHolidayWeeken) {
-      let weekIndex1 = parseInt(date1.i / 7);
-      let weekIndex2 = parseInt(date2.i / 7);
-
-      let i = date2.i % 7;
-      let count = 0;
-      for (let w = weekIndex2; w <= weekIndex1; w++) {
-
-        for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
-          let day = weeks[w].dates[i];
-          if (day.isWeekend || day.holiday) continue;
-          count++;
-
-        }
-        i = 0;
-      }
-      return count;
-
-    }
-    return date1.i - date2.i + 1;
+    return i1 - i2 + 1;
 
 
   }
@@ -127,8 +113,8 @@ export function generateWeeks2(startDate, n) {
     weeks.push({
       dates: getWeekDates(startOfWeek, year,weekNumber),
       label: formatDate(startOfWeek, { month: "short", year: "2-digit" }),
-      year,
-      weekNumber
+      y:year,
+      i:weekNumber
     });
 
     startOfWeek.setTime(weekStartTime + msPerWeek); // Advance by one week
@@ -187,7 +173,7 @@ const getWeekDates= (startDate,year,weekNumber) => {
       i: i++,
       n:n,
       label: formatDate(currentDate, { day: "2-digit" }),
-      year,weekNumber
+      y:year,w:weekNumber
     };
     dates.push(dateWrap);
     currentDate.setDate(currentDate.getDate() + 1);
