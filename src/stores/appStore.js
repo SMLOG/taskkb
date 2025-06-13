@@ -60,7 +60,7 @@ export const useAppStore = defineStore('app', () => {
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
           attachFileName, attachmentIdRef.value
         );
-        attachmentIdRef.value = result.id
+        attachmentIdRef.value = result.attachmentId
         console.log('attachment id', attachmentIdRef.value)
         if (result) {
           tab.saved = true;

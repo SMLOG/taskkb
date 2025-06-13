@@ -124,6 +124,7 @@ export async function writeObjectToJsonAttachment(dataObject, filename, attachme
         }
 
         // Delete old attachment if provided
+        console.info("delete attachment id ",attachmentId)
         if (attachmentId && !isNaN(parseInt(attachmentId))) {
             const deleteResponse = await requestJira(`/rest/api/3/attachment/${attachmentId}`, {
                 method: 'DELETE',
@@ -136,7 +137,7 @@ export async function writeObjectToJsonAttachment(dataObject, filename, attachme
         }
 
         const result = await response.json();
-        return { success: true, result: Array.isArray(result) ? result[0] : result };
+        return { success: true, attachmentId:result[0].id};
     } catch (error) {
         console.error(`Error writing JSON attachment: ${error.message}`);
         return { success: false, error: error.message };
