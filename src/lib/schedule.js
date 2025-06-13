@@ -59,7 +59,7 @@ export function getPreviousWeekDate(date) {
   return result;
 }
 
-  function getDateIndexAtWeeks(weeks,d){
+  export function getDateIndexAtWeeks(weeks,d){
     let startWeekNumber = weeks[0].i;
     let targetWeekNum = d.w;
    return (targetWeekNum - startWeekNumber)*7+d.i;

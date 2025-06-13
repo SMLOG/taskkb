@@ -294,14 +294,9 @@ export function useTree() {
 
               autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
               
-              const startIndex = plusWorkDays(
-                moveType.value._tl.start.i,
-                moveUnits
-              ).i;
-              const endIndex = plusWorkDays(
-                moveType.value._tl.end.i,
-                moveUnits
-              ).i;
+              const startIndex = moveType.value._tl.start.w+moveType.value._tl.start.i+moveUnits;
+
+              const endIndex = moveType.value._tl.end.w+moveType.value._tl.end.i+moveUnits;;
 
               selectStartRef.value.start =
                 weeksRef.value[Math.floor(startIndex / 7)]?.dates[
