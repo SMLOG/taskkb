@@ -160,8 +160,8 @@ export function useTree() {
     if (moveType.value) {
       event.stopPropagation();
 
-      selectStartRef.value.row._tl.start = selectStartRef.value.start;
-      selectStartRef.value.row._tl.end = selectStartRef.value.end;
+     // selectStartRef.value.row._tl.start = selectStartRef.value.start;
+     // selectStartRef.value.row._tl.end = selectStartRef.value.end;
 
       moveType.value = null;
     } else {
@@ -230,6 +230,7 @@ export function useTree() {
           start: selectStartRef.value.start,
           end: date,
         });
+        console.log(row._tl)
       } else {
         selectStartRef.value = null;
       }
