@@ -12,9 +12,10 @@ export function addDatePeriod(addPeriod) {
 export function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
-function findTheDateInWeeks(weeks, date) {
+function findTheDateInWeeks(weeks, d) {
 
   //return weeks[(date.w-weeks[0].w)][wi];
+  let date = d.date;
   const normalizedDate = new Date(date);
   normalizedDate.setHours(0, 0, 0, 0); // Set to midnight
   const dateTime = normalizedDate.getTime();
@@ -58,8 +59,8 @@ export function getPreviousWeekDate(date) {
 }
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
-    let date1 = d1.n > d2.n ? findTheDateInWeeks(weeks,d1.date) : findTheDateInWeeks(weeks,d2.date);
-    let date2 = d1.n > d2.n ? findTheDateInWeeks(weeks,d2.date) : findTheDateInWeeks(weeks,d1.date);
+    let date1 = d1.n > d2.n ? findTheDateInWeeks(weeks,d1) : findTheDateInWeeks(weeks,d2);
+    let date2 = d1.n > d2.n ? findTheDateInWeeks(weeks,d2) : findTheDateInWeeks(weeks,d1);
     if (exclusiveHolidayWeeken) {
       let weekIndex1 = parseInt(date1.i / 7);
       let weekIndex2 = parseInt(date2.i / 7);
