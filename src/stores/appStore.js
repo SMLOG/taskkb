@@ -56,13 +56,13 @@ export const useAppStore = defineStore('app', () => {
         const tab = tabs.value[activeTabRef.value];
 
         tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
-        const appStateSaved = await writeObjectToJsonAttachment(
+        const result = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
           attachFileName, attachmentIdRef.value
         );
-        attachmentIdRef.value = appStateSaved.id
+        attachmentIdRef.value = result.id
         console.log('attachment id', attachmentIdRef.value)
-        if (appStateSaved) {
+        if (result) {
           tab.saved = true;
           console.log(`Saved data for tab ${tab.id}`);
         } else {
@@ -181,7 +181,6 @@ export const useAppStore = defineStore('app', () => {
   const attachmentIdRef = ref(-1);
   async function saveData() {
     try {
-      console.error('saveData');
 
       await saveCurrentTabData();
     } catch (error) {
@@ -189,17 +188,7 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  // Save config
-  async function saveConfig() {
-    try {
-      console.error('saveConfig');
 
-      await saveCurrentTabData(attachmentIdRef.value);
-
-    } catch (error) {
-      console.error('Failed to save config:', error);
-    }
-  }
 
   // Initialize store
   initLoadTabsData().catch(error => console.error('Init failed:', error));
@@ -215,7 +204,6 @@ export const useAppStore = defineStore('app', () => {
     removeTab,
     setActiveTab,
     saveData,
-    saveConfig,
     loadActiveTab,
     getCurrentTab,
     importToNewTab

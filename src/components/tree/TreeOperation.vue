@@ -17,8 +17,8 @@
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="saveData(0)" class="btn-secondary">
-              💾 Save
+            <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
+              💾 Save {{ savingRef?"...":"" }}
             </button>
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
@@ -126,6 +126,9 @@ const dropdownPosition = ref('top');
 const DROPDOWN_HEIGHT = 200;
 const isFullscreen = ref(false);
 
+const savingRef = ref(false);
+
+
 const handleClickOutside = (event) => {
   if (menuRef.value && !menuRef.value.contains(event.target)) {
     showDropdown.value = false;
@@ -189,9 +192,11 @@ function download() {
 }
 
 async function  saveData(bool) {
-  if (!bool || configRef.value.autoSave) {
-   await useAppStore().saveConfig();
+  if (!bool) {
+    savingRef.value = true;
    await useAppStore().saveData();
+   savingRef.value = false;
+
   }
 }
 
