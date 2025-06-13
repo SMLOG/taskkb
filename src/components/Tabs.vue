@@ -5,7 +5,7 @@
       :key="index"
       :tab="tab"
       :isActive="appStore.activeTabRef === index"
-      @removeTab="appStore.removeTab(index)"
+      @removeTab="showRmoveConfirmRef=index"
       @click="appStore.setActiveTab(index)"
     />
     <button
@@ -19,6 +19,7 @@
     </button>
   </div>
   <NewTabPopup v-if="showNewTabPopup" v-model="showNewTabPopup" />
+  <ConfirmPopUp v-if="showRmoveConfirmRef>-1" @cancel="showRmoveConfirmRef=-1" @confirm="confirmRemoveTab()"/>
 </template>
 
 <script setup>
@@ -26,12 +27,21 @@ import { ref } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import Tab from '@/components/Tab.vue';
 import NewTabPopup from '@/components/NewTabPopup.vue';
+import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
 
 const showNewTabPopup = ref(false);
 const appStore = useAppStore();
 const addTab = () => {
   showNewTabPopup.value = true;
 };
+
+const showRmoveConfirmRef = ref(-1);
+const confirmRemoveTab = ()=>{
+  appStore.removeTab(showRmoveConfirmRef.value);
+  showRmoveConfirmRef.value=-1;
+
+}
+
 </script>
 
 <style scoped>

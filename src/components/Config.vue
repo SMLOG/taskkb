@@ -84,7 +84,7 @@
       Confirm Delete
     </h3>
     <p id="modal-description" class="text-gray-600 dark:text-gray-300 mb-6 text-sm leading-relaxed">
-      Are you sure you want to delete the column "<b>{{ confirmColName }}</b>"? <span class="font-semibold text-red-500 dark:text-red-400">This action cannot be undo once deleted.</span>
+      Are you sure you want to delete the column "<b>{{ confirmColName }}</b>"? <span class="font-semibold text-red-500 dark:text-red-400">This action cannot be undo once confirmed.</span>
     </p>
     <div class="flex justify-end gap-3">
       <button
