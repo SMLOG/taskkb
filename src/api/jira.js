@@ -51,7 +51,8 @@ export async function readJsonAttachment(filename) {
             return { error: `Failed to fetch attachments: ${attachmentsResponse.status}` };
         }
 
-        const attachmentData = jsonParse(await attachmentsResponse.text());
+        const attachmentData = (await attachmentsResponse.json());
+        console.log(attachmentData)
         const attachments = attachmentData.fields?.attachment || [];
         const jsonAttachment = attachments.find(attachment => attachment.filename === filename);
 
@@ -81,7 +82,7 @@ export async function readJsonAttachment(filename) {
             return { error: `Failed to fetch attachment content: ${fileResponse.status}` };
         }
 
-        const content = await fileResponse.json();
+        const content = await jsonParse(await fileResponse.text());
         return { attachmentId, content };
     } catch (error) {
         console.error(`Error reading JSON attachment: ${error.message}`);
