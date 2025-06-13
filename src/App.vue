@@ -3,24 +3,33 @@
 import TreeOperation from '@/components/tree/TreeOperation.vue'
 
 import FormatTool from "@/components/tools/FormatTool.vue";
-import { useRoute } from 'vue-router';
 import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 
 import { storeToRefs } from 'pinia'
+import { ref } from 'vue'
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
-const route = useRoute();
 
-const isTree = route.path === '/';
+
+const loadedRef = ref(false);
+
+(async () => {
+  
+  await appStore.initLoadTabsData();
+  loadedRef.value = true;
+}
+)();
+
 </script>
 
 <template>
 
   <main class="flex-grow relative">
-    <NotificationProvider class="h-full">
+    <div v-if="!loadedRef">Loading</div>
+    <NotificationProvider class="h-full" v-if="loadedRef">
       <div class="flex flex-col h-full">
         <div> <TabsContainer /></div>
         <div class="flex-1  flex ">
