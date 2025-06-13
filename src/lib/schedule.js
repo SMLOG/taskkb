@@ -63,8 +63,8 @@ export function getPreviousWeekDate(date) {
 
     ;
 
-    let date1 = d1.i > d2.i ? findTheDateInWeeks(weeks,d1.date) : findTheDateInWeeks(weeks,d2.date);
-    let date2 = d1.i > d2.i ? findTheDateInWeeks(weeks,d2.date) : findTheDateInWeeks(weeks,d1.date);
+    let date1 = d1.n > d2.n ? findTheDateInWeeks(weeks,d1.date) : findTheDateInWeeks(weeks,d2.date);
+    let date2 = d1.n > d2.n ? findTheDateInWeeks(weeks,d2.date) : findTheDateInWeeks(weeks,d1.date);
     if (exclusiveHolidayWeeken) {
       let weekIndex1 = parseInt(date1.i / 7);
       let weekIndex2 = parseInt(date2.i / 7);
