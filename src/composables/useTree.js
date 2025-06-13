@@ -17,7 +17,7 @@ import {
   calcDaysBetween,
   formatDate2,
   getPreviousWeekDate,
-  generateWeeks,
+  generateWeeks,getDateIndexAtWeeks,getDateByIndexAtWeeks
 } from "@/lib/schedule";
 import { debounce } from "lodash";
 
@@ -292,18 +292,17 @@ export function useTree() {
 
 
 
-              autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
-              
-              const startIndex = moveType.value._tl.start.w+moveType.value._tl.start.i+moveUnits;
+             // autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
 
-              const endIndex = moveType.value._tl.end.w+moveType.value._tl.end.i+moveUnits;;
 
-              selectStartRef.value.start =
-                weeksRef.value[Math.floor(startIndex / 7)]?.dates[
-                  startIndex % 7
-                ];
-              selectStartRef.value.end =
-                weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
+             
+              const startIndex = getDateIndexAtWeeks(weeksRef.value,moveType.value._tl.start)+moveUnits;
+
+              const endIndex = getDateIndexAtWeeks(weeksRef.value,moveType.value._tl.end)+moveUnits;
+
+              selectStartRef.value.start = getDateByIndexAtWeeks(weeksRef.value,startIndex);
+        
+              selectStartRef.value.end = getDateByIndexAtWeeks(weeksRef.value,endIndex);
             }
           }
         }

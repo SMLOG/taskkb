@@ -43,7 +43,7 @@ const props=defineProps({
 });
 
 const getDayClasses = (day, selectStartRef) => ({
-  selected: selectStartRef?.start && isBetween(selectStartRef.start.i, selectStartRef.end.i, day.i),
+  selected: selectStartRef?.start && isBetween(selectStartRef.start.n, selectStartRef.end.n, day.n),
   today: day.isCur,
   weekend: day.isWeekend,
   holiday: day.holiday,

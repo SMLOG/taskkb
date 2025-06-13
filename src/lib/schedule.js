@@ -58,7 +58,11 @@ export function getPreviousWeekDate(date) {
   result.setDate(date.getDate() - 7);
   return result;
 }
-
+  export function getDateByIndexAtWeeks(weeks,index){
+    return weeks[Math.floor(index / 7)]?.dates[
+      index % 7
+    ];
+  }
   export function getDateIndexAtWeeks(weeks,d){
     let startWeekNumber = weeks[0].i;
     let targetWeekNum = d.w;
