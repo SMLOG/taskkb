@@ -67,8 +67,8 @@ export function getPreviousWeekDate(date) {
   }
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
-    let i1=findTheDateInWeeks(weeks,d1);
-    let i2=findTheDateInWeeks(weeks,d2);
+    let i1=getDateIndexAtWeeks(weeks,d1);
+    let i2=getDateIndexAtWeeks(weeks,d2);
 
     return i1 - i2 + 1;
 
