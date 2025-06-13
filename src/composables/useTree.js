@@ -258,7 +258,7 @@ export function useTree() {
       if (selectStartRef.value && date) {
         if (!selectStartRef.value.row._tl) {
           selectStartRef.value.end = date;
-          autoExpanedWeeksIfNeed([date.i])
+          autoExpanedWeeksIfNeed([getDateByIndexAtWeeks(date)])
           return;
         }
 
@@ -278,7 +278,7 @@ export function useTree() {
 
             return;
           }
-          autoExpanedWeeksIfNeed([newDate.i]);
+          autoExpanedWeeksIfNeed([getDateByIndexAtWeeks(newDate)]);
 
           switch (moveType.value.type) {
             case "rightDrag":
@@ -292,9 +292,7 @@ export function useTree() {
 
 
 
-             // autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
-
-
+             autoExpanedWeeksIfNeed([ getDateByIndexAtWeeks(moveType.value._tl.start), getDateByIndexAtWeeks(moveType.value._tl.end) ]);
              
               const startIndex = getDateIndexAtWeeks(weeksRef.value,moveType.value._tl.start)+moveUnits;
 
