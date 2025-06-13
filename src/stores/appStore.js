@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { readJsonAttachment, writeObjectToJsonAttachment } from '@/api/jira';
-import { loopToSetDate } from '../lib/row-utils';
+import { loopToSetDate,forEachTree } from '../lib/row-utils';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -50,28 +50,35 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  async function saveCurrentTabData() {
-    try {
+  
+  async function saveAll() {
       if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
         const tab = tabs.value[activeTabRef.value];
 
         tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
+
+      }
+
+   
+      /*tabs.value.map(tab=>{
+        tabsDataMapRef.value[tab.id].config
+        forEachTree(tabsDataMapRef.value[tab.id].data,'_childs',);
+      });*/
         const result = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
           attachFileName, attachmentIdRef.value
         );
         attachmentIdRef.value = result.attachmentId
+        tabs.value.map(tab=>tab.saved=true);
+
         console.log('attachment id', attachmentIdRef.value)
         if (result) {
-          tab.saved = true;
           console.log(`Saved data for tab ${tab.id}`);
         } else {
-          console.error('Failed to save some or all attachments');
+          throw new Error("Save Error");
         }
-      }
-    } catch (error) {
-      console.error('Failed to save current tab data:', error);
-    }
+      
+ 
   }
 
   async function addTab(tabId, title) {
@@ -133,23 +140,7 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  async function loadTabData(tab, external) {
-    try {
-      if (external) {
-        const { data, config } = external;
-        tabsDataMapRef.value[tab.id] = { data, config };
-      } else {
-        let data = await readJsonAttachment(`${tab.id}-data.json`);
-        let config = await readJsonAttachment(`${tab.id}-config.json`);
-        if (data && config) {
-          loopToSetDate(data);
-          tabsDataMapRef.value[tab.id] = { data, config };
-        }
-      }
-    } catch (error) {
-      console.error(`Failed to load tab data for ${tab.id}:`, error);
-    }
-  }
+ 
 
   async function setActiveTab(index) {
     try {
@@ -158,9 +149,7 @@ export const useAppStore = defineStore('app', () => {
         activeTabRef.value = index;
         const tab = tabs.value[index];
 
-        if (!tabsDataMapRef.value[tab.id]) {
-          await loadTabData(tab);
-        }
+
         const tabData = tabsDataMapRef.value[tab.id];
 
         if (tabData) {
@@ -182,7 +171,7 @@ export const useAppStore = defineStore('app', () => {
   async function saveData() {
     try {
 
-      await saveCurrentTabData();
+      await saveAll();
     } catch (error) {
       console.error('Failed to save data:', error);
     }

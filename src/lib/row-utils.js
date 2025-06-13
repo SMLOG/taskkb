@@ -14,3 +14,13 @@ export function loopToSetDate(row) {
     }
   }
 }
+
+export function forEachTree(node,childsName,callback) {
+  callback(node);
+  let childs = row[childsName];
+  if (childs) {
+    for (let ch of childs) {
+      forEachTree(ch,childsName,callback);
+    }
+  }
+}
