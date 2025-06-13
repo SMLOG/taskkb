@@ -95,6 +95,8 @@ const applyFontColor2 = () => {
 
 const checkSelection = () => {
   const selectedText = window.getSelection().toString();
+  console.log(selectedText.trim())
+
   if (selectedText.trim().length > 0) {
     isFormatToolVisible.value = true;
     const selection = window.getSelection().getRangeAt(0);
