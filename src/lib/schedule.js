@@ -135,9 +135,8 @@ export function generateWeeks(startDate, n) {
       endn: getDateAsInteger(new Date(weekStartTime + msPerDay * 6)),
       label: formatDate(startOfWeek, { month: "short", year: "2-digit" }),
       dates: getDatesBetween(startOfWeek, new Date(weekStartTime + msPerDay * 6), i,year,month,weekNumber),
-      year,
-      month,
-      weekNumber
+      y:year,
+      w:weekNumber
     });
 
     startOfWeek.setTime(weekStartTime + msPerWeek); // Advance by one week
