@@ -14,6 +14,7 @@ export function deepCopy(obj) {
 }
 function findTheDateInWeeks(weeks, date) {
 
+  //return weeks[(date.w-weeks[0].w)][wi];
   const normalizedDate = new Date(date);
   normalizedDate.setHours(0, 0, 0, 0); // Set to midnight
   const dateTime = normalizedDate.getTime();
