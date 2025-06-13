@@ -99,4 +99,5 @@ export default {
 input {
   box-sizing: border-box;
 }
+.active{font-weight: bold;}
 </style>
