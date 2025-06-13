@@ -75,7 +75,7 @@
     <!-- Confirmation Dialog -->
     <div
   v-if="showConfirm"
-  class="fixed inset-0 z-60 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300"
+  class="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300"
 >
   <div
     class="bg-white dark:bg-gray-900 rounded-xl p-6 max-w-sm w-full mx-4 shadow-lg dark:shadow-gray-950/50 transform transition-all duration-300 scale-100 hover:scale-[1.02]"

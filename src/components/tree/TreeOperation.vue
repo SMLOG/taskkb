@@ -193,9 +193,14 @@ function download() {
 
 async function  saveData(bool) {
   if (!bool) {
+    try{
     savingRef.value = true;
    await useAppStore().saveData();
-   savingRef.value = false;
+   showNotification('Saved Successful!', 'success');
+    }catch(error){
+      showNotification('Save Fail!', 'error');
+    }
+    savingRef.value = false;
 
   }
 }

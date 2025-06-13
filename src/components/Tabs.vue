@@ -43,8 +43,7 @@ const addTab = () => {
 }
 
 .tab.active {
-  @apply bg-white text-gray-900 dark:bg-black dark:text-white;
-  z-index: 10;
+  @apply bg-white text-gray-900 dark:bg-black dark:text-white z-1;
 }
 
 .tab:not(.active) {
