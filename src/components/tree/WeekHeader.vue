@@ -78,6 +78,8 @@ const getDayClasses = (day, selectStartRef) => ({
   font-size: 60%;
   display: inline-block;
   width: 3em;
+  @apply flex-1;
+
 }
 
 .selected {
