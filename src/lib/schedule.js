@@ -13,10 +13,7 @@ export function deepCopy(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
 function findTheDateInWeeks(weeks, date) {
-  // Early validation
-  if (!Array.isArray(weeks) || weeks.length === 0 || !(date instanceof Date)) return null;
 
-  // Normalize the input date to midnight
   const normalizedDate = new Date(date);
   normalizedDate.setHours(0, 0, 0, 0); // Set to midnight
   const dateTime = normalizedDate.getTime();
@@ -59,9 +56,6 @@ export function getPreviousWeekDate(date) {
   return result;
 }
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
-
-
-    ;
 
     let date1 = d1.n > d2.n ? findTheDateInWeeks(weeks,d1.date) : findTheDateInWeeks(weeks,d2.date);
     let date2 = d1.n > d2.n ? findTheDateInWeeks(weeks,d2.date) : findTheDateInWeeks(weeks,d1.date);
@@ -131,8 +125,6 @@ export function generateWeeks(startDate, n) {
       start: new Date(weekStartTime), // Direct reference (assumes immutability not required)
       end: new Date(weekStartTime + msPerDay * 6),
       i,
-      startn: getDateAsInteger(startOfWeek),
-      endn: getDateAsInteger(new Date(weekStartTime + msPerDay * 6)),
       label: formatDate(startOfWeek, { month: "short", year: "2-digit" }),
       dates: getDatesBetween(startOfWeek, new Date(weekStartTime + msPerDay * 6), i,year,month,weekNumber),
       y:year,
@@ -175,13 +167,15 @@ const getDatesBetween = (startDate, endDate, weekIndex,year,weekNumber) => {
     let dateWrap = {
       date: new Date(currentDate),
       n: n,
-      i: weekIndex * 7 + i++,
+      i: weekIndex * 7 + i,
+      wi:i,
       isCur: isToday(currentDate),
       isWeekend: isWeekend(currentDate),
       label: formatDate(currentDate, { day: "2-digit" }),
       h: holiday.length && holiday[0],
       y:year,w:weekNumber
     };
+    i++;
     dates.push(dateWrap);
     currentDate.setDate(currentDate.getDate() + 1);
   }
