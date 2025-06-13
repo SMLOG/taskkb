@@ -92,7 +92,6 @@ const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
 const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto',
 });
-//const firstDay = computed(() => weeksRef.value?.[0]?.dates?.[0] ?? null);
 
 const firstDay = ref(weeksRef.value?.[0]?.dates?.[0] ?? null);
 

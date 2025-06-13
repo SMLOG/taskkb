@@ -145,6 +145,83 @@ export function generateWeeks(startDate, n) {
 
   return weeks;
 }
+
+const getWeekDates= (startDate,year,weekNumber) => {
+  const dates = [];
+  const currentDate = new Date(startDate);
+  let i = 0;
+  while (i<7) {
+    let n = getDateAsInteger(currentDate);
+    let dateWrap = {
+      i: i++,
+      n:n,
+      label: formatDate(currentDate, { day: "2-digit" }),
+      year,weekNumber
+    };
+    dates.push(dateWrap);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  return dates;
+};
+
+export function generateWeeksBetween(startDate, endDate) {
+  if (!(startDate instanceof Date) || isNaN(startDate)) {
+    throw new Error('startDate must be a valid Date object');
+  }
+  if (!(endDate instanceof Date) || isNaN(endDate)) {
+    throw new Error('endDate must be a valid Date object');
+  }
+  if (endDate < startDate) {
+    throw new Error('endDate must be on or after startDate');
+  }
+
+  const weeks = [];
+  const startOfWeek = new Date(startDate);
+  const startDayOfWeek = (startOfWeek.getDay() + 6) % 7; // Adjust for Monday start
+  startOfWeek.setDate(startOfWeek.getDate() - startDayOfWeek);
+  startOfWeek.setHours(0, 0, 0, 0); // Normalize to start of day
+
+  const endOfWeek = new Date(endDate);
+  const endDayOfWeek = (endOfWeek.getDay() + 6) % 7;
+  endOfWeek.setDate(endOfWeek.getDate() - endDayOfWeek + 6); // Adjust to end of week (Sunday)
+  endOfWeek.setHours(23, 59, 59, 999); // Normalize to end of day
+
+  const MS_PER_DAY = 86400000; // Milliseconds per day
+  const MS_PER_WEEK = MS_PER_DAY * 7; // Milliseconds per week
+
+  let weekStartTime = startOfWeek.getTime();
+
+  while (weekStartTime <= endOfWeek.getTime()) {
+    const weekEndTime = weekStartTime + MS_PER_DAY * 6;
+    const weekStartDate = new Date(weekStartTime);
+    const year = weekStartDate.getFullYear();
+
+    // Calculate ISO week number
+    const firstDayOfYear = new Date(year, 0, 1);
+    const firstDayOffset = (firstDayOfYear.getDay() + 6) % 7; // Monday-based offset
+    const daysSinceYearStart = (weekStartTime - firstDayOfYear.getTime()) / MS_PER_DAY;
+    const weekNumber = Math.floor((daysSinceYearStart + firstDayOffset + 3) / 7) + 1;
+
+    weeks.push({
+      start: new Date(weekStartTime),
+      end: new Date(weekEndTime),
+      startNumber: getDateAsInteger(new Date(weekStartTime)),
+      endNumber: getDateAsInteger(new Date(weekEndTime)),
+      label: formatDate(weekStartDate, { month: 'short', year: '2-digit' }),
+      dates: getWeekDates(
+        new Date(weekStartTime),
+        year,
+        weekNumber
+      ),
+      year,
+      weekNumber,
+    });
+
+    weekStartTime += MS_PER_WEEK; // Advance by one week
+  }
+
+  return weeks;
+}
 const isWeekend = (date) => {
   const dayOfWeek = date.getDay();
   return dayOfWeek === 0 || dayOfWeek === 6;
@@ -187,6 +264,8 @@ const getDatesBetween = (startDate, endDate, weekIndex,year,month,weekNumber) =>
   }
   return dates;
 };
+
+
 
 // Holidays data
 const holidays = [
