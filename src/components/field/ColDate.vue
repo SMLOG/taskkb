@@ -1,6 +1,6 @@
 <template>
   <div v-if="row" class="flex-1 h-full">
-    <ContentEditableDate v-model="row['c' + col.fn]" :dropdownItems="col.field.options"></ContentEditableDate>
+    <ContentEditableDate v-model="row['c' + col.fn]" :dropdownItems="col.options"></ContentEditableDate>
   </div>
   <div v-else-if="col" class="flex-1 h-full">
     <ContentEditable v-model="col.name" :isText="true"></ContentEditable>

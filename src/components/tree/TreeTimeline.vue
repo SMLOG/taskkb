@@ -117,7 +117,6 @@ watch(
 watch(
   () => [activeTabRef.value],
   () => {
-    console.log(activeTabRef.value,configRef.value.showSch,schReadyRef.value)
     if(configRef.value.showSch)updateWeeks();
       selectStartRef.value=null
       nextTick(()=>{
@@ -161,9 +160,3 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 </script>
 
 <style src="@/components/tree/tree.css" scoped></style>
-
-<style scoped>
-@reference "@/assets/main.css"
-
-
-</style>

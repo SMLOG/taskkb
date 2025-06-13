@@ -2,7 +2,7 @@
   <div v-if="row" class="h-full">
     <ContentEditableDate
       v-model="date"
-      :dropdownItems="col.field.options"
+      :dropdownItems="col.options"
       @change="handleChange"
     ></ContentEditableDate>
   </div>
