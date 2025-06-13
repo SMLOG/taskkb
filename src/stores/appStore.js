@@ -12,18 +12,17 @@ export const useAppStore = defineStore('app', () => {
   // Tree and config state
   const treeRef = ref({ _childs: [] });
   const configRef = ref({ cols: [] });
+  const attachFileName = 'perfecttdo.json';
 
   // Initialize store
-  async function init() {
+  async function initLoadTabsData() {
     try {
       console.log('Initializing store...');
 
-      const { attachmentId, content: appState } = await readJsonAttachment('perfecttdo.json');
+      const { attachmentId, content: appState } = await readJsonAttachment(attachFileName);
       attachmentIdRef.value = attachmentId;
       if (appState) {
         tabs.value = appState.tabs || [];
-      } else {
-        console.log('No perfecttdo.json found, using default state');
       }
 
       for (const tab of tabs.value) {
@@ -32,7 +31,7 @@ export const useAppStore = defineStore('app', () => {
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
-      let activeTabIndex= appState.activeTab >= 0 && appState.activeTab < tabs.value.length ? appState.activeTab : tabs.length > 0 ? 0: -1;
+      let activeTabIndex = appState.activeTab >= 0 && appState.activeTab < tabs.value.length ? appState.activeTab : tabs.length > 0 ? 0 : -1;
       await setActiveTab(activeTabIndex);
 
     } catch (error) {
@@ -59,7 +58,7 @@ export const useAppStore = defineStore('app', () => {
         tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
         const appStateSaved = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
-          'perfecttdo.json', attachmentIdRef.value
+          attachFileName, attachmentIdRef.value
         );
         attachmentIdRef.value = appStateSaved.id
         console.log('attachment id', attachmentIdRef.value)
@@ -203,9 +202,10 @@ export const useAppStore = defineStore('app', () => {
   }
 
   // Initialize store
-  init().catch(error => console.error('Init failed:', error));
+  initLoadTabsData().catch(error => console.error('Init failed:', error));
 
   return {
+    initLoadTabsData,
     tabs,
     activeTabRef,
     treeRef,
