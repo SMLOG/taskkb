@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative min-w-full" :class="{ drag: isDragging, move: isMoving }">
+  <div class="table-container relative min-w-full" :class="{ drag: isDragging, move: isMoving }" @keyup.enter="handleEnterKeyUp">
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
@@ -19,7 +19,7 @@
         :cols="cols"
         :showSch="configRef?.showSch"
       />
-      <div class="row header border-t border-gray-500 bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
+      <div class="row header border-t bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div
             class="col"
@@ -157,6 +157,16 @@ const gridColumns = computed(() =>
 );
 const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
 const isMoving = computed(() => moveType.value?.type === 'move');
+
+
+const handleEnterKeyUp = (event) => {
+    console.log(event.target.tagName,'up')
+
+  if (event.target.tagName === 'DIV' ) {
+    return; 
+  }
+
+};
 </script>
 
 <style src="@/components/tree/tree.css" scoped></style>

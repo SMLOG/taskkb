@@ -1,7 +1,7 @@
 <template>
   <div class="editable-dropdown h-full" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick">
     <div  class="flex flex-1 h-full justify-between">
-      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste" @keydown.enter.prevent="handleEnter"
+      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste" @keydown.enter="handleEnter"
         @focus="showDropdown = true" class="text h-full flex-1" v-html="renderToHtml(modelValue)">
       </div>
       <div v-if="editable" class="dropdown-toggle absolute right-0 top-0 flex items-center justify-between p-0 mt-1 py-0 bg-white dark:bg-gray-800 border-none border-gray-300 dark:border-gray-600 rounded-md" @click="toggleDropdown">
@@ -187,14 +187,16 @@ const insertNewLine = (event) => {
 
 const handleEnter = (event) => {
   if (event.key === 'Enter' && event.shiftKey) {
+    event.preventDefault();
     insertNewLine(event);
-    event.stopPropagation();
-    console.log(event)
+    return false; 
   } else {
-        console.log('blur')
 
     contentEditable.value?.blur();
     emit('enter');
+    console.log('Enter pressed');
+    
+    return true; 
   }
 };
 
