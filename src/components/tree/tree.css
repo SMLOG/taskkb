@@ -124,12 +124,6 @@
   width: 3em;
 }
 
-.plantime {
-  background-color: #6cb8e6;
-  cursor: move;
-  position: relative;
-}
-
 .rightDrag {
   position: absolute;
   right: 0px;
