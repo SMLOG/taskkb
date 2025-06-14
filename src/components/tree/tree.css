@@ -72,13 +72,12 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   line-height: 24px;
-  @apply border-b border-gray-500 border-r
+  @apply border-b border-r;
 }
 .table-container{width:0px;}
 .col {
-  @apply border-r border-gray-500;
-
-    position: relative;
+  @apply border-r;
+  position: relative;
 }
 
 
@@ -89,12 +88,12 @@
 }
 
 .header .col {
-  @apply border-r border-gray-500;
+  @apply border-r;
 
 }
 
 .row .col:first-child{
-  @apply border-l border-gray-500;
+  @apply border-l;
 }
 
 .sticky {

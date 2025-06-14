@@ -20,8 +20,13 @@ a,
   }
 }
 
-.sticky{
+.sticky,.row {
  @apply bg-white dark:bg-black	;
+}
+
+.row,.row .col,.row .week-slot::after{
+   border-color:#0B120E24 #091e4224;
+   @apply dark:border-gray-700;
 }
 
 /* Set default caret color for specific elements */

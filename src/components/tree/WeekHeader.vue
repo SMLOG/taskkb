@@ -54,7 +54,7 @@ const getDayClasses = (day, selectStartRef) => ({
 <style scoped>
 @reference "@/assets/main.css"
 .col {
-  @apply border-r border-gray-500;
+  @apply border-r;
   position: relative;
 }
 
@@ -69,7 +69,7 @@ const getDayClasses = (day, selectStartRef) => ({
   position: absolute;
   top: 0;
   height: 100%;
-  @apply border-r border-gray-500;
+  @apply border-r;
   right: 0;
 }
 
