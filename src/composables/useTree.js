@@ -235,11 +235,11 @@ export function useTree() {
         selectStartRef.value = null;
       }
     } else {
-      if (selectStartRef.value && row !== selectStartRef.value.row) {
-        selectStartRef.value = null;
-      } else {
+      //if (selectStartRef.value && row !== selectStartRef.value.row) {
+       // selectStartRef.value = null;
+      //} else {
         selectRowSch(row, event);
-      }
+      //}
     }
   };
 
