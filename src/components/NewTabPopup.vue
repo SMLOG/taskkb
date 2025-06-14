@@ -148,7 +148,7 @@ function loopTree(tree, callback) {
 const selectTemplate = (template) => {
   emit('select-template', template);
   emit('update:modelValue', false);
-  const tabName =  `${template.name} ${tabs.value.length + 1}`;
+  const tabName =  `${template.name} ${tabs.value.length + 1}(New)`;
   const newTabId = uuidv4();
 
   let data = sample[template.id];
