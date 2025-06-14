@@ -35,7 +35,7 @@ const loadedRef = ref(false);
         <div class="flex-1  flex ">
 
         <div class="flex-1 relative flex">
-          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full px-1">
+          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full mx-1">
             <FormatTool>
               <router-view>
               </router-view>
