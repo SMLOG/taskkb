@@ -73,8 +73,8 @@ export function useTree() {
 
   const selectRowSch = (row, event) => {
     if (
-      !moveType.value &&
-      (!selectStartRef.value || selectStartRef.value.type != 2)
+      row?._tl?.start &&row?._tl?.end
+
     ) {
       selectStartRef.value = {
         type: 1,
@@ -408,7 +408,6 @@ export function useTree() {
   };
 
   const locateCurSch = (event) => {
-    if (moveType.value) return;
     let title = event.target.classList.contains("sch");
     if (title) {
       let rowEl = event.target.closest(".row");
