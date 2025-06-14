@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { readJsonAttachment, writeObjectToJsonAttachment } from '@/api/jira';
+import { getStorageBridge } from '@/api/bridge';
+
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -17,7 +18,7 @@ export const useAppStore = defineStore('app', () => {
   async function initLoadTabsData() {
     try {
       console.log('Initializing store...');
-
+      const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridge();
       const { attachmentId, content: appState } = await readJsonAttachment(attachFileName);
       attachmentIdRef.value = attachmentId;
       if (appState) {
@@ -63,6 +64,7 @@ export const useAppStore = defineStore('app', () => {
         tabsDataMapRef.value[tab.id].config
         forEachTree(tabsDataMapRef.value[tab.id].data,'_childs',);
       });*/
+        const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridge();
         const result = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
           attachFileName, attachmentIdRef.value
