@@ -64,10 +64,6 @@
             <input type="checkbox" v-model="config.showSch" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
             Show Schedule
           </label>
-          <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
-            <input type="checkbox" v-model="config.autoSave" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-            Auto Save
-          </label>
         </div>
       </div>
     </div>
