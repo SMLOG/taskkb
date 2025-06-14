@@ -6,7 +6,7 @@ export async function readJsonAttachment(filename) {
     }
 
     try {
-        const storageKey = `jira-${filename}`;
+        const storageKey = `${filename}`;
         const storedData = localStorage.getItem(storageKey);
 
         if (!storedData) {
