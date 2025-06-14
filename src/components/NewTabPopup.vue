@@ -81,16 +81,16 @@ const emit = defineEmits(['update:modelValue', 'select-file', 'select-template']
 const templates = ref([
   {
     id: 1,
-    name: 'Todo',
+    name: 'Todo List',
     icon: '✓',
     description: 'Task list template',
     color: 'bg-blue-500',
   },
   {
     id: 2,
-    name: 'Task',
+    name: 'Project Plan',
     icon: '🗓',
-    description: 'Task Plan',
+    description: 'Project Plan/Timeline',
     color: 'bg-green-500'
   },
   {
@@ -151,7 +151,7 @@ const selectTemplate = (template) => {
   const tabName =  `${template.name} ${tabs.value.length + 1}`;
   const newTabId = uuidv4();
 
-  let data = sample[template.name.toLowerCase()];
+  let data = sample[template.id];
   if(data){
     data.config.startDate = new Date();
     data.config.title = tabName;
