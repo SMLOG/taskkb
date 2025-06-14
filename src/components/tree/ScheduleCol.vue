@@ -5,7 +5,7 @@
                 <div v-if="row._tl && row._tl.end" :style="{
                     width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
                     marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
-                }" class="plantime relative cursor-move bg-blue-300 hover:bg-blue-400 dark:bg-gray-700 dark:hover:bg-gray-600"
+                }" class="plantime relative cursor-move bg-blue-300 hover:bg-blue-400 dark:bg-gray-800 dark:hover:bg-gray-600"
                     :class="{ dragMode: dragMode }">{{
                         calculateDaysBetweenDates(row._tl.end,
                             row._tl.start, true)
