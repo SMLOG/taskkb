@@ -30,7 +30,7 @@ export async function writeObjectToJsonAttachment(dataObject, filename) {
     }
 
     try {
-        const storageKey = `jira-${filename}`;
+        const storageKey = `${filename}`;
         const jsonString = JSON.stringify(dataObject, null, 2);
         
         localStorage.setItem(storageKey, jsonString);
