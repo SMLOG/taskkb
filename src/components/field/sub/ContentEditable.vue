@@ -165,15 +165,34 @@ const stopEditing = () => {
 const insertNewLine = (event) => {
   event.preventDefault();
   const selection = window.getSelection();
-  const textNode = document.createElement('br');
-  selection.getRangeAt(0).insertNode(textNode);
-  selection.collapseToEnd();
+  
+  if (!selection.rangeCount) return;
+  
+  const range = selection.getRangeAt(0);
+  
+  const fragment = document.createDocumentFragment();
+  fragment.appendChild(document.createElement('br'));
+  const zwsp = document.createTextNode('\u200B'); 
+  fragment.appendChild(zwsp);
+  
+  range.insertNode(fragment);
+  
+  const newRange = document.createRange();
+  newRange.setStart(zwsp, 1);
+  newRange.collapse(true);
+  
+  selection.removeAllRanges();
+  selection.addRange(newRange);
 };
 
 const handleEnter = (event) => {
   if (event.key === 'Enter' && event.shiftKey) {
     insertNewLine(event);
+    event.stopPropagation();
+    console.log(event)
   } else {
+        console.log('blur')
+
     contentEditable.value?.blur();
     emit('enter');
   }

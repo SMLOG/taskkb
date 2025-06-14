@@ -32,7 +32,7 @@ a,
 /* Set default caret color for specific elements */
 input, 
 textarea, 
-[contenteditable="true"] {
+[contenteditable="true"] ,[contenteditable="true"] *{
     caret-color: initial !important; /* Uses the default caret color */
 }
 
