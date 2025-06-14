@@ -15,7 +15,7 @@
 </template>
 
 <script setup>
-import ContentEditable from './ContentEditable.vue';
+import ContentEditable from './sub/ContentEditable.vue';
 const clickRow =(row)=>{
   try{
   row._collapsed = !row._collapsed

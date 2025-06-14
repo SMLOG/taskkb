@@ -13,8 +13,8 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue';
-import ContentEditableDate from './ContentEditableDate.vue';
-import ContentEditable from './ContentEditable.vue';
+import ContentEditableDate from './sub/ContentEditableDate.vue';
+import ContentEditable from './sub/ContentEditable.vue';
 import { format } from 'date-fns';
 
 const props = defineProps({

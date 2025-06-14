@@ -8,8 +8,8 @@
 </template>
 
 <script setup>
-import ContentEditableDate from './ContentEditableDate.vue';
-import ContentEditable from './ContentEditable.vue';
+import ContentEditableDate from './sub/ContentEditableDate.vue';
+import ContentEditable from './sub/ContentEditable.vue';
 import { defineProps } from 'vue';
 
 const props = defineProps({

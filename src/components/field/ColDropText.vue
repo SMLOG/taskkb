@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import ContentEditable from './ContentEditable.vue';
+import ContentEditable from './sub/ContentEditable.vue';
 import { defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
