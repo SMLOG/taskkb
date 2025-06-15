@@ -9,7 +9,7 @@
         id="modal-title"
         class="text-lg font-semibold text-gray-900 dark:text-gray-50 mb-4 tracking-tight"
       >
-        {{ title || "Confirmation" }}
+        {{ title || "Confirmation Deletion" }}
       </h3>
       <p
         id="modal-description"
@@ -28,7 +28,7 @@
           class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-400"
           @click="$emit('confirm')"
         >
-          Confirm
+          Confirm Delete
         </button>
       </div>
     </div>

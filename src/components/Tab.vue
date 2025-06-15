@@ -7,7 +7,7 @@
   >
     <span 
       v-if="!isEditing" 
-      class="truncate max-w-[130px]"
+      :class="`truncate max-w-[${isActive?260:130}px]`"
     >
       {{ tab.title }}
     </span>
@@ -95,9 +95,9 @@ export default {
 .tab {
   max-width: 200px;
 }
+.tab.active{font-weight: bold;}
 
 input {
   box-sizing: border-box;
 }
-.active{font-weight: bold;}
 </style>
