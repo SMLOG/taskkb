@@ -183,6 +183,10 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
+  function setTabs(newTabs) {
+    tabs.value = newTabs;
+  }
+
 
 
   // Initialize store
@@ -195,6 +199,7 @@ export const useAppStore = defineStore('app', () => {
     treeRef,
     configRef,
     schReadyRef,
+    setTabs,
     addTab,
     removeTab,
     setActiveTab,
