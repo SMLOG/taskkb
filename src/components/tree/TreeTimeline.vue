@@ -160,12 +160,27 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 
 
 const handleEnterKeyUp = (event) => {
-    console.log(event.target.tagName,'up')
-
-  if (event.target.tagName === 'DIV' ) {
+  if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
+    let cellEl = event.target.closest(".col");
+    let curRowEl = event.target.closest(".row");
+    
+    let nextRowEl = curRowEl.nextElementSibling;
+    
+    if (nextRowEl) {
+      let cellIndex = Array.from(curRowEl.children).indexOf(cellEl);
+      let nextCellEl = nextRowEl.children[cellIndex];
+      
+      if (nextCellEl) {
+        const dblClickEvent = new MouseEvent('dblclick', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        nextCellEl.querySelector('.m').dispatchEvent(dblClickEvent);
+      }
+    }
     return; 
   }
-
 };
 </script>
 
