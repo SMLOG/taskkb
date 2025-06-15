@@ -6,17 +6,6 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import TabsPanel from '@/components/TabsPanel.vue';
-import TreeTimeline from '@/components/tree/TreeTimeline.vue';
-
-export default {
-  components: {
-    TabsPanel,TreeTimeline
-  },
-};
 </script>
-
-<style>
-/* Global styles if needed */
-</style>

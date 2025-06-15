@@ -8,7 +8,7 @@
       :key="tab.id || index"
       :tab="tab"
       :isActive="appStore.activeTabRef === index"
-      @removeTab="showRmoveConfirmRef=index"
+      @removeTab="$emit('removeTab',index)"
       @click="appStore.setActiveTab(index)"
       draggable="true"
       @dragstart="handleDragStart($event, index)"
