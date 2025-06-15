@@ -193,6 +193,8 @@ const handleEnterDown = (event) => {
   } else {
 
     contentEditable.value?.blur();
+      showDropdown.value=false;
+
   const event = new KeyboardEvent('keyup', {
     key: "Enter",
     bubbles: true,
