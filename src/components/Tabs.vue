@@ -1,5 +1,4 @@
 <template>
-  <div class="flex items-end" style="height: 30px;">
     <div class="tabs flex items-end flex-1">
     <Tab
       v-for="(tab, index) in appStore.tabs"
@@ -19,17 +18,14 @@
       </svg>
     </button>
   </div>
-  </div>
-  <NewTabPopup v-if="showNewTabPopup" v-model="showNewTabPopup" />
-  <ConfirmPopUp v-if="showRmoveConfirmRef>-1" @cancel="showRmoveConfirmRef=-1" @confirm="confirmRemoveTab()"/>
+
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import Tab from '@/components/Tab.vue';
-import NewTabPopup from '@/components/NewTabPopup.vue';
-import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
+
 
 const showNewTabPopup = ref(false);
 const appStore = useAppStore();
@@ -87,12 +83,5 @@ const confirmRemoveTab = ()=>{
   opacity: 1;
 }
 
-.plus-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  margin-left: 8px;
-}
+
 </style>

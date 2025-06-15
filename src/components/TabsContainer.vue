@@ -1,18 +1,18 @@
 <template>
   <div >
     <div class="container mx-auto p-0 pb-0 min-w-full select-none">
-      <Tabs />
+      <TabsPanel />
     </div>
   </div>
 </template>
 
 <script>
-import Tabs from '@/components/Tabs.vue';
+import TabsPanel from '@/components/TabsPanel.vue';
 import TreeTimeline from '@/components/tree/TreeTimeline.vue';
 
 export default {
   components: {
-    Tabs,TreeTimeline
+    TabsPanel,TreeTimeline
   },
 };
 </script>
