@@ -127,6 +127,10 @@ export function useTree() {
         handleScheduleClick(row, target, event);
         return;
       }
+    const schEl = target.closest(".sch");
+    if (!schEl) {
+      selectStartRef.value = null;
+    }
 
       // Handle move or drag operations
       setMoveType(row, target, event);
@@ -212,7 +216,10 @@ export function useTree() {
 
   const handleScheduleClick = (row, target, event) => {
     const schEl = target.closest(".sch");
-    if (!schEl) return;
+    if (!schEl) {
+      selectStartRef.value = null;
+      return;
+    }
 
     const { left, width: totalWidth } = schEl.getBoundingClientRect();
     const x = event.clientX - left;
