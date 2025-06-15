@@ -40,5 +40,8 @@ textarea,
 body * {
     caret-color: transparent; /* Makes caret invisible */
 }
+.plantime{
+  @apply relative cursor-move bg-blue-300 hover:bg-blue-400 dark:bg-gray-800 dark:hover:bg-gray-600;
+}
 
 
