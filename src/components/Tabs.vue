@@ -1,5 +1,6 @@
 <template>
   <div class="flex items-end" style="height: 30px;">
+    <div class="tabs flex items-end flex-1">
     <Tab
       v-for="(tab, index) in appStore.tabs"
       :key="index"
@@ -17,6 +18,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
       </svg>
     </button>
+  </div>
   </div>
   <NewTabPopup v-if="showNewTabPopup" v-model="showNewTabPopup" />
   <ConfirmPopUp v-if="showRmoveConfirmRef>-1" @cancel="showRmoveConfirmRef=-1" @confirm="confirmRemoveTab()"/>
