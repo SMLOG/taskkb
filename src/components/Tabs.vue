@@ -138,6 +138,7 @@ const handleDragEnd = (e) => {
 .tab.dragging {
   opacity: 0.5;
   transform: scale(0.95);
+  cursor:move;
 }
 
 .tab.drag-over {
