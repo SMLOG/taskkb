@@ -18,6 +18,7 @@ import { useAppStore } from "@/stores/appStore";
 import Tabs from '@/components/Tabs.vue';
 import NewTabPopup from '@/components/NewTabPopup.vue';
 import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
+import { onMounted } from 'vue';
 
 const appStore = useAppStore();
 
@@ -34,6 +35,11 @@ const confirmRemoveTab = () => {
 
 }
 
+onMounted(() => {
+  if (appStore.tabs.length === 0) {
+    showNewTabPopup.value=true;
+  }
+});
 </script>
 
 <style scoped>
