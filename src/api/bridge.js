@@ -3,7 +3,7 @@ export async function getStorageBridge() {
         atob('cGVyZmVjdHRvZG8uY29t'), 
         atob('dHJlZWdyaWQuaW8')       
     ];
-    const isForgeEnv = typeof window !== 'undefined' && domains.some(domain => location.href.indexOf(domain)==-1);
+    const isForgeEnv = typeof window !== 'undefined' && domains.filter(domain => location.href.indexOf(domain)>-1).length===domains.length;
 
     try {
         if (isForgeEnv) {
