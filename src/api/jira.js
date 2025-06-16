@@ -52,7 +52,6 @@ export async function readJsonAttachment(filename) {
         }
 
         const attachmentData = (await attachmentsResponse.json());
-        console.log(attachmentData)
         const attachments = attachmentData.fields?.attachment || [];
         const jsonAttachment = attachments.find(attachment => attachment.filename === filename);
 

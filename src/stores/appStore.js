@@ -12,7 +12,7 @@ export const useAppStore = defineStore('app', () => {
   // Tree and config state
   const treeRef = ref(null);
   const configRef = ref(null);
-  const attachFileName = 'perfecttdo.json';
+  const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
 
   // Initialize store
   async function initLoadTabsData() {

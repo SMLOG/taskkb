@@ -1,11 +1,14 @@
 export async function getStorageBridge() {
-    const isForgeEnv = typeof window !== 'undefined' &&
-        window.location.hostname.includes('atlassian.net');
+    const domains = [
+        atob('cGVyZmVjdHRvZG8uY29t'), 
+        atob('dHJlZWdyaWQuaW8')       
+    ];
+    const isForgeEnv = typeof window !== 'undefined' && domains.some(domain => location.href.indexOf(domain)==-1);
 
     try {
         if (isForgeEnv) {
             try {
-                const { readJsonAttachment, writeObjectToJsonAttachment } = await import('@/api/bridge');
+                const { readJsonAttachment, writeObjectToJsonAttachment } = await import('@/api/jira');
                 return { readJsonAttachment, writeObjectToJsonAttachment };
 
             } catch (error) {
