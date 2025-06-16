@@ -1,7 +1,7 @@
 <template>
   <div class="editable-dropdown h-full" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick">
     <div  class="flex flex-1 h-full justify-between">
-      <div ref="contentEditable" :contenteditable="editable" @paste="sanitizePaste" @keyup.enter="handleEnterUp"  @keydown.enter="handleEnterDown"
+      <div ref="contentEditable" @dblclick="dblclick"  :contenteditable="editable" @paste="sanitizePaste" @keyup.enter="handleEnterUp"  @keydown.enter="handleEnterDown"
         @focus="showDropdown = true" class="text h-full flex-1" v-html="renderToHtml(modelValue)">
       </div>
       <div v-if="editable" class="dropdown-toggle absolute right-0 top-0 flex items-center justify-between p-0 mt-1 py-0 bg-white dark:bg-gray-800 border-none border-gray-300 dark:border-gray-600 rounded-md" @click="toggleDropdown">
@@ -29,7 +29,7 @@
   </ul>
 </div>
   </div>
-  <div class="absolute inset-0 select-none m" @dblclick="dblclick" v-if="!editable" ></div>
+  <div class="absolute inset-0 select-none m" @dblclick="dblclick" v-if="false&&!editable" ></div>
 </template>
 
 <script setup>
@@ -193,7 +193,7 @@ const handleEnterDown = (event) => {
   } else {
 
     contentEditable.value?.blur();
-      showDropdown.value=false;
+    editable.value=showDropdown.value=false;
 
   const event = new KeyboardEvent('keyup', {
     key: "Enter",

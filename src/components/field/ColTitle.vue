@@ -1,6 +1,6 @@
 <template>
-  <div v-if="row" class="h-full">
-    <div  class="flex h-full">
+  <div v-if="row" class="h-full flex flex-1">
+    <div  class="flex h-full flex-1">
       <div   :style="{ paddingLeft: ((level-1) * 15) + 'px' }" class="h-full mr-2 z-1">
         <span>{{ row._id }}</span>
         <span @click="()=>clickRow(row)"

@@ -176,7 +176,7 @@ const handleEnterKeyUp = (event) => {
           cancelable: true,
           view: window
         });
-        nextCellEl.querySelector('.m').dispatchEvent(dblClickEvent);
+        nextCellEl.querySelector('[contentEditable]').dispatchEvent(dblClickEvent);
       }
     }
     return; 
