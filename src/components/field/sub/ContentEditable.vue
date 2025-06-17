@@ -15,7 +15,7 @@
     </div>
     <div
   v-show="showDropdown && !isText && dropdownItems && dropdownItems.length"
-  class="absolute  w-full max-w-md mx-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-6 transition-all duration-300 ease-in-out"
+  class="absolute min-w-[100px]  w-full max-w-md mx-auto bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-6 transition-all duration-300 ease-in-out"
 >
   <ul class="py-2">
     <li
