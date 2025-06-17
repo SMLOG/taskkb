@@ -1,1 +1,1 @@
-npm run build -- --outDir=/Users/kid/git/atlassianapp/perfecttodo/static/hello-world/build --emptyOutDir
+npm run build -- --outDir=../plan/static/hello-world/build --emptyOutDir
