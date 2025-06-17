@@ -515,18 +515,18 @@ export function useTree() {
             (i == 0 ? "  ".repeat(item.level) + item.depth + "." + " " : "") +
             (row["c" + col.fn] ? row["c" + col.fn] : "")
         )
-        .concat([
+        .concat(config.showSch?[
           row._tl ? formatDate2(row._tl.start.date) : "",
           row._tl ? formatDate2(row._tl.end.date) : "",
-        ]);
+        ]:[]);
     });
     let headers = cols.map((c) => c.name);
-    if (!onlyText) headers = headers.concat(["Start Date", "End Date"]);
+    if (config.showSch) headers = headers.concat(["Start Date", "End Date"]);
     rows.unshift(headers);
 
     let text = rows
-      .map((r) =>
-        r
+      .map((row) =>
+        row
           .map(
             (d) =>
               `${
