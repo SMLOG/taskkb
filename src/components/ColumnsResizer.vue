@@ -87,7 +87,7 @@ const winResize = debounce(() => {
 }, 100);
 
 watch(
-  () => [activeTabRef?.value],
+  () => [activeTabRef?.value,props.cols],
   () => {
     winResize();
   },
