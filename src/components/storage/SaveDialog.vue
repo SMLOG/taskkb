@@ -20,10 +20,14 @@
       </div>
     </div>
   </div>
+  <GoogleDrivePicker/>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+
+import GoogleDrivePicker from '@/components/storage/GoogleDrivePicker.vue';
+
 
 const emit = defineEmits(['saved']);
 
