@@ -13,12 +13,13 @@ export const useAppStore = defineStore('app', () => {
   const treeRef = ref(null);
   const configRef = ref(null);
   const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
-
+  const typeRef = ref(null);
   // Initialize store
   async function initLoadTabsData() {
     try {
       console.log('Initializing store...');
-      const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridge();
+      const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge();
+      typeRef.value=type;
       const { attachmentId, content: appState } = await readJsonAttachment(attachFileName);
       attachmentIdRef.value = attachmentId;
       if (appState) {
@@ -199,6 +200,7 @@ export const useAppStore = defineStore('app', () => {
     treeRef,
     configRef,
     schReadyRef,
+    typeRef,
     setTabs,
     addTab,
     removeTab,

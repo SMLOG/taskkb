@@ -8,8 +8,8 @@ export async function getStorageBridge() {
     try {
         if (isForgeEnv) {
             try {
-                const { readJsonAttachment, writeObjectToJsonAttachment } = await import('@/api/jira');
-                return { readJsonAttachment, writeObjectToJsonAttachment };
+                const { readJsonAttachment, writeObjectToJsonAttachment} = await import('@/api/jira');
+                return { readJsonAttachment, writeObjectToJsonAttachment,type :"Attachment" };
 
             } catch (error) {
                 console.error('Failed to load Forge bridge:', error);
@@ -20,7 +20,7 @@ export async function getStorageBridge() {
         console.error('Error checking Forge environment:', error);
     }
 
-                    const { readJsonAttachment, writeObjectToJsonAttachment } = await import('@/api/local');
-                return { readJsonAttachment, writeObjectToJsonAttachment };
+                    const { readJsonAttachment, writeObjectToJsonAttachment,type } = await import('@/api/local');
+                return { readJsonAttachment, writeObjectToJsonAttachment,type:'localStorage' };
 
 }

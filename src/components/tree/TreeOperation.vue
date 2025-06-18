@@ -18,7 +18,7 @@
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
-              💾 Save {{ savingRef?"...":"" }}
+              💾 Save {{ savingRef?"...":"" }} To {{ typeRef }}
             </button>
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
@@ -117,7 +117,7 @@ const tree = useTree();
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
-const { configRef, treeRef } = storeToRefs(useAppStore());
+const { configRef, treeRef,typeRef } = storeToRefs(useAppStore());
 
 const menuRef = ref(null);
 const showDropdown = ref(false);
