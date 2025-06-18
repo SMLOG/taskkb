@@ -145,7 +145,7 @@ const dblclick = () => {
 const getValue = () => {
   return props.isText 
     ? contentEditable.value?.textContent.trim() 
-    : contentEditable.value?.innerHTML.replace(/<[/]?div>/g, '').replace(/\r/g, '\n');
+    : contentEditable.value?.innerHTML.replace(/<div.*?>(.*?)<\/div>/gi, '\n$1').replace(/\r/g, '\n');
 };
 
 const stopEditing = () => {
