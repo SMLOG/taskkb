@@ -17,8 +17,8 @@
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
-              💾 Save {{ savingRef?"...":"" }} To {{ typeRef }}
+            <button @click="openDialog" class="btn-secondary" :disabled="savingRef">
+              💾 Save {{ savingRef?"...":"" }} 
             </button>
             <button @click="showConfig = !showConfig" class="btn-secondary">
               ⚙ Config
@@ -74,6 +74,7 @@
       </div>
     </div>
   </div>
+  <SaveDialog ref="saveDialog" @saved="saveData(0)"/>
 </template>
 
 <style>
@@ -110,10 +111,18 @@ import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
+import SaveDialog from '../SaveDialog.vue';
 
 const showNotification = inject('showNotification');
 
 const tree = useTree();
+
+const saveDialog = ref(null);
+
+
+const openDialog = () => {
+  saveDialog.value.open();
+};
 
 const { selectDepths } = tree;
 const showConfig = ref(false);
@@ -267,11 +276,4 @@ function copyClipboard() {
   });
 }
 
-watch(
-  () => tree.treeRef,
-  () => {
-    saveData();
-  },
-  { deep: true }
-);
 </script>
