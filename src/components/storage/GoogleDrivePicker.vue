@@ -217,33 +217,43 @@ const writeFile = async () => {
   }
 
   try {
-    const permissionCheck = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`, {
-      method: 'GET',
+  const permissionCheck = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`, {
+    method: 'GET',
+    headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
+  });
+
+  if (permissionCheck.status === 401) {
+    console.warn('Access token expired, refreshing...');
+    accessToken.value = await refreshAccessToken();
+
+    // Retry checking permissions after refreshing the token
+    const retryCheck = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`, {
       headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
     });
-    if (permissionCheck.status === 401) {
-      accessToken.value = await refreshAccessToken();
-      const retryCheck = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`, {
-        headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
-      });
-      if (!retryCheck.ok) {
-        throw new Error('Failed to verify permissions after token refresh');
-      }
-      permissionData = await retryCheck.json();
-    } else if (!permissionCheck.ok) {
-      throw new Error('Failed to check permissions');
-    } else {
-      permissionData = await permissionCheck.json();
+
+    if (!retryCheck.ok) {
+      const errorData = await retryCheck.json();
+      throw new Error(`Failed to verify permissions after token refresh: ${errorData.error.message}`);
     }
-    if (!['writer', 'owner'].includes(permissionData.role)) {
-      alert('You do not have write permission for the selected folder. Please choose another folder.');
-      return;
-    }
-  } catch (error) {
-    console.error('Error checking folder permissions:', error);
-    alert('Unable to verify folder permissions: ' + error.message);
+
+    permissionData = await retryCheck.json();
+  } else if (!permissionCheck.ok) {
+    const errorData = await permissionCheck.json();
+    throw new Error(`Failed to check permissions: ${errorData.error.message}`);
+  } else {
+    permissionData = await permissionCheck.json();
+  }
+
+  // Check if the user has write permission
+  if (!['writer', 'owner'].includes(permissionData.role)) {
+    alert('You do not have write permission for the selected folder. Please choose another folder.');
     return;
   }
+
+} catch (error) {
+  console.error('Error checking folder permissions:', error);
+  alert('Unable to verify folder permissions: ' + error.message);
+}
 
   const fileMetadata = {
     name: 'sample.txt',
