@@ -2,7 +2,7 @@
   <div>
 
          <button @click="handleSignInClick" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
-             Sign In with Google
+            <slot/>
     </button>
     <button v-if="isAuthenticated" @click="pickFolder">Pick Folder to Write</button>
     <button v-if="isAuthenticated" @click="writeFile" :disabled="!selectedFolderId">Write to Drive</button>
