@@ -9,9 +9,9 @@
       <div class="mb-4">
         <label for="where" class="block mb-2">Where:</label>
         <select v-model="storageLocation" id="where" class="w-full p-2 border rounded">
-          <option value="googleDrive">Google Drive - My Drive</option>
-          <option value="local">Browser</option>
-          <option value="local">Device</option>
+          <option value="GooleDrivePicker">Google Drive - My Drive</option>
+          <option value="browser">Browser</option>
+          <option value="device">Device</option>
         </select>
       </div>
       <div class="flex justify-between">
@@ -20,13 +20,11 @@
       </div>
     </div>
   </div>
-  <GoogleDrivePicker/>
 </template>
 
 <script setup>
 import { ref } from 'vue';
 
-import GoogleDrivePicker from '@/components/storage/GoogleDrivePicker.vue';
 
 
 const emit = defineEmits(['saved']);
@@ -38,7 +36,6 @@ const isOpen = ref(false);
 
 const cancel = () => {
   isOpen.value = false;
-  alert('Save canceled');
 };
 
 const save = () => {

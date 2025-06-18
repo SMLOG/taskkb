@@ -74,7 +74,8 @@
       </div>
     </div>
   </div>
-  <SaveDialog ref="saveDialog" @saved="saveData(0)"/>
+  <SaveDialog ref="saveDialog" @saved="saveToSelectLocation"/>
+  <AuthorizationDialog  v-if="storageType"/>
 </template>
 
 <style>
@@ -112,6 +113,9 @@ import Config from '@/components/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
 import SaveDialog from '@/components/storage/SaveDialog.vue';
+import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue';
+
+
 
 const showNotification = inject('showNotification');
 
@@ -214,6 +218,16 @@ async function  saveData(bool) {
   }
 }
 
+const storageType = ref(null);
+async function saveToSelectLocation(selection){
+ if(selection.storageLocation === 'browser'){
+  saveData(0);
+  storageType.value=null;
+ }else{
+  storageType.value=selection.storageLocation;
+ }
+
+}
 function deleteSelectedNodes() {
   if (confirm("Please confirm to delete it?")) {
     tree.delSelectedNode();
