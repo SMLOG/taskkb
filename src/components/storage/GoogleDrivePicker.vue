@@ -1,12 +1,9 @@
 <template>
   <div>
-    <h1>Google Drive Operations</h1>
-    <div id="g_id_onload"
-         :data-client_id="clientId"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false"></div>
-    <div class="g_id_signin" data-type="standard"></div>
-    <p class="info">Please sign in and select a folder you own or have write access to (e.g., shared with edit permissions).</p>
+
+         <button @click="handleSignInClick" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
+             Sign In with Google
+    </button>
     <button v-if="isAuthenticated" @click="pickFolder">Pick Folder to Write</button>
     <button v-if="isAuthenticated" @click="writeFile" :disabled="!selectedFolderId">Write to Drive</button>
     <button v-if="isAuthenticated" @click="pickFile">Pick File to Read</button>
@@ -19,7 +16,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 
 // Constants
-const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com';
+const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com'; // Replace with your actual client ID
 
 // Reactive state
 const isAuthenticated = ref(false);
@@ -28,6 +25,7 @@ const selectedFolderId = ref(null);
 const selectedFileId = ref(null);
 const fileContent = ref('');
 let tokenClient = null;
+let isTokenRequested = false; // Flag to prevent multiple token requests
 
 // Dynamically load scripts
 const loadScript = (src, onload) => {
@@ -44,7 +42,15 @@ const loadScript = (src, onload) => {
     document.head.appendChild(script);
   });
 };
-
+const handleSignInClick = () => {
+    if (tokenClient) {
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+        console.error('Token client not initialized');
+        alert('Token client not ready. Please try again.');
+        initializeGSI(); // Ensure it's initialized
+    }
+};
 // Initialize Google Sign-In
 const initGoogleSignIn = () => {
   if (typeof google === 'undefined' || !google.accounts.oauth2) {
@@ -65,6 +71,7 @@ const initializeGSI = () => {
       if (tokenResponse && tokenResponse.access_token) {
         accessToken.value = tokenResponse.access_token;
         isAuthenticated.value = true;
+        isTokenRequested = false; // Reset flag upon successful authentication
         loadPicker();
       } else {
         console.error('No access token received:', tokenResponse);
@@ -83,12 +90,15 @@ window.handleCredentialResponse = (response) => {
   console.log('Credential Response:', response);
   if (response && response.credential) {
     if (tokenClient) {
-      tokenClient.requestAccessToken({ prompt: 'consent' });
+      if (!isTokenRequested) { // Check if token request is already made
+        isTokenRequested = true; // Set the flag
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+      }
     } else {
       console.error('Token client not initialized');
       alert('Token client not ready. Please try again.');
       initializeGSI();
-      tokenClient.requestAccessToken({ prompt: 'consent' });
+      tokenClient.requestAccessToken({ prompt: 'consent' }); // Avoid duplication by checking status
     }
   } else {
     console.error('Invalid credential response:', response);
@@ -311,7 +321,6 @@ onUnmounted(() => {
   // Remove global callback to prevent memory leaks
   delete window.handleCredentialResponse;
 });
-
 </script>
 
 <style scoped>
