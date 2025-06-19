@@ -127,9 +127,11 @@ function loadFile(event) {
        
       } catch (error) {
         console.error("Invalid JSON file", error);
+        alert("Invalid JSON file")
       }
     };
     reader.readAsText(file);
+    return;
   } else {
     alert("Please select a valid JSON file.");
   }
