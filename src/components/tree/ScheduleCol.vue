@@ -1,6 +1,6 @@
 <template>
-    <div class="col" v-if="showSch">
-        <div style="display: flex; flex-wrap: nowrap" class="sch">
+    <div class="col flex" v-if="showSch">
+        <div style="display: flex; flex-wrap: nowrap" class="sch" :style="{width:days*25+'px'}">
             <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
                     width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
@@ -23,6 +23,7 @@
                 </div>
             </div>
         </div>
+        <div></div>
     </div>
 </template>
 

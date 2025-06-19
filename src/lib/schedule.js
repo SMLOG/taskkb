@@ -186,24 +186,7 @@ const getDatesBetween = (startDate, endDate, weekIndex,year,weekNumber) => {
 
 // Holidays data
 const holidays = [
-  { date: '2025-01-01', n: 20250101, name: 'New Year\'s Day' },
-  { date: '2025-01-29', n: 20250129, name: 'Lunar New Year\'s Day' },
-  { date: '2025-01-30', n: 20250130, name: 'Lunar New Year Holiday' },
-  { date: '2025-01-31', n: 20250131, name: 'Lunar New Year Holiday' },
-  { date: '2025-02-01', n: 20250201, name: 'Lunar New Year Holiday' },
-  { date: '2025-02-02', n: 20250202, name: 'Lunar New Year Holiday' },
-  { date: '2025-04-04', n: 20250404, name: 'Ching Ming Festival' },
-  { date: '2025-04-18', n: 20250418, name: 'Good Friday' },
-  { date: '2025-04-19', n: 20250419, name: 'Holy Saturday' },
-  { date: '2025-04-21', n: 20250421, name: 'Easter Monday' },
-  { date: '2025-05-01', n: 20250501, name: 'Labour Day' },
-  { date: '2025-05-30', n: 20250530, name: 'Tuen Ng Festival' },
-  { date: '2025-07-01', n: 20250701, name: 'Hong Kong Special Administrative Region Establishment Day' },
-  { date: '2025-09-29', n: 20250929, name: 'National Day' },
-  { date: '2025-10-01', n: 20251001, name: 'National Day Holiday' },
-  { date: '2025-10-14', n: 20251014, name: 'Chung Yeung Festival' },
-  { date: '2025-12-25', n: 20251225, name: 'Christmas Day' },
-  { date: '2025-12-26', n: 20251226, name: 'Boxing Day' }
+
 ];
 
 
@@ -211,3 +194,26 @@ const holidays = [
 export function isBetween (a, b, c) {
   return (a <= c && c <= b) || (b <= c && c <= a);
 };
+
+export function weeksBetween(date1, date2) {
+  // Validate inputs are valid Date objects
+  if (!(date1 instanceof Date) || !(date2 instanceof Date) || isNaN(date1) || isNaN(date2)) {
+    throw new Error('Both arguments must be valid Date objects');
+  }
+
+  // Normalize dates to midnight to ignore hours, minutes, and seconds
+  const start = new Date(Math.min(date1.getTime(), date2.getTime()));
+  start.setHours(0, 0, 0, 0);
+  const end = new Date(Math.max(date1.getTime(), date2.getTime()));
+  end.setHours(0, 0, 0, 0);
+
+  // Calculate the number of days between dates (inclusive)
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diffInMs = end.getTime() - start.getTime();
+  const diffInDays = Math.floor(diffInMs / msPerDay) + 1; // Add 1 for inclusive counting
+
+  // Calculate the number of weeks, rounding up to count partial weeks
+  const weeks = Math.ceil(diffInDays / 7)+1;
+
+  return weeks;
+}

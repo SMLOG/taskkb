@@ -1,5 +1,5 @@
 <template>
-  <div class="col select-none"  v-if="showSch">
+  <div class="col select-none flex"  v-if="showSch">
     <div class="flex flex-nowrap">
       <div v-for="(week, index) in weeks" :key="week" class="week-slot">
         <div>
@@ -17,6 +17,7 @@
         </div>
       </div>
     </div>
+    <div></div>
   </div>
 </template>
 
@@ -77,7 +78,7 @@ const getDayClasses = (day, selectStartRef) => ({
   padding: 0 5px;
   font-size: 60%;
   display: inline-block;
-  width: 3em;
+  width: 25px;
   @apply flex-1;
 
 }

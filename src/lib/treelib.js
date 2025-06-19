@@ -95,3 +95,13 @@ export function filterChildDepths(depths) {
     return true; // Include item if no parent is found
   });
 }
+
+export function loopTree(tree, callback) {
+  if (tree.id) {
+    callback(tree);
+  }
+  
+  if (tree._childs && Array.isArray(tree._childs)) {
+    tree._childs.forEach(child => loopTree(child, callback));
+  }
+}

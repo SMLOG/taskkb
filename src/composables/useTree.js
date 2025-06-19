@@ -300,7 +300,7 @@ export function useTree() {
 
 
 
-              autoExpanedWeeksIfNeed([moveType.value._tl.start.i,moveType.value._tl.end.i]);
+              autoExpanedWeeksIfNeed([Math.max(moveType.value._tl.start.i,moveType.value._tl.end.i)+moveUnits]);
               
               const startIndex = plusWorkDays(
                 moveType.value._tl.start.i,
