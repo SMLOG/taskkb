@@ -40,3 +40,4 @@ export async function writeObjectToJsonAttachment(dataObject, filename) {
         return { success: false, error: error.message };
     }
 }
+export const type = "Browser";
