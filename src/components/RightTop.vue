@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-md mx-2 mt-1">
+    <div class="max-w-md mx-2 mt-1 relative">
       <div class="flex space-x-2">
         <button
           @click="share"
@@ -22,26 +22,35 @@
             />
           </svg>
         </button>
+
+
+      </div>
+
+      <!-- Profile Footer -->
+      <div v-if="isProfileVisible"  class="absolute z-99  w-80 m-1 right-0 bg-white dark:bg-gray-800 p-4 border-t border-gray-300 dark:border-gray-600">
+        <Profile/>
       </div>
     </div>
   </template>
   
   <script setup>
   import { ref } from 'vue';
+  import Profile from './Profile.vue';
+  
+  const isProfileVisible = ref(false);
   
   const share = () => {
     alert('Sharing functionality to be implemented');
   };
   
   const showProfile = () => {
-    alert('Profile functionality to be implemented');
+    isProfileVisible.value = true;
   };
   </script>
   
   <style scoped>
   /* Optional: Custom styles for fine-grained control */
   button {
-    /* Smooth transition for color changes */
     transition-property: background-color, color;
     transition-duration: 200ms;
     transition-timing-function: ease-in-out;
