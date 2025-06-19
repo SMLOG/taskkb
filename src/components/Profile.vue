@@ -14,21 +14,19 @@
           <p class="text-xs text-gray-400">email</p>
         </div>
       </div>
-      <p class="text-sm text-gray-500 mb-4">Google Drive</p>
+      <p class="text-sm text-gray-600 mb-4">Google Drive</p>
       <div class="flex justify-between">
         <button @click="$emit('add-account')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded">Add account</button>
         <button @click="$emit('sign-out')" class="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded">Sign out</button>
       </div>
     </div>
   </template>
-  
-  <script>
-  export default {
-    name: 'GoogleDriveUI',
-    emits: ['close', 'add-account', 'sign-out']
-  }
-  </script>
-  
-  <style scoped>
-  /* Add any additional custom styles here if needed */
-  </style>
+
+<script setup>
+// Define the emits directly in the setup script
+defineEmits(['close', 'add-account', 'sign-out']);
+</script>
+
+<style scoped>
+/* Add any additional custom styles here if needed */
+</style>
