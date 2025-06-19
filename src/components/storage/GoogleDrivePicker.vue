@@ -1,8 +1,7 @@
 <template>
   <div>
-
-         <button @click="handleSignInClick" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
-            <slot/>
+    <button @click="handleSignInClick" class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
+      <slot>Sign in with Google</slot>
     </button>
     <button v-if="isAuthenticated" @click="pickFolder">Pick Folder to Write</button>
     <button v-if="isAuthenticated" @click="writeFile" :disabled="!selectedFolderId">Write to Drive</button>
@@ -14,6 +13,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import { useUserStore } from '@/stores/userStore'; // Import the userStore
 
 // Constants
 const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com'; // Replace with your actual client ID
@@ -25,7 +25,10 @@ const selectedFolderId = ref(null);
 const selectedFileId = ref(null);
 const fileContent = ref('');
 let tokenClient = null;
-let isTokenRequested = false; // Flag to prevent multiple token requests
+let isTokenRequested = false;
+
+// Initialize user store
+const userStore = useUserStore();
 
 // Dynamically load scripts
 const loadScript = (src, onload) => {
@@ -42,15 +45,30 @@ const loadScript = (src, onload) => {
     document.head.appendChild(script);
   });
 };
-const handleSignInClick = () => {
-    if (tokenClient) {
-        tokenClient.requestAccessToken({ prompt: 'consent' });
+
+// Fetch user info from Google API
+const fetchUserInfo = async (token) => {
+  try {
+    const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (response.ok) {
+      const userData = await response.json();
+      return {
+        username: userData.name || userData.email.split('@')[0], // Fallback to email prefix if no name
+        email: userData.email,
+      };
     } else {
-        console.error('Token client not initialized');
-        alert('Token client not ready. Please try again.');
-        initializeGSI(); // Ensure it's initialized
+      const errorData = await response.json();
+      throw new Error(`Failed to fetch user info: ${errorData.error.message}`);
     }
+  } catch (error) {
+    console.error('Error fetching user info:', error);
+    alert('Failed to fetch user info: ' + error.message);
+    return null;
+  }
 };
+
 // Initialize Google Sign-In
 const initGoogleSignIn = () => {
   if (typeof google === 'undefined' || !google.accounts.oauth2) {
@@ -65,13 +83,27 @@ const initGoogleSignIn = () => {
 const initializeGSI = () => {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: clientId,
-    scope: 'https://www.googleapis.com/auth/drive',
-    callback: (tokenResponse) => {
+    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email', // Added profile and email scopes
+    callback: async (tokenResponse) => {
       console.log('Token Response:', tokenResponse);
       if (tokenResponse && tokenResponse.access_token) {
         accessToken.value = tokenResponse.access_token;
         isAuthenticated.value = true;
-        isTokenRequested = false; // Reset flag upon successful authentication
+        isTokenRequested = false;
+
+        // Fetch user info and add to userStore
+        const userInfo = await fetchUserInfo(tokenResponse.access_token);
+        if (userInfo) {
+          // Check if user already exists to avoid duplicates
+          const existingUser = userStore.getUserByEmail(userInfo.email);
+          if (!existingUser) {
+            userStore.addUser(userInfo.username, userInfo.email);
+            console.log('User added to store:', userInfo);
+          } else {
+            console.log('User already exists in store:', userInfo);
+          }
+        }
+
         loadPicker();
       } else {
         console.error('No access token received:', tokenResponse);
@@ -81,8 +113,18 @@ const initializeGSI = () => {
     error_callback: (error) => {
       console.error('Token initialization error:', error);
       alert('Error initializing token client: ' + error.message);
-    }
+    },
   });
+};
+
+const handleSignInClick = () => {
+    if (tokenClient) {
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    } else {
+        console.error('Token client not initialized');
+        alert('Token client not ready. Please try again.');
+        initializeGSI(); // Ensure it's initialized
+    }
 };
 
 // Handle Sign-In response (global callback)
@@ -90,15 +132,15 @@ window.handleCredentialResponse = (response) => {
   console.log('Credential Response:', response);
   if (response && response.credential) {
     if (tokenClient) {
-      if (!isTokenRequested) { // Check if token request is already made
-        isTokenRequested = true; // Set the flag
+      if (!isTokenRequested) {
+        isTokenRequested = true;
         tokenClient.requestAccessToken({ prompt: 'consent' });
       }
     } else {
       console.error('Token client not initialized');
       alert('Token client not ready. Please try again.');
       initializeGSI();
-      tokenClient.requestAccessToken({ prompt: 'consent' }); // Avoid duplication by checking status
+      tokenClient.requestAccessToken({ prompt: 'consent' });
     }
   } else {
     console.error('Invalid credential response:', response);
@@ -129,7 +171,7 @@ const refreshAccessToken = () => {
           } else {
             reject(new Error('Failed to refresh access token'));
           }
-        }
+        },
       });
     } else {
       reject(new Error('Token client not initialized'));
@@ -144,31 +186,33 @@ const pickFolder = async () => {
     return;
   }
 
-    const pickerCallback = (data) => {
-      if (data.action === google.picker.Action.PICKED) {
-        selectedFolderId.value = data.docs[0].id;
-        alert('Selected folder: ' + data.docs[0].name);
-      }
-    };
-    const picker = new google.picker.PickerBuilder()
-      //  .setAppId('YOUR_APP_ID')
-        .setOAuthToken(accessToken.value)
-        .addView(new google.picker.DocsView()
-          .setIncludeFolders(true)
-          .setSelectFolderEnabled(true)
-          .setParent('root')
-         // .setMimeTypes('application/vnd.google-apps.folder')
-          .setLabel('Folders'))
-        .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
-          .setLabel('Google Drive').setMimeTypes('application/vnd.google-apps.document'))
-        .addView(new google.picker.DocsView(google.picker.ViewId.SHARED_WITH_ME)
-          .setLabel('Shared drives'))
-        .addView(new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED)
-          .setLabel('Recent'))
-        .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
-        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-        .setCallback(pickerCallback)
-        .build();
+  const pickerCallback = (data) => {
+    if (data.action === google.picker.Action.PICKED) {
+      selectedFolderId.value = data.docs[0].id;
+      alert('Selected folder: ' + data.docs[0].name);
+    }
+  };
+  const picker = new google.picker.PickerBuilder()
+    .setOAuthToken(accessToken.value)
+    .addView(
+      new google.picker.DocsView()
+        .setIncludeFolders(true)
+        .setSelectFolderEnabled(true)
+        .setParent('root')
+    )
+    .addView(
+      new google.picker.DocsView(google.picker.ViewId.DOCS).setLabel('Google Drive').setMimeTypes('application/vnd.google-apps.document')
+    )
+    .addView(
+      new google.picker.DocsView(google.picker.ViewId.SHARED_WITH_ME).setLabel('Shared drives')
+    )
+    .addView(
+      new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED).setLabel('Recent')
+    )
+    .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
+    .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+    .setCallback(pickerCallback)
+    .build();
   picker.setVisible(true);
 };
 
@@ -179,8 +223,7 @@ const pickFile = async () => {
     return;
   }
 
-  const view = new google.picker.DocsView(google.picker.ViewId.DOCS)
-    .setMimeTypes('text/plain');
+  const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes('text/plain');
 
   const picker = new google.picker.PickerBuilder()
     .addView(view)
@@ -206,49 +249,52 @@ const writeFile = async () => {
     return;
   }
 
+  let permissionData;
   try {
-  const permissionCheck = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`, {
-    method: 'GET',
-    headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
-  });
+    const permissionCheck = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
+      {
+        method: 'GET',
+        headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+      }
+    );
 
-  if (permissionCheck.status === 401) {
-    console.warn('Access token expired, refreshing...');
-    accessToken.value = await refreshAccessToken();
+    if (permissionCheck.status === 401) {
+      console.warn('Access token expired, refreshing...');
+      accessToken.value = await refreshAccessToken();
+      const retryCheck = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
+        {
+          headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+        }
+      );
 
-    // Retry checking permissions after refreshing the token
-    const retryCheck = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`, {
-      headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
-    });
+      if (!retryCheck.ok) {
+        const errorData = await retryCheck.json();
+        throw new Error(`Failed to verify permissions after token refresh: ${errorData.error.message}`);
+      }
 
-    if (!retryCheck.ok) {
-      const errorData = await retryCheck.json();
-      throw new Error(`Failed to verify permissions after token refresh: ${errorData.error.message}`);
+      permissionData = await retryCheck.json();
+    } else if (!permissionCheck.ok) {
+      const errorData = await permissionCheck.json();
+      throw new Error(`Failed to check permissions: ${errorData.error.message}`);
+    } else {
+      permissionData = await permissionCheck.json();
     }
 
-    permissionData = await retryCheck.json();
-  } else if (!permissionCheck.ok) {
-    const errorData = await permissionCheck.json();
-    throw new Error(`Failed to check permissions: ${errorData.error.message}`);
-  } else {
-    permissionData = await permissionCheck.json();
+    if (!['writer', 'owner'].includes(permissionData.role)) {
+      alert('You do not have write permission for the selected folder. Please choose another folder.');
+      return;
+    }
+  } catch (error) {
+    console.error('Error checking folder permissions:', error);
+    alert('Unable to verify folder permissions: ' + error.message);
   }
-
-  // Check if the user has write permission
-  if (!['writer', 'owner'].includes(permissionData.role)) {
-    alert('You do not have write permission for the selected folder. Please choose another folder.');
-    return;
-  }
-
-} catch (error) {
-  console.error('Error checking folder permissions:', error);
-  alert('Unable to verify folder permissions: ' + error.message);
-}
 
   const fileMetadata = {
     name: 'sample.txt',
     mimeType: 'text/plain',
-    parents: [selectedFolderId.value]
+    parents: [selectedFolderId.value],
   };
   const fileContent = 'Hello, World!';
   const blob = new Blob([fileContent], { type: 'text/plain' });
@@ -257,11 +303,14 @@ const writeFile = async () => {
   form.append('file', blob);
 
   try {
-    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true', {
-      method: 'POST',
-      headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` }),
-      body: form
-    });
+    const response = await fetch(
+      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true',
+      {
+        method: 'POST',
+        headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+        body: form,
+      }
+    );
     const data = await response.json();
     if (response.ok) {
       console.log('File written:', data);
@@ -288,10 +337,13 @@ const readFile = async () => {
   }
 
   try {
-    const response = await fetch(`https://www.googleapis.com/drive/v3/files/${selectedFileId.value}?alt=media&supportsAllDrives=true`, {
-      method: 'GET',
-      headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
-    });
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${selectedFileId.value}?alt=media&supportsAllDrives=true`,
+      {
+        method: 'GET',
+        headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+      }
+    );
     if (response.ok) {
       fileContent.value = await response.text();
     } else {
@@ -318,7 +370,6 @@ onMounted(async () => {
 
 // Clean up on unmount
 onUnmounted(() => {
-  // Remove global callback to prevent memory leaks
   delete window.handleCredentialResponse;
 });
 </script>
