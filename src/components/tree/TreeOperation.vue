@@ -213,7 +213,7 @@ function deleteSelectedNodes() {
 }
 
 function addRow(num) {
-  tree.insertNode({ _id: '' });
+  tree.insertNode({ });
 }
 
 function copyNode() {
