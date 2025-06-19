@@ -75,7 +75,7 @@
     </div>
   </div>
   <SaveDialog ref="saveDialog" @saved="saveToSelectLocation"/>
-  <AuthorizationDialog  v-if="storageType"/>
+  <AuthorizationDialog  v-if="storageType" @cancel="storageType=null"/>
 </template>
 
 <style>

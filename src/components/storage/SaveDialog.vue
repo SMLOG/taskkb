@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+  <div v-if="isOpen" class="fixed inset-0 flex items-center justify-center z-50 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div class="bg-white border border-gray-300 p-4 rounded-lg w-96">
       <div class="mb-4">
         <label for="saveAs" class="block mb-2">Save as:</label>
