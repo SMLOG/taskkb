@@ -155,6 +155,7 @@ const pickFolder = async () => {
         .setOAuthToken(accessToken.value)
         .addView(new google.picker.DocsView()
           .setIncludeFolders(true)
+          .setSelectFolderEnabled(true)
           .setParent('root')
          // .setMimeTypes('application/vnd.google-apps.folder')
           .setLabel('Folders'))
