@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getStorageBridge } from '@/api/bridge';
+import {loopTree} from '@/lib/treelib';
+import {weeksBetween} from '@/lib/schedule';
 
 
 export const useAppStore = defineStore('app', () => {
@@ -59,8 +61,26 @@ export const useAppStore = defineStore('app', () => {
         tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
 
       }
+      let startTime=0;
+      let endTime=0;
+      const reCalStartAndCount=(row)=>{
+        if(row._tl){
+          if(row._tl?.start?.date)
+              if(startTime===0||row._tl.start.date.getTime()<startTime){
+                startTime =row._tl.start.date.getTime();
+              }
 
-   
+              if(endTime===0||row._tl.end.date.getTime()>endTime){
+                 endTime =row._tl.end.date.getTime();
+              }
+        }
+      }
+      loopTree(treeRef.value,reCalStartAndCount);
+
+      let weekCount = weeksBetween(new Date(startTime),new Date(endTime));
+
+      configRef.value.startDate = new Date(startTime);
+      configRef.value.weekCount = weekCount;
       /*tabs.value.map(tab=>{
         tabsDataMapRef.value[tab.id].config
         forEachTree(tabsDataMapRef.value[tab.id].data,'_childs',);
