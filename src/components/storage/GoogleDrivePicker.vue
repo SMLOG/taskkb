@@ -8,15 +8,16 @@
     <button v-if="isAuthenticated" @click="pickFile">Pick File to Read</button>
     <button v-if="isAuthenticated" @click="readFile" :disabled="!selectedFileId">Read from Drive</button>
     <pre>{{ fileContent }}</pre>
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import { useUserStore } from '@/stores/userStore'; // Import the userStore
+import { useUserStore } from '@/stores/userStore';
 
 // Constants
-const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com'; // Replace with your actual client ID
+const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com';
 
 // Reactive state
 const isAuthenticated = ref(false);
@@ -55,7 +56,7 @@ const fetchUserInfo = async (token) => {
     if (response.ok) {
       const userData = await response.json();
       return {
-        username: userData.name || userData.email.split('@')[0], // Fallback to email prefix if no name
+        username: userData.name || userData.email.split('@')[0],
         email: userData.email,
       };
     } else {
@@ -83,7 +84,7 @@ const initGoogleSignIn = () => {
 const initializeGSI = () => {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: clientId,
-    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email', // Added profile and email scopes
+    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
     callback: async (tokenResponse) => {
       console.log('Token Response:', tokenResponse);
       if (tokenResponse && tokenResponse.access_token) {
@@ -91,16 +92,20 @@ const initializeGSI = () => {
         isAuthenticated.value = true;
         isTokenRequested = false;
 
-        // Fetch user info and add to userStore
+        // Fetch user info and add to userStore with accessToken
         const userInfo = await fetchUserInfo(tokenResponse.access_token);
         if (userInfo) {
-          // Check if user already exists to avoid duplicates
           const existingUser = userStore.getUserByEmail(userInfo.email);
           if (!existingUser) {
-            userStore.addUser(userInfo.username, userInfo.email);
-            console.log('User added to store:', userInfo);
+            userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
+            console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
           } else {
-            console.log('User already exists in store:', userInfo);
+            // Update existing user with new accessToken
+            userStore.updateUser(userInfo.email, {
+              username: userInfo.username,
+              accessToken: tokenResponse.access_token,
+            });
+            console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
           }
         }
 
@@ -123,7 +128,7 @@ const handleSignInClick = () => {
     } else {
         console.error('Token client not initialized');
         alert('Token client not ready. Please try again.');
-        initializeGSI(); // Ensure it's initialized
+        initializeGSI();
     }
 };
 
@@ -159,14 +164,25 @@ const loadPicker = () => {
 };
 
 // Refresh access token
-const refreshAccessToken = () => {
+const refreshAccessToken = async () => {
   return new Promise((resolve, reject) => {
     if (tokenClient) {
       tokenClient.requestAccessToken({
         prompt: '',
-        callback: (tokenResponse) => {
+        callback: async (tokenResponse) => {
           if (tokenResponse && tokenResponse.access_token) {
             accessToken.value = tokenResponse.access_token;
+            // Update userStore with new accessToken
+            const userInfo = await fetchUserInfo(tokenResponse.access_token);
+            if (userInfo) {
+              const existingUser = userStore.getUserByEmail(userInfo.email);
+              if (existingUser) {
+                userStore.updateUser(userInfo.email, {
+                  accessToken: tokenResponse.access_token,
+                });
+                console.log('Access token updated in store for:', userInfo.email);
+              }
+            }
             resolve(accessToken.value);
           } else {
             reject(new Error('Failed to refresh access token'));

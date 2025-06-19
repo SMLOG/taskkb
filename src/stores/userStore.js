@@ -1,16 +1,16 @@
+// stores/userStore.js
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const useUserStore = defineStore('user', () => {
-  // State: List of users
+  // State: List of users with username, email, and accessToken
   const users = ref([
-    { username: 'defaultUser', email: 'default@example.com' }, // Example initial data
   ]);
 
   // Actions: Methods to manipulate the state
-  function addUser(username, email) {
+  function addUser(username, email, accessToken = null) {
     if (username && email) {
-      users.value.push({ username, email });
+      users.value.push({ username, email, accessToken });
     }
   }
 
@@ -25,11 +25,10 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  // Getters: Computed properties (optional, for derived state)
+  // Getters: Computed properties
   const userCount = () => users.value.length;
   const getUserByEmail = (email) => users.value.find((user) => user.email === email);
 
-  // Expose state, actions, and getters
   return {
     users,
     addUser,
