@@ -65,7 +65,7 @@ import { ref,computed } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
-
+import {loopTree} from '@/lib/treelib';
 const tabsStore = useAppStore();
 const tabs = computed(() => tabsStore.tabs);
 
@@ -135,15 +135,7 @@ function loadFile(event) {
   }
 }
 
-function loopTree(tree, callback) {
-  if (tree.id) {
-    callback(tree);
-  }
-  
-  if (tree._childs && Array.isArray(tree._childs)) {
-    tree._childs.forEach(child => loopTree(child, callback));
-  }
-}
+
 
 const selectTemplate = (template) => {
   emit('select-template', template);
