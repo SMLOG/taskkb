@@ -144,45 +144,6 @@ const pickFolder = async () => {
     return;
   }
 
-  /*const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
-    .setIncludeFolders(true)
-    .setSelectFolderEnabled(true);
-
-  try {
-    const response = await fetch('https://www.googleapis.com/drive/v3/files?q=mimeType="application/vnd.google-apps.folder"&spaces=drive&fields=files(id,name,permissions)', {
-      headers: new Headers({ 'Authorization': `Bearer ${accessToken.value}` })
-    });
-    if (response.status === 401) {
-      accessToken.value = await refreshAccessToken();
-    } else if (!response.ok) {
-      throw new Error('Failed to fetch folders');
-    }
-    const data = await response.json();
-    const writableFolders = data.files.filter(file => 
-      file.permissions && file.permissions.some(p => p.role === 'writer' || p.role === 'owner')
-    );
-    if (writableFolders.length > 0) {
-      //writableFolders.map(f => `"${f.id}" in parents`).join(' or ')
-      view.setQuery('');
-    }
-  } catch (error) {
-    console.error('Error filtering writable folders:', error);
-    alert('Unable to filter writable folders. Showing all folders; please select one you can write to.');
-  }*/
-
-  /*const picker = new google.picker.PickerBuilder()
-    .addView(view)
-    .setOAuthToken(accessToken.value)
-    .setCallback((data) => {
-      if (data.action === google.picker.Action.PICKED) {
-        selectedFolderId.value = data.docs[0].id;
-        alert('Selected folder: ' + data.docs[0].name);
-      }
-    })
-    
-    .build();*/
-
-
     const pickerCallback = (data) => {
       if (data.action === google.picker.Action.PICKED) {
         selectedFolderId.value = data.docs[0].id;
