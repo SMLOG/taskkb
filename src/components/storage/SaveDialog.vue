@@ -18,8 +18,9 @@
           id="where" 
           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none transition-colors duration-200"
         >
-          <option value="GooleDrivePicker">Google Drive - My Drive</option>
-          <option value="browser">Browser</option>
+        <option value="googlemy">Google Drive - My Drive</option>
+        <option value="googlefolder">Google Drive - Pick a folder...</option>
+        <option value="browser">Browser</option>
           <option value="device">Device</option>
         </select>
       </div>

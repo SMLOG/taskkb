@@ -9,11 +9,11 @@
         ×
       </button>
       <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Authorization required</h2>
-      <p class="mb-4 text-gray-600 dark:text-gray-300">Authorize this app in OneDrive:</p>
+      <p class="mb-4 text-gray-600 dark:text-gray-300">Authorize this app in  {{ resolveComponnent(props.name).name }}:</p>
 
-      <GoogleDrivePicker class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 transition-colors">
-        Authorize
-      </GoogleDrivePicker>
+      
+
+      <component :is="resolveComponnent(props.name).cp">Authorize</component>
       <div class="mt-4 flex items-center justify-center">
         <input 
           type="checkbox" 
@@ -31,6 +31,19 @@
 import { ref } from 'vue';
 import GoogleDrivePicker from '@/components/storage/GoogleDrivePicker.vue';
 const emit = defineEmits(['cancel']);
+
+const props = defineProps({
+  name: {
+    type: String
+  }
+})
+
+const pickerMap = {
+  "googlemy":{cp:GoogleDrivePicker,name:"Google My Drive"},
+  "googlefolder":{cp:GoogleDrivePicker,name:"Google Drive Folder"}
+}
+
+const resolveComponnent = (name)=>pickerMap[name];
 
 const rememberMe = ref(false);
 
