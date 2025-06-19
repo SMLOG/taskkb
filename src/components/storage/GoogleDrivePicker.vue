@@ -144,7 +144,7 @@ const pickFolder = async () => {
     return;
   }
 
-  const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
+  /*const view = new google.picker.DocsView(google.picker.ViewId.FOLDERS)
     .setIncludeFolders(true)
     .setSelectFolderEnabled(true);
 
@@ -162,14 +162,15 @@ const pickFolder = async () => {
       file.permissions && file.permissions.some(p => p.role === 'writer' || p.role === 'owner')
     );
     if (writableFolders.length > 0) {
-      view.setQuery(writableFolders.map(f => `"${f.id}" in parents`).join(' or '));
+      //writableFolders.map(f => `"${f.id}" in parents`).join(' or ')
+      view.setQuery('');
     }
   } catch (error) {
     console.error('Error filtering writable folders:', error);
     alert('Unable to filter writable folders. Showing all folders; please select one you can write to.');
-  }
+  }*/
 
-  const picker = new google.picker.PickerBuilder()
+  /*const picker = new google.picker.PickerBuilder()
     .addView(view)
     .setOAuthToken(accessToken.value)
     .setCallback((data) => {
@@ -178,7 +179,33 @@ const pickFolder = async () => {
         alert('Selected folder: ' + data.docs[0].name);
       }
     })
-    .build();
+    
+    .build();*/
+
+
+    const pickerCallback = (data) => {
+      if (data.action === google.picker.Action.PICKED) {
+        selectedFolderId.value = data.docs[0].id;
+        alert('Selected folder: ' + data.docs[0].name);
+      }
+    };
+    const picker = new google.picker.PickerBuilder()
+      //  .setAppId('YOUR_APP_ID')
+        .setOAuthToken(accessToken.value)
+        .addView(new google.picker.DocsView()
+          .setIncludeFolders(true)
+          .setMimeTypes('application/vnd.google-apps.folder')
+          .setLabel('Folders'))
+        .addView(new google.picker.DocsView(google.picker.ViewId.DOCS)
+          .setLabel('Google Drive'))
+        .addView(new google.picker.DocsView(google.picker.ViewId.SHARED_WITH_ME)
+          .setLabel('Shared drives'))
+        .addView(new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED)
+          .setLabel('Recent'))
+        .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
+        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+        .setCallback(pickerCallback)
+        .build();
   picker.setVisible(true);
 };
 
