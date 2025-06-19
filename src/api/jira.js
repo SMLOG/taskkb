@@ -144,3 +144,5 @@ export async function writeObjectToJsonAttachment(dataObject, filename, attachme
         return { success: false, error: error.message };
     }
 }
+
+export const type = "Attachment";
