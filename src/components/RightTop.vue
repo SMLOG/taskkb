@@ -13,7 +13,7 @@
           Share
         </button>
         <button
-          @click="showProfile"
+          @click="toggleShowProfile"
           class="bg-blue-500 text-white dark:bg-blue-700 dark:text-gray-100 p-0.5 rounded-full hover:bg-blue-600 dark:hover:bg-blue-800 flex items-center justify-center w-6 h-6 transition-colors duration-200"
         >
           <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
@@ -43,8 +43,8 @@
     alert('Sharing functionality to be implemented');
   };
   
-  const showProfile = () => {
-    isProfileVisible.value = true;
+  const toggleShowProfile = () => {
+    isProfileVisible.value = !isProfileVisible.value;
   };
   </script>
   
