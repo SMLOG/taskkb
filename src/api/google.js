@@ -10,7 +10,6 @@ const isAuthenticated = ref(false);
 const accessToken = ref(null);
 const selectedFolderId = ref(null);
 const selectedFileId = ref(null);
-const fileContent = ref('');
 let tokenClient = null;
 let isTokenRequested = false;
 

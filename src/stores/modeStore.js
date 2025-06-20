@@ -7,10 +7,11 @@ export const useModeStore = defineStore('mode', () => {
   const fileName = ref("Untitled.treegrid");
   const showMode = ref(false);
   const showAuth = ref(false);
+  const cacheFolders = ref([]);
 
 
   return {
     mode,
-    fileName,showMode,showAuth
+    fileName,showMode,showAuth,cacheFolders
   };
 });
