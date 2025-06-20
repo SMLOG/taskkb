@@ -67,44 +67,54 @@ const initGoogleSignIn = async () => {
 
 async function initializeGSI() {
     try {
-      tokenClient = await google.accounts.oauth2.initTokenClient({
-        client_id: clientId,
-        scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-        callback: async (tokenResponse) => {
-          console.log('Token Response:', tokenResponse);
-          if (tokenResponse && tokenResponse.access_token) {
-            accessToken.value = tokenResponse.access_token;
-            isAuthenticated.value = true;
-            isTokenRequested = false;
-  
-            // Fetch user info and add to userStore with accessToken
-            const userInfo = await fetchUserInfo(tokenResponse.access_token);
-            if (userInfo) {
-              const existingUser = userStore.getUserByEmail(userInfo.email);
-              if (!existingUser) {
-                userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
-                console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
-              } else {
-                // Update existing user with new accessToken
-                userStore.updateUser(userInfo.email, {
-                  username: userInfo.username,
-                  accessToken: tokenResponse.access_token,
-                });
-                console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
-              }
-            }
-  
-            await loadPicker();
-          } else {
-            console.error('No access token received:', tokenResponse);
-            alert('Failed to obtain access token.');
-          }
-        },
-        error_callback: (error) => {
-          console.error('Token initialization error:', error);
-          alert('Error initializing token client: ' + error.message);
-        },
-      });
+        return new Promise((resolve,reject)=>{
+
+            (async()=>{
+                tokenClient = await google.accounts.oauth2.initTokenClient({
+                    client_id: clientId,
+                    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+                    callback: async (tokenResponse) => {
+                      console.log('Token Response:', tokenResponse);
+                      if (tokenResponse && tokenResponse.access_token) {
+                        accessToken.value = tokenResponse.access_token;
+                        console.log( accessToken.value)
+                        isAuthenticated.value = true;
+                        isTokenRequested = false;
+              
+                        // Fetch user info and add to userStore with accessToken
+                        const userInfo = await fetchUserInfo(tokenResponse.access_token);
+                        if (userInfo) {
+                          const existingUser = userStore.getUserByEmail(userInfo.email);
+                          if (!existingUser) {
+                            userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
+                            console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
+                          } else {
+                            // Update existing user with new accessToken
+                            userStore.updateUser(userInfo.email, {
+                              username: userInfo.username,
+                              accessToken: tokenResponse.access_token,
+                            });
+                            console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
+                          }
+                        }
+              
+                        await loadPicker();
+                        resolve();
+                      } else {
+                        console.error('No access token received:', tokenResponse);
+                        alert('Failed to obtain access token.');
+                        reject();
+                      }
+                    },
+                    error_callback: (error) => {
+                      console.error('Token initialization error:', error);
+                      alert('Error initializing token client: ' + error.message);
+                      reject()
+                    },
+                  });
+            })();
+        })
+
     } catch (error) {
       console.error('Error in initializeGSI:', error);
       alert('Error initializing GSI: ' + error.message);
@@ -113,36 +123,15 @@ async function initializeGSI() {
 
 const handleSignInClick = async () => {
     if (tokenClient) {
-        tokenClient.requestAccessToken({ prompt: 'consent' });
+        await tokenClient.requestAccessToken({ prompt: 'consent' });
     } else {
         console.error('Token client not initialized');
         alert('Token client not ready. Please try again.');
-        initializeGSI();
+        await initializeGSI();
     }
 };
 
-// Handle Sign-In response (global callback)
-window.handleCredentialResponse = (response) => {
-  console.log('Credential Response:', response);
-  if (response && response.credential) {
-    if (tokenClient) {
-      if (!isTokenRequested) {
-        isTokenRequested = true;
-        tokenClient.requestAccessToken({ prompt: 'consent' });
-      }
-    } else {
-      console.error('Token client not initialized');
-      alert('Token client not ready. Please try again.');
-      initializeGSI();
-      tokenClient.requestAccessToken({ prompt: 'consent' });
-    }
-  } else {
-    console.error('Invalid credential response:', response);
-    alert('Sign-in failed. Please try again.');
-  }
-};
 
-// Load Google API Client Library for Picker
 const loadPicker = async () => {
   if (typeof gapi === 'undefined') {
     console.error('Google API Client Library not loaded');
@@ -264,6 +253,7 @@ const writeFile = async (fileId, dataObj) => {
         if (permissionCheck.status === 401) {
           console.warn('Access token expired, refreshing...');
           accessToken.value = await refreshAccessToken();
+          console.log( accessToken.value)
           const retryCheck = await fetch(
             `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
             {
@@ -318,7 +308,7 @@ const writeFile = async (fileId, dataObj) => {
     }
 
     form.append('file', blob);
-
+    console.log( accessToken.value)
     try {
       const response = await fetch(url, {
         method: method,
@@ -485,21 +475,6 @@ export async function writeObjectToJsonAttachment(dataObject, fileId) {
             await handleSignInClick();
         }
 
-        // Ensure user is signed in
-        const authInstance = gapi.auth2.getAuthInstance();
-        if (!authInstance.isSignedIn.get()) {
-            try {
-                await authInstance.signIn({ prompt: 'select_account' });
-            } catch (error) {
-                console.error('Sign-in failed:', error);
-                return { success: false, error: 'User authentication required' };
-            }
-        }
-
-        // Set accessToken for writeFile
-        accessToken.value = authInstance.currentUser.get().getAuthResponse().access_token;
-
-        // Call writeFile
         await writeFile(fileId, dataObject);
 
         return { success: true, fileId: fileId || 'new-file-id' }; // Note: writeFile doesn't return fileId for new files; adjust as needed
