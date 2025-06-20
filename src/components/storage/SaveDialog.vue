@@ -14,15 +14,15 @@
       <div class="mb-4">
         <label for="where" class="block mb-2 font-medium">Where:</label>
         <select 
-          v-model="storageLocation" 
+          v-model="selectIndexRef" 
           id="where" 
           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none transition-colors duration-200"
           @change="changeMode"
           >
         
-        <option  v-for="option in cacheFolders" :value="option.mode">{{ option.name }}</option>
-        <option v-if="cacheFolders.length" disabled="disabled">-----------------</option>
-        <option  v-for="option in modesRef" :value="option.mode">{{ option.name }}</option>
+        <option  v-for="(option,i) in cacheFolders" :value="i">{{ option.name }}</option>
+        <option v-if="cacheFolders.length" disabled>-----------------</option>
+        <option  v-for="(option,i) in modesRef" :value="cacheFolders.length+i">{{ option.name }}</option>
         </select>
       </div>
 
@@ -64,15 +64,25 @@ const modesRef = ref([
 ])
 
 const changeMode = () =>{
+  const allOptions = [...cacheFolders.value,...modesRef.value]
+  const selectOption = allOptions[selectIndexRef.value];
+  if(selectOption.folder){
+      (async()=>{
+      const {pickFolder} = await getStorageBridgeByName(selectOption.mode);
+      if(pickFolder){
+        const folder  = await pickFolder();
+        cacheFolders.value.push({mode:selectOption.mode,...folder})
+      }
 
-  (async()=>{
-    const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridgeByName('G');
+      console.log(selectOption)
 
-  })();
+    })();
+  }
+
 
 
 }
-const storageLocation = ref('G');
+const selectIndexRef = ref(0);
 const isOpen = ref(false);
 
 const cancel = () => {

@@ -29,8 +29,7 @@ export async function getStorageBridgeByName(mode) {
     switch (mode) {
         case "G":
             {
-                const { readJsonAttachment, writeObjectToJsonAttachment, type } = await import('@/api/google');
-                return { readJsonAttachment, writeObjectToJsonAttachment, type };
+                return await import('@/api/google');
             }
         case "J": {
             const { readJsonAttachment, writeObjectToJsonAttachment, type } = await import('@/api/jira');

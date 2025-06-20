@@ -205,12 +205,9 @@ const refreshAccessToken = async () => {
 };
 
 // Pick folder with write permission filter
-const pickFolder = async () => {
-    if (!accessToken.value) {
-        alert('Please sign in first.');
-        return;
-    }
-
+export const pickFolder = async () => {
+    await handleSignInClick();
+    
     const pickerCallback = (data) => {
         if (data.action === google.picker.Action.PICKED) {
             selectedFolderId.value = data.docs[0].id;
