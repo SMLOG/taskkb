@@ -166,11 +166,10 @@ async function handleSignInClick() {
 const loadPicker = async () => {
     if (typeof gapi === 'undefined') {
         console.error('Google API Client Library not loaded');
-        alert('Failed to load Google API Client Library. Please try again.');
         return;
     }
    return new Promise((resolve)=>{
-    gapi.load('picker', { callback: () => resolve });
+    gapi.load('picker', { callback: resolve });
    }) 
 };
 
@@ -215,7 +214,6 @@ export const pickFolder = async () => {
         const pickerCallback = (data) => {
             if (data.action === google.picker.Action.PICKED) {
                 selectedFolderId.value = data.docs[0].id;
-                alert('Selected folder: ' + data.docs[0].name);
                 resolve(data.docs[0]);
             }
         };
@@ -248,7 +246,6 @@ export const pickFolder = async () => {
 // Pick file
 const pickFile = async () => {
     if (!accessToken.value) {
-        alert('Please sign in first.');
         return;
     }
 
