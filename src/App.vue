@@ -7,12 +7,12 @@ import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/storage/StorageOptions.vue';
-
+import NoFound from './components/NoFound.vue';
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 const appStore = useAppStore();
 
-const {activeTabRef,showStorageOption} = storeToRefs(appStore);
+const {activeTabRef,showPopUp} = storeToRefs(appStore);
 
 
 const loadedRef = ref(false);
@@ -48,7 +48,8 @@ const loadedRef = ref(false);
       </div>
     </NotificationProvider>
   </main>
-  <StorageOptions v-if="showStorageOption"/>
+  <StorageOptions v-if="showPopUp===1"/>
+  <NoFound v-if="showPopUp===2"/>
 
 </template>
 

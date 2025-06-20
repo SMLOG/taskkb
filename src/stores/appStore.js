@@ -15,7 +15,7 @@ export const useAppStore = defineStore('app', () => {
   const configRef = ref(null);
   const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
   const typeRef = ref(null);
-  const showStorageOption = ref(false);
+  const showPopUp = ref(false);
   // Initialize store
 
 
@@ -231,6 +231,6 @@ export const useAppStore = defineStore('app', () => {
     saveData,
     loadActiveTab,
     getCurrentTab,
-    importToNewTab,loadFile,showStorageOption
+    importToNewTab,loadFile,showPopUp
   };
 });
