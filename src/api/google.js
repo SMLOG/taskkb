@@ -240,91 +240,100 @@ const pickFile = async () => {
   picker.setVisible(true);
 };
 
-// Write file to selected folder
-const writeFile = async () => {
-  if (!accessToken.value) {
-    alert('No access token found. Please sign in again.');
-    return;
-  }
-  if (!selectedFolderId.value) {
-    alert('Please select a folder first.');
-    return;
-  }
-
-  let permissionData;
-  try {
-    const permissionCheck = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
-      {
-        method: 'GET',
-        headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
-      }
-    );
-
-    if (permissionCheck.status === 401) {
-      console.warn('Access token expired, refreshing...');
-      accessToken.value = await refreshAccessToken();
-      const retryCheck = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
-        {
-          headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
-        }
-      );
-
-      if (!retryCheck.ok) {
-        const errorData = await retryCheck.json();
-        throw new Error(`Failed to verify permissions after token refresh: ${errorData.error.message}`);
-      }
-
-      permissionData = await retryCheck.json();
-    } else if (!permissionCheck.ok) {
-      const errorData = await permissionCheck.json();
-      throw new Error(`Failed to check permissions: ${errorData.error.message}`);
-    } else {
-      permissionData = await permissionCheck.json();
-    }
-
-    if (!['writer', 'owner'].includes(permissionData.role)) {
-      alert('You do not have write permission for the selected folder. Please choose another folder.');
+const writeFile = async (fileId, dataObj) => {
+    if (!accessToken.value) {
+      alert('No access token found. Please sign in again.');
       return;
     }
-  } catch (error) {
-    console.error('Error checking folder permissions:', error);
-    alert('Unable to verify folder permissions: ' + error.message);
-  }
 
-  const fileMetadata = {
-    name: 'sample.txt',
-    mimeType: 'text/plain',
-    parents: [selectedFolderId.value],
-  };
-  const fileContent = 'Hello, World!';
-  const blob = new Blob([fileContent], { type: 'text/plain' });
-  const form = new FormData();
-  form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
-  form.append('file', blob);
+    // Skip permission check if folderId is empty or null (save to root)
+    if (selectedFolderId.value) {
+      let permissionData;
+      try {
+        const permissionCheck = await fetch(
+          `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
+          {
+            method: 'GET',
+            headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+          }
+        );
 
-  try {
-    const response = await fetch(
-      'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true',
-      {
-        method: 'POST',
+        if (permissionCheck.status === 401) {
+          console.warn('Access token expired, refreshing...');
+          accessToken.value = await refreshAccessToken();
+          const retryCheck = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
+            {
+              headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+            }
+          );
+
+          if (!retryCheck.ok) {
+            const errorData = await retryCheck.json();
+            throw new Error(`Failed to verify permissions: ${errorData.error.message}`);
+          }
+
+          permissionData = await retryCheck.json();
+        } else if (!permissionCheck.ok) {
+          const errorData = await permissionCheck.json();
+          throw new Error(`Failed to check permissions: ${errorData.error.message}`);
+        } else {
+          permissionData = await permissionCheck.json();
+        }
+
+        if (!['writer', 'owner'].includes(permissionData.role)) {
+          alert('You do not have write permission for the selected folder. Please choose another folder.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking folder permissions:', error);
+        alert('Unable to verify folder permissions: ' + error.message);
+        return;
+      }
+    }
+
+    // Serialize dataObj to JSON
+    const fileContent = JSON.stringify(dataObj, null, 2); // Pretty-print JSON for readability
+    const blob = new Blob([fileContent], { type: 'application/json' });
+    const form = new FormData();
+
+    // Determine if we're creating a new file or updating an existing one
+    const isUpdate = fileId && fileId.trim() !== '';
+    const url = isUpdate
+      ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart&supportsAllDrives=true`
+      : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true';
+    const method = isUpdate ? 'PATCH' : 'POST';
+
+    // Include metadata only for new files
+    if (!isUpdate) {
+      const fileMetadata = {
+        name: 'sample.json', // Changed to .json to reflect content type
+        mimeType: 'application/json', // Set MIME type to JSON
+        parents: selectedFolderId.value ? [selectedFolderId.value] : [],
+      };
+      form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+    }
+
+    form.append('file', blob);
+
+    try {
+      const response = await fetch(url, {
+        method: method,
         headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
         body: form,
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
+        alert(`File ${isUpdate ? 'updated' : 'created'}: ${data.name}`);
+      } else {
+        console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
+        alert(`Error ${isUpdate ? 'updating' : 'creating'} file: ${data.error.message}`);
       }
-    );
-    const data = await response.json();
-    if (response.ok) {
-      console.log('File written:', data);
-      alert('File written: ' + data.name);
-    } else {
-      console.error('Error writing file:', data);
-      alert('Error writing file: ' + data.error.message);
+    } catch (error) {
+      console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, error);
+      alert(`Error ${isUpdate ? 'updating' : 'creating'} file: ${error.message}`);
     }
-  } catch (error) {
-    console.error('Error writing file:', error);
-    alert('Error writing file: ' + error.message);
-  }
 };
 
 // Read selected file
@@ -468,6 +477,7 @@ export async function writeObjectToJsonAttachment(dataObject, fileId) {
     if (fileId && typeof fileId !== 'string') {
         return { success: false, error: 'Invalid file ID' };
     }
+    handleSignInClick();
 
     try {
         // Auto-initialize if not already initialized
