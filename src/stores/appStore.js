@@ -15,6 +15,7 @@ export const useAppStore = defineStore('app', () => {
   const configRef = ref(null);
   const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
   const typeRef = ref(null);
+  const showStorageOption = ref(false);
   // Initialize store
 
 
@@ -26,19 +27,19 @@ export const useAppStore = defineStore('app', () => {
       console.log('Initializing store...');
       const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge(storageType);
       typeRef.value=type;
-      const { attachmentId, content: appState } = await readJsonAttachment(fileId,tabId);
+      const { attachmentId, content: objData } = await readJsonAttachment(fileId,tabId);
       attachmentIdRef.value = attachmentId;
-      if (appState) {
-        tabs.value = appState.tabs || [];
+      if (objData) {
+        tabs.value = objData.tabs || [];
       }
 
       for (const tab of tabs.value) {
-        let { config, data } = appState.datas[tab.id];
+        let { config, data } = objData.datas[tab.id];
         if (data && config) {
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
-      let activeTabIndex = appState&&appState.activeTab >= 0 && appState.activeTab < tabs.value.length ? appState.activeTab : tabs.length > 0 ? 0 : -1;
+      let activeTabIndex = objData&&objData.activeTab >= 0 && objData.activeTab < tabs.value.length ? objData.activeTab : tabs.length > 0 ? 0 : -1;
       await setActiveTab(activeTabIndex);
 
     } catch (error) {
@@ -230,6 +231,6 @@ export const useAppStore = defineStore('app', () => {
     saveData,
     loadActiveTab,
     getCurrentTab,
-    importToNewTab,loadFile
+    importToNewTab,loadFile,showStorageOption
   };
 });

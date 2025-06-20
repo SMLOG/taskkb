@@ -6,12 +6,13 @@ import FormatTool from "@/components/tools/FormatTool.vue";
 import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
+import StorageOptions from './components/storage/StorageOptions.vue';
 
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 const appStore = useAppStore();
 
-const {activeTabRef} = storeToRefs(appStore);
+const {activeTabRef,showStorageOption} = storeToRefs(appStore);
 
 
 const loadedRef = ref(false);
@@ -46,8 +47,9 @@ const loadedRef = ref(false);
         </div>
       </div>
     </NotificationProvider>
-
   </main>
+  <StorageOptions v-if="showStorageOption"/>
+
 </template>
 
 <style scoped>
