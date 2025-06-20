@@ -126,10 +126,10 @@ const initGoogleSignIn = async () => {
     
         return await tokenPromise; // Wait for token response and return tokenClient
       } catch (error) {
-        console.error('Error in initializeGSI:', error);
+        console.error('Error in initGoogleSignIn:', error);
         throw new Error('Error initializing GSI: ' + error.message);
       }
-      
+
 };
 
 
@@ -141,13 +141,13 @@ async function handleSignInClick() {
     try {
       if (!tokenClient) {
         console.log('Initializing token client');
-        tokenClient = await initializeGSI(clientId, accessToken, isAuthenticated, isTokenRequested, userStore);
+        tokenClient = await initGoogleSignIn(clientId, accessToken, isAuthenticated, isTokenRequested, userStore);
       } else {
         console.log('Requesting access token');
         await new Promise((resolve, reject) => {
           tokenClient.requestAccessToken({
             prompt: 'consent',
-            callback: () => resolve(), // Callback is already handled in initializeGSI
+            callback: () => resolve(), // Callback is already handled in initGoogleSignIn
             error_callback: (error) => reject(error),
           });
         });
@@ -399,7 +399,7 @@ export async function readJsonAttachment(fileId,tabId) {
     }
 
     try {
-        await loadScript('https://accounts.google.com/gsi/client', initGoogleSignIn);
+        await loadScript('https://accounts.google.com/gsi/client');
         await loadScript('https://apis.google.com/js/api.js');
       } catch (error) {
         console.error('Script loading error:', error);

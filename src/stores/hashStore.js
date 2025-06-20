@@ -37,13 +37,13 @@ export const useHashStore = defineStore('hash', () => {
   updateHash(route.hash || window.location.hash)
 
   // Watch Vue Router's route.hash for changes
-  watch(
+  /*watch(
     () => route.hash,
     (newHash) => {
       updateHash(newHash || window.location.hash)
     },
     { immediate: true } // Run immediately to catch initial hash
-  )
+  )*/
 
   // Fallback: Listen to browser hashchange events
   window.addEventListener('hashchange', () => {
