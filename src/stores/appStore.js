@@ -15,15 +15,24 @@ export const useAppStore = defineStore('app', () => {
   const configRef = ref(null);
   const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
   const typeRef = ref(null);
-  const showPopUp = ref(false);
+  const showPopUp = ref(0);
+  const loading = ref(true);
   // Initialize store
 
+  function updateShowUp(value){
+    showPopUp.value = value;
+    console.log(showPopUp.value)
+  }
 
   async function loadFile(storageType,fileId,tabId){
+    if(!storageType||!fileId)
+      showPopUp.value=1;
+    else
     initLoadTabsData(storageType,fileId,tabId).catch(error => console.error('Init failed:', error));
   }
   async function initLoadTabsData(storageType,fileId,tabId) {
     try {
+      loading.value = true;
       console.log('Initializing store...');
       const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge(storageType);
       typeRef.value=type;
@@ -31,6 +40,8 @@ export const useAppStore = defineStore('app', () => {
       attachmentIdRef.value = attachmentId;
       if (objData) {
         tabs.value = objData.tabs || [];
+      }else{
+        showPopUp.value = 2;
       }
 
       for (const tab of tabs.value) {
@@ -45,6 +56,7 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Failed to initialize store:', error);
     }
+    loading.value = false;
   }
 
   // Load active tab
@@ -231,6 +243,6 @@ export const useAppStore = defineStore('app', () => {
     saveData,
     loadActiveTab,
     getCurrentTab,
-    importToNewTab,loadFile,showPopUp
+    importToNewTab,loadFile,showPopUp,updateShowUp,loading
   };
 });

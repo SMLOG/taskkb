@@ -12,17 +12,11 @@ import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 const appStore = useAppStore();
 
-const {activeTabRef,showPopUp} = storeToRefs(appStore);
+const {activeTabRef} = storeToRefs(appStore);
 
 
 const loadedRef = ref(false);
 
-(async () => {
-  
-  await appStore.initLoadTabsData();
-  loadedRef.value = true;
-}
-)();
 
 </script>
 
@@ -48,8 +42,8 @@ const loadedRef = ref(false);
       </div>
     </NotificationProvider>
   </main>
-  <StorageOptions v-if="showPopUp===1"/>
-  <NoFound v-if="showPopUp===2"/>
+  <StorageOptions v-if="appStore.showPopUp===1"/>
+  <NoFound v-if="appStore.showPopUp===2"/>
 
 </template>
 

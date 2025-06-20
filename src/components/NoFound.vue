@@ -17,11 +17,17 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref,nextTick } from 'vue';
+import { useAppStore } from '@/stores/appStore';
+import { useHashStore } from '@/stores/hashStore';
 
 // Define reactive variables or functions
 const handleCancel = () => {
     console.log('Cancel clicked');
+    useAppStore().updateShowUp(0);
+    nextTick(()=>{
+        useHashStore().resetHash();
+    })
 };
 
 const handleTryOpen = () => {
