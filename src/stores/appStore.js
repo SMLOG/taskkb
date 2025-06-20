@@ -18,15 +18,15 @@ export const useAppStore = defineStore('app', () => {
   // Initialize store
 
 
-  async function loadFile(storageType,appStore,newTab){
-
+  async function loadFile(storageType,fileId,tabId){
+    initLoadTabsData(storageType,fileId,tabId).catch(error => console.error('Init failed:', error));
   }
-  async function initLoadTabsData() {
+  async function initLoadTabsData(storageType,fileId,tabId) {
     try {
       console.log('Initializing store...');
-      const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge();
+      const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge(storageType);
       typeRef.value=type;
-      const { attachmentId, content: appState } = await readJsonAttachment(attachFileName);
+      const { attachmentId, content: appState } = await readJsonAttachment(fileId,tabId);
       attachmentIdRef.value = attachmentId;
       if (appState) {
         tabs.value = appState.tabs || [];
@@ -214,8 +214,6 @@ export const useAppStore = defineStore('app', () => {
 
 
 
-  // Initialize store
-  initLoadTabsData().catch(error => console.error('Init failed:', error));
 
   return {
     initLoadTabsData,

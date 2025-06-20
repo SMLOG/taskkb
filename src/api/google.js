@@ -62,77 +62,77 @@ const initGoogleSignIn = async () => {
     console.error('Google Sign-In library not loaded');
     return;
   }
-  await initializeGSI();
+  
+      // Ensure Google API is loaded
+      if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
+        console.error('Google API script not loaded.');
+        throw new Error('Google API is not available. Please try again later.');
+      }
+    
+      try {
+        // Create a promise to handle token response
+        const tokenPromise = new Promise((resolve, reject) => {
+          const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+            callback: async (tokenResponse) => {
+              console.log('Token Response:', tokenResponse);
+              if (tokenResponse?.access_token) {
+                try {
+                  accessToken.value = tokenResponse.access_token;
+                  isAuthenticated.value = true;
+                  isTokenRequested = false;
+    
+                  // Fetch user info
+                  const userInfo = await fetchUserInfo(tokenResponse.access_token);
+                  if (userInfo?.email) {
+                    const existingUser = userStore.getUserByEmail(userInfo.email);
+                    if (!existingUser) {
+                      userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
+                      console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
+                    } else {
+                      userStore.updateUser(userInfo.email, {
+                        username: userInfo.username,
+                        accessToken: tokenResponse.access_token,
+                      });
+                      console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
+                    }
+    
+                    // Load Google Picker
+                    await loadPicker();
+                    resolve(tokenClient); // Resolve with tokenClient
+                  } else {
+                    console.error('Invalid user info:', userInfo);
+                    reject(new Error('Failed to fetch user information.'));
+                  }
+                } catch (userError) {
+                  console.error('Error in token callback:', userError);
+                  reject(userError);
+                }
+              } else {
+                console.error('No access token received:', tokenResponse);
+                reject(new Error('Failed to obtain access token.'));
+              }
+            },
+            error_callback: (error) => {
+              console.error('Token initialization error:', error);
+              reject(error);
+            },
+          });
+    
+          // Trigger the token request
+          tokenClient.requestAccessToken({ prompt: 'consent' });
+        });
+    
+        return await tokenPromise; // Wait for token response and return tokenClient
+      } catch (error) {
+        console.error('Error in initializeGSI:', error);
+        throw new Error('Error initializing GSI: ' + error.message);
+      }
+      
 };
 
-async function initializeGSI() {
-    // Ensure Google API is loaded
-    if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
-      console.error('Google API script not loaded.');
-      throw new Error('Google API is not available. Please try again later.');
-    }
-  
-    try {
-      // Create a promise to handle token response
-      const tokenPromise = new Promise((resolve, reject) => {
-        const tokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
-          scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-          callback: async (tokenResponse) => {
-            console.log('Token Response:', tokenResponse);
-            if (tokenResponse?.access_token) {
-              try {
-                accessToken.value = tokenResponse.access_token;
-                isAuthenticated.value = true;
-                isTokenRequested = false;
-  
-                // Fetch user info
-                const userInfo = await fetchUserInfo(tokenResponse.access_token);
-                if (userInfo?.email) {
-                  const existingUser = userStore.getUserByEmail(userInfo.email);
-                  if (!existingUser) {
-                    userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
-                    console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
-                  } else {
-                    userStore.updateUser(userInfo.email, {
-                      username: userInfo.username,
-                      accessToken: tokenResponse.access_token,
-                    });
-                    console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
-                  }
-  
-                  // Load Google Picker
-                  await loadPicker();
-                  resolve(tokenClient); // Resolve with tokenClient
-                } else {
-                  console.error('Invalid user info:', userInfo);
-                  reject(new Error('Failed to fetch user information.'));
-                }
-              } catch (userError) {
-                console.error('Error in token callback:', userError);
-                reject(userError);
-              }
-            } else {
-              console.error('No access token received:', tokenResponse);
-              reject(new Error('Failed to obtain access token.'));
-            }
-          },
-          error_callback: (error) => {
-            console.error('Token initialization error:', error);
-            reject(error);
-          },
-        });
-  
-        // Trigger the token request
-        tokenClient.requestAccessToken({ prompt: 'consent' });
-      });
-  
-      return await tokenPromise; // Wait for token response and return tokenClient
-    } catch (error) {
-      console.error('Error in initializeGSI:', error);
-      throw new Error('Error initializing GSI: ' + error.message);
-    }
-  }
+
 
 
 
@@ -358,26 +358,26 @@ const writeFile = async (fileId, dataObj,fileName) => {
 };
 
 // Read selected file
-const readFile = async () => {
+const readFile = async (fileId) => {
   if (!accessToken.value) {
     alert('No access token found. Please sign in again.');
     return;
   }
-  if (!selectedFileId.value) {
+  if (!fileId) {
     alert('Please select a file to read first.');
     return;
   }
 
   try {
     const response = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${selectedFileId.value}?alt=media&supportsAllDrives=true`,
+      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
       {
         method: 'GET',
         headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
       }
     );
     if (response.ok) {
-      fileContent.value = await response.text();
+       return  await response.text();
     } else {
       const errorData = await response.json();
       console.error('Error reading file:', errorData);
@@ -389,63 +389,11 @@ const readFile = async () => {
   }
 };
 
-// Initialize Google API client with provided clientId
-export async function initGoogleDriveClient() {
-    const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com';
 
-    try {
-        await loadScript('https://accounts.google.com/gsi/client', initGoogleSignIn);
-        await loadScript('https://apis.google.com/js/api.js');
-      } catch (error) {
-        console.error('Script loading error:', error);
-        alert('Failed to load required scripts. Please try again.');
-      }
-
-
-    return new Promise((resolve, reject) => {
-        if (isGapiInitialized) {
-            resolve();
-            return;
-        }
-
-        // Check if gapi is defined
-        if (typeof gapi === 'undefined') {
-            const error = new Error('Google API Client Library (gapi) is not loaded. Ensure <script src="https://apis.google.com/js/api.js"></script> is included in your HTML.');
-            console.error(error.message);
-            reject(error);
-            return;
-        }
-
-        gapi.load('client:auth2', () => {
-            gapi.client
-                .init({
-                    clientId: clientId,
-                    discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
-                    scope: 'https://www.googleapis.com/auth/drive.file',
-                })
-                .then(() => {
-                    // Attempt silent sign-in
-                    const authInstance = gapi.auth2.getAuthInstance();
-                    if (!authInstance.isSignedIn.get()) {
-                        authInstance.signIn({ prompt: 'none' }).catch((error) => {
-                            console.warn('Silent sign-in failed, user may need to sign in manually:', error);
-                            // Proceed anyway; sign-in will be handled in read/write functions
-                        });
-                    }
-                    isGapiInitialized = true;
-                    resolve();
-                })
-                .catch((error) => {
-                    console.error('Error initializing Google API client:', error);
-                    reject(error);
-                });
-        });
-    });
-}
 
 let isGapiInitialized;
 // Read JSON file from Google Drive using file ID
-export async function readJsonAttachment(fileId) {
+export async function readJsonAttachment(fileId,tabId) {
     if (!fileId || typeof fileId !== 'string') {
         return { error: 'Invalid or missing file ID' };
     }
@@ -464,24 +412,9 @@ export async function readJsonAttachment(fileId) {
             await handleSignInClick();
         }
 
-        // Ensure user is signed in
-        const authInstance = gapi.auth2.getAuthInstance();
-        if (!authInstance.isSignedIn.get()) {
-            try {
-                await authInstance.signIn({ prompt: 'select_account' });
-            } catch (error) {
-                console.error('Sign-in failed:', error);
-                return { error: 'User authentication required' };
-            }
-        }
+       let body = await readFile(fileId);
 
-        // Get the file content
-        const fileResponse = await gapi.client.drive.files.get({
-            fileId: fileId,
-            alt: 'media',
-        });
-
-        const content = jsonParse(fileResponse.body);
+        const content = jsonParse(body);
         return { content };
     } catch (error) {
         console.error(`Error reading from Google Drive: ${error.message}`);
