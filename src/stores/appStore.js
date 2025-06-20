@@ -18,6 +18,9 @@ export const useAppStore = defineStore('app', () => {
   // Initialize store
 
 
+  async function loadFile(storageType,appStore,newTab){
+
+  }
   async function initLoadTabsData() {
     try {
       console.log('Initializing store...');
@@ -229,6 +232,6 @@ export const useAppStore = defineStore('app', () => {
     saveData,
     loadActiveTab,
     getCurrentTab,
-    importToNewTab
+    importToNewTab,loadFile
   };
 });

@@ -29,6 +29,8 @@ export const useHashStore = defineStore('hash', () => {
     tab.value = newTab
     type.value = storageType;
 
+    appStore.loadFile(storageType,appStore,newTab);
+
   }
 
   // Initial parse
