@@ -142,6 +142,7 @@ const initGoogleSignIn = async () => {
 
 async function handleSignInClick() {
     let tokenClient;
+    if(accessToken.value)return;
     try {
         if (!tokenClient) {
             console.log('Initializing token client');
@@ -350,7 +351,7 @@ const writeFile = async (fileId, dataObj, fileName) => {
         if (response.ok) {
             console.log(data);
             console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
-            alert(`File ${isUpdate ? 'updated' : 'created'}: ${data.name}`);
+            return data;
         } else {
             console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
             alert(`Error ${isUpdate ? 'updating' : 'creating'} file: ${data.error.message}`);
@@ -420,7 +421,6 @@ const readFile = async (fileId) => {
 
 
 
-let isGapiInitialized;
 export async function readJsonAttachment(fileId, tabId) {
     if (!fileId || typeof fileId !== 'string') {
         return { error: 'Invalid or missing file ID' };
@@ -428,11 +428,9 @@ export async function readJsonAttachment(fileId, tabId) {
 
 
     try {
-        // Auto-initialize if not already initialized
 
-        if (!isGapiInitialized) {
             await handleSignInClick();
-        }
+        
 
         let result = await readFile(fileId);
 
@@ -453,14 +451,12 @@ export async function writeObjectToJsonAttachment(dataObject, fileName, fileId) 
     }
 
     try {
-        // Auto-initialize if not already initialized
-        if (!isGapiInitialized) {
             await handleSignInClick();
-        }
+        
 
-        await writeFile(fileId, dataObject, fileName);
+       const {id} = await writeFile(fileId, dataObject, fileName);
 
-        return { success: true, fileId: fileId || 'new-file-id' }; // Note: writeFile doesn't return fileId for new files; adjust as needed
+        return { success: true, attachmentId: id }; // Note: writeFile doesn't return fileId for new files; adjust as needed
     } catch (error) {
         console.error(`Error writing to Google Drive: ${error.message}`);
         return { success: false, error: fileId ? `Failed to update file with ID ${fileId}: ${error.message}` : `Failed to create file: ${error.message}` };
