@@ -259,7 +259,7 @@ const pickFile = async () => {
   picker.setVisible(true);
 };
 
-const writeFile = async (fileId, dataObj) => {
+const writeFile = async (fileId, dataObj,fileName) => {
     if (!accessToken.value) {
       alert('No access token found. Please sign in again.');
       return;
@@ -327,7 +327,7 @@ const writeFile = async (fileId, dataObj) => {
     // Include metadata only for new files
     if (!isUpdate) {
       const fileMetadata = {
-        name: 'sample.json', // Changed to .json to reflect content type
+        name: fileName, // Changed to .json to reflect content type
         mimeType: 'application/json', // Set MIME type to JSON
         parents: selectedFolderId.value ? [selectedFolderId.value] : [],
       };
@@ -344,6 +344,7 @@ const writeFile = async (fileId, dataObj) => {
       });
       const data = await response.json();
       if (response.ok) {
+        console.log(data);
         console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
         alert(`File ${isUpdate ? 'updated' : 'created'}: ${data.name}`);
       } else {
@@ -502,7 +503,7 @@ export async function writeObjectToJsonAttachment(dataObject, fileName,fileId) {
             await handleSignInClick();
         }
 
-        await writeFile(fileId, dataObject);
+        await writeFile(fileId, dataObject,fileName);
 
         return { success: true, fileId: fileId || 'new-file-id' }; // Note: writeFile doesn't return fileId for new files; adjust as needed
     } catch (error) {
