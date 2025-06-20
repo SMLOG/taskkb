@@ -368,7 +368,6 @@ const readFile = async (fileId) => {
     return;
   }
 
-  try {
     const response = await fetch(
       `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
       {
@@ -383,16 +382,12 @@ const readFile = async (fileId) => {
       console.error('Error reading file:', errorData);
       alert('Error reading file: ' + errorData.error.message);
     }
-  } catch (error) {
-    console.error('Error reading file:', error);
-    alert('Error reading file: ' + error.message);
-  }
+  
 };
 
 
 
 let isGapiInitialized;
-// Read JSON file from Google Drive using file ID
 export async function readJsonAttachment(fileId,tabId) {
     if (!fileId || typeof fileId !== 'string') {
         return { error: 'Invalid or missing file ID' };
@@ -403,7 +398,6 @@ export async function readJsonAttachment(fileId,tabId) {
         await loadScript('https://apis.google.com/js/api.js');
       } catch (error) {
         console.error('Script loading error:', error);
-        alert('Failed to load required scripts. Please try again.');
       }
     try {
         // Auto-initialize if not already initialized
