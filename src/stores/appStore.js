@@ -110,9 +110,11 @@ export const useAppStore = defineStore('app', () => {
         forEachTree(tabsDataMapRef.value[tab.id].data,'_childs',);
       });*/
         const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridge();
+
+        
         const result = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
-          modeStore.fileName, attachmentIdRef.value
+          modeStore.fileName, attachmentIdRef.value,useModeStore().parentFolder
         );
         let org = attachmentIdRef.value;
         attachmentIdRef.value = result.attachmentId

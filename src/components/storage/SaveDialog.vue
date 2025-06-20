@@ -47,11 +47,12 @@
 <script setup>
 import { ref } from 'vue';
 import { useModeStore } from "@/stores/modeStore";
+import { useAppStore } from "@/stores/appStore";
 import { getStorageBridgeByName } from '@/api/bridge';
 
 import { storeToRefs } from 'pinia';
 
-const {fileName,showAuth,mode,cacheFolders} = storeToRefs(useModeStore());
+const {fileName,showAuth,mode,cacheFolders,parentFolder} = storeToRefs(useModeStore());
 
 
 const nameMap = {
@@ -107,6 +108,8 @@ const cancel = () => {
 const save = () => {
   isOpen.value = false;
   showAuth.value = true;
+  parentFolder.value = cacheFolders.value.length>selectIndexRef.value?selectIndexRef.value:-1;
+  useAppStore.saveData();
 
 };
 
