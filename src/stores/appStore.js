@@ -3,7 +3,7 @@ import { ref } from 'vue';
 import { getStorageBridge } from '@/api/bridge';
 import {loopTree} from '@/lib/treelib';
 import {weeksBetween} from '@/lib/schedule';
-
+import { useHashStore } from '@/stores/hashStore'
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -17,6 +17,9 @@ export const useAppStore = defineStore('app', () => {
   const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
   const typeRef = ref(null);
   // Initialize store
+  const hashStore = useHashStore()
+    const { file, tab } = hashStore
+    
   async function initLoadTabsData() {
     try {
       console.log('Initializing store...');
