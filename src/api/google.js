@@ -488,7 +488,7 @@ export async function readJsonAttachment(fileId) {
     }
 }
 
-export async function writeObjectToJsonAttachment(dataObject, fileId) {
+export async function writeObjectToJsonAttachment(dataObject, fileName,fileId) {
     if (!dataObject || typeof dataObject !== 'object') {
         return { success: false, error: 'Invalid or missing data object' };
     }
