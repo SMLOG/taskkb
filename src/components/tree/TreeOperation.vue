@@ -17,7 +17,7 @@
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
+            <button @click="openDialog" class="btn-secondary" :disabled="savingRef">
               💾 Save {{ savingRef?"...":"" }} 
             </button>
             <button @click="showConfig = !showConfig" class="btn-secondary">
@@ -74,8 +74,8 @@
       </div>
     </div>
   </div>
-  <SaveDialog ref="saveDialog" @saved="saveToSelectLocation"/>
-  <AuthorizationDialog  v-if="storageType" @cancel="storageType=null" :name="storageType"/>
+  <SaveDialog ref="saveDialog" />
+  <AuthorizationDialog />
 </template>
 
 <style>
@@ -218,16 +218,7 @@ async function  saveData(bool) {
   }
 }
 
-const storageType = ref(null);
-async function saveToSelectLocation(selection){
- if(selection.storageLocation === 'browser'){
-  saveData(0);
-  storageType.value=null;
- }else{
-  storageType.value=selection.storageLocation;
- }
 
-}
 function deleteSelectedNodes() {
   if (confirm("Please confirm to delete it?")) {
     tree.delSelectedNode();

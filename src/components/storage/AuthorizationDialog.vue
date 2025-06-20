@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
+  <div v-if="showAuth" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center relative border border-gray-200 dark:border-gray-700">
       <button 
         @click="closePopup" 
@@ -9,11 +9,11 @@
         ×
       </button>
       <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Authorization required</h2>
-      <p class="mb-4 text-gray-600 dark:text-gray-300">Authorize this app in  {{ resolveComponnent(props.name).name }}:</p>
+      <p class="mb-4 text-gray-600 dark:text-gray-300">Authorize this app in  {{ resolveComponnent(mode)?.name }}:</p>
 
       
 
-      <component :is="resolveComponnent(props.name).cp">Authorize</component>
+      <component :is="resolveComponnent(mode)?.cp">Authorize</component>
       <div class="mt-4 flex items-center justify-center">
         <input 
           type="checkbox" 
@@ -30,17 +30,19 @@
 <script setup>
 import { ref } from 'vue';
 import GoogleDrivePicker from '@/components/storage/GoogleDrivePicker.vue';
+
+import { useModeStore } from "@/stores/modeStore";
+import { storeToRefs } from 'pinia';
+
+
+const {mode,showAuth} = storeToRefs(useModeStore());
+
 const emit = defineEmits(['cancel']);
 
-const props = defineProps({
-  name: {
-    type: String
-  }
-})
+
 
 const pickerMap = {
-  "googlemy":{cp:GoogleDrivePicker,name:"Google My Drive"},
-  "googlefolder":{cp:GoogleDrivePicker,name:"Google Drive Folder"}
+  "google":{cp:GoogleDrivePicker,name:"Google My Drive"},
 }
 
 const resolveComponnent = (name)=>pickerMap[name];
@@ -52,7 +54,7 @@ const authorize = () => {
 };
 
 const closePopup = () => {
-  emit('cancel');
+  showAuth.value = false;
 };
 </script>
 

@@ -3,6 +3,7 @@ import { ref } from 'vue';
 import { getStorageBridge } from '@/api/bridge';
 import {loopTree} from '@/lib/treelib';
 import {weeksBetween} from '@/lib/schedule';
+import { useModeStore } from '@/stores/modeStore';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -13,11 +14,12 @@ export const useAppStore = defineStore('app', () => {
   // Tree and config state
   const treeRef = ref(null);
   const configRef = ref(null);
-  const attachFileName = atob('cGVyZmVjdHRkby5qc29u');
   const typeRef = ref(null);
   const showPopUp = ref(0);
   const loading = ref(true);
   // Initialize store
+
+  const modeStore = useModeStore();
 
   function updateShowUp(value){
     showPopUp.value = value;
@@ -110,7 +112,7 @@ export const useAppStore = defineStore('app', () => {
         const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridge();
         const result = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
-          attachFileName, attachmentIdRef.value
+          modeStore.fileName, attachmentIdRef.value
         );
         let org = attachmentIdRef.value;
         attachmentIdRef.value = result.attachmentId
