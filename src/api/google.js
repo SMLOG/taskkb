@@ -359,31 +359,60 @@ const writeFile = async (fileId, dataObj,fileName) => {
 
 // Read selected file
 const readFile = async (fileId) => {
-  if (!accessToken.value) {
-    alert('No access token found. Please sign in again.');
-    return;
-  }
-  if (!fileId) {
-    alert('Please select a file to read first.');
-    return;
-  }
-
-    const response = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
-      {
-        method: 'GET',
-        headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
-      }
-    );
-    if (response.ok) {
-       return  await response.text();
-    } else {
-      const errorData = await response.json();
-      console.error('Error reading file:', errorData);
-      alert('Error reading file: ' + errorData.error.message);
+    if (!accessToken.value) {
+      alert('No access token found. Please sign in again.');
+      return;
+    }
+    if (!fileId) {
+      alert('Please select a file to read first.');
+      return;
     }
   
-};
+    try {
+      // Step 1: Fetch file metadata (version, modifiedTime, lastModifyingUser, etc.)
+      const metadataResponse = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
+        {
+          method: 'GET',
+          headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+        }
+      );
+  
+      if (!metadataResponse.ok) {
+        const errorData = await metadataResponse.json();
+        console.error('Error fetching metadata:', errorData);
+        alert('Error fetching metadata: ' + errorData.error.message);
+        return;
+      }
+  
+      const metadata = await metadataResponse.json();
+      console.log('File Metadata:', metadata);
+   
+      const contentResponse = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
+        {
+          method: 'GET',
+          headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+        }
+      );
+  
+      if (contentResponse.ok) {
+        const content = await contentResponse.text();
+        return {
+          content, // File content as text
+          metadata, // File metadata (version, modifiedTime, lastModifyingUser, etc.)
+        };
+      } else {
+        const errorData = await contentResponse.json();
+        console.error('Error reading file content:', errorData);
+        alert('Error reading file content: ' + errorData.error.message);
+        return;
+      }
+    } catch (error) {
+      console.error('Unexpected error:', error);
+      alert('Unexpected error: ' + error.message);
+    }
+  };
 
 
 
@@ -406,9 +435,9 @@ export async function readJsonAttachment(fileId,tabId) {
             await handleSignInClick();
         }
 
-       let body = await readFile(fileId);
+       let result = await readFile(fileId);
 
-        const content = jsonParse(body);
+        const content = jsonParse(result.content);
         return { content };
     } catch (error) {
         console.error(`Error reading from Google Drive: ${error.message}`);
