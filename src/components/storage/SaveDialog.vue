@@ -70,8 +70,14 @@ const changeMode = () =>{
       (async()=>{
       const {pickFolder} = await getStorageBridgeByName(selectOption.mode);
       if(pickFolder){
-        const folder  = await pickFolder();
+        try {
+          const folder  = await pickFolder();
         cacheFolders.value.push({mode:selectOption.mode,...folder})
+        console.log('folder',folder)
+        } catch (error) {
+          console.error(error)
+        }
+
       }
 
       console.log(selectOption)
@@ -92,7 +98,6 @@ const cancel = () => {
 const save = () => {
   isOpen.value = false;
   showAuth.value = true;
-  mode.value  = storageLocation.value;
 
 };
 

@@ -169,7 +169,9 @@ const loadPicker = async () => {
         alert('Failed to load Google API Client Library. Please try again.');
         return;
     }
-    gapi.load('picker', { callback: () => console.log('Picker API loaded') });
+   return new Promise((resolve)=>{
+    gapi.load('picker', { callback: () => resolve });
+   }) 
 };
 
 // Refresh access token
@@ -207,35 +209,40 @@ const refreshAccessToken = async () => {
 // Pick folder with write permission filter
 export const pickFolder = async () => {
     await handleSignInClick();
-    
-    const pickerCallback = (data) => {
-        if (data.action === google.picker.Action.PICKED) {
-            selectedFolderId.value = data.docs[0].id;
-            alert('Selected folder: ' + data.docs[0].name);
-        }
-    };
-    const picker = new google.picker.PickerBuilder()
-        .setOAuthToken(accessToken.value)
-        .addView(
-            new google.picker.DocsView()
-                .setIncludeFolders(true)
-                .setSelectFolderEnabled(true)
-                .setParent('root')
-        )
-        .addView(
-            new google.picker.DocsView(google.picker.ViewId.DOCS).setLabel('Google Drive').setMimeTypes('application/vnd.google-apps.document')
-        )
-        .addView(
-            new google.picker.DocsView(google.picker.ViewId.SHARED_WITH_ME).setLabel('Shared drives')
-        )
-        .addView(
-            new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED).setLabel('Recent')
-        )
-        .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
-        .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
-        .setCallback(pickerCallback)
-        .build();
-    picker.setVisible(true);
+
+    return  new Promise((resolve,reject)=>{
+
+        const pickerCallback = (data) => {
+            if (data.action === google.picker.Action.PICKED) {
+                selectedFolderId.value = data.docs[0].id;
+                alert('Selected folder: ' + data.docs[0].name);
+                resolve(data.docs[0]);
+            }
+        };
+        const picker = new google.picker.PickerBuilder()
+            .setOAuthToken(accessToken.value)
+            .addView(
+                new google.picker.DocsView()
+                    .setIncludeFolders(true)
+                    .setSelectFolderEnabled(true)
+                    .setParent('root')
+            )
+            .addView(
+                new google.picker.DocsView(google.picker.ViewId.DOCS).setLabel('Google Drive').setMimeTypes('application/vnd.google-apps.document')
+            )
+            .addView(
+                new google.picker.DocsView(google.picker.ViewId.SHARED_WITH_ME).setLabel('Shared drives')
+            )
+            .addView(
+                new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED).setLabel('Recent')
+            )
+            .enableFeature(google.picker.Feature.SUPPORT_DRIVES)
+            .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .setCallback(pickerCallback)
+            .build();
+        picker.setVisible(true);
+    });
+
 };
 
 // Pick file
