@@ -421,7 +421,16 @@ export async function readJsonAttachment(fileId) {
     }
 
     try {
+        await loadScript('https://accounts.google.com/gsi/client', initGoogleSignIn);
+        await loadScript('https://apis.google.com/js/api.js');
+      } catch (error) {
+        console.error('Script loading error:', error);
+        alert('Failed to load required scripts. Please try again.');
+      }
+    try {
         // Auto-initialize if not already initialized
+        handleSignInClick();
+
         if (!isGapiInitialized) {
             await initGoogleDriveClient();
         }
