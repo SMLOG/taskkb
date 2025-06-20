@@ -66,70 +66,97 @@ const initGoogleSignIn = async () => {
 };
 
 async function initializeGSI() {
+    // Ensure Google API is loaded
+    if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
+      console.error('Google API script not loaded.');
+      throw new Error('Google API is not available. Please try again later.');
+    }
+  
     try {
-        return new Promise((resolve,reject)=>{
-
-            (async()=>{
-                tokenClient = await google.accounts.oauth2.initTokenClient({
-                    client_id: clientId,
-                    scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-                    callback: async (tokenResponse) => {
-                      console.log('Token Response:', tokenResponse);
-                      if (tokenResponse && tokenResponse.access_token) {
-                        accessToken.value = tokenResponse.access_token;
-                        console.log( accessToken.value)
-                        isAuthenticated.value = true;
-                        isTokenRequested = false;
-              
-                        // Fetch user info and add to userStore with accessToken
-                        const userInfo = await fetchUserInfo(tokenResponse.access_token);
-                        if (userInfo) {
-                          const existingUser = userStore.getUserByEmail(userInfo.email);
-                          if (!existingUser) {
-                            userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
-                            console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
-                          } else {
-                            // Update existing user with new accessToken
-                            userStore.updateUser(userInfo.email, {
-                              username: userInfo.username,
-                              accessToken: tokenResponse.access_token,
-                            });
-                            console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
-                          }
-                        }
-              
-                        await loadPicker();
-                        resolve();
-                      } else {
-                        console.error('No access token received:', tokenResponse);
-                        alert('Failed to obtain access token.');
-                        reject();
-                      }
-                    },
-                    error_callback: (error) => {
-                      console.error('Token initialization error:', error);
-                      alert('Error initializing token client: ' + error.message);
-                      reject()
-                    },
-                  });
-            })();
-        })
-
+      // Create a promise to handle token response
+      const tokenPromise = new Promise((resolve, reject) => {
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: clientId,
+          scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+          callback: async (tokenResponse) => {
+            console.log('Token Response:', tokenResponse);
+            if (tokenResponse?.access_token) {
+              try {
+                accessToken.value = tokenResponse.access_token;
+                isAuthenticated.value = true;
+                isTokenRequested = false;
+  
+                // Fetch user info
+                const userInfo = await fetchUserInfo(tokenResponse.access_token);
+                if (userInfo?.email) {
+                  const existingUser = userStore.getUserByEmail(userInfo.email);
+                  if (!existingUser) {
+                    userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
+                    console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
+                  } else {
+                    userStore.updateUser(userInfo.email, {
+                      username: userInfo.username,
+                      accessToken: tokenResponse.access_token,
+                    });
+                    console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
+                  }
+  
+                  // Load Google Picker
+                  await loadPicker();
+                  resolve(tokenClient); // Resolve with tokenClient
+                } else {
+                  console.error('Invalid user info:', userInfo);
+                  reject(new Error('Failed to fetch user information.'));
+                }
+              } catch (userError) {
+                console.error('Error in token callback:', userError);
+                reject(userError);
+              }
+            } else {
+              console.error('No access token received:', tokenResponse);
+              reject(new Error('Failed to obtain access token.'));
+            }
+          },
+          error_callback: (error) => {
+            console.error('Token initialization error:', error);
+            reject(error);
+          },
+        });
+  
+        // Trigger the token request
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+      });
+  
+      return await tokenPromise; // Wait for token response and return tokenClient
     } catch (error) {
       console.error('Error in initializeGSI:', error);
-      alert('Error initializing GSI: ' + error.message);
+      throw new Error('Error initializing GSI: ' + error.message);
     }
   }
 
-const handleSignInClick = async () => {
-    if (tokenClient) {
-        await tokenClient.requestAccessToken({ prompt: 'consent' });
-    } else {
-        console.error('Token client not initialized');
-        alert('Token client not ready. Please try again.');
-        await initializeGSI();
+
+
+async function handleSignInClick() {
+    let tokenClient;
+    try {
+      if (!tokenClient) {
+        console.log('Initializing token client');
+        tokenClient = await initializeGSI(clientId, accessToken, isAuthenticated, isTokenRequested, userStore);
+      } else {
+        console.log('Requesting access token');
+        await new Promise((resolve, reject) => {
+          tokenClient.requestAccessToken({
+            prompt: 'consent',
+            callback: () => resolve(), // Callback is already handled in initializeGSI
+            error_callback: (error) => reject(error),
+          });
+        });
+      }
+    } catch (error) {
+      console.error('Error in handleSignInClick:', error);
+      alert('Sign-in failed: ' + error.message);
     }
-};
+  }
 
 
 const loadPicker = async () => {
