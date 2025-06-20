@@ -437,7 +437,7 @@ export async function readJsonAttachment(fileId, tabId) {
         let result = await readFile(fileId);
 
         const content = jsonParse(result.content);
-        return { content };
+        return { content,attachmentId:fileId };
     } catch (error) {
         console.error(`Error reading from Google Drive: ${error.message}`);
         return { error: `Failed to read file with ID ${fileId}: ${error.message}` };
