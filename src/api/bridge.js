@@ -20,7 +20,7 @@ export async function getStorageBridge() {
         console.error('Error checking Forge environment:', error);
     }
 
-                    const { readJsonAttachment, writeObjectToJsonAttachment,type } = await import('@/api/browser');
+                    const { readJsonAttachment, writeObjectToJsonAttachment,type } = await import('@/api/google');
                 return { readJsonAttachment, writeObjectToJsonAttachment,type };
 
 }
