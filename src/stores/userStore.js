@@ -1,11 +1,14 @@
 // stores/userStore.js
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 export const useUserStore = defineStore('user', () => {
   // State: List of users with username, email, and accessToken
   const users = ref([
   ]);
+
+
+
 
   // Actions: Methods to manipulate the state
   function addUser(username, email, accessToken = null) {
@@ -28,6 +31,8 @@ export const useUserStore = defineStore('user', () => {
   // Getters: Computed properties
   const userCount = () => users.value.length;
   const getUserByEmail = (email) => users.value.find((user) => user.email === email);
+
+
 
   return {
     users,
