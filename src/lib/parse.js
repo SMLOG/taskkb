@@ -6,23 +6,26 @@ export function jsonParse(jsonString){
         return value;
       });
 }
-export const parseHash = (hash) => {
+export   const parseHash = (hash) => {
   let file = ''
   let tab = ''
+  let storageType = ''
 
-  if (!hash || !hash.startsWith('#/')) {
+  if (!hash || !hash.includes('#/')) {
     return { file, tab }
   }
 
-  const pattern = /^#\/file-([^/]+)\/tab-([^/]+)(?:[/?/]+)?$/
+  const pattern = /\/([GB])-([^/]+)\/([^/?]+)/
   const match = hash.match(pattern)
 
   if (match) {
-    file = match[1]
-    tab = match[2]
-  } else {
-    console.warn(`Invalid hash format: "${hash}". Expected: #/file-xxx/tab-xxx[?/]`)
+    storageType = match[1]
+    file = match[2]
+    tab = match[3]
+    console.log(storageType,file,tab)
+  } else if (hash) {
+    console.warn(`Invalid hash format: "${hash}". Expected: contains #/file-xxx/tab-xxx`)
   }
 
-  return { file, tab }
+  return { file, tab,storageType }
 }

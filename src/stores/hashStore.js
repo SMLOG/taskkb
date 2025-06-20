@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
 import { useAppStore} from '@/stores/appStore'
 import { useUserStore} from '@/stores/userStore'
+import {parseHash} from '@/lib/parse';
 
 export const useHashStore = defineStore('hash', () => {
   // Reactive state for file and tab
@@ -16,29 +17,7 @@ export const useHashStore = defineStore('hash', () => {
 
 
   // Parse hash function (same as before)
-  const parseHash = (hash) => {
-    let file = ''
-    let tab = ''
-    let storageType = ''
-  
-    if (!hash || !hash.includes('#/')) {
-      return { file, tab }
-    }
-  
-    const pattern = /\/([GB])-([^/]+)\/([^/?]+)/
-    const match = hash.match(pattern)
-  
-    if (match) {
-      storageType = match[1]
-      file = match[2]
-      tab = match[3]
-      console.log(storageType,file,tab)
-    } else if (hash) {
-      console.warn(`Invalid hash format: "${hash}". Expected: contains #/file-xxx/tab-xxx`)
-    }
-  
-    return { file, tab,storageType }
-  }
+
 
   // Get the current route
   const route = useRoute()

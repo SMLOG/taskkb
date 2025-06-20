@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
   // Actions: Methods to manipulate the state
   function addUser(username, email, accessToken = null) {
     if (username && email) {
-      users.value.push({ username, email, accessToken });
+      users.value.push({ username, email, accessToken});
     }
   }
 
