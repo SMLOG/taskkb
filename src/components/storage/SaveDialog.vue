@@ -52,7 +52,6 @@ import { getStorageBridgeByName } from '@/api/bridge';
 import { storeToRefs } from 'pinia';
 
 const {fileName,showAuth,mode,cacheFolders} = storeToRefs(useModeStore());
-const emit = defineEmits(['saved']);
 
 
 const nameMap = {
@@ -74,8 +73,16 @@ const changeMode = () =>{
       if(pickFolder){
         try {
           const folder  = await pickFolder();
-        cacheFolders.value.push({mode:selectOption.mode,...folder})
+        let exits = cacheFolders.value.filter(f=>f.id==folder.id);
+        if(exits.length>0){
+          let i = cacheFolders.value.indexOf(exits[0]);
+          selectIndexRef.value = i;
+        }else{
+          cacheFolders.value.unshift({mode:selectOption.mode,...folder})
         console.log('folder',folder)
+        selectIndexRef.value = 0;
+        }
+
         } catch (error) {
           console.error(error)
         }
