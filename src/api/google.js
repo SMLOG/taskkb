@@ -386,7 +386,6 @@ const readFile = async (fileId) => {
         if (!metadataResponse.ok) {
             const errorData = await metadataResponse.json();
             console.error('Error fetching metadata:', errorData);
-            alert('Error fetching metadata: ' + errorData.error.message);
             return;
         }
 
@@ -433,9 +432,9 @@ export async function readJsonAttachment(fileId, tabId) {
         
 
         let result = await readFile(fileId);
-
-        const content = jsonParse(result.content);
+        let content = result?.content?jsonParse(result.content):null;
         return { content,attachmentId:fileId };
+
     } catch (error) {
         console.error(`Error reading from Google Drive: ${error.message}`);
         return { error: `Failed to read file with ID ${fileId}: ${error.message}` };
