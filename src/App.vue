@@ -9,13 +9,11 @@ import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/storage/StorageOptions.vue';
 import NoFound from './components/NoFound.vue';
 import { storeToRefs } from 'pinia'
-import { ref } from 'vue'
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
 
 
-const loadedRef = ref(false);
 
 
 </script>
@@ -23,8 +21,8 @@ const loadedRef = ref(false);
 <template>
 
   <main class="flex-grow relative">
-    <div v-if="!loadedRef">Loading</div>
-    <NotificationProvider class="h-full" v-if="loadedRef">
+    <div v-if="appStore.loading">Loading</div>
+    <NotificationProvider class="h-full" v-if="!appStore.loading">
       <div class="flex flex-col h-full">
         <div> <TabsContainer /></div>
         <div class="flex-1  flex ">

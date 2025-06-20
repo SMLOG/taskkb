@@ -25,32 +25,37 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function loadFile(storageType,fileId,tabId){
-    if(!storageType||!fileId)
-      showPopUp.value=1;
-    else
+
     initLoadTabsData(storageType,fileId,tabId).catch(error => console.error('Init failed:', error));
   }
   async function initLoadTabsData(storageType,fileId,tabId) {
     try {
       loading.value = true;
       console.log('Initializing store...');
-      const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge(storageType);
-      typeRef.value=type;
-      const { attachmentId, content: objData } = await readJsonAttachment(fileId,tabId);
-      attachmentIdRef.value = attachmentId;
-      if (objData) {
-        tabs.value = objData.tabs || [];
-      }else{
-        showPopUp.value = 2;
+      let rootData = {tabs:[]};
+      if(storageType && storageType){
+        const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge(storageType);
+        typeRef.value=type;
+        const { attachmentId, content: objData } = await readJsonAttachment(fileId,tabId);
+        attachmentIdRef.value = attachmentId;
+        if(!objData){
+          showPopUp.value = 2;
+          return;
+        }
+       rootData = objData;
+      }
+
+      if (rootData) {
+        tabs.value = rootData.tabs ;
       }
 
       for (const tab of tabs.value) {
-        let { config, data } = objData.datas[tab.id];
+        let { config, data } = rootData.datas[tab.id];
         if (data && config) {
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
-      let activeTabIndex = objData&&objData.activeTab >= 0 && objData.activeTab < tabs.value.length ? objData.activeTab : tabs.length > 0 ? 0 : -1;
+      let activeTabIndex = rootData&&rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
       await setActiveTab(activeTabIndex);
 
     } catch (error) {
