@@ -7,7 +7,7 @@ import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/storage/StorageOptions.vue';
-import NoFound from './components/NoFound.vue';
+import NoFound from '@/components/storage/NoFound.vue';
 import { storeToRefs } from 'pinia'
 const appStore = useAppStore();
 

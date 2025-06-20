@@ -9,5 +9,5 @@
 
 <script setup>
 import TabsPanel from '@/components/TabsPanel.vue';
-import RightTop from '@/components/RightTop.vue';
+import RightTop from '@/components/storage/RightTop.vue';
 </script>
