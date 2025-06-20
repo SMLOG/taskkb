@@ -20,9 +20,9 @@
           @change="changeMode"
           >
         
-        <option  v-for="(option,i) in cacheFolders" :value="i">{{ option.name }}</option>
+        <option  v-for="(option,i) in cacheFolders" :value="i"> {{ (nameMap[option.mode]?nameMap[option.mode]+" - ":"") +option.name }}</option>
         <option v-if="cacheFolders.length" disabled>-----------------</option>
-        <option  v-for="(option,i) in modesRef" :value="cacheFolders.length+i">{{ option.name }}</option>
+        <option  v-for="(option,i) in modesRef" :value="cacheFolders.length+i">{{ (nameMap[option.mode]?nameMap[option.mode]+" - ":"") +option.name }}</option>
         </select>
       </div>
 
@@ -55,10 +55,12 @@ const {fileName,showAuth,mode,cacheFolders} = storeToRefs(useModeStore());
 const emit = defineEmits(['saved']);
 
 
-
+const nameMap = {
+  "G":"Google Drive"
+}
 const modesRef = ref([
-{mode:'G',name:"Google Drive - My Drive"}
-,{mode:'G',name:"Google Drive - Pick a folder...",folder:true}
+{mode:'G',name:"My Drive"}
+,{mode:'G',name:"Pick a folder...",folder:true}
 ,{mode:'L',name:"Browser"}
 ,{mode:'D',name:"Device"}
 ])
