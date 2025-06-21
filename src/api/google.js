@@ -20,7 +20,7 @@ const userStore = useUserStore();
 
 
 // Fetch user info from Google API
-const fetchUserInfo = async (token) => {
+export const fetchUserInfo = async (token) => {
     try {
         const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
             headers: { Authorization: `Bearer ${token}` },
@@ -134,7 +134,7 @@ async function handleSignIn() {
             await new Promise((resolve, reject) => {
                 tokenClient.requestAccessToken({
                     prompt: 'consent',
-                    callback: () => resolve(), // Callback is already handled in initGoogleSignIn
+                    callback: () => resolve(), 
                     error_callback: (error) => reject(error),
                 });
             });

@@ -1,21 +1,18 @@
-export async function getStorageBridge() {
-    const domains = [
+export async function getStorageBridge(m) {
+    const isForgeEnv = typeof window !== 'undefined' && [
         atob('cGVyZmVjdHRvZG8uY29t'),
         atob('dHJlZWdyaWQuaW8')
-    ];
-    const isForgeEnv = typeof window !== 'undefined' && domains.filter(domain => location.href.indexOf(domain) > -1).length == 0
+    ].filter(domain => location.href.indexOf(domain) > -1).length == 0;
+    let mode = m || "L";
 
     try {
         if (isForgeEnv) {
-            try {
-                const { readJsonAttachment, writeObjectToJsonAttachment, type } = await import('@/api/jira');
-                return { readJsonAttachment, writeObjectToJsonAttachment, type };
-
-            } catch (error) {
-                console.error('Failed to load Forge bridge:', error);
-                throw new Error('Forge bridge unavailable');
-            }
+            mode = "J"
         }
+
+        return getStorageBridgeByName(mode);
+
+
     } catch (error) {
         console.error('Error checking Forge environment:', error);
     }
@@ -32,10 +29,11 @@ export async function getStorageBridgeByName(mode) {
                 return await import('@/api/google');
             }
         case "J": {
-            const { readJsonAttachment, writeObjectToJsonAttachment, type } = await import('@/api/jira');
-            return { readJsonAttachment, writeObjectToJsonAttachment, type };
+            return await import('@/api/jira');
         }
-
+        case "L": {
+            return await import('@/api/browser');
+        }
     }
 
 
