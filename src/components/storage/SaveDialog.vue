@@ -34,8 +34,8 @@
         </button>
       </div>
     </div>
-    <AuthorizationDialog v-if="showAuth" @confirm="handleConfirm" @close="handleCancel" />
   </div>
+  <AuthorizationDialog v-if="showAuth" @confirm="handleConfirm" @close="handleCancel" />
 </template>
 
 <script setup>
@@ -120,22 +120,24 @@ const authAndSave = async () => {
   const selected = getSelected();
   mode.value = selected.mode;
   const modeStore = useModeStore();
+
   if (!await modeStore.authUser(selected.mode)) {
 
     try {
       await new Promise((resolve, reject) => {
-        currentDialog.value = dialogConfig[stepIndex];
         showAuth.value = true;
         resolvePromise.value = resolve;
         rejectPromise.value = reject;
       });
+    isOpen.value = false;
+
     } catch (error) {
       showAuth.value = false;
+
     }
   }
   parentFolder.value = cacheFolders.value.length > selectIndexRef.value ? selectIndexRef.value : -1;
   await useAppStore().saveData();
-  isOpen.value = false;
 
 
 };
