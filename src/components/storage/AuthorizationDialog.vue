@@ -1,5 +1,5 @@
 <template>
-  <div v-if="showAuth" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
+  <div  class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center relative border border-gray-200 dark:border-gray-700">
       <button 
         @click="closePopup" 
@@ -35,9 +35,13 @@ import { useModeStore } from "@/stores/modeStore";
 import { storeToRefs } from 'pinia';
 
 
+defineProps({
+  title: String
+});
+
 const {mode,showAuth} = storeToRefs(useModeStore());
 
-const emit = defineEmits(['cancel']);
+const emits=defineEmits(['confirm', 'close']);
 
 
 
@@ -54,7 +58,7 @@ const authorize = () => {
 };
 
 const closePopup = () => {
-  showAuth.value = false;
+  emits('close');
 };
 </script>
 

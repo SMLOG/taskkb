@@ -75,7 +75,6 @@
     </div>
   </div>
   <SaveDialog ref="saveDialog" />
-  <AuthorizationDialog />
 </template>
 
 <style>
@@ -113,7 +112,6 @@ import Config from '@/components/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
 import SaveDialog from '@/components/storage/SaveDialog.vue';
-import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue';
 
 
 
