@@ -120,7 +120,7 @@ const authAndSave = async () => {
   const selected = getSelected();
   mode.value = selected.mode;
   const modeStore = useModeStore();
-  if (!await modeStore.authUser()) {
+  if (!await modeStore.authUser(selected.mode)) {
 
     try {
       await new Promise((resolve, reject) => {

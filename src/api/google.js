@@ -1,6 +1,7 @@
 import { jsonParse } from '@/lib/parse';
 import { useUserStore } from '@/stores/userStore';
 import { ref } from 'vue';
+import { loadScript } from '@/lib/net';
 
 // Constants
 const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com';
@@ -16,21 +17,7 @@ let isTokenRequested = false;
 // Initialize user store
 const userStore = useUserStore();
 
-// Dynamically load scripts
-const loadScript = (src, onload) => {
-    return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = src;
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-            onload && onload();
-            resolve();
-        };
-        script.onerror = () => reject(new Error(`Failed to load script: ${src}`));
-        document.head.appendChild(script);
-    });
-};
+
 
 // Fetch user info from Google API
 const fetchUserInfo = async (token) => {
