@@ -122,11 +122,7 @@ const initGoogleSignIn = async () => {
 
 };
 
-
-
-
-
-async function handleSignInClick() {
+async function handleSignIn() {
     let tokenClient;
     if(accessToken.value)return;
     try {
@@ -194,7 +190,7 @@ const refreshAccessToken = async () => {
 
 // Pick folder with write permission filter
 export const pickFolder = async () => {
-    await handleSignInClick();
+    await handleSignIn();
 
     return  new Promise((resolve,reject)=>{
 
@@ -232,10 +228,7 @@ export const pickFolder = async () => {
 
 // Pick file
 const pickFile = async () => {
-    if (!accessToken.value) {
-        return;
-    }
-
+    await handleSignIn();
     const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes('text/plain');
 
     const picker = new google.picker.PickerBuilder()
@@ -413,7 +406,7 @@ export async function readJsonAttachment(fileId, tabId) {
 
     try {
 
-            await handleSignInClick();
+            await handleSignIn();
         
 
         let result = await readFile(fileId);
@@ -435,7 +428,7 @@ export async function writeObjectToJsonAttachment(dataObject, fileName, fileId) 
     }
 
     try {
-            await handleSignInClick();
+            await handleSignIn();
         
 
        const {id} = await writeFile(fileId, dataObject, fileName);
