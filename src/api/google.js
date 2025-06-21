@@ -128,7 +128,7 @@ async function handleSignIn() {
     try {
         if (!tokenClient) {
             console.log('Initializing token client');
-            tokenClient = await initGoogleSignIn(clientId, accessToken, isAuthenticated, isTokenRequested, userStore);
+            tokenClient = await initGoogleSignIn();
         } else {
             console.log('Requesting access token');
             await new Promise((resolve, reject) => {
