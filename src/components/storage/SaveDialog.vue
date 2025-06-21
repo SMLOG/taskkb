@@ -35,7 +35,7 @@
       </div>
     </div>
   </div>
-  <AuthorizationDialog v-if="showAuth" @confirm="handleConfirm" @close="handleCancel" />
+  <AuthorizationDialog v-if="showAuth" @confirm="handleConfirm" :name="nameMap[modeName]" :mode="modeName" @close="handleCancel" />
 </template>
 
 <script setup>
@@ -116,6 +116,7 @@ const handleCancel = () => {
   rejectPromise.value();
 };
 
+const modeName = ref('');
 const authAndSave = async () => {
   const selected = getSelected();
   mode.value = selected.mode;
@@ -126,6 +127,7 @@ const authAndSave = async () => {
     try {
       await new Promise((resolve, reject) => {
         showAuth.value = true;
+        modeName.value = selected.mode;
         resolvePromise.value = resolve;
         rejectPromise.value = reject;
       });
