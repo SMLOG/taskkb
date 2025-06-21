@@ -34,7 +34,7 @@
           Cancel
         </button>
         <button 
-          @click="save" 
+          @click="authAndSave" 
           class="px-4 py-2 bg-green-500 dark:bg-green-600 text-white rounded hover:bg-green-600 dark:hover:bg-green-700 transition-colors duration-200"
         >
           Save
@@ -65,9 +65,13 @@ const modesRef = ref([
 ,{mode:'D',name:"Device"}
 ])
 
-const changeMode = () =>{
+const getSelected = () =>{
   const allOptions = [...cacheFolders.value,...modesRef.value]
   const selectOption = allOptions[selectIndexRef.value];
+  return selectOption;
+}
+const changeMode = () =>{
+  const selectOption = getSelected();;
   if(selectOption.folder){
       (async()=>{
       const {pickFolder} = await getStorageBridgeByName(selectOption.mode);
@@ -85,7 +89,10 @@ const changeMode = () =>{
         }
 
         } catch (error) {
-          console.error(error)
+         
+         const df = modesRef.value.filter(e=>e.mode=== selectOption.mode)[0];
+         const allOptions = [...cacheFolders.value,...modesRef.value]
+         selectIndexRef.value = allOptions.indexOf(df);
         }
 
       }
@@ -105,11 +112,15 @@ const cancel = () => {
   isOpen.value = false;
 };
 
-const save = () => {
+const authAndSave =  async() => {
   isOpen.value = false;
-  showAuth.value = true;
+  const selected = getSelected();
+  mode.value = selected.mode;
+  const modeStore = useModeStore();
+  await modeStore.authUser();
   parentFolder.value = cacheFolders.value.length>selectIndexRef.value?selectIndexRef.value:-1;
-  useAppStore.saveData();
+  useAppStore().saveData();
+
 
 };
 

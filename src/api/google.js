@@ -50,7 +50,7 @@ const fetchUserInfo = async (token) => {
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
-        alert('Failed to fetch user info: ' + error.message);
+        console.error('Failed to fetch user info: ' + error.message);
         return null;
     }
 };
@@ -158,7 +158,7 @@ async function handleSignInClick() {
         }
     } catch (error) {
         console.error('Error in handleSignInClick:', error);
-        alert('Sign-in failed: ' + error.message);
+        console.error('Sign-in failed: ' + error.message);
     }
 }
 
@@ -257,7 +257,7 @@ const pickFile = async () => {
         .setCallback((data) => {
             if (data.action === google.picker.Action.PICKED) {
                 selectedFileId.value = data.docs[0].id;
-                alert('Selected file: ' + data.docs[0].name);
+                console.error('Selected file: ' + data.docs[0].name);
             }
         })
         .build();
@@ -266,7 +266,7 @@ const pickFile = async () => {
 
 const writeFile = async (fileId, dataObj, fileName) => {
     if (!accessToken.value) {
-        alert('No access token found. Please sign in again.');
+        console.error('No access token found. Please sign in again.');
         return;
     }
 
@@ -307,12 +307,12 @@ const writeFile = async (fileId, dataObj, fileName) => {
             }
 
             if (!['writer', 'owner'].includes(permissionData.role)) {
-                alert('You do not have write permission for the selected folder. Please choose another folder.');
+                console.error('You do not have write permission for the selected folder. Please choose another folder.');
                 return;
             }
         } catch (error) {
             console.error('Error checking folder permissions:', error);
-            alert('Unable to verify folder permissions: ' + error.message);
+            console.error('Unable to verify folder permissions: ' + error.message);
             return;
         }
     }
@@ -354,22 +354,20 @@ const writeFile = async (fileId, dataObj, fileName) => {
             return data;
         } else {
             console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
-            alert(`Error ${isUpdate ? 'updating' : 'creating'} file: ${data.error.message}`);
         }
     } catch (error) {
         console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, error);
-        alert(`Error ${isUpdate ? 'updating' : 'creating'} file: ${error.message}`);
     }
 };
 
 // Read selected file
 const readFile = async (fileId) => {
     if (!accessToken.value) {
-        alert('No access token found. Please sign in again.');
+        console.error('No access token found. Please sign in again.');
         return;
     }
     if (!fileId) {
-        alert('Please select a file to read first.');
+        console.error('Please select a file to read first.');
         return;
     }
 
@@ -409,12 +407,12 @@ const readFile = async (fileId) => {
         } else {
             const errorData = await contentResponse.json();
             console.error('Error reading file content:', errorData);
-            alert('Error reading file content: ' + errorData.error.message);
+            console.error('Error reading file content: ' + errorData.error.message);
             return;
         }
     } catch (error) {
         console.error('Unexpected error:', error);
-        alert('Unexpected error: ' + error.message);
+        console.error('Unexpected error: ' + error.message);
     }
 };
 

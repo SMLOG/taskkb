@@ -31,6 +31,11 @@ export const useUserStore = defineStore('user', () => {
   // Getters: Computed properties
   const userCount = () => users.value.length;
   const getUserByEmail = (email) => users.value.find((user) => user.email === email);
+  const getUser = ()=>{
+    if(users.value.length){
+      return users.value[0];
+    }else return null;
+  }
 
 
 
@@ -40,6 +45,6 @@ export const useUserStore = defineStore('user', () => {
     removeUser,
     updateUser,
     userCount,
-    getUserByEmail,
+    getUserByEmail,getUser
   };
 });
