@@ -25,5 +25,5 @@ export const cpList = ref([
   { type: 'ColDropText', name: "Text" },
   { type: 'ColDate', name: "Date" },
   { type: 'StartDate', name: "Start date" },
-  { type: 'ColCheck', name: "Check" }
+  { type: 'ColCheck', name: "CheckBox" }
 ]);
