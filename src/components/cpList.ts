@@ -5,12 +5,14 @@ import ColDropText from '@/components/field/ColDropText.vue';
 import ColDate from '@/components/field/ColDate.vue';
 import StartDate from '@/components/field/StartDate.vue';
 import ColSeq from '@/components/field/ColSeq.vue';
+import ColCheck from '@/components/field/ColCheck.vue';
 const componentMap = {
   ColTitle,
   ColDropText,
   ColDate,
   ColSeq,
-  StartDate
+  StartDate,
+  ColCheck
 };
 // Resolve component dynamically
 export function resolveComponent(cp) {
@@ -22,5 +24,6 @@ export const cpList = ref([
   { type: 'ColTitle', name: "Title" },
   { type: 'ColDropText', name: "Text" },
   { type: 'ColDate', name: "Date" },
-  { type: 'StartDate', name: "Start date" }
+  { type: 'StartDate', name: "Start date" },
+  { type: 'ColCheck', name: "Check" }
 ]);
