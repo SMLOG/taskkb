@@ -1,6 +1,6 @@
 <template>
   <div v-if="isOpen"
-    class="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
+    class="fixed inset-0 z-999 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div
       class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center relative border border-gray-200 dark:border-gray-700">
       <button @click="closePopup"

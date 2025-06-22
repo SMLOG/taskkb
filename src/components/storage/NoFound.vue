@@ -1,6 +1,6 @@
 <template>
     <div
-        class="bg-gray-900 fixed inset-0 z-50 flex items-center justify-center flex items-center justify-center h-screen z-99999">
+        class="bg-gray-900 fixed inset-0 z-50 flex items-center justify-center flex items-center justify-center h-screen z-9999">
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center border border-gray-700">
             <h2 class="text-gray-400 text-lg mb-4">Error loading file</h2>
             <p class="text-gray-500 mb-6">The file was not found. It does not exist or you do not have access. ()</p>

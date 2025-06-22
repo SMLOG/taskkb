@@ -1,6 +1,6 @@
 <template>
   <div v-if="isOpen"
-    class="fixed inset-0 flex items-center justify-center z-9999 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
+    class="fixed inset-0 flex items-center justify-center z-999 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div
       class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 p-4 rounded-lg w-96 text-gray-900 dark:text-gray-100">
       <div class="mb-4">

@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed inset-0 flex items-center justify-center z-9999" v-if="modelValue" @click.self="closePopup()">
+  <div class="fixed inset-0 flex items-center justify-center z-999" v-if="modelValue" @click.self="closePopup()">
 
     <div
       class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-lg rounded-lg p-6 w-96 shadow-xl border border-white/20 dark:border-gray-700/30">
