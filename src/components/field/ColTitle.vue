@@ -32,7 +32,9 @@ const props = defineProps({
   level:{
         type: Number,
     required: false
-  }
+  },value: {
+    required: false
+  },
 });
 
 
