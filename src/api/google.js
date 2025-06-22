@@ -105,7 +105,6 @@ const initGoogleSignIn = async () => {
                     }
                 },
                 error_callback: (error) => {
-                    console.error('Token initialization error:', error);
                     reject(error);
                 },
             });
@@ -116,13 +115,12 @@ const initGoogleSignIn = async () => {
 
         return await tokenPromise; // Wait for token response and return tokenClient
     } catch (error) {
-        console.error('Error in initGoogleSignIn:', error);
         throw new Error('Error initializing GSI: ' + error.message);
     }
 
 };
 
-async function authorize() {
+export async function authorize() {
     let tokenClient;
     if(accessToken.value)return;
     try {

@@ -1,6 +1,6 @@
 <template>
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
+  <div v-if="isOpen"
+    class="fixed inset-0 z-9999 flex items-center justify-center bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div
       class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center relative border border-gray-200 dark:border-gray-700">
       <button @click="closePopup"
@@ -10,7 +10,7 @@
       </button>
       <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Authorization required</h2>
       <p class="mb-4 text-gray-600 dark:text-gray-300">Authorize this app in {{ name }}:</p>
-      <div> <button @click="handleSignInClick"
+      <div> <button @click="authorize"
           class="bg-blue-500 text-white font-semibold py-2 px-4 rounded hover:bg-blue-600 transition duration-200">
           Authorize </button></div>
       <div class="mt-4 flex items-center justify-center">
@@ -25,29 +25,43 @@
 <script setup>
 import { ref } from 'vue';
 import { getStorageBridgeByName } from '@/api/bridge';
+const isOpen = ref(false);
 
-const props = defineProps({
-  name: String,
-  mode:String
-});
-const emits = defineEmits(['confirm', 'close']);
 
 const rememberMe = ref(false);
 
 const closePopup = () => {
-  emits('close');
+  returnReject.value();
 };
-const handleSignInClick = async () => {
+const authorize = async () => {
   try {
-    const storageBridge = await getStorageBridgeByName(props.mode);
+    const storageBridge = await getStorageBridgeByName(mode.value);
     await storageBridge.authorize(rememberMe.value);
-    emits('confirm');
+    console.error("Authorization success");
+
+    closePopup();
+    returnResolve.value();
   } catch (error) {
-    console.error("Authorization failed:", error);
-   emits('close');
 
   }
 };
+
+const returnResolve = ref(null);
+const returnReject = ref(null);
+const mode = ref(null);
+const name = ref(null);
+defineExpose({
+  async open(modeValue, modeName) {
+    return new Promise((resolve, reject) => {
+      mode.value = modeValue;
+      name.value = modeName;
+      returnResolve.value = resolve;
+      returnReject.value = reject;
+      isOpen.value = true;
+    })
+  }
+});
+
 </script>
 
 <style scoped>

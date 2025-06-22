@@ -8,6 +8,7 @@ import { useModeStore } from '@/stores/modeStore';
 export const useAppStore = defineStore('app', () => {
   // Tabs state
   const tabs = ref([]);
+  const path = ref(null);
   const tabsDataMapRef = ref({});
   const activeTabRef = ref(-1);
   const schReadyRef = ref(false);
@@ -239,7 +240,7 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     initLoadTabsData,
-    tabs,
+    tabs,path,
     activeTabRef,
     treeRef,
     configRef,

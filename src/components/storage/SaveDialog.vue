@@ -1,6 +1,6 @@
 <template>
   <div v-if="isOpen"
-    class="fixed inset-0 flex items-center justify-center z-50 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
+    class="fixed inset-0 flex items-center justify-center z-9999 bg-black/40 dark:bg-black/60 backdrop-blur-sm transition-all duration-300">
     <div
       class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 p-4 rounded-lg w-96 text-gray-900 dark:text-gray-100">
       <div class="mb-4">
@@ -15,7 +15,8 @@
           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none transition-colors duration-200"
           @change="changeMode">
 
-          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")
+          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " -
+            " : "")
             +option.name }}</option>
           <option v-if="cacheFolders.length" disabled>-----------------</option>
           <option v-for="(option, i) in modesRef" :value="cacheFolders.length + i">{{
@@ -28,14 +29,15 @@
           class="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors duration-200">
           Cancel
         </button>
-        <button @click="authAndSave"
+        <button @click="save"
           class="px-4 py-2 bg-green-500 dark:bg-green-600 text-white rounded hover:bg-green-600 dark:hover:bg-green-700 transition-colors duration-200">
           Save
         </button>
       </div>
     </div>
   </div>
-  <AuthorizationDialog v-if="showAuth" @confirm="handleConfirm" :name="nameMap[modeName]" :mode="modeName" @close="handleCancel" />
+
+  <AuthorizationDialog ref="authDialog" />
 </template>
 
 <script setup>
@@ -47,9 +49,12 @@ import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue';
 
 import { storeToRefs } from 'pinia';
 
-const { fileName, mode, cacheFolders, parentFolder } = storeToRefs(useModeStore());
+const authDialog = ref(null);
 
-const showAuth = ref(false);
+
+
+const { fileName, cacheFolders } = storeToRefs(useModeStore());
+
 
 const nameMap = {
   "G": "Google Drive"
@@ -103,50 +108,27 @@ const isOpen = ref(false);
 
 const cancel = () => {
   isOpen.value = false;
+  returnReject.value();
 };
 
-const resolvePromise = ref(null);
-const rejectPromise = ref(null);
 
-const handleConfirm = () => {
-  resolvePromise.value();
-};
-
-const handleCancel = () => {
-  rejectPromise.value();
-};
-
-const modeName = ref('');
-const authAndSave = async () => {
+const save = async () => {
   const selected = getSelected();
-  mode.value = selected.mode;
-  const modeStore = useModeStore();
-
-  if (!await modeStore.authUser(selected.mode)) {
-
-    try {
-      await new Promise((resolve, reject) => {
-        showAuth.value = true;
-        modeName.value = selected.mode;
-        resolvePromise.value = resolve;
-        rejectPromise.value = reject;
-      });
-    isOpen.value = false;
-
-    } catch (error) {
-      showAuth.value = false;
-
-    }
-  }
-  parentFolder.value = cacheFolders.value.length > selectIndexRef.value ? selectIndexRef.value : -1;
+  await authDialog.value.open(selected.mode, nameMap[selected.mode]);
   await useAppStore().saveData();
 
-
 };
 
+const returnResolve = ref(null);
+const returnReject = ref(null);
+
 defineExpose({
-  open() {
-    isOpen.value = true;
+  async open() {
+    return new Promise((resolve, reject) => {
+      returnResolve.value = resolve;
+      returnReject.value = reject;
+      isOpen.value = true;
+    })
   }
 });
 </script>
