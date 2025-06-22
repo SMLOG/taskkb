@@ -1,7 +1,7 @@
 <template>
     <div class="col td flex" :class="{ sticky: col.sticky }" :style="colStyle(col,cellIndex)">
         <div class="cell flex flex-1  px-1">
-            <component :is="resolveComponent(col.cp)" :value="cellValue" :row="row" :col="col" :level="level" :index="id">
+            <component :is="resolveComponent(col.cp)" :value="cellValue" :row="row" :col="col" :level="level" :index="index">
             </component>
         </div>
     </div>
@@ -36,7 +36,7 @@ const props = defineProps({
     id: {
         type: String,
         default: ''
-    },
+    },index:{}
 
 });
 
