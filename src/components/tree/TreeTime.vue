@@ -2,12 +2,7 @@
     <div class="row grid min-h-7" :data-weeks="1" :class="{ selected: selectDepths.indexOf(depth) > -1 }" :data-depth="depth" :data-level="level" v-if="depth !== ''"
         :draggable="isDrag" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-            <div class="col td flex" :class="{ sticky: col.sticky }" :style="colStyle(col, 1, cellIndex)">
-                <div class="cell flex flex-1  px-1">
-                    <component :is="resolveComponent(col.cp)" :row="row" :col="col" :level="level" :index="id">
-                    </component>
-                </div>
-            </div>
+                <Cell :row="row" :col="col" :level="level" :index="id" :depth="depth" ></Cell>
         </template>
         <ScheduleCol :row="row" :days="days" :firstDay="firstDay" :showSch="showSch" :weeks="weeksRef"  />
     </div>
@@ -21,6 +16,7 @@
 import { useTree } from '@/composables/useTree';
 import { defineProps, watch } from 'vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
+import Cell from '@/components/tree/Cell.vue';
 import ScheduleCol from '@/components/tree/ScheduleCol.vue';
 import { resolveComponent } from '@/components/cpList';
 
