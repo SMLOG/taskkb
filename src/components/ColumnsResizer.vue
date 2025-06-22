@@ -5,7 +5,7 @@
       <div
         class="columns-resize-bar"
         ref="rbar"
-        @mousedown="startResize(col, key, $event)"
+        @mousedown="startResize(col, key, $event);handleMouseDown(col, key, $event);"
       ></div>
     </template>
     <div
@@ -21,6 +21,7 @@
 import { ref, onMounted, onUnmounted, nextTick, reactive,watch } from 'vue';
 import { useAppStore } from '@/stores/appStore';
 import { storeToRefs } from 'pinia'
+import { max } from 'date-fns';
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
@@ -168,6 +169,72 @@ onUnmounted(() => {
   window.removeEventListener('resize', winResize);
   window.removeEventListener('scroll', scrollEventHandler);
 });
+
+function getFixedPositionWidths(selector) {
+    const originals = document.querySelectorAll(selector);
+    if (!originals.length) return null;
+
+    // Store results for each element
+    const widths = [];
+
+    originals.forEach((original, index) => {
+        // 1. Create a fixed-position wrapper (hidden & off-screen)
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '-9999px';
+        wrapper.style.left = '-9999px';
+        wrapper.style.visibility = 'hidden';
+        wrapper.style.display = 'inline-block';
+
+        // 2. Clone the current element (deep clone)
+        const clone = original.cloneNode(true);
+
+        // 3. Append clone to wrapper
+        wrapper.appendChild(clone);
+
+        // 4. Add wrapper to DOM (required for measurement)
+        document.body.appendChild(wrapper);
+
+        // 5. Get the wrapper's width (matching the clone's fixed width)
+        const width = wrapper.getBoundingClientRect().width;
+        widths.push({ index, width, element: original });
+
+        // 6. Clean up (remove wrapper)
+        document.body.removeChild(wrapper);
+    });
+
+    return widths;
+}
+
+const mousedownCount = ref(0);
+let mousedownTimer = null;
+
+const handleMouseDown = (col, colIndex, event) => {
+  mousedownCount.value++;
+  
+  if (mousedownCount.value === 1) {
+    // First click - wait to see if a second comes
+    mousedownTimer = setTimeout(() => {
+      // If no second click within timeout, treat as single click
+      mousedownCount.value = 0;
+    }, 300); // Adjust delay (ms) for double-click detection
+  } else if (mousedownCount.value === 2) {
+    // Double click detected!
+    clearTimeout(mousedownTimer);
+    mousedownCount.value = 0;
+    calColWidthAndResize(col, colIndex); // Your target function
+  }
+};
+
+
+const calColWidthAndResize = (col, colIndex) => {
+  const th = props.th[colIndex];
+  const results = getFixedPositionWidths(`.row .col:nth-child(${colIndex+1})`);
+  const maxWidth = Math.max(...results.map(r => r.width));
+  col.width = maxWidth;
+    reAdjustBars();
+
+};
 </script>
 
 <style scoped>
