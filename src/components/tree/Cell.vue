@@ -1,5 +1,5 @@
 <template>
-    <div class="col td flex" :class="{ sticky: col.sticky }" >
+    <div class="col td flex" :class="{ sticky: col.sticky }" :style="colStyle(col,cellIndex)">
         <div class="cell flex flex-1  px-1">
             <component :is="resolveComponent(col.cp)" :row="row" :col="col" :level="level" :index="id">
             </component>
@@ -21,6 +21,10 @@ const props = defineProps({
         type: Object,
         required: true,
     },
+    cellIndex: {
+        type: Number,
+        required: true
+    },
     depth: {
         type: String,
         required: true,
@@ -37,6 +41,14 @@ const props = defineProps({
 
 });
 
-
+const colStyle = (col, index) => {
+    let style = {};
+    if (col.sticky) {
+        style.left = `var(--sticky-left-${index})`;
+    } else {
+        style.left = 'auto';
+    }
+    return style;
+};
 </script>
 

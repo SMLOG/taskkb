@@ -2,7 +2,7 @@
     <div class="row grid min-h-7" :data-weeks="1" :class="{ selected: selectDepths.indexOf(depth) > -1 }" :data-depth="depth" :data-level="level" v-if="depth !== ''"
         :draggable="isDrag" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
-                <Cell :row="row" :col="col" :level="level" :index="id" :depth="depth" ></Cell>
+                <Cell :row="row" :col="col" :level="level" :cellIndex="cellIndex" :index="id" :depth="depth" ></Cell>
         </template>
         <ScheduleCol :row="row" :days="days" :firstDay="firstDay" :showSch="showSch" :weeks="weeksRef"  />
     </div>
