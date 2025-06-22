@@ -31,6 +31,7 @@ const isOpen = ref(false);
 const rememberMe = ref(false);
 
 const closePopup = () => {
+  isOpen.value = false;
   returnReject.value();
 };
 const authorize = async () => {

@@ -122,25 +122,21 @@ const initGoogleSignIn = async () => {
 
 export async function authorize() {
     let tokenClient;
-    if(accessToken.value)return;
-    try {
-        if (!tokenClient) {
-            console.log('Initializing token client');
-            tokenClient = await initGoogleSignIn();
-        } else {
-            console.log('Requesting access token');
-            await new Promise((resolve, reject) => {
-                tokenClient.requestAccessToken({
-                    prompt: 'consent',
-                    callback: () => resolve(), 
-                    error_callback: (error) => reject(error),
-                });
+    if (accessToken.value) return;
+    if (!tokenClient) {
+        console.log('Initializing token client');
+        tokenClient = await initGoogleSignIn();
+    } else {
+        console.log('Requesting access token');
+        await new Promise((resolve, reject) => {
+            tokenClient.requestAccessToken({
+                prompt: 'consent',
+                callback: () => resolve(),
+                error_callback: (error) => reject(error),
             });
-        }
-    } catch (error) {
-        console.error('Error in handleSignInClick:', error);
-        console.error('Sign-in failed: ' + error.message);
+        });
     }
+
 }
 
 
@@ -149,9 +145,9 @@ const loadPicker = async () => {
         console.error('Google API Client Library not loaded');
         return;
     }
-   return new Promise((resolve)=>{
-    gapi.load('picker', { callback: resolve });
-   }) 
+    return new Promise((resolve) => {
+        gapi.load('picker', { callback: resolve });
+    })
 };
 
 // Refresh access token
@@ -190,7 +186,7 @@ const refreshAccessToken = async () => {
 export const pickFolder = async () => {
     await authorize();
 
-    return  new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
 
         const pickerCallback = (data) => {
             if (data.action === google.picker.Action.PICKED) {
@@ -404,12 +400,12 @@ export async function readJsonAttachment(fileId, tabId) {
 
     try {
 
-            await authorize();
-        
+        await authorize();
+
 
         let result = await readFile(fileId);
-        let content = result?.content?jsonParse(result.content):null;
-        return { content,attachmentId:fileId };
+        let content = result?.content ? jsonParse(result.content) : null;
+        return { content, attachmentId: fileId };
 
     } catch (error) {
         console.error(`Error reading from Google Drive: ${error.message}`);
@@ -426,10 +422,10 @@ export async function writeObjectToJsonAttachment(dataObject, fileName, fileId) 
     }
 
     try {
-            await authorize();
-        
+        await authorize();
 
-       const {id} = await writeFile(fileId, dataObject, fileName);
+
+        const { id } = await writeFile(fileId, dataObject, fileName);
 
         return { success: true, attachmentId: id }; // Note: writeFile doesn't return fileId for new files; adjust as needed
     } catch (error) {

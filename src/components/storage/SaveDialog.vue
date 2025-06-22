@@ -111,9 +111,14 @@ const cancel = () => {
 
 
 const save = async () => {
-  const selected = getSelected();
+  try{
+    const selected = getSelected();
   await authDialog.value.open(selected.mode, nameMap[selected.mode]);
-  await useAppStore().saveData();
+  //await useAppStore().saveData();
+  }catch(error){
+    
+  }
+
 
 };
 
