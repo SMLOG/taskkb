@@ -15,8 +15,7 @@
           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none transition-colors duration-200"
           @change="changeMode">
 
-          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")
-            +option.name }}</option>
+          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")+option.name }}</option>
           <option v-if="cacheFolders.length" disabled>-----------------</option>
           <option v-for="(option, i) in modesRef" :value="cacheFolders.length + i">{{
             (nameMap[option.mode] ? nameMap[option.mode] + " - " : "") + option.name }}</option>
@@ -36,7 +35,7 @@
     </div>
   </div>
 
-<AuthorizationDialog ref="authDialog" />
+  <AuthorizationDialog ref="authDialog" />
 </template>
 
 <script setup>
@@ -52,7 +51,7 @@ const authDialog = ref(null);
 
 
 
-const { fileName,cacheFolders } = storeToRefs(useModeStore());
+const { fileName, cacheFolders } = storeToRefs(useModeStore());
 
 
 const nameMap = {
@@ -113,7 +112,7 @@ const cancel = () => {
 
 const save = async () => {
   const selected = getSelected();
-  await authDialog.value.open(selected.mode,nameMap[selected.mode]);
+  await authDialog.value.open(selected.mode, nameMap[selected.mode]);
   await useAppStore().saveData();
 
 };
@@ -122,10 +121,10 @@ const returnResolve = ref(null);
 const returnReject = ref(null);
 
 defineExpose({
- async open() {
-    return new Promise((resolve,reject)=>{
+  async open() {
+    return new Promise((resolve, reject) => {
       returnResolve.value = resolve;
-      returnReject.value=reject;
+      returnReject.value = reject;
       isOpen.value = true;
     })
   }
