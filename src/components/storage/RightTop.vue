@@ -2,6 +2,17 @@
     <div class="max-w-md mx-2 mt-1 relative">
       <div class="flex space-x-2">
         <button
+          @click="more"
+          class="text-white  dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center transition-colors duration-200"
+        >
+  
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="4" cy="12" r="2" fill="black"/>
+  <circle cx="12" cy="12" r="2" fill="black"/>
+  <circle cx="20" cy="12" r="2" fill="black"/>
+</svg>
+        </button>
+        <button
           @click="share"
           class="bg-blue-500 text-white dark:bg-blue-700 dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-blue-600 dark:hover:bg-blue-800 flex items-center transition-colors duration-200"
         >
