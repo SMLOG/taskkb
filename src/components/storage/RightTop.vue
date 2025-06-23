@@ -27,7 +27,7 @@
       </div>
 
       <!-- Profile Footer -->
-      <div v-if="isProfileVisible"  class="absolute z-99  w-80 m-1 right-0 bg-white dark:bg-gray-800 p-4 border-t border-gray-300 dark:border-gray-600">
+      <div v-if="isProfileVisible"  class="absolute z-99  w-80 m-1 right-0 bg-white dark:bg-gray-800  border-t border-gray-300 dark:border-gray-600">
         <Profile/>
       </div>
     </div>
