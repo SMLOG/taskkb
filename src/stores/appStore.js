@@ -5,7 +5,7 @@ import {loopTree} from '@/lib/treelib';
 import {weeksBetween} from '@/lib/schedule';
 import { useModeStore } from '@/stores/modeStore';
 import { useUserStore } from './userStore';
-import { fi } from 'date-fns/locale';
+import { useHashStore } from './hashStore';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -122,6 +122,10 @@ export const useAppStore = defineStore('app', () => {
          Object.assign(path.value,result);
 
         tabs.value.map(tab=>tab.saved=true);
+
+        useHashStore().updatePath(path.value);
+        
+        
 
         console.log(`Saved data  attachment from ${orgPath&&JSON.stringify(orgPath,2)}  to ${path.value && JSON.stringify(path.value)}`);
 

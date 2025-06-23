@@ -2,9 +2,9 @@
 import { defineStore } from 'pinia'
 import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
-import { useAppStore} from '@/stores/appStore'
-import { useUserStore} from '@/stores/userStore'
-import {parseHash} from '@/lib/parse';
+import { useAppStore } from '@/stores/appStore'
+import { useUserStore } from '@/stores/userStore'
+import { parseHash } from '@/lib/parse';
 import { useAuthDialog } from '@/composables/useAuthDialog';
 
 
@@ -26,19 +26,19 @@ export const useHashStore = defineStore('hash', () => {
 
   // Function to update state from hash
   const updateHash = (hash) => {
-    const { file: newFile, tab: newTab,storageType } = parseHash(hash)
+    const { file: newFile, tab: newTab, storageType } = parseHash(hash)
     file.value = newFile
     tab.value = newTab
     type.value = storageType;
-    (async()=>{
-      try{
-          await appStore.loadFile(storageType, newFile, newTab);
-      }catch(error){
-         await useAuthDialog().globalAuthDlg.value.open({mode:storageType},true);
-         await appStore.loadFile(storageType, newFile, newTab);
+    (async () => {
+      try {
+        await appStore.loadFile(storageType, newFile, newTab);
+      } catch (error) {
+        await useAuthDialog().globalAuthDlg.value.open({ mode: storageType }, true);
+        await appStore.loadFile(storageType, newFile, newTab);
 
       }
-  })();
+    })();
 
   }
 
@@ -47,17 +47,28 @@ export const useHashStore = defineStore('hash', () => {
 
 
   // Fallback: Listen to browser hashchange events
-  window.addEventListener('hashchange', () => {
+  const hashLinstern = () => {
     updateHash(window.location.hash)
-  })
+  }
+  window.addEventListener('hashchange', hashLinstern)
 
-  function resetHash(){
-    window.location.hash = window.location.hash.replace( /\/([GB])-([^/]+)\/([^/?]+)/g,'');
+  function resetHash() {
+    window.location.hash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '');
   }
 
+  function updatePath(path) {
+    let newHash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tab}`);
+   if(window.location.hash!==newHash){
+      window.removeEventListener('hashchange', hashLinstern)
+      window.location.hash = newHash
+      window.addEventListener('hashchange', hashLinstern)
+   }
+
+
+  }
   return {
     type,
     file,
-    tab,resetHash
+    tab, resetHash, updatePath
   }
 })
