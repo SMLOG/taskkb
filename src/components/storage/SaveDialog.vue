@@ -35,17 +35,16 @@
     </div>
   </div>
 
-  <AuthorizationDialog ref="authDialog" />
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { useModeStore } from "@/stores/modeStore";
 import { getStorageBridgeByName } from '@/api/bridge';
-import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
+import { useAuthDialog } from '@/composables/useAuthDialog';
 
 const authDialog = ref(null);
 
@@ -131,7 +130,7 @@ const save = async () => {
     if(selected.accessToken){
 
     }else{
-      const auth = await authDialog.value.open(selected, nameMap[selected.mode]);
+      const auth = await useAuthDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
 
       rauth = {...selected,...auth};
       addOrUpdateAuthCacheList(rauth);

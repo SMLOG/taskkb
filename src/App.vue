@@ -9,13 +9,15 @@ import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/storage/StorageOptions.vue';
 import NoFound from '@/components/storage/NoFound.vue';
 import { storeToRefs } from 'pinia';
+import { useAuthDialog } from '@/composables/useAuthDialog';
 import { useHash } from '@/composables/useHash';
 import { ref } from 'vue';
 import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue'
 import About from '@/components/About.vue';
 
 const authDialog = ref(null);
-useHash(authDialog);
+useAuthDialog(authDialog);
+useHash();
 
 const appStore = useAppStore();
 
@@ -26,7 +28,6 @@ const {activeTabRef} = storeToRefs(appStore);
 </script>
 
 <template>
-<AuthorizationDialog ref="authDialog" />
 
   <main class="flex-grow relative" >
     <About v-if="appStore.loading"/>
@@ -50,6 +51,7 @@ const {activeTabRef} = storeToRefs(appStore);
   </main>
   <StorageOptions v-if="appStore.showPopUp===1"/>
   <NoFound v-if="appStore.showPopUp===2"/>
+  <AuthorizationDialog ref="authDialog" />
 
 </template>
 
