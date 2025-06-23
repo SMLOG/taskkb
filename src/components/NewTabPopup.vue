@@ -65,16 +65,14 @@ import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
 import SaveDialog from '@/components/storage/SaveDialog.vue';
+import { storeToRefs } from 'pinia';
 
 const saveDialog = ref(null);
 
-
-const openDialog = async () => {
-  await saveDialog.value.open();
-};
-
 const appStore = useAppStore();
 const tabs = computed(() => appStore.tabs);
+
+const {path} = storeToRefs(appStore);
 
 const props = defineProps({
   modelValue: {
@@ -147,9 +145,10 @@ function loadFile(event) {
 
 
 const selectTemplate = async (event, template) => {
-  if(!appStore.path){
+  if(!path.value){
     try{
-      await openDialog();
+     path.value =  await saveDialog.value.open();
+
     }catch(error){
       closePopup();
       return;

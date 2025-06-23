@@ -37,11 +37,10 @@ const closePopup = () => {
 const authorize = async () => {
   try {
     const storageBridge = await getStorageBridgeByName(mode.value);
-    await storageBridge.authorize(rememberMe.value);
-    console.error("Authorization success");
+    const {parentID,fileID,userID,accessToken}  =  await storageBridge.authorize(rememberMe.value);
 
     closePopup();
-    returnResolve.value();
+    returnResolve.value(parentID,fileID,userID,accessToken);
   } catch (error) {
 
   }

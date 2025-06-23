@@ -1,5 +1,4 @@
 import { jsonParse } from '@/lib/parse';
-import { useUserStore } from '@/stores/userStore';
 import { ref } from 'vue';
 import { loadScript } from '@/lib/net';
 
@@ -14,8 +13,6 @@ const selectedFileId = ref(null);
 let tokenClient = null;
 let isTokenRequested = false;
 
-// Initialize user store
-const userStore = useUserStore();
 
 
 
@@ -76,21 +73,8 @@ const initGoogleSignIn = async () => {
                             // Fetch user info
                             const userInfo = await fetchUserInfo(tokenResponse.access_token);
                             if (userInfo?.email) {
-                                const existingUser = userStore.getUserByEmail(userInfo.email);
-                                if (!existingUser) {
-                                    userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
-                                    console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
-                                } else {
-                                    userStore.updateUser(userInfo.email, {
-                                        username: userInfo.username,
-                                        accessToken: tokenResponse.access_token,
-                                    });
-                                    console.log('User updated in store:', { ...userInfo, accessToken: tokenResponse.access_token });
-                                }
-
-                                // Load Google Picker
                                 await loadPicker();
-                                resolve(tokenClient); // Resolve with tokenClient
+                                resolve({tokenClient,...userInfo}); // Resolve with tokenClient
                             } else {
                                 console.error('Invalid user info:', userInfo);
                                 reject(new Error('Failed to fetch user information.'));
@@ -121,21 +105,19 @@ const initGoogleSignIn = async () => {
 };
 
 export async function authorize() {
-    let tokenClient;
-    if (accessToken.value) return;
-    if (!tokenClient) {
-        console.log('Initializing token client');
-        tokenClient = await initGoogleSignIn();
-    } else {
-        console.log('Requesting access token');
+    console.log('Initializing token client');
+    let  authInfo = await initGoogleSignIn();
+    return authInfo;
+
+       /* console.log('Requesting access token');
         await new Promise((resolve, reject) => {
             tokenClient.requestAccessToken({
                 prompt: 'consent',
                 callback: () => resolve(),
                 error_callback: (error) => reject(error),
             });
-        });
-    }
+        });*/
+    
 
 }
 

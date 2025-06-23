@@ -70,7 +70,7 @@ const getSelected = () => {
   return selectOption;
 }
 const changeMode = () => {
-  const selectOption = getSelected();;
+  const selectOption = getSelected();
   if (selectOption.folder) {
     (async () => {
       const { pickFolder } = await getStorageBridgeByName(selectOption.mode);
@@ -113,8 +113,9 @@ const cancel = () => {
 const save = async () => {
   try{
     const selected = getSelected();
-  await authDialog.value.open(selected.mode, nameMap[selected.mode]);
+  const {parentID,fileID,userID,accessToken} = await authDialog.value.open(selected.mode, nameMap[selected.mode]);
   //await useAppStore().saveData();
+  returnResolve({type:selected.mode,parentID,fileID,userID,accessToken});
   }catch(error){
     
   }
