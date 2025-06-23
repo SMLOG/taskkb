@@ -5,6 +5,8 @@ import { ref, watch } from 'vue'
 import { useAppStore} from '@/stores/appStore'
 import { useUserStore} from '@/stores/userStore'
 import {parseHash} from '@/lib/parse';
+import { useAuthDialog } from '@/composables/useAuthDialog';
+
 
 export const useHashStore = defineStore('hash', () => {
   // Reactive state for file and tab
@@ -28,7 +30,15 @@ export const useHashStore = defineStore('hash', () => {
     file.value = newFile
     tab.value = newTab
     type.value = storageType;
-    appStore.loadFile(storageType,newFile,newTab);
+    (async()=>{
+      try{
+          await appStore.loadFile(storageType, newFile, newTab);
+      }catch(error){
+         await useAuthDialog().globalAuthDlg.value.open({mode:storageType},true);
+         await appStore.loadFile(storageType, newFile, newTab);
+
+      }
+  })();
 
   }
 

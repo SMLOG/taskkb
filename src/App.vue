@@ -10,14 +10,14 @@ import StorageOptions from './components/storage/StorageOptions.vue';
 import NoFound from '@/components/storage/NoFound.vue';
 import { storeToRefs } from 'pinia';
 import { useAuthDialog } from '@/composables/useAuthDialog';
-import { useHash } from '@/composables/useHash';
+import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
 import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue'
 import About from '@/components/About.vue';
 
 const authDialog = ref(null);
 useAuthDialog(authDialog);
-useHash();
+useHashStore();
 
 const appStore = useAppStore();
 
