@@ -74,6 +74,11 @@ export const useUserStore = defineStore('user', () => {
     return users.value.length ? users.value[curIndex.value] : null;
   };
 
+  function logout(){
+    users.value.length = 0;
+    curIndex.value=-1;
+    sessionStorage.removeItem('userStore');
+  }
   return {
     users,
     addOrUpdateUser,
@@ -82,6 +87,6 @@ export const useUserStore = defineStore('user', () => {
     userCount,
     getUserByEmail,
     getUser,
-    cacheFolders,
+    cacheFolders,logout
   };
 });

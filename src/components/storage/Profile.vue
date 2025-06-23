@@ -31,7 +31,7 @@
           Add account
         </button>
         <button 
-          @click="$emit('sign-out')"
+          @click="clearSessionAuth"
           class="bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-2 px-4 rounded border border-gray-300 dark:border-gray-600"
         >
           Sign out
@@ -87,6 +87,10 @@ onUnmounted(() => {
 const addNewUser = () => {
   emit('add-account');
 };
+
+const clearSessionAuth = ()=>{
+  userStore.logout();
+}
 </script>
 
 <style scoped>

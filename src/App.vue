@@ -12,6 +12,7 @@ import { storeToRefs } from 'pinia';
 import { useHash } from '@/composables/useHash';
 import { ref } from 'vue';
 import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue'
+import About from '@/components/About.vue';
 
 const authDialog = ref(null);
 useHash(authDialog);
@@ -28,7 +29,7 @@ const {activeTabRef} = storeToRefs(appStore);
 <AuthorizationDialog ref="authDialog" />
 
   <main class="flex-grow relative" >
-    <div v-if="appStore.loading">Loading</div>
+    <About v-if="appStore.loading"/>
     <NotificationProvider class="h-full" v-if="!appStore.loading">
       <div class="flex flex-col h-full">
         <div> <TabsContainer /></div>
