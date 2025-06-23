@@ -59,9 +59,7 @@ export const useHashStore = defineStore('hash', () => {
   function updatePath(path) {
     let newHash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tab}`);
    if(window.location.hash!==newHash){
-      window.removeEventListener('hashchange', hashLinstern)
-      window.location.hash = newHash
-      window.addEventListener('hashchange', hashLinstern)
+      history.pushState(null, null, newHash);
    }
 
 

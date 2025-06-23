@@ -122,6 +122,7 @@ export const useAppStore = defineStore('app', () => {
          Object.assign(path.value,result);
 
         tabs.value.map(tab=>tab.saved=true);
+       path.value.tab = getCurrentTab().id;
 
         useHashStore().updatePath(path.value);
         
@@ -222,6 +223,9 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
+    path.value.tab = getCurrentTab().id;
+    useHashStore().updatePath(path.value);
+
   }
 
   async function saveData() {
