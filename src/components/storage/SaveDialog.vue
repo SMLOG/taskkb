@@ -15,7 +15,7 @@
           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none transition-colors duration-200"
           @change="changeMode">
 
-          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")+option.name }}</option>
+          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")+option.name+`(${option.email})` }}</option>
           <option v-if="cacheFolders.length" disabled>-----------------</option>
           <option v-for="(option, i) in modesRef" :value="cacheFolders.length + i">{{
             (nameMap[option.mode] ? nameMap[option.mode] + " - " : "") + option.name }}</option>
@@ -41,7 +41,6 @@
 <script setup>
 import { ref } from 'vue';
 import { useModeStore } from "@/stores/modeStore";
-import { useAppStore } from "@/stores/appStore";
 import { getStorageBridgeByName } from '@/api/bridge';
 import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue';
 
@@ -69,6 +68,20 @@ const getSelected = () => {
   const selectOption = allOptions[selectIndexRef.value];
   return selectOption;
 }
+
+const addOrUpdateAuthCacheList = (auth)=>{
+  console.log(auth)
+  let exits = cacheFolders.value.filter(f => f.mode==auth.mode&&f.parentID == auth.parentID);
+          if (exits.length > 0) {
+            let i = cacheFolders.value.indexOf(exits[0]);
+            selectIndexRef.value = i;
+            cacheFolders.value[i] = auth;
+          } else {
+            cacheFolders.value.unshift(auth)
+            console.log('folder', auth)
+            selectIndexRef.value = 0;
+          }
+}
 const changeMode = () => {
   const selectOption = getSelected();
   if (selectOption.folder) {
@@ -77,15 +90,7 @@ const changeMode = () => {
       if (pickFolder) {
         try {
           const folder = await pickFolder();
-          let exits = cacheFolders.value.filter(f => f.id == folder.id);
-          if (exits.length > 0) {
-            let i = cacheFolders.value.indexOf(exits[0]);
-            selectIndexRef.value = i;
-          } else {
-            cacheFolders.value.unshift({ mode: selectOption.mode, ...folder })
-            console.log('folder', folder)
-            selectIndexRef.value = 0;
-          }
+          addOrUpdateAuthCacheList(folder);
 
         } catch (error) {
 
@@ -113,9 +118,11 @@ const cancel = () => {
 const save = async () => {
   try{
     const selected = getSelected();
-  const {parentID,fileID,userID,accessToken} = await authDialog.value.open(selected.mode, nameMap[selected.mode]);
-  //await useAppStore().saveData();
-  returnResolve({type:selected.mode,parentID,fileID,userID,accessToken});
+  const auth = await authDialog.value.open(selected, nameMap[selected.mode]);
+
+  addOrUpdateAuthCacheList({...selected,...auth});
+
+  returnResolve(auth);
   }catch(error){
     
   }

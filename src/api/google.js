@@ -41,6 +41,7 @@ export const fetchUserInfo = async (token) => {
 
 // Initialize Google Sign-In
 const initGoogleSignIn = async () => {
+    let returnInfo = {};
     if (typeof google === 'undefined' || !google.accounts.oauth2) {
         try {
             await loadScript('https://accounts.google.com/gsi/client');
@@ -56,68 +57,69 @@ const initGoogleSignIn = async () => {
         throw new Error('Google API is not available. Please try again later.');
     }
 
-    try {
-        // Create a promise to handle token response
-        const tokenPromise = new Promise((resolve, reject) => {
-            const tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: clientId,
-                scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
-                callback: async (tokenResponse) => {
-                    console.log('Token Response:', tokenResponse);
-                    if (tokenResponse?.access_token) {
-                        try {
-                            accessToken.value = tokenResponse.access_token;
-                            isAuthenticated.value = true;
-                            isTokenRequested = false;
 
-                            // Fetch user info
-                            const userInfo = await fetchUserInfo(tokenResponse.access_token);
-                            if (userInfo?.email) {
-                                await loadPicker();
-                                resolve({tokenClient,...userInfo}); // Resolve with tokenClient
-                            } else {
-                                console.error('Invalid user info:', userInfo);
-                                reject(new Error('Failed to fetch user information.'));
-                            }
-                        } catch (userError) {
-                            console.error('Error in token callback:', userError);
-                            reject(userError);
-                        }
-                    } else {
-                        console.error('No access token received:', tokenResponse);
-                        reject(new Error('Failed to obtain access token.'));
-                    }
-                },
-                error_callback: (error) => {
-                    reject(error);
-                },
-            });
-
-            // Trigger the token request
-            tokenClient.requestAccessToken({ prompt: 'consent' });
+    // Create a promise to handle token response
+    const tokenResponse = await new Promise((resolve, reject) => {
+        const tokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: clientId,
+            scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
+            callback: async (tokenResponse) => {
+                console.log('Token Response:', tokenResponse);
+                if (tokenResponse?.access_token) {
+                    resolve(tokenResponse);
+                } else {
+                    console.error('No access token received:', tokenResponse);
+                    reject(new Error('Failed to obtain access token.'));
+                }
+            },
+            error_callback: (error) => {
+                reject(error);
+            },
         });
 
-        return await tokenPromise; // Wait for token response and return tokenClient
-    } catch (error) {
-        throw new Error('Error initializing GSI: ' + error.message);
+        // Trigger the token request
+        tokenClient.requestAccessToken({ prompt: 'consent' });
+    });
+
+
+    returnInfo.accessToken = tokenResponse.access_token;
+
+    // Fetch user info
+    const userInfo = await fetchUserInfo(tokenResponse.access_token);
+    if (userInfo?.email) {
+        await loadPicker();
+        returnInfo = { ...returnInfo, ...userInfo };
+        return returnInfo;
     }
+
+    console.error('Invalid user info:', userInfo);
+    throw new Error('Failed to fetch user information.');
+
+
+
+
 
 };
 
-export async function authorize() {
+export async function authorize(auth, rememberMe) {
     console.log('Initializing token client');
-    let  authInfo = await initGoogleSignIn();
-    return authInfo;
-
-       /* console.log('Requesting access token');
+    if (auth.accessToken) {
+        console.log('Requesting access token');
         await new Promise((resolve, reject) => {
             tokenClient.requestAccessToken({
                 prompt: 'consent',
                 callback: () => resolve(),
                 error_callback: (error) => reject(error),
             });
-        });*/
-    
+        });
+    } else {
+        let authInfo = await initGoogleSignIn(auth, rememberMe);
+        return authInfo;
+    }
+
+
+
+
 
 }
 
@@ -378,12 +380,8 @@ export async function readJsonAttachment(fileId, tabId) {
     if (!fileId || typeof fileId !== 'string') {
         return { error: 'Invalid or missing file ID' };
     }
-
-
     try {
-
         await authorize();
-
 
         let result = await readFile(fileId);
         let content = result?.content ? jsonParse(result.content) : null;

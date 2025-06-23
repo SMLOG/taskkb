@@ -36,11 +36,12 @@ const closePopup = () => {
 };
 const authorize = async () => {
   try {
-    const storageBridge = await getStorageBridgeByName(mode.value);
-    const {parentID,fileID,userID,accessToken}  =  await storageBridge.authorize(rememberMe.value);
+    console.log('auth')
+    const storageBridge = await getStorageBridgeByName(selectedAuth.value.mode);
+    const auth  =  await storageBridge.authorize(selectedAuth,rememberMe.value);
 
-    closePopup();
-    returnResolve.value(parentID,fileID,userID,accessToken);
+    isOpen.value = false;
+    returnResolve.value(auth);
   } catch (error) {
 
   }
@@ -48,13 +49,13 @@ const authorize = async () => {
 
 const returnResolve = ref(null);
 const returnReject = ref(null);
-const mode = ref(null);
+const selectedAuth = ref(null);
 const name = ref(null);
 defineExpose({
-  async open(modeValue, modeName) {
+  async open(selectedAuthValue, selectedAuthName) {
     return new Promise((resolve, reject) => {
-      mode.value = modeValue;
-      name.value = modeName;
+      selectedAuth.value = selectedAuthValue;
+      name.value = selectedAuthName;
       returnResolve.value = resolve;
       returnReject.value = reject;
       isOpen.value = true;

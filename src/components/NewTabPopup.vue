@@ -174,6 +174,7 @@ const selectTemplate = async (event, template) => {
   } else {
     loadFile(event);
   }
+  useAppStore().saveData();
 };
 
 const closePopup = () => {
