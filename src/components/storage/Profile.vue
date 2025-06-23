@@ -32,7 +32,7 @@
   // Example method to add a new user
   function addNewUser() {
     // Replace with actual input values, e.g., from a form
-    userStore.addUser(`user${userStore.userCount() + 1}`, `user${userStore.userCount() + 1}@example.com`);
+    userStore.addOrUpdateUser(`user${userStore.userCount() + 1}`, `user${userStore.userCount() + 1}@example.com`);
   }
   
   // Define emits

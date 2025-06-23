@@ -54,7 +54,7 @@ const initGoogleSignIn = async () => {
 
     // Create a promise to handle token response
     const tokenResponse = await new Promise((resolve, reject) => {
-         tokenClient = google.accounts.oauth2.initTokenClient({
+        tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: clientId,
             scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
             callback: async (tokenResponse) => {
@@ -97,7 +97,7 @@ const initGoogleSignIn = async () => {
 
 export async function authorize(auth, rememberMe) {
     console.log('Initializing token client');
-    if(auth.accessToken)    return auth;
+    if (auth.accessToken) return auth;
     else return await initGoogleSignIn(auth, rememberMe);
 
 }
@@ -147,9 +147,9 @@ const refreshAccessToken = async () => {
 
 // Pick folder with write permission filter
 export const pickFolder = async (auth) => {
-   const authInfo =  await authorize(auth);
+    const authInfo = await authorize(auth);
     await loadPicker();
-    const doc = await  new Promise((resolve, reject) => {
+    const doc = await new Promise((resolve, reject) => {
 
         const pickerCallback = (data) => {
             if (data.action === google.picker.Action.PICKED) {
@@ -203,57 +203,52 @@ const pickFile = async () => {
     picker.setVisible(true);
 };
 
-const writeFile = async (fileId, dataObj, fileName) => {
-    if (!accessToken.value) {
-        console.error('No access token found. Please sign in again.');
-        return;
+const writeFile = async (dataObj, path, auth) => {
+    if (!dataObj || typeof dataObj !== 'object') {
+        throw new Error('Invalid or missing data object');
+
+    }
+    if (path && typeof path !== 'object') {
+        throw new Error('Invalid path');
     }
 
-    // Skip permission check if folderId is empty or null (save to root)
-    if (selectedFolderId.value) {
+    const parentFolderId = path?.parent?.id;
+    if (parentFolderId) {
         let permissionData;
-        try {
-            const permissionCheck = await fetch(
-                `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
+        const permissionCheck = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${parentFolderId}/permissions/me?supportsAllDrives=true`,
+            {
+                method: 'GET',
+                headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
+            }
+        );
+
+        if (permissionCheck.status === 401) {
+            auth.accessToken = await refreshAccessToken();
+            const retryCheck = await fetch(
+                `https://www.googleapis.com/drive/v3/files/${parentFolderId}/permissions/me?supportsAllDrives=true`,
                 {
-                    method: 'GET',
-                    headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+                    headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
                 }
             );
 
-            if (permissionCheck.status === 401) {
-                console.warn('Access token expired, refreshing...');
-                accessToken.value = await refreshAccessToken();
-                console.log(accessToken.value)
-                const retryCheck = await fetch(
-                    `https://www.googleapis.com/drive/v3/files/${selectedFolderId.value}/permissions/me?supportsAllDrives=true`,
-                    {
-                        headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
-                    }
-                );
-
-                if (!retryCheck.ok) {
-                    const errorData = await retryCheck.json();
-                    throw new Error(`Failed to verify permissions: ${errorData.error.message}`);
-                }
-
-                permissionData = await retryCheck.json();
-            } else if (!permissionCheck.ok) {
-                const errorData = await permissionCheck.json();
-                throw new Error(`Failed to check permissions: ${errorData.error.message}`);
-            } else {
-                permissionData = await permissionCheck.json();
+            if (!retryCheck.ok) {
+                const errorData = await retryCheck.json();
+                throw new Error(`Failed to verify permissions: ${errorData.error.message}`);
             }
 
-            if (!['writer', 'owner'].includes(permissionData.role)) {
-                console.error('You do not have write permission for the selected folder. Please choose another folder.');
-                return;
-            }
-        } catch (error) {
-            console.error('Error checking folder permissions:', error);
-            console.error('Unable to verify folder permissions: ' + error.message);
-            return;
+            permissionData = await retryCheck.json();
+        } else if (!permissionCheck.ok) {
+            const errorData = await permissionCheck.json();
+            throw new Error(`Failed to check permissions: ${errorData.error.message}`);
+        } else {
+            permissionData = await permissionCheck.json();
         }
+
+        if (!['writer', 'owner'].includes(permissionData.role)) {
+            throw new Error('You do not have write permission for the selected folder. Please choose another folder.');
+        }
+
     }
 
     // Serialize dataObj to JSON
@@ -262,41 +257,37 @@ const writeFile = async (fileId, dataObj, fileName) => {
     const form = new FormData();
 
     // Determine if we're creating a new file or updating an existing one
-    const isUpdate = fileId && fileId.trim() !== '';
+    const isUpdate = path?.fileId!==undefined && path?.fileId?.trim() !== '';
     const url = isUpdate
-        ? `https://www.googleapis.com/upload/drive/v3/files/${fileId}?uploadType=multipart&supportsAllDrives=true`
+        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.fileId?.trim() }?uploadType=multipart&supportsAllDrives=true`
         : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true';
     const method = isUpdate ? 'PATCH' : 'POST';
 
     // Include metadata only for new files
     if (!isUpdate) {
         const fileMetadata = {
-            name: fileName, // Changed to .json to reflect content type
+            name: path.fileName, // Changed to .json to reflect content type
             mimeType: 'application/json', // Set MIME type to JSON
-            parents: selectedFolderId.value ? [selectedFolderId.value] : [],
+            parents: parentFolderId ? [parentFolderId] : [],
         };
         form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
     }
 
     form.append('file', blob);
-    console.log(accessToken.value)
-    try {
-        const response = await fetch(url, {
-            method: method,
-            headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
-            body: form,
-        });
-        const data = await response.json();
-        if (response.ok) {
-            console.log(data);
-            console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
-            return data;
-        } else {
-            console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
-        }
-    } catch (error) {
-        console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, error);
+    const response = await fetch(url, {
+        method: method,
+        headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
+        body: form,
+    });
+    const data = await response.json();
+    if (response.ok) {
+        console.log(data);
+        console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
+        return data;
+    } else {
+        console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
     }
+
 };
 
 // Read selected file
@@ -374,25 +365,9 @@ export async function readJsonAttachment(fileId, tabId) {
     }
 }
 
-export async function writeObjectToJsonAttachment(dataObject, fileName, fileId) {
-    if (!dataObject || typeof dataObject !== 'object') {
-        return { success: false, error: 'Invalid or missing data object' };
-    }
-    if (fileId && typeof fileId !== 'string') {
-        return { success: false, error: 'Invalid file ID' };
-    }
+export async function writeObjectToJsonAttachment(dataObject, path, auth) {
+    return await writeFile(dataObject, path, auth);
 
-    try {
-        await authorize();
-
-
-        const { id } = await writeFile(fileId, dataObject, fileName);
-
-        return { success: true, attachmentId: id }; // Note: writeFile doesn't return fileId for new files; adjust as needed
-    } catch (error) {
-        console.error(`Error writing to Google Drive: ${error.message}`);
-        return { success: false, error: fileId ? `Failed to update file with ID ${fileId}: ${error.message}` : `Failed to create file: ${error.message}` };
-    }
 }
 
 export const type = "GoogleDrive";

@@ -1,9 +1,10 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
-import { getStorageBridge } from '@/api/bridge';
+import { getStorageBridge, getStorageBridgeByName } from '@/api/bridge';
 import {loopTree} from '@/lib/treelib';
 import {weeksBetween} from '@/lib/schedule';
 import { useModeStore } from '@/stores/modeStore';
+import { useUserStore } from './userStore';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -110,13 +111,13 @@ export const useAppStore = defineStore('app', () => {
         tabsDataMapRef.value[tab.id].config
         forEachTree(tabsDataMapRef.value[tab.id].data,'_childs',);
       });*/
-        const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridge();
+
+        
+        const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridgeByName(path.value.mode);
 
         
         const result = await writeObjectToJsonAttachment(
-          { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },
-          modeStore.fileName, attachmentIdRef.value,useModeStore().parentFolder
-        );
+          { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },path.value,useUserStore().getUser());
         let org = attachmentIdRef.value;
         attachmentIdRef.value = result.attachmentId
         tabs.value.map(tab=>tab.saved=true);

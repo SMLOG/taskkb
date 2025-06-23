@@ -17,7 +17,7 @@
           </div>
 
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="openDialog" class="btn-secondary" :disabled="savingRef">
+            <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
               💾 Save {{ savingRef?"...":"" }} 
             </button>
             <button @click="showConfig = !showConfig" class="btn-secondary">

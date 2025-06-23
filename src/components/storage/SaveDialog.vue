@@ -45,12 +45,14 @@ import { getStorageBridgeByName } from '@/api/bridge';
 import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue';
 
 import { storeToRefs } from 'pinia';
+import { useUserStore } from '@/stores/userStore';
 
 const authDialog = ref(null);
 
 
 
-const { fileName, cacheFolders } = storeToRefs(useModeStore());
+const { fileName } = storeToRefs(useModeStore());
+const {cacheFolders} = storeToRefs(useUserStore());
 
 
 const nameMap = {
@@ -86,6 +88,10 @@ const addOrUpdateAuthCacheList = (auth)=>{
             console.log('folder', auth)
             selectIndexRef.value = 0;
           }
+          const userStore = useUserStore();
+
+          userStore.addOrUpdateUser(auth);
+
 }
 const changeMode = () => {
   const selectOption = getSelected();

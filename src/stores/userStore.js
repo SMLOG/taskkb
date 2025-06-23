@@ -1,50 +1,87 @@
-// stores/userStore.js
 import { defineStore } from 'pinia';
-import { ref } from 'vue'
+import { ref } from 'vue';
 
 export const useUserStore = defineStore('user', () => {
-  // State: List of users with username, email, and accessToken
-  const users = ref([
-  ]);
+  // State
+  const users = ref([]);
+  const curIndex = ref(-1);
+  const cacheFolders = ref([]);
 
-
-
-
-  // Actions: Methods to manipulate the state
-  function addUser(username, email, accessToken = null) {
-    if (username && email) {
-      users.value.push({ username, email, accessToken});
+  // Restore state from sessionStorage on initialization
+  if (typeof window !== 'undefined') {
+    const savedState = sessionStorage.getItem('userStore');
+    if (savedState) {
+      try {
+        const parsedState = JSON.parse(savedState);
+        users.value = parsedState.users || [];
+        curIndex.value = parsedState.curIndex ?? -1;
+        cacheFolders.value = parsedState.cacheFolders || [];
+      } catch (error) {
+        console.error('Failed to parse sessionStorage state:', error);
+      }
     }
+  }
+
+  // Helper function to save state to sessionStorage
+  const saveState = () => {
+    if (typeof window !== 'undefined') {
+      try {
+        const state = {
+          users: users.value,
+          curIndex: curIndex.value,
+          cacheFolders: cacheFolders.value,
+        };
+        sessionStorage.setItem('userStore', JSON.stringify(state));
+      } catch (error) {
+        console.error('Failed to save state to sessionStorage:', error);
+      }
+    }
+  };
+
+  function addOrUpdateUser({ mode, modeName, username, email, accessToken }) {
+    if (!username?.trim() || !email?.trim()) {
+      console.warn('Username and email are required.');
+      return;
+    }
+    const existingUser = users.value.find(user => user.mode === mode && user.email === email);
+    if (existingUser) {
+      Object.assign(existingUser, { mode, modeName, username, email, accessToken });
+      curIndex.value = users.value.indexOf(existingUser);
+    } else {
+      users.value.push({ mode, modeName, username, email, accessToken });
+      curIndex.value = users.value.length - 1;
+    }
+    saveState(); // Save state after modification
   }
 
   function removeUser(email) {
     users.value = users.value.filter((user) => user.email !== email);
+    saveState(); // Save state after modification
   }
 
   function updateUser(oldEmail, updatedUser) {
     const index = users.value.findIndex((user) => user.email === oldEmail);
     if (index !== -1) {
       users.value[index] = { ...users.value[index], ...updatedUser };
+      saveState(); // Save state after modification
     }
   }
 
-  // Getters: Computed properties
+  // Getters
   const userCount = () => users.value.length;
   const getUserByEmail = (email) => users.value.find((user) => user.email === email);
-  const getUser = ()=>{
-    if(users.value.length){
-      return users.value[0];
-    }else return null;
-  }
-
-
+  const getUser = () => {
+    return users.value.length ? users.value[curIndex.value] : null;
+  };
 
   return {
     users,
-    addUser,
+    addOrUpdateUser,
     removeUser,
     updateUser,
     userCount,
-    getUserByEmail,getUser
+    getUserByEmail,
+    getUser,
+    cacheFolders,
   };
 });

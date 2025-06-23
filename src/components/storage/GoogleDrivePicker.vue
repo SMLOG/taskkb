@@ -97,7 +97,7 @@ const initializeGSI = () => {
         if (userInfo) {
           const existingUser = userStore.getUserByEmail(userInfo.email);
           if (!existingUser) {
-            userStore.addUser(userInfo.username, userInfo.email, tokenResponse.access_token);
+            userStore.addOrUpdateUser(userInfo.username, userInfo.email, tokenResponse.access_token);
             console.log('User added to store:', { ...userInfo, accessToken: tokenResponse.access_token });
           } else {
             // Update existing user with new accessToken
