@@ -259,7 +259,7 @@ const writeFile = async (dataObj, path, auth) => {
     // Determine if we're creating a new file or updating an existing one
     const isUpdate = path?.id!==undefined && path?.id?.trim() !== '';
     const url = isUpdate
-        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.id?.trim() }?uploadType=multipart&supportsAllDrives=true`
+        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.id?.trim() }?uploadType=multipart&fields=id&supportsAllDrives=true`
         : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true';
     const method = isUpdate ? 'PATCH' : 'POST';
 
@@ -274,11 +274,48 @@ const writeFile = async (dataObj, path, auth) => {
     }
 
     form.append('file', blob);
+
+
+
+    const boundary = `boundary_${crypto.randomUUID().replace(/-/g, '')}`;
+
+    // Prepare metadata
+    const metadata = { name: path.fileName };
+
+    // Encode JSON data as base64
+    const base64Data = btoa(fileContent);
+    // Construct multipart body
+    const body = [
+      `--${boundary}`,
+      'Content-Type: application/json; charset=UTF-8',
+      '',
+      JSON.stringify(metadata),
+      `--${boundary}`,
+      'Content-Transfer-Encoding: base64',
+      '',
+      base64Data,
+      `--${boundary}--`,
+    ].join('\r\n');
+
+
+
+    // Send request
     const response = await fetch(url, {
-        method: method,
-        headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
-        body: form,
+      method,
+      headers: {
+        'Authorization': `Bearer ${auth.accessToken}`,
+        'Content-Type': `multipart/related; boundary=${boundary}`,
+      },
+      body,
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(`Upload failed: ${error.error.message}`);
+    }
+
+  
+
     const data = await response.json();
     if (response.ok) {
         console.log(data);
