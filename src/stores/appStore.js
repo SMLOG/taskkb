@@ -5,6 +5,7 @@ import {loopTree} from '@/lib/treelib';
 import {weeksBetween} from '@/lib/schedule';
 import { useModeStore } from '@/stores/modeStore';
 import { useUserStore } from './userStore';
+import { fi } from 'date-fns/locale';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -30,6 +31,10 @@ export const useAppStore = defineStore('app', () => {
 
   async function loadFile(storageType,fileId,tabId){
 
+    path.value = {
+      mode:storageType,
+      id : fileId
+    }
     initLoadTabsData(storageType,fileId,tabId).catch(error => console.error('Init failed:', error));
   }
   async function initLoadTabsData(storageType,fileId,tabId) {
@@ -38,9 +43,10 @@ export const useAppStore = defineStore('app', () => {
       console.log('Initializing store...');
       let rootData = {tabs:[]};
       if(storageType && storageType){
-        const {readJsonAttachment,writeObjectToJsonAttachment,type} = await getStorageBridge(storageType);
+        const {readJsonAttachment,type} = await getStorageBridge(path.value.mode);
         typeRef.value=type;
-        const { attachmentId, content: objData } = await readJsonAttachment(fileId,tabId);
+        console.log(path.value)
+        const { attachmentId, content: objData } = await readJsonAttachment(path.value,useUserStore().getUser());
         attachmentIdRef.value = attachmentId;
         if(!objData){
           showPopUp.value = 2;
@@ -107,27 +113,22 @@ export const useAppStore = defineStore('app', () => {
 
       configRef.value.startDate = new Date(startTime);
       configRef.value.weekCount = weekCount;
-      /*tabs.value.map(tab=>{
-        tabsDataMapRef.value[tab.id].config
-        forEachTree(tabsDataMapRef.value[tab.id].data,'_childs',);
-      });*/
-
+ 
         
         const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridgeByName(path.value.mode);
 
         
         const result = await writeObjectToJsonAttachment(
           { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },path.value,useUserStore().getUser());
-        let org = attachmentIdRef.value;
-        attachmentIdRef.value = result.attachmentId
+        let orgPath = JSON.parse(JSON.stringify(path.value));
+         Object.assign(path.value,result);
+
         tabs.value.map(tab=>tab.saved=true);
 
         console.log('attachment id', attachmentIdRef.value)
-        if (result) {
-          console.log(`Saved data  attachment from ${org}  to ${attachmentIdRef.value}`);
-        } else {
-          throw new Error("Save Error");
-        }
+        console.log(`Saved data  attachment from ${orgPath}  to ${path.value}`);
+
+
       
  
   }

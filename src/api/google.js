@@ -257,9 +257,9 @@ const writeFile = async (dataObj, path, auth) => {
     const form = new FormData();
 
     // Determine if we're creating a new file or updating an existing one
-    const isUpdate = path?.fileId!==undefined && path?.fileId?.trim() !== '';
+    const isUpdate = path?.id!==undefined && path?.id?.trim() !== '';
     const url = isUpdate
-        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.fileId?.trim() }?uploadType=multipart&supportsAllDrives=true`
+        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.id?.trim() }?uploadType=multipart&supportsAllDrives=true`
         : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true';
     const method = isUpdate ? 'PATCH' : 'POST';
 
@@ -284,47 +284,45 @@ const writeFile = async (dataObj, path, auth) => {
         console.log(data);
         console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
         return data;
-    } else {
-        console.error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
-    }
+    } 
+
+ throw new Error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
+    
 
 };
 
 // Read selected file
-const readFile = async (fileId) => {
-    if (!accessToken.value) {
-        console.error('No access token found. Please sign in again.');
-        return;
+const readFile = async (path,auth) => {
+    if (!auth?.accessToken) {
+        throw new Error('No access token found. Please sign in again.');
     }
-    if (!fileId) {
-        console.error('Please select a file to read first.');
-        return;
+    if (!path?.id) {
+        throw new Error('Please select a file to read first.');
     }
 
-    try {
+
         // Step 1: Fetch file metadata (version, modifiedTime, lastModifyingUser, etc.)
         const metadataResponse = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${fileId}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
+            `https://www.googleapis.com/drive/v3/files/${path.id}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
             {
                 method: 'GET',
-                headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+                headers: new Headers({ Authorization: `Bearer ${auth.accessToken.value}` }),
             }
         );
 
         if (!metadataResponse.ok) {
             const errorData = await metadataResponse.json();
-            console.error('Error fetching metadata:', errorData);
-            return;
+            throw new Error('Error fetching metadata:', errorData);
         }
 
         const metadata = await metadataResponse.json();
         console.log('File Metadata:', metadata);
 
         const contentResponse = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&supportsAllDrives=true`,
+            `https://www.googleapis.com/drive/v3/files/${path.id}?alt=media&supportsAllDrives=true`,
             {
                 method: 'GET',
-                headers: new Headers({ Authorization: `Bearer ${accessToken.value}` }),
+                headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
             }
         );
 
@@ -334,35 +332,25 @@ const readFile = async (fileId) => {
                 content, // File content as text
                 metadata, // File metadata (version, modifiedTime, lastModifyingUser, etc.)
             };
-        } else {
+        } 
             const errorData = await contentResponse.json();
-            console.error('Error reading file content:', errorData);
-            console.error('Error reading file content: ' + errorData.error.message);
-            return;
-        }
-    } catch (error) {
-        console.error('Unexpected error:', error);
-        console.error('Unexpected error: ' + error.message);
-    }
+            throw new Error('Error reading file content:', errorData);
+        
+  
 };
 
 
 
-export async function readJsonAttachment(fileId, tabId) {
-    if (!fileId || typeof fileId !== 'string') {
-        return { error: 'Invalid or missing file ID' };
-    }
-    try {
-        await authorize();
+export async function readJsonAttachment(path, auth) {
+        if (!path || typeof path !== 'object') {
+            throw 'Invalid path';
+        }
 
-        let result = await readFile(fileId);
+        let result = await readFile(path,auth);
         let content = result?.content ? jsonParse(result.content) : null;
         return { content, attachmentId: fileId };
 
-    } catch (error) {
-        console.error(`Error reading from Google Drive: ${error.message}`);
-        return { error: `Failed to read file with ID ${fileId}: ${error.message}` };
-    }
+   
 }
 
 export async function writeObjectToJsonAttachment(dataObject, path, auth) {
