@@ -165,7 +165,7 @@ export const useAppStore = defineStore('app', () => {
   async function importToNewTab(tabId, data) {
     try {
       const tab = await addTab(tabId, data.config.title);
-      await setActiveTab(-1);
+      //await setActiveTab(-1);
       await loadTabData(tab, data);
       await setActiveTab(tabs.value.length - 1);
     } catch (error) {

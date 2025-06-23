@@ -1,5 +1,5 @@
 <template>
-    <div
+    <div v-if="isOpen"
         class="bg-gray-900 fixed inset-0 z-50 flex items-center justify-center flex items-center justify-center h-screen z-9999">
         <div class="bg-gray-800 p-6 rounded-lg shadow-lg text-center border border-gray-700">
             <h2 class="text-gray-400 text-lg mb-4">Error loading file</h2>
@@ -18,16 +18,16 @@
 
 <script setup>
 import { ref,nextTick } from 'vue';
-import { useAppStore } from '@/stores/appStore';
 import { useHashStore } from '@/stores/hashStore';
 
 // Define reactive variables or functions
 const handleCancel = () => {
     console.log('Cancel clicked');
-    useAppStore().updateShowUp(0);
     nextTick(()=>{
         useHashStore().resetHash();
     })
+    isOpen.value = false;
+    returnResolve.value();
 };
 
 const handleTryOpen = () => {
@@ -37,6 +37,21 @@ const handleTryOpen = () => {
 const handleChangeUser = () => {
     console.log('Change user clicked');
 };
+
+const returnResolve = ref(null);
+const returnReject = ref(null);
+const isOpen = ref(false);
+
+defineExpose({
+  async open() {
+    return new Promise((resolve, reject) => {
+      returnResolve.value = resolve;
+      returnReject.value = reject;
+      isOpen.value = true;
+    })
+  }
+});
+
 </script>
 
 <style scoped>

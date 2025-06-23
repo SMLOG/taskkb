@@ -34,8 +34,15 @@ export const useHashStore = defineStore('hash', () => {
       try {
         await appStore.loadFile(storageType, newFile, newTab);
       } catch (error) {
-        await useAuthDialog().globalAuthDlg.value.open({ mode: storageType }, true);
-        await appStore.loadFile(storageType, newFile, newTab);
+        console.error(error)
+        if(error?.code===404){
+          await useAuthDialog().globalNoFoundDlg.value.open();
+
+        }else{
+          await useAuthDialog().globalAuthDlg.value.open({ mode: storageType }, true);
+          await appStore.loadFile(storageType, newFile, newTab);
+        }
+
 
       }
     })();

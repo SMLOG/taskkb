@@ -1,10 +1,14 @@
 
 let globalAuthDlg
-export function useAuthDialog(authDlg) {
+let globalNoFoundDlg
+export function useAuthDialog(authDlg,noFound) {
 
   if(authDlg){
     globalAuthDlg = authDlg;
   }
+  if(noFound){
+    globalNoFoundDlg = noFound;
+  }
 
-  return {globalAuthDlg};
+  return {globalAuthDlg,globalNoFoundDlg};
 }

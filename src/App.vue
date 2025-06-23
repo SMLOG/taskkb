@@ -16,7 +16,8 @@ import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue'
 import About from '@/components/About.vue';
 
 const authDialog = ref(null);
-useAuthDialog(authDialog);
+const noFound = ref(null);
+useAuthDialog(authDialog,noFound);
 useHashStore();
 
 const appStore = useAppStore();
@@ -50,8 +51,8 @@ const {activeTabRef} = storeToRefs(appStore);
     </NotificationProvider>
   </main>
   <StorageOptions v-if="appStore.showPopUp===1"/>
-  <NoFound v-if="appStore.showPopUp===2"/>
   <AuthorizationDialog ref="authDialog" />
+  <NoFound ref="noFound"/>
 
 </template>
 

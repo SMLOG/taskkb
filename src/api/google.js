@@ -348,7 +348,7 @@ const readFile = async (path, auth) => {
 
     if (!metadataResponse.ok) {
         const errorData = await metadataResponse.json();
-        throw new Error('Error fetching metadata:', errorData);
+        throw errorData?.error;
     }
 
     const metadata = await metadataResponse.json();
