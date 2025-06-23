@@ -13,6 +13,7 @@
           Share
         </button>
         <button
+          ref="showProfileButton"
           @click="toggleShowProfile"
           class="bg-blue-500 text-white dark:bg-blue-700 dark:text-gray-100 p-0.5 rounded-full hover:bg-blue-600 dark:hover:bg-blue-800 flex items-center justify-center w-6 h-6 transition-colors duration-200"
         >
@@ -26,7 +27,7 @@
 
       </div>
 
-        <Profile v-if="isProfileVisible" @close="isProfileVisible=false" />
+        <Profile v-if="isProfileVisible" @close="isProfileVisible=false" :showProfileButton="showProfileButton" />
     </div>
   </template>
   
@@ -35,6 +36,7 @@
   import Profile from './Profile.vue';
   
   const isProfileVisible = ref(false);
+  const showProfileButton = ref(null)
   
   const share = () => {
     alert('Sharing functionality to be implemented');

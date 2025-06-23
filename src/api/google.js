@@ -1,5 +1,4 @@
 import { jsonParse } from '@/lib/parse';
-import { ref } from 'vue';
 import { loadScript } from '@/lib/net';
 
 // Constants
@@ -257,9 +256,9 @@ const writeFile = async (dataObj, path, auth) => {
     const form = new FormData();
 
     // Determine if we're creating a new file or updating an existing one
-    const isUpdate = path?.id!==undefined && path?.id?.trim() !== '';
+    const isUpdate = path?.id !== undefined && path?.id?.trim() !== '';
     const url = isUpdate
-        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.id?.trim() }?uploadType=multipart&fields=id&supportsAllDrives=true`
+        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.id?.trim()}?uploadType=multipart&fields=id&supportsAllDrives=true`
         : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true';
     const method = isUpdate ? 'PATCH' : 'POST';
 
@@ -286,50 +285,50 @@ const writeFile = async (dataObj, path, auth) => {
     const base64Data = btoa(fileContent);
     // Construct multipart body
     const body = [
-      `--${boundary}`,
-      'Content-Type: application/json; charset=UTF-8',
-      '',
-      JSON.stringify(metadata),
-      `--${boundary}`,
-      'Content-Transfer-Encoding: base64',
-      '',
-      base64Data,
-      `--${boundary}--`,
+        `--${boundary}`,
+        'Content-Type: application/json; charset=UTF-8',
+        '',
+        JSON.stringify(metadata),
+        `--${boundary}`,
+        'Content-Transfer-Encoding: base64',
+        '',
+        base64Data,
+        `--${boundary}--`,
     ].join('\r\n');
 
 
 
     // Send request
     const response = await fetch(url, {
-      method,
-      headers: {
-        'Authorization': `Bearer ${auth.accessToken}`,
-        'Content-Type': `multipart/related; boundary=${boundary}`,
-      },
-      body,
+        method,
+        headers: {
+            'Authorization': `Bearer ${auth.accessToken}`,
+            'Content-Type': `multipart/related; boundary=${boundary}`,
+        },
+        body,
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Upload failed: ${error.error.message}`);
+        const error = await response.json();
+        throw new Error(`Upload failed: ${error.error.message}`);
     }
 
-  
+
 
     const data = await response.json();
     if (response.ok) {
         console.log(data);
         console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
         return data;
-    } 
+    }
 
- throw new Error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
-    
+    throw new Error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
+
 
 };
 
 // Read selected file
-const readFile = async (path,auth) => {
+const readFile = async (path, auth) => {
     if (!auth?.accessToken) {
         throw new Error('No access token found. Please sign in again.');
     }
@@ -338,56 +337,56 @@ const readFile = async (path,auth) => {
     }
 
 
-        // Step 1: Fetch file metadata (version, modifiedTime, lastModifyingUser, etc.)
-        const metadataResponse = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${path.id}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
-            {
-                method: 'GET',
-                headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
-            }
-        );
-
-        if (!metadataResponse.ok) {
-            const errorData = await metadataResponse.json();
-            throw new Error('Error fetching metadata:', errorData);
+    // Step 1: Fetch file metadata (version, modifiedTime, lastModifyingUser, etc.)
+    const metadataResponse = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${path.id}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
+        {
+            method: 'GET',
+            headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
         }
+    );
 
-        const metadata = await metadataResponse.json();
-        console.log('File Metadata:', metadata);
+    if (!metadataResponse.ok) {
+        const errorData = await metadataResponse.json();
+        throw new Error('Error fetching metadata:', errorData);
+    }
 
-        const contentResponse = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${path.id}?alt=media&supportsAllDrives=true`,
-            {
-                method: 'GET',
-                headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
-            }
-        );
+    const metadata = await metadataResponse.json();
+    console.log('File Metadata:', metadata);
 
-        if (contentResponse.ok) {
-            const content = await contentResponse.text();
-            return {
-                content, // File content as text
-                metadata, // File metadata (version, modifiedTime, lastModifyingUser, etc.)
-            };
-        } 
-            const errorData = await contentResponse.json();
-            throw new Error('Error reading file content:', errorData);
-        
-  
+    const contentResponse = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${path.id}?alt=media&supportsAllDrives=true`,
+        {
+            method: 'GET',
+            headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
+        }
+    );
+
+    if (contentResponse.ok) {
+        const content = await contentResponse.text();
+        return {
+            content, // File content as text
+            metadata, // File metadata (version, modifiedTime, lastModifyingUser, etc.)
+        };
+    }
+    const errorData = await contentResponse.json();
+    throw new Error('Error reading file content:', errorData);
+
+
 };
 
 
 
 export async function readJsonAttachment(path, auth) {
-        if (!path || typeof path !== 'object') {
-            throw 'Invalid path';
-        }
+    if (!path || typeof path !== 'object') {
+        throw 'Invalid path';
+    }
 
-        let result = await readFile(path,auth);
-        let content = result?.content ? jsonParse(result.content) : null;
-        return { path,content, };
+    let result = await readFile(path, auth);
+    let content = result?.content ? jsonParse(result.content) : null;
+    return { path, content, };
 
-   
+
 }
 
 export async function writeObjectToJsonAttachment(dataObject, path, auth) {
