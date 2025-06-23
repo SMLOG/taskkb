@@ -3,7 +3,7 @@
     <div class="flex space-x-2">
       <button
         @click="showDropDownMenuItems"
-        class="text-white dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center transition-colors duration-200"
+        class="text-white dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center transition-colors duration-200"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="4" cy="12" r="2" fill="black"/>
@@ -35,32 +35,7 @@
       </button>
     </div>
 
-    <!-- Dropdown Menu -->
-    <div v-if="isMenuVisible" class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded shadow-lg z-10">
-      <ul>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Save</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Share...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Synchronize</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Open from</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Open Recent</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">New...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Rename...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Make a Copy...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Open Folder...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Move to Folder...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Import from</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Export as</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Embed</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Publish</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">New Library</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Open Library from</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Revision History...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Properties...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Page Setup...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Print...</a></li>
-        <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700">Close</a></li>
-      </ul>
-    </div>
+    <MenuItems v-if="isMenuVisible"></MenuItems>
 
     <Profile v-if="isProfileVisible" @close="isProfileVisible=false" :showProfileButton="showProfileButton" />
   </div>
@@ -69,6 +44,7 @@
 <script setup>
 import { ref } from 'vue';
 import Profile from './Profile.vue';
+import MenuItems from './MenuItems.vue';
 
 const isProfileVisible = ref(false);
 const showProfileButton = ref(null);
@@ -94,10 +70,5 @@ button {
   transition-timing-function: ease-in-out;
 }
 
-/* Optional: Style the dropdown */
-div[role="menu"] {
-  position: absolute;
-  top: 100%;
-  right: 0;
-}
+
 </style>
