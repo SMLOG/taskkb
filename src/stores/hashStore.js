@@ -57,7 +57,7 @@ export const useHashStore = defineStore('hash', () => {
   }
 
   function updatePath(path) {
-    let newHash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tab}`);
+    let newHash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tabId}`);
    if(window.location.hash!==newHash){
       history.pushState(null, null, newHash);
    }

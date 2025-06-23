@@ -33,12 +33,13 @@ export const useAppStore = defineStore('app', () => {
 
    if(fileId && storageType) path.value = {
       mode:storageType,
-      id : fileId
+      id : fileId,
+      tabId
     }
-   await initLoadTabsData(storageType,fileId,tabId);
+   await initLoadTabsData(storageType);
  
   }
-  async function initLoadTabsData(storageType,fileId,tabId) {
+  async function initLoadTabsData(storageType) {
       loading.value = true;
       console.log('Initializing store...');
       let rootData = {tabs:[]};
@@ -65,7 +66,12 @@ export const useAppStore = defineStore('app', () => {
           tabsDataMapRef.value[tab.id] = { data, config };
         }
       }
+
       let activeTabIndex = rootData&&rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
+      let theTabs = tabs.value.filter(e=>e.id===path.value.tabId);
+      if(path.value.tabId&&theTabs.length>0){
+        activeTabIndex= tabs.value.indexOf(theTabs[0]);
+      }
       await setActiveTab(activeTabIndex);
 
  
@@ -122,7 +128,7 @@ export const useAppStore = defineStore('app', () => {
          Object.assign(path.value,result);
 
         tabs.value.map(tab=>tab.saved=true);
-       path.value.tab = getCurrentTab().id;
+       path.value.tabId = getCurrentTab().id;
 
         useHashStore().updatePath(path.value);
         
@@ -223,7 +229,7 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
-    path.value.tab = getCurrentTab().id;
+    path.value.tabId = getCurrentTab().id;
     useHashStore().updatePath(path.value);
 
   }
