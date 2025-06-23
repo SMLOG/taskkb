@@ -5,13 +5,7 @@ import { loadScript } from '@/lib/net';
 // Constants
 const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com';
 
-// Reactive state
-const isAuthenticated = ref(false);
-const accessToken = ref(null);
-const selectedFolderId = ref(null);
-const selectedFileId = ref(null);
 let tokenClient = null;
-let isTokenRequested = false;
 
 
 
@@ -60,7 +54,7 @@ const initGoogleSignIn = async () => {
 
     // Create a promise to handle token response
     const tokenResponse = await new Promise((resolve, reject) => {
-        const tokenClient = google.accounts.oauth2.initTokenClient({
+         tokenClient = google.accounts.oauth2.initTokenClient({
             client_id: clientId,
             scope: 'https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',
             callback: async (tokenResponse) => {
@@ -103,23 +97,8 @@ const initGoogleSignIn = async () => {
 
 export async function authorize(auth, rememberMe) {
     console.log('Initializing token client');
-    if (auth.accessToken) {
-        console.log('Requesting access token');
-        await new Promise((resolve, reject) => {
-            tokenClient.requestAccessToken({
-                prompt: 'consent',
-                callback: () => resolve(),
-                error_callback: (error) => reject(error),
-            });
-        });
-    } else {
-        let authInfo = await initGoogleSignIn(auth, rememberMe);
-        return authInfo;
-    }
-
-
-
-
+    if(auth.accessToken)    return auth;
+    else return await initGoogleSignIn(auth, rememberMe);
 
 }
 
@@ -167,19 +146,18 @@ const refreshAccessToken = async () => {
 };
 
 // Pick folder with write permission filter
-export const pickFolder = async () => {
-    await authorize();
-
-    return new Promise((resolve, reject) => {
+export const pickFolder = async (auth) => {
+   const authInfo =  await authorize(auth);
+    await loadPicker();
+    const doc = await  new Promise((resolve, reject) => {
 
         const pickerCallback = (data) => {
             if (data.action === google.picker.Action.PICKED) {
-                selectedFolderId.value = data.docs[0].id;
                 resolve(data.docs[0]);
             }
         };
         const picker = new google.picker.PickerBuilder()
-            .setOAuthToken(accessToken.value)
+            .setOAuthToken(authInfo.accessToken)
             .addView(
                 new google.picker.DocsView()
                     .setIncludeFolders(true)
@@ -201,6 +179,9 @@ export const pickFolder = async () => {
             .build();
         picker.setVisible(true);
     });
+    console.log(doc)
+    authInfo.parent = doc;
+    return authInfo;
 
 };
 

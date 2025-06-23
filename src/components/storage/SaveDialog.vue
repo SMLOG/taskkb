@@ -15,7 +15,7 @@
           class="w-full p-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 outline-none transition-colors duration-200"
           @change="changeMode">
 
-          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")+option.name+`(${option.email})` }}</option>
+          <option v-for="(option, i) in cacheFolders" :value="i"> {{ (nameMap[option.mode] ? nameMap[option.mode] + " - " : "")+(option?.parent?.name||option.name)+`(${option.email})` }}</option>
           <option v-if="cacheFolders.length" disabled>-----------------</option>
           <option v-for="(option, i) in modesRef" :value="cacheFolders.length + i">{{
             (nameMap[option.mode] ? nameMap[option.mode] + " - " : "") + option.name }}</option>
@@ -71,7 +71,12 @@ const getSelected = () => {
 
 const addOrUpdateAuthCacheList = (auth)=>{
   console.log(auth)
-  let exits = cacheFolders.value.filter(f => f.mode==auth.mode&&f.parentID == auth.parentID);
+  if(auth.mode && cacheFolders.value.filter(e=>e.mode==auth.mode).length==0){
+    let copy =  [...modesRef.value.filter(e=>e.mode==auth.mode)];
+    copy.map(e=>{e.accessToken = auth.accessToken;e.email=auth.email})
+    cacheFolders.value.unshift(...copy);
+  }
+  let exits = cacheFolders.value.filter(f => f.mode==auth.mode&&auth.accessToken&&(auth.parent == null && f.parent == null  || auth?.parent?.id==f?.parent?.id));
           if (exits.length > 0) {
             let i = cacheFolders.value.indexOf(exits[0]);
             selectIndexRef.value = i;
@@ -89,8 +94,8 @@ const changeMode = () => {
       const { pickFolder } = await getStorageBridgeByName(selectOption.mode);
       if (pickFolder) {
         try {
-          const folder = await pickFolder();
-          addOrUpdateAuthCacheList(folder);
+          const folder = await pickFolder(selectOption);
+          addOrUpdateAuthCacheList({...selectOption,...folder,folder:false});
 
         } catch (error) {
 
