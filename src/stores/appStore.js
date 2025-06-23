@@ -31,7 +31,7 @@ export const useAppStore = defineStore('app', () => {
 
   async function loadFile(storageType,fileId,tabId){
 
-    path.value = {
+   if(fileId && storageType) path.value = {
       mode:storageType,
       id : fileId
     }

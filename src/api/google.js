@@ -306,7 +306,7 @@ const readFile = async (path,auth) => {
             `https://www.googleapis.com/drive/v3/files/${path.id}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
             {
                 method: 'GET',
-                headers: new Headers({ Authorization: `Bearer ${auth.accessToken.value}` }),
+                headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
             }
         );
 
@@ -348,7 +348,7 @@ export async function readJsonAttachment(path, auth) {
 
         let result = await readFile(path,auth);
         let content = result?.content ? jsonParse(result.content) : null;
-        return { content, attachmentId: fileId };
+        return { path,content, };
 
    
 }

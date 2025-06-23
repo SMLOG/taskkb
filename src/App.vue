@@ -8,7 +8,8 @@ import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/storage/StorageOptions.vue';
 import NoFound from '@/components/storage/NoFound.vue';
-import { storeToRefs } from 'pinia'
+import { storeToRefs } from 'pinia';
+import GoogleDrivePicker from '@/components/storage/GoogleDrivePicker.vue'
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
@@ -20,7 +21,7 @@ const {activeTabRef} = storeToRefs(appStore);
 
 <template>
 
-  <main class="flex-grow relative">
+  <main class="flex-grow relative" >
     <div v-if="appStore.loading">Loading</div>
     <NotificationProvider class="h-full" v-if="!appStore.loading">
       <div class="flex flex-col h-full">
