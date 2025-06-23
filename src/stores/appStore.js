@@ -69,7 +69,7 @@ export const useAppStore = defineStore('app', () => {
 
       let activeTabIndex = rootData&&rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
       let theTabs = tabs.value.filter(e=>e.id===path.value.tabId);
-      if(path.value.tabId&&theTabs.length>0){
+      if(path.value?.tabId&&theTabs.length>0){
         activeTabIndex= tabs.value.indexOf(theTabs[0]);
       }
       await setActiveTab(activeTabIndex);
@@ -247,6 +247,10 @@ export const useAppStore = defineStore('app', () => {
     tabs.value = newTabs;
   }
 
+  function resetPath(){
+    path.value =  null;
+    useHashStore().updatePath(path.value)
+  }
 
 
 
@@ -265,6 +269,7 @@ export const useAppStore = defineStore('app', () => {
     saveData,
     loadActiveTab,
     getCurrentTab,
-    importToNewTab,loadFile,showPopUp,updateShowUp,loading
+    importToNewTab,loadFile,showPopUp,updateShowUp,loading,
+    resetPath
   };
 });

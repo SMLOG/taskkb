@@ -18,13 +18,13 @@
 
 <script setup>
 import { ref,nextTick } from 'vue';
-import { useHashStore } from '@/stores/hashStore';
+import { useAppStore } from '@/stores/appStore';
 
 // Define reactive variables or functions
 const handleCancel = () => {
     console.log('Cancel clicked');
     nextTick(()=>{
-        useHashStore().resetHash();
+        useAppStore().resetPath();
     })
     isOpen.value = false;
     returnResolve.value();
