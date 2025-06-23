@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-2xl mx-auto p-6">
+    <div class="mx-auto p-6">
       <h1 class="text-3xl font-bold text-gray-800 mb-4">
         Organized Data & Planning Software
       </h1>
@@ -11,7 +11,7 @@
         <span class="font-semibold text-blue-600">logical and intuitive</span> way.
       </p>
       
-      <div id="geStatus" class="flex items-center text-xl font-medium text-gray-700 mb-4">
+      <div class="flex items-center text-center text-xl font-medium text-gray-700 mb-4">
         <span>Loading...</span>
         <img src="/images/spin.gif" class="w-6 h-6 ml-2" alt="Loading spinner" />
       </div>

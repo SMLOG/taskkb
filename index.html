@@ -16,26 +16,58 @@
     gtag('config', 'G-00P8YT0K8N');
   </script>
     <style>
-          #about {
-            font-family: Arial, sans-serif;
+       #about body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
         }
-       #about  h1 {
-            color: #2c3e50;
-            font-size: 2.2em;
-            margin-bottom: 15px;
+        
+        #about {
+            width: 100%;
+            padding: 24px;
         }
-       #about  p {
-            font-size: 1.1em;
-            margin-bottom: 20px;
+        
+        #about h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 16px;
         }
-        #about  .highlight {
-            font-weight: bold;
-            color: #2980b9;
+        
+        #about .description {
+            font-size: 18px;
+            color: #4b5563;
+            margin-bottom: 24px;
+            line-height: 1.75;
+        }
+        
+        #about .highlight {
+            font-weight: 600;
+            color: #2563eb;
+        }
+        
+        #about .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 16px;
+        }
+        
+        #about .loading-spinner {
+            width: 24px;
+            height: 24px;
+            margin-left: 8px;
+        }
+        
+        #about .js-note {
+            color: #6b7280;
+            font-style: italic;
         }
         </style>
 </head>
@@ -43,18 +75,24 @@
 <body>
   <div id="app" class="flex h-screen flex-col">
     <div id="about">
+      
       <h1>Organized Data & Planning Software</h1>
-      <p>
-        <span class="highlight">TreeGrid.io</span> is a free online tool that helps you <span
-          class="highlight">organize, manage, and visualize</span> your data and plans efficiently.
-        Designed for clarity and productivity, it enables users to structure information in a <span
-          class="highlight">logical and intuitive</span> way.
+        
+      <p class="description">
+          <span class="highlight">TreeGrid.io</span> is a free online tool that helps you 
+          <span class="highlight">organize, manage, and visualize</span> your data and plans efficiently.
+          Designed for clarity and productivity, it enables users to structure information in a 
+          <span class="highlight">logical and intuitive</span> way.
       </p>
-      <h2 id="geStatus">Loading... <img src="images/spin.gif" /></h2>
-      <p>
-        Please ensure JavaScript is enabled.
+      
+      <div class="loading-container">
+          <span>Loading...</span>
+          <img src="/images/spin.gif" class="loading-spinner" alt="Loading spinner" />
+      </div>
+      
+      <p class="js-note">
+          Please ensure JavaScript is enabled.
       </p>
-    </div>
   </div>
   </div>
   <script type="module" src="/src/main.js"></script>
