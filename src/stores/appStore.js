@@ -46,8 +46,8 @@ export const useAppStore = defineStore('app', () => {
         const {readJsonAttachment,type} = await getStorageBridge(path.value.mode);
         typeRef.value=type;
         console.log(path.value)
-        const { attachmentId, content: objData } = await readJsonAttachment(path.value,useUserStore().getUser());
-        attachmentIdRef.value = attachmentId;
+        const { path:pathData, content: objData } = await readJsonAttachment(path.value,useUserStore().getUser());
+        console.log(pathData)
         if(!objData){
           showPopUp.value = 2;
           return;
@@ -115,7 +115,7 @@ export const useAppStore = defineStore('app', () => {
       configRef.value.weekCount = weekCount;
  
         
-        const {readJsonAttachment,writeObjectToJsonAttachment} = await getStorageBridgeByName(path.value.mode);
+        const {writeObjectToJsonAttachment} = await getStorageBridgeByName(path.value.mode);
 
         
         const result = await writeObjectToJsonAttachment(
@@ -125,8 +125,7 @@ export const useAppStore = defineStore('app', () => {
 
         tabs.value.map(tab=>tab.saved=true);
 
-        console.log('attachment id', attachmentIdRef.value)
-        console.log(`Saved data  attachment from ${orgPath}  to ${path.value}`);
+        console.log(`Saved data  attachment from ${orgPath&&JSON.stringify(orgPath,2)}  to ${path.value && JSON.stringify(path.value)}`);
 
 
       
@@ -223,7 +222,6 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  const attachmentIdRef = ref(-1);
   async function saveData() {
     try {
 
