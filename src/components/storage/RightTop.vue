@@ -3,6 +3,7 @@
     <div class="flex space-x-2">
       <button
         @click="showDropDownMenuItems"
+        ref="showMenu"
         class="text-white dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center transition-colors duration-200"
       >
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -35,7 +36,7 @@
       </button>
     </div>
 
-    <MenuItems v-if="isMenuVisible"></MenuItems>
+    <MenuItems v-if="isMenuVisible" :showButton="showMenu" @close="isMenuVisible=false"></MenuItems>
 
     <Profile v-if="isProfileVisible" @close="isProfileVisible=false" :showProfileButton="showProfileButton" />
   </div>
@@ -48,6 +49,7 @@ import MenuItems from './MenuItems.vue';
 
 const isProfileVisible = ref(false);
 const showProfileButton = ref(null);
+const showMenu = ref(null);
 const isMenuVisible = ref(false);
 
 const share = () => {

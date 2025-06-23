@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in overflow-hidden">
+  <div ref="dropdown" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in overflow-hidden">
     <ul class="py-1 divide-y divide-gray-100 dark:divide-gray-700">
       <li v-for="(item, index) in menuItems" :key="index">
         <a 
@@ -19,7 +19,9 @@
 </template>
 
 <script setup>
-const emit = defineEmits(['item-clicked']);
+import { ref,onMounted,onUnmounted } from 'vue';
+
+const emit = defineEmits(['item-clicked','close']);
 
 const menuItems = [
   { label: 'Save', shortcut: '⌘S', action: () => emit('item-clicked', 'save') },
@@ -35,6 +37,38 @@ const menuItems = [
   { label: 'Properties...', action: () => emit('item-clicked', 'properties') },
   { label: 'Close', shortcut: '⌘W', action: () => emit('item-clicked', 'close'), destructive: true },
 ];
+
+
+// Prop to identify the profile button (passed as a ref or selector)
+const props = defineProps({
+  showButton: {
+    default: null,
+  },
+});
+
+// Handle clicks outside the component
+const dropdown = ref(null);
+const handleClickOutside = (event) => {
+  const profileButton = props.showButton ;
+
+  if (
+    dropdown.value &&
+    !dropdown.value.contains(event.target) &&
+    !(profileButton && (profileButton.contains(event.target) || profileButton === event.target))
+  ) {
+    emit('close');
+  }
+};
+
+// Add and remove event listener
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
 </script>
 
 <style scoped>
