@@ -147,9 +147,12 @@ function loadFile(event) {
 const selectTemplate = async (event, template) => {
   if(!path.value){
     try{
-     path.value =  await saveDialog.value.open();
+     await saveDialog.value.open();
+     console.log('Save Dialog')
 
     }catch(error){
+      console.log('Save Dialog',error)
+
       closePopup();
       return;
     }

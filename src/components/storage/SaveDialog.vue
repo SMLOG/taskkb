@@ -123,11 +123,19 @@ const cancel = () => {
 const save = async () => {
   try{
     const selected = getSelected();
-  const auth = await authDialog.value.open(selected, nameMap[selected.mode]);
+    let rauth = selected;
+    if(selected.accessToken){
 
-  addOrUpdateAuthCacheList({...selected,...auth});
+    }else{
+      const auth = await authDialog.value.open(selected, nameMap[selected.mode]);
 
-  returnResolve(auth);
+      rauth = {...selected,...auth};
+      addOrUpdateAuthCacheList(rauth);
+    }
+  isOpen.value = false;
+  console.error('resolve')
+  returnResolve.value(rauth);
+
   }catch(error){
     
   }
@@ -142,7 +150,7 @@ defineExpose({
   async open() {
     return new Promise((resolve, reject) => {
       returnResolve.value = resolve;
-      returnReject.value = reject;
+      //returnReject.value = reject;
       isOpen.value = true;
     })
   }
