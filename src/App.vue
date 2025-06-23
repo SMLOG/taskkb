@@ -9,17 +9,23 @@ import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/storage/StorageOptions.vue';
 import NoFound from '@/components/storage/NoFound.vue';
 import { storeToRefs } from 'pinia';
-import GoogleDrivePicker from '@/components/storage/GoogleDrivePicker.vue'
+import { useHash } from '@/composables/useHash';
+import { ref } from 'vue';
+import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue'
+
+const authDialog = ref(null);
+useHash(authDialog);
+
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
 
 
 
-
 </script>
 
 <template>
+<AuthorizationDialog ref="authDialog" />
 
   <main class="flex-grow relative" >
     <div v-if="appStore.loading">Loading</div>

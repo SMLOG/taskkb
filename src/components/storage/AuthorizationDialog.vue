@@ -25,6 +25,8 @@
 <script setup>
 import { ref } from 'vue';
 import { getStorageBridgeByName } from '@/api/bridge';
+import { useUserStore } from '@/stores/userStore';
+
 const isOpen = ref(false);
 
 
@@ -41,6 +43,10 @@ const authorize = async () => {
     const auth  =  await storageBridge.authorize(selectedAuth,rememberMe.value);
 
     isOpen.value = false;
+    const userStore = useUserStore();
+
+    userStore.addOrUpdateUser(auth);
+
     returnResolve.value(auth);
   } catch (error) {
 

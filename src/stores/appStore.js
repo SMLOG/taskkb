@@ -35,10 +35,10 @@ export const useAppStore = defineStore('app', () => {
       mode:storageType,
       id : fileId
     }
-    initLoadTabsData(storageType,fileId,tabId).catch(error => console.error('Init failed:', error));
+   await initLoadTabsData(storageType,fileId,tabId);
+ 
   }
   async function initLoadTabsData(storageType,fileId,tabId) {
-    try {
       loading.value = true;
       console.log('Initializing store...');
       let rootData = {tabs:[]};
@@ -68,9 +68,7 @@ export const useAppStore = defineStore('app', () => {
       let activeTabIndex = rootData&&rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
       await setActiveTab(activeTabIndex);
 
-    } catch (error) {
-      console.error('Failed to initialize store:', error);
-    }
+ 
     loading.value = false;
   }
 

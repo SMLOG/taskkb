@@ -26,10 +26,7 @@
 
       </div>
 
-      <!-- Profile Footer -->
-      <div v-if="isProfileVisible"  class="absolute z-99  w-80 m-1 right-0 bg-white dark:bg-gray-800  border-t border-gray-300 dark:border-gray-600">
-        <Profile/>
-      </div>
+        <Profile v-if="isProfileVisible" @close="isProfileVisible=false" />
     </div>
   </template>
   

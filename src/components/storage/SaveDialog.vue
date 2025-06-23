@@ -88,9 +88,7 @@ const addOrUpdateAuthCacheList = (auth)=>{
             console.log('folder', auth)
             selectIndexRef.value = 0;
           }
-          const userStore = useUserStore();
 
-          userStore.addOrUpdateUser(auth);
 
 }
 const changeMode = () => {
