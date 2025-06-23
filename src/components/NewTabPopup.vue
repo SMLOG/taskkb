@@ -147,12 +147,9 @@ function loadFile(event) {
 const selectTemplate = async (event, template) => {
   if(!path.value){
     try{
-     await saveDialog.value.open();
-     console.log('Save Dialog')
+     path.value =  await saveDialog.value.open();
 
     }catch(error){
-      console.log('Save Dialog',error)
-
       closePopup();
       return;
     }
@@ -168,7 +165,7 @@ const selectTemplate = async (event, template) => {
     if (data) {
       data.config.startDate = new Date();
       data.config.title = tabName;
-      data.config.cols.map(col => col.id = uuidv4())
+      data.config.cols.map(col => col.id = uuidv4());
       loopTree(data.data, (node) => node.id = uuidv4());
       useAppStore().importToNewTab(newTabId, data);
     } else {

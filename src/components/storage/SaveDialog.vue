@@ -150,7 +150,7 @@ defineExpose({
   async open() {
     return new Promise((resolve, reject) => {
       returnResolve.value = resolve;
-      //returnReject.value = reject;
+      returnReject.value = reject;
       isOpen.value = true;
     })
   }
