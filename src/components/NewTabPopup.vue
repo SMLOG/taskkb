@@ -9,7 +9,7 @@
       <div class="mb-4">
         <button @click="openFile"
           class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
-          <span class="text-gray-800 dark:text-gray-200">Open existing file</span>
+          <span class="text-gray-800 dark:text-gray-200">Import from existing file</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
             viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -150,7 +150,7 @@ const selectTemplate = async (event, template) => {
      path.value =  await saveDialog.value.open();
 
     }catch(error){
-      closePopup();
+      //closePopup();
       return;
     }
   }
@@ -175,6 +175,7 @@ const selectTemplate = async (event, template) => {
     loadFile(event);
   }
   useAppStore().saveData();
+  closePopup();
 };
 
 const closePopup = () => {
