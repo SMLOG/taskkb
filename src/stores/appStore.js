@@ -29,51 +29,71 @@ export const useAppStore = defineStore('app', () => {
       id: fileId,
       tabId
     }
-    await initLoadTabsData(path);
+    await initLoadTabsData();
 
   }
-  async function initLoadTabsData(storageType) {
+  async function initLoadTabsData() {
     loading.value = true;
     console.log('Initializing store...');
-    let rootData = { tabs: [] };
-    if (path.value?.mode) {
-      const { readJsonAttachment, type } = await getStorageBridge(path.value.mode);
-      typeRef.value = type;
-      const { path: pathData, content: objData } = await readJsonAttachment(path.value, useUserStore().getUser());
-
-      rootData = objData;
-    }
-
-    if (rootData) {
-      tabs.value = rootData.tabs;
-    }
-
-    for (const tab of tabs.value) {
-      let { config, data } = rootData.datas[tab.id];
-      if (data && config) {
-        tabsDataMapRef.value[tab.id] = { data, config };
+  
+    try {
+      let rootData = { tabs: [], datas: {}, activeTab: -1 };
+  
+      // Load data based on path mode
+      if (path.value?.mode) {
+        const { readJsonAttachment, type } = await getStorageBridge(path.value.mode);
+        typeRef.value = type;
+        
+        const { content: objData } = await readJsonAttachment(
+          path.value, 
+          useUserStore().getUser()
+        );
+        rootData = objData ?? rootData;
       }
+  
+      // Initialize tabs
+      tabs.value = rootData.tabs ?? [];
+  
+      // Populate tabs data map
+      tabsDataMapRef.value = Object.fromEntries(
+        tabs.value
+          .filter(tab => rootData.datas?.[tab.id]?.data && rootData.datas?.[tab.id]?.config)
+          .map(tab => [tab.id, {
+            data: rootData.datas[tab.id].data,
+            config: rootData.datas[tab.id].config
+          }])
+      );
+  
+      // Determine active tab index
+      let activeTabIndex = -1;
+      if (path.value?.tabId) {
+        const targetTab = tabs.value.find(tab => tab.id === path.value.tabId);
+        if (targetTab) {
+          activeTabIndex = tabs.value.indexOf(targetTab);
+        }
+      } else if (rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length) {
+        activeTabIndex = rootData.activeTab;
+      } else if (tabs.value.length > 0) {
+        activeTabIndex = 0;
+      }
+  
+      await setActiveTab(activeTabIndex);
+  
+    } catch (error) {
+      console.error('Failed to initialize tabs data:', error);
+      tabs.value = [];
+      tabsDataMapRef.value = {};
+      await setActiveTab(-1);
+      throw error;
+    } finally {
+      loading.value = false;
     }
-
-    let activeTabIndex = rootData && rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
-    let theTabs = tabs.value.filter(e => e.id === path.value.tabId);
-    if (path.value?.tabId && theTabs.length > 0) {
-      activeTabIndex = tabs.value.indexOf(theTabs[0]);
-    }
-    await setActiveTab(activeTabIndex);
-
-
-    loading.value = false;
   }
 
   // Load active tab
   async function loadActiveTab() {
-    try {
-      if (activeTabRef.value < tabs.value.length && activeTabRef.value >= 0) {
-        await setActiveTab(activeTabRef.value);
-      }
-    } catch (error) {
-      console.error('Failed to load active tab:', error);
+    if (activeTabRef.value < tabs.value.length && activeTabRef.value >= 0) {
+      await setActiveTab(activeTabRef.value);
     }
   }
 
@@ -130,35 +150,23 @@ export const useAppStore = defineStore('app', () => {
   }
 
   async function addTab(tabId, title) {
-    try {
-      const tab = { id: tabId, title };
-      const tabData = {
-        config: { cols: [], title },
-        data: { _childs: [] }
-      };
+    const tab = { id: tabId, title };
+    const tabData = {
+      config: { cols: [], title },
+      data: { _childs: [] }
+    };
 
-      tabs.value.push(tab);
-      tabsDataMapRef.value[tab.id] = tabData;
-      activeTabRef.value = tabs.value.length - 1;
+    tabs.value.push(tab);
+    tabsDataMapRef.value[tab.id] = tabData;
 
-      treeRef.value = tabData.data;
-      configRef.value = tabData.config;
-
-      return tab;
-    } catch (error) {
-      console.error('Failed to add tab:', error);
-    }
+    return tab;
   }
 
   async function importToNewTab(tabId, data) {
-    try {
       const tab = await addTab(tabId, data.config.title);
-      //await setActiveTab(-1);
       await loadTabData(tab, data);
       await setActiveTab(tabs.value.length - 1);
-    } catch (error) {
-      console.error('Failed to import to new tab:', error);
-    }
+ 
   }
 
   async function loadTabData(tab, data) {
