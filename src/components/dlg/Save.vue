@@ -1,4 +1,5 @@
 <template>
+  <div class="text-left">
       <div class="mb-4">
         <label for="saveAs" class="block mb-2 font-medium">Save as:</label>
         <input v-model="fileName" id="saveAs" type="text"
@@ -28,7 +29,7 @@
           Save
         </button>
       </div>
-
+    </div>
 </template>
 
 <script setup>
