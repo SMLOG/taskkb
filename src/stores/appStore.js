@@ -35,26 +35,26 @@ export const useAppStore = defineStore('app', () => {
   async function initLoadTabsData() {
     loading.value = true;
     console.log('Initializing store...');
-  
+
     try {
       let rootData = { tabs: [], datas: {}, activeTab: -1 };
-  
+
       // Load data based on path mode
       if (path.value?.mode) {
         const { readJsonAttachment, type } = await getStorageBridge(path.value.mode);
         typeRef.value = type;
-        
-        const { content: objData,path:pathData } = await readJsonAttachment(
-          path.value, 
+
+        const { content: objData, path: pathData } = await readJsonAttachment(
+          path.value,
           useUserStore().getUser()
         );
         path.value = pathData;
         rootData = objData ?? rootData;
       }
-  
+
       // Initialize tabs
       tabs.value = rootData.tabs ?? [];
-  
+
       // Populate tabs data map
       tabsDataMapRef.value = Object.fromEntries(
         tabs.value
@@ -64,7 +64,7 @@ export const useAppStore = defineStore('app', () => {
             config: rootData.datas[tab.id].config
           }])
       );
-  
+
       // Determine active tab index
       let activeTabIndex = -1;
       if (path.value?.tabId) {
@@ -77,9 +77,9 @@ export const useAppStore = defineStore('app', () => {
       } else if (tabs.value.length > 0) {
         activeTabIndex = 0;
       }
-  
+
       await setActiveTab(activeTabIndex);
-  
+
     } catch (error) {
       console.error('Failed to initialize tabs data:', error);
       tabs.value = [];
@@ -107,16 +107,16 @@ export const useAppStore = defineStore('app', () => {
 
     }
 
-    if(treeRef.value){
-      let startTime = 0;
-      let endTime = 0;
+    if (treeRef.value) {
+      let startTime = new Date().getTime();
+      let endTime = startTime;
       const reCalStartAndCount = (row) => {
         if (row._tl) {
           if (row._tl?.start?.date)
             if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
               startTime = row._tl.start.date.getTime();
             }
-  
+
           if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
             endTime = row._tl.end.date.getTime();
           }
@@ -125,7 +125,7 @@ export const useAppStore = defineStore('app', () => {
       loopTree(treeRef.value, reCalStartAndCount);
 
       let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
-  
+
       configRef.value.startDate = new Date(startTime);
       configRef.value.weekCount = weekCount;
 
@@ -161,27 +161,27 @@ export const useAppStore = defineStore('app', () => {
     if (!title || typeof title !== 'string') {
       throw new Error('Invalid or missing title');
     }
-  
+
     // Create tab object
     const tab = { id: tabId, title };
-  
+
     // Define default tab data structure
     const defaultTabData = {
       config: { cols: [], title },
       data: { children: [] } // Renamed _childs to children for clarity
     };
-  
+
     // Add tab and its data to respective stores
     tabs.value.push(tab);
     tabsDataMapRef.value[tabId] = data ?? defaultTabData;
-  
+
     return tab;
   }
 
   async function importToNewTab(tabId, data) {
-      const tab = await addTab(tabId, data.config.title,data);
-      await setActiveTab(tabs.value.length - 1);
- 
+    const tab = await addTab(tabId, data.config.title, data);
+    await setActiveTab(tabs.value.length - 1);
+
   }
 
 
@@ -193,21 +193,21 @@ export const useAppStore = defineStore('app', () => {
     try {
       // Store current tab to be removed
       const tab = tabs.value[index];
-  
+
       // Adjust active tab index before removal
       if (tabs.value.length === 1) {
         setActiveTab(-1);
       } else if (activeTabRef.value >= index) {
         await setActiveTab(Math.max(0, activeTabRef.value - 1));
       }
-  
+
       // Remove tab and associated data
       tabs.value.splice(index, 1);
       delete tabsDataMapRef.value[tab.id];
-  
+
       // Reset state if no tabs remain
-  
-  
+
+
     } catch (error) {
       console.error('Failed to remove tab:', error);
     }
@@ -235,11 +235,11 @@ export const useAppStore = defineStore('app', () => {
         schReadyRef.value = false;
       }
 
-      if(index<0){
+      if (index < 0) {
         if (tabs.value.length === 0) {
           treeRef.value = { _childs: [] };
           configRef.value = { cols: [] };
-        } 
+        }
       }
 
     } catch (error) {
