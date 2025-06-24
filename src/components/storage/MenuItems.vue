@@ -48,26 +48,31 @@ const dropdown = ref(null);
 const submenu = ref([]);
 const submenuPositions = ref({});
 
+// Centralized action handler
+const handleAction = (id) => {
+  emit('item-clicked', id);
+};
+
 const menuItems = ref([
-  { label: 'Save', shortcut: '⌘S', action: () => emit('item-clicked', 'save') },
-  { label: 'Share...', action: () => emit('item-clicked', 'share') },
+  { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
+  { label: 'Share...', action: () => handleAction('share') },
   {
     label: 'Open From...',
     submenu: [
-      { label: 'Google Drive', action: () => emit('item-clicked', 'open-from-google-drive') },
-      { label: 'Dropbox', action: () => emit('item-clicked', 'open-from-dropbox') },
-      { label: 'OneDrive', action: () => emit('item-clicked', 'open-from-onedrive') },
+      { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
+      { label: 'Dropbox', action: () => handleAction('open-from-dropbox') },
+      { label: 'OneDrive', action: () => handleAction('open-from-onedrive') },
     ],
   },
-  { label: 'Open Recent', action: () => emit('item-clicked', 'open-recent') },
-  { label: 'New...', shortcut: '⌘N', action: () => emit('item-clicked', 'new') },
-  { label: 'Rename...', action: () => emit('item-clicked', 'rename') },
-  { label: 'Make a Copy...', action: () => emit('item-clicked', 'copy') },
-  { label: 'Open Folder...', action: () => emit('item-clicked', 'open-folder') },
-  { label: 'Import from', action: () => emit('item-clicked', 'import') },
-  { label: 'Export as', action: () => emit('item-clicked', 'export') },
-  { label: 'Properties...', action: () => emit('item-clicked', 'properties') },
-  { label: 'Close', shortcut: '⌘W', action: () => emit('item-clicked', 'close'), destructive: true },
+  { label: 'Open Recent', action: () => handleAction('open-recent') },
+  { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
+  { label: 'Rename...', action: () => handleAction('rename') },
+  { label: 'Make a Copy...', action: () => handleAction('copy') },
+  { label: 'Open Folder...', action: () => handleAction('open-folder') },
+  { label: 'Import from', action: () => handleAction('import') },
+  { label: 'Export as', action: () => handleAction('export') },
+  { label: 'Properties...', action: () => handleAction('properties') },
+  { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
 ]);
 
 const props = defineProps({
