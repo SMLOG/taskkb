@@ -1,39 +1,54 @@
 <template>
   <div ref="dropdown" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in">
-    <ul class="py-1 divide-y divide-gray-100 dark:divide-gray-700">
-      <li v-for="(item, index) in menuItems" :key="index" class="relative group" @mouseenter="openSubmenu(index)" @mouseleave="closeSubmenu">
-        <a
-          href="#"
-          class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-          :class="{ 'text-red-600 dark:text-red-400': item.destructive }"
-          @click.prevent="handleItemClick(item)"
-        >
-          <span>{{ item.label }}</span>
-          <span v-if="item.shortcut" class="text-xs text-gray-400 dark:text-gray-500">
-            {{ item.shortcut }}
-          </span>
-          <span v-if="item.submenu" class="ml-2 text-gray-400">
-            ▶
-          </span>
-        </a>
-        <!-- Submenu -->
-        <ul
-          v-if="item.submenu && activeSubmenuIndex === index"
-          class="absolute top-0 mt-[-1px] w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-60"
-          :class="submenuPositionClasses[index]"
-          :ref="el => submenu[index] = el"
-        >
-          <li v-for="(submenuItem, subIndex) in item.submenu" :key="subIndex">
-            <a
-              href="#"
-              class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-              @click.prevent="submenuItem.action"
-            >
-              {{ submenuItem.label }}
-            </a>
-          </li>
-        </ul>
-      </li>
+    <ul class="py-1">
+      <template v-for="(group, groupIndex) in menuItems" :key="`group-${groupIndex}`">
+        <!-- Group Heading (optional) -->
+        <li v-if="group.label" class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          {{ group.label }}
+        </li>
+        <!-- Group Items -->
+        <li v-for="(item, index) in group.items" :key="`item-${groupIndex}-${index}`" class="relative group" @mouseenter="openSubmenu(groupIndex, index)" @mouseleave="closeSubmenu">
+          <a
+            href="#"
+            class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
+            :class="{ 'text-red-600 dark:text-red-400': item.destructive }"
+            @click.prevent="handleItemClick(item)"
+          >
+            <span>{{ item.label }}</span>
+            <span v-if="item.shortcut" class="text-xs text-gray-400 dark:text-gray-500">
+              {{ item.shortcut }}
+            </span>
+            <span v-if="item.submenu" class="ml-2 text-gray-400">
+              ▶
+            </span>
+          </a>
+          <!-- Submenu -->
+          <ul
+            v-if="item.submenu && activeSubmenuIndex?.group === groupIndex && activeSubmenuIndex?.item === index"
+            class="absolute top-0 mt-[-1px] w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-60"
+            :class="submenuPositionClasses[`${groupIndex}-${index}`]"
+            :ref="el => setSubmenuRef(groupIndex, index, el)"
+          >
+            <!-- Submenu Group (if any) -->
+            <template v-for="(subGroup, subGroupIndex) in item.submenu" :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
+              <li v-if="subGroup.label" class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                {{ subGroup.label }}
+              </li>
+              <li v-for="(submenuItem, subIndex) in subGroup.items" :key="`subitem-${subGroupIndex}-${subIndex}`">
+                <a
+                  href="#"
+                  class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
+                  @click.prevent="submenuItem.action"
+                >
+                  {{ submenuItem.label }}
+                </a>
+              </li>
+            </template>
+          </ul>
+        </li>
+        <!-- Divider between groups (except for the last group) -->
+        <li v-if="groupIndex < menuItems.length - 1" class="border-t border-gray-100 dark:border-gray-700"></li>
+      </template>
     </ul>
   </div>
 </template>
@@ -45,7 +60,7 @@ const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
 const dropdown = ref(null);
-const submenu = ref([]);
+const submenu = ref({});
 const submenuPositions = ref({});
 
 // Centralized action handler
@@ -54,25 +69,49 @@ const handleAction = (id) => {
 };
 
 const menuItems = ref([
-  { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
-  { label: 'Share...', action: () => handleAction('share') },
   {
-    label: 'Open From...',
-    submenu: [
-      { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
-      { label: 'Dropbox', action: () => handleAction('open-from-dropbox') },
-      { label: 'OneDrive', action: () => handleAction('open-from-onedrive') },
+    label: 'File Operations',
+    items: [
+      { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
+      { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
+      { label: 'Rename...', action: () => handleAction('rename') },
+      { label: 'Make a Copy...', action: () => handleAction('copy') },
+      { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
     ],
   },
-  { label: 'Open Recent', action: () => handleAction('open-recent') },
-  { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
-  { label: 'Rename...', action: () => handleAction('rename') },
-  { label: 'Make a Copy...', action: () => handleAction('copy') },
-  { label: 'Open Folder...', action: () => handleAction('open-folder') },
-  { label: 'Import from', action: () => handleAction('import') },
-  { label: 'Export as', action: () => handleAction('export') },
-  { label: 'Properties...', action: () => handleAction('properties') },
-  { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
+  {
+    label: 'Open Options',
+    items: [
+      {
+        label: 'Open From...',
+        submenu: [
+          {
+            label: 'Cloud Storage',
+            items: [
+              { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
+              { label: 'Dropbox', action: () => handleAction('open-from-dropbox') },
+              { label: 'OneDrive', action: () => handleAction('open-from-onedrive') },
+            ],
+          },
+        ],
+      },
+      { label: 'Open Recent', action: () => handleAction('open-recent') },
+      { label: 'Open Folder...', action: () => handleAction('open-folder') },
+    ],
+  },
+  {
+    label: 'Import/Export',
+    items: [
+      { label: 'Import from', action: () => handleAction('import') },
+      { label: 'Export as', action: () => handleAction('export') },
+    ],
+  },
+  {
+    label: 'Properties',
+    items: [
+      { label: 'Properties...', action: () => handleAction('properties') },
+    ],
+  },
 ]);
 
 const props = defineProps({
@@ -87,18 +126,24 @@ const handleItemClick = (item) => {
   }
 };
 
-const openSubmenu = async (index) => {
-  activeSubmenuIndex.value = index;
+const openSubmenu = async (groupIndex, itemIndex) => {
+  activeSubmenuIndex.value = { group: groupIndex, item: itemIndex };
   await nextTick();
-  calculateSubmenuPosition(index);
+  calculateSubmenuPosition(groupIndex, itemIndex);
 };
 
 const closeSubmenu = () => {
   activeSubmenuIndex.value = null;
 };
 
-const calculateSubmenuPosition = (index) => {
-  const submenuEl = submenu.value[index];
+const setSubmenuRef = (groupIndex, itemIndex, el) => {
+  if (el) {
+    submenu.value[`${groupIndex}-${itemIndex}`] = el;
+  }
+};
+
+const calculateSubmenuPosition = (groupIndex, itemIndex) => {
+  const submenuEl = submenu.value[`${groupIndex}-${itemIndex}`];
   if (!submenuEl || !dropdown.value) return;
 
   const dropdownRect = dropdown.value.getBoundingClientRect();
@@ -108,12 +153,14 @@ const calculateSubmenuPosition = (index) => {
   const spaceOnRight = viewportWidth - (dropdownRect.right + submenuWidth);
   const shouldOpenLeft = spaceOnRight < 0;
 
-  submenuPositions.value[index] = shouldOpenLeft ? 'left' : 'right';
+  submenuPositions.value[`${groupIndex}-${itemIndex}`] = shouldOpenLeft ? 'left' : 'right';
 };
 
 const submenuPositionClasses = computed(() => {
-  return menuItems.value.reduce((acc, _, index) => {
-    acc[index] = submenuPositions.value[index] === 'left' ? 'left-[-224px]' : 'left-full';
+  return menuItems.value.reduce((acc, group, groupIndex) => {
+    group.items.forEach((_, itemIndex) => {
+      acc[`${groupIndex}-${itemIndex}`] = submenuPositions.value[`${groupIndex}-${itemIndex}`] === 'left' ? 'left-[-224px]' : 'left-full';
+    });
     return acc;
   }, {});
 });
@@ -134,8 +181,8 @@ const handleClickOutside = (event) => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
   window.addEventListener('resize', () => {
-    if (activeSubmenuIndex.value !== null) {
-      calculateSubmenuPosition(activeSubmenuIndex.value);
+    if (activeSubmenuIndex.value) {
+      calculateSubmenuPosition(activeSubmenuIndex.value.group, activeSubmenuIndex.value.item);
     }
   });
 });
