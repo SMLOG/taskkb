@@ -9,7 +9,7 @@ import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/dlg/StorageOptions.vue';
 import NoFound from '@/components/dlg/NoFoundDlg.vue';
 import { storeToRefs } from 'pinia';
-import { useAuthDialog } from '@/composables/useAuthDialog';
+import { useDialog } from '@/composables/useDialog';
 import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
 import AuthorizationDialog from '@/components/dlg/AuthorizationDlg.vue'
@@ -17,7 +17,7 @@ import About from '@/components/About.vue';
 
 const authDialog = ref(null);
 const noFound = ref(null);
-useAuthDialog(authDialog,noFound);
+useDialog(authDialog,noFound);
 useHashStore();
 
 const appStore = useAppStore();

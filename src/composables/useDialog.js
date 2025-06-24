@@ -1,7 +1,7 @@
 
 let globalAuthDlg
 let globalNoFoundDlg
-export function useAuthDialog(authDlg,noFound) {
+export function useDialog(authDlg,noFound) {
 
   if(authDlg){
     globalAuthDlg = authDlg;

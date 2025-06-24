@@ -43,7 +43,7 @@ import { getStorageBridgeByName } from '@/api/bridge';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
-import { useAuthDialog } from '@/composables/useAuthDialog';
+import { useDialog } from '@/composables/useDialog';
 
 
 const fileName = ref("Untitled.treegridio");
@@ -131,7 +131,7 @@ const save = async () => {
 
         }else{
 
-          const auth = await useAuthDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
+          const auth = await useDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
 
           rauth = {...selected,...auth};
           addOrUpdateAuthCacheList(rauth);
