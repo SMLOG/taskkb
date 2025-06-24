@@ -7,7 +7,7 @@ import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 import StorageOptions from './components/dlg/StorageOptions.vue';
-import NoFound from '@/components/dlg/NoFound.vue';
+import NoFound from '@/components/dlg/NoFoundDlg.vue';
 import { storeToRefs } from 'pinia';
 import { useAuthDialog } from '@/composables/useAuthDialog';
 import {useHashStore} from '@/stores/hashStore';
