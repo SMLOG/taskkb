@@ -149,16 +149,28 @@ export const useAppStore = defineStore('app', () => {
 
   }
 
-  async function addTab(tabId, title,data) {
+  async function addTab(tabId, title, data = null) {
+    // Validate inputs
+    if (!tabId || typeof tabId !== 'string') {
+      throw new Error('Invalid or missing tabId');
+    }
+    if (!title || typeof title !== 'string') {
+      throw new Error('Invalid or missing title');
+    }
+  
+    // Create tab object
     const tab = { id: tabId, title };
-    const tabData = {
+  
+    // Define default tab data structure
+    const defaultTabData = {
       config: { cols: [], title },
-      data: { _childs: [] }
+      data: { children: [] } // Renamed _childs to children for clarity
     };
-
+  
+    // Add tab and its data to respective stores
     tabs.value.push(tab);
-    tabsDataMapRef.value[tab.id] = data??tabData;
-
+    tabsDataMapRef.value[tabId] = data ?? defaultTabData;
+  
     return tab;
   }
 
