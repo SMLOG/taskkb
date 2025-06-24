@@ -17,24 +17,61 @@
 import { nextTick, ref ,markRaw} from 'vue';
 
 const isOpen = ref(false);
-const componentName = ref(null)
 
 const closePopup = (ret) => {
-  isOpen.value = false;
+  pop();
+  if(componentNameList.value.length==0){
+     isOpen.value = false;
+     reset();
+  }
   returnReject.value(ret);
 };
 const handleConfirm = (ret)=>{
+
+  pop();
+  if(returnResolveList.length==0){
+    isOpen.value = false;
+    reset();
+
+  }
   returnResolve.value(ret);
 }
 
+const returnResolveList = ref([]);
+const returnRejectList = ref([]);
+const componentNameList = ref([]);
+
 const returnResolve = ref(null);
 const returnReject = ref(null);
+const componentName = ref(null);
+
+
+const pop = ()=>{
+  returnResolve.value = returnResolveList.value.pop();
+  returnReject.value = returnRejectList.value.pop();
+  componentName.value = componentNameList.value.pop();
+}
+const reset = ()=>{
+
+  componentName.value = null;
+}
+
 defineExpose({
   async open(name) {
     return new Promise((resolve, reject) => {
-      returnResolve.value = resolve;
-      returnReject.value = reject;
-      componentName.value = markRaw(name);
+      if(componentName.value!=null){
+        returnResolveList.value.push(returnResolve.value);
+        returnRejectList.value.push(returnReject.value);
+        componentNameList.value.push(componentName.value);
+      }
+
+      const component = markRaw(name);
+      returnResolveList.value.push(resolve);
+      returnRejectList.value.push(reject);
+      componentNameList.value.push(component);
+      pop();
+
+
       nextTick().then(()=>{
         isOpen.value = true;
       })

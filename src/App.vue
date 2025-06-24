@@ -15,6 +15,7 @@ import { ref } from 'vue';
 import AuthorizationDialog from '@/components/dlg/AuthorizationDlg.vue'
 import Dialog from '@/components/dlg/Dialog.vue'
 import About from '@/components/About.vue';
+import Save from './components/dlg/Save.vue';
 
 const authDialog = ref(null);
 const noFound = ref(null);
@@ -31,7 +32,6 @@ const {activeTabRef} = storeToRefs(appStore);
 </script>
 
 <template>
-
   <main class="flex-grow relative" >
     <About v-if="appStore.loading"/>
     <NotificationProvider class="h-full" v-if="!appStore.loading">

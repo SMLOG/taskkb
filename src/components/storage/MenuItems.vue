@@ -57,6 +57,8 @@
 import { useDialog } from '@/composables/useDialog';
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
+import useApp from '@/composables/useApp';
+import { useAppStore } from '@/stores/appStore';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -68,7 +70,10 @@ const submenuPositions = ref({});
 const handleAction = async (id) => {
   emit('close');
   if(id==='new'){
+    let orgPath = useAppStore().path;
+    useAppStore().resetPath();
     await useDialog().dialog().open(NewTab);
+
   }
   emit('item-clicked', id);
 };

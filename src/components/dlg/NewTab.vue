@@ -56,8 +56,9 @@ import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
 import { storeToRefs } from 'pinia';
+import Save from './Save.vue';
+import { useDialog } from '@/composables/useDialog';
 
-const saveDialog = ref(null);
 
 const appStore = useAppStore();
 const tabs = computed(() => appStore.tabs);
@@ -130,12 +131,14 @@ function loadFile(event) {
 
 
 const selectTemplate = async (event, template) => {
+  console.log(template)
   if(!path.value?.mode){
     try{
-     path.value =  await saveDialog.value.open();
+     path.value =  await  useDialog().dialog().open(Save);
 
     }catch(error){
       //closePopup();
+      console.error(error)
       return;
     }
   }
