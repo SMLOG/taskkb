@@ -20,7 +20,7 @@
           </span>
         </a>
         <!-- Submenu -->
-        <ul v-if="item.submenu " 
+        <ul v-if="item.submenu && activeSubmenuIndex === index"
             class="absolute top-0 mt-[-1px] w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-60"
             :class="submenuPositionClasses[index]"
             ref="submenu">
