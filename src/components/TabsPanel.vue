@@ -25,8 +25,8 @@ const appStore = useAppStore();
 
 const addTab = async () => {
 
-  if(!appStore.path?.mode){
-    appStore.updatePath( await  useDialog().dialog().open(Save));
+  if(!appStore.path){
+    appStore.newFile( await  useDialog().dialog().open(Save));
   }
 
   await useDialog().dialog().open(NewTab);

@@ -62,6 +62,7 @@ const activeSubmenuIndex = ref(null);
 const dropdown = ref(null);
 const submenu = ref({});
 const submenuPositions = ref({});
+const appStore = useAppStore();
 
 // Centralized action handler
 const handleAction = async (id) => {
@@ -69,11 +70,11 @@ const handleAction = async (id) => {
   switch (id) {
     case 'new':
       {
-        let orgPath = useAppStore().path;
+        let orgPath = appStore.path;
+        appStore.newFile( await  useDialog().dialog().open(Save));
         
-        const newPath = await useDialog().dialog().open(Save)
-        
-        await useDialog().dialog().open(NewTab,newPath);
+        await useDialog().dialog().open(NewTab);
+        await appStore.saveData();
 
 
       }

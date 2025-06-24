@@ -25,7 +25,7 @@ export const useAppStore = defineStore('app', () => {
 
   async function loadFile(storageType, fileId, tabId) {
 
-    updatePath({
+    storageType && fileId&& updatePath({
       mode: storageType,
       id: fileId,
       tabId
@@ -267,7 +267,17 @@ export const useAppStore = defineStore('app', () => {
   }
 
 
+const newFile = (newPath)=>{
+  resetPath();
+  path.value = newPath;
+  tabs.value.length=0;
+  tabsDataMapRef.value = {};
+  activeTabRef.value = -1;
+  treeRef.value = null;
+  configRef.value = null;
 
+
+}
   return {
     initLoadTabsData,
     tabs, path,
@@ -284,6 +294,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath,updatePath
+    resetPath,updatePath,newFile
   };
 });
