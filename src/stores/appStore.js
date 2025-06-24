@@ -44,10 +44,11 @@ export const useAppStore = defineStore('app', () => {
         const { readJsonAttachment, type } = await getStorageBridge(path.value.mode);
         typeRef.value = type;
         
-        const { content: objData } = await readJsonAttachment(
+        const { content: objData,path:pathData } = await readJsonAttachment(
           path.value, 
           useUserStore().getUser()
         );
+        path.value = pathData;
         rootData = objData ?? rootData;
       }
   

@@ -13,7 +13,7 @@ export async function readJsonAttachment(path) {
         }
 
         const content = jsonParse(storedData);
-        return { content,path };
+        return { content,path:{...path,fileName:path.id} };
   
 }
 
