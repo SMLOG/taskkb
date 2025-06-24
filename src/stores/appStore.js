@@ -1,9 +1,8 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getStorageBridge, getStorageBridgeByName } from '@/api/bridge';
-import {loopTree} from '@/lib/treelib';
-import {weeksBetween} from '@/lib/schedule';
-import { useModeStore } from '@/stores/modeStore';
+import { loopTree } from '@/lib/treelib';
+import { weeksBetween } from '@/lib/schedule';
 import { useUserStore } from './userStore';
 import { useHashStore } from './hashStore';
 
@@ -18,63 +17,52 @@ export const useAppStore = defineStore('app', () => {
   const treeRef = ref(null);
   const configRef = ref(null);
   const typeRef = ref(null);
-  const showPopUp = ref(0);
   const loading = ref(true);
-  // Initialize store
 
-  const modeStore = useModeStore();
 
-  function updateShowUp(value){
-    showPopUp.value = value;
-    console.log(showPopUp.value)
-  }
 
-  async function loadFile(storageType,fileId,tabId){
 
-   if(fileId && storageType) path.value = {
-      mode:storageType,
-      id : fileId,
+  async function loadFile(storageType, fileId, tabId) {
+
+    path.value = {
+      mode: storageType,
+      id: fileId,
       tabId
     }
-   await initLoadTabsData(storageType);
- 
+    await initLoadTabsData(path);
+
   }
   async function initLoadTabsData(storageType) {
-      loading.value = true;
-      console.log('Initializing store...');
-      let rootData = {tabs:[]};
-      if(storageType && storageType){
-        const {readJsonAttachment,type} = await getStorageBridge(path.value.mode);
-        typeRef.value=type;
-        console.log(path.value)
-        const { path:pathData, content: objData } = await readJsonAttachment(path.value,useUserStore().getUser());
-        console.log(pathData)
-        if(!objData){
-          showPopUp.value = 2;
-          return;
-        }
-       rootData = objData;
-      }
+    loading.value = true;
+    console.log('Initializing store...');
+    let rootData = { tabs: [] };
+    if (path.value?.mode) {
+      const { readJsonAttachment, type } = await getStorageBridge(path.value.mode);
+      typeRef.value = type;
+      const { path: pathData, content: objData } = await readJsonAttachment(path.value, useUserStore().getUser());
 
-      if (rootData) {
-        tabs.value = rootData.tabs ;
-      }
+      rootData = objData;
+    }
 
-      for (const tab of tabs.value) {
-        let { config, data } = rootData.datas[tab.id];
-        if (data && config) {
-          tabsDataMapRef.value[tab.id] = { data, config };
-        }
-      }
+    if (rootData) {
+      tabs.value = rootData.tabs;
+    }
 
-      let activeTabIndex = rootData&&rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
-      let theTabs = tabs.value.filter(e=>e.id===path.value.tabId);
-      if(path.value?.tabId&&theTabs.length>0){
-        activeTabIndex= tabs.value.indexOf(theTabs[0]);
+    for (const tab of tabs.value) {
+      let { config, data } = rootData.datas[tab.id];
+      if (data && config) {
+        tabsDataMapRef.value[tab.id] = { data, config };
       }
-      await setActiveTab(activeTabIndex);
+    }
 
- 
+    let activeTabIndex = rootData && rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length ? rootData.activeTab : tabs.length > 0 ? 0 : -1;
+    let theTabs = tabs.value.filter(e => e.id === path.value.tabId);
+    if (path.value?.tabId && theTabs.length > 0) {
+      activeTabIndex = tabs.value.indexOf(theTabs[0]);
+    }
+    await setActiveTab(activeTabIndex);
+
+
     loading.value = false;
   }
 
@@ -89,56 +77,56 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  
+
   async function saveAll() {
-      if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
-        const tab = tabs.value[activeTabRef.value];
+    if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
+      const tab = tabs.value[activeTabRef.value];
 
-        tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
+      tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
 
-      }
-      let startTime=0;
-      let endTime=0;
-      const reCalStartAndCount=(row)=>{
-        if(row._tl){
-          if(row._tl?.start?.date)
-              if(startTime===0||row._tl.start.date.getTime()<startTime){
-                startTime =row._tl.start.date.getTime();
-              }
+    }
+    let startTime = 0;
+    let endTime = 0;
+    const reCalStartAndCount = (row) => {
+      if (row._tl) {
+        if (row._tl?.start?.date)
+          if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
+            startTime = row._tl.start.date.getTime();
+          }
 
-              if(endTime===0||row._tl.end.date.getTime()>endTime){
-                 endTime =row._tl.end.date.getTime();
-              }
+        if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
+          endTime = row._tl.end.date.getTime();
         }
       }
-      loopTree(treeRef.value,reCalStartAndCount);
+    }
+    loopTree(treeRef.value, reCalStartAndCount);
 
-      let weekCount = weeksBetween(new Date(startTime),new Date(endTime));
+    let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
 
-      configRef.value.startDate = new Date(startTime);
-      configRef.value.weekCount = weekCount;
- 
-        
-        const {writeObjectToJsonAttachment} = await getStorageBridgeByName(path.value.mode);
-
-        
-        const result = await writeObjectToJsonAttachment(
-          { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value },path.value,useUserStore().getUser());
-        let orgPath = JSON.parse(JSON.stringify(path.value));
-         Object.assign(path.value,result);
-
-        tabs.value.map(tab=>tab.saved=true);
-       path.value.tabId = getCurrentTab().id;
-
-        useHashStore().updatePath(path.value);
-        
-        
-
-        console.log(`Saved data  attachment from ${orgPath&&JSON.stringify(orgPath,2)}  to ${path.value && JSON.stringify(path.value)}`);
+    configRef.value.startDate = new Date(startTime);
+    configRef.value.weekCount = weekCount;
 
 
-      
- 
+    const { writeObjectToJsonAttachment } = await getStorageBridgeByName(path.value.mode);
+
+
+    const result = await writeObjectToJsonAttachment(
+      { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value }, path.value, useUserStore().getUser());
+    let orgPath = JSON.parse(JSON.stringify(path.value));
+    Object.assign(path.value, result);
+
+    tabs.value.map(tab => tab.saved = true);
+    path.value.tabId = getCurrentTab().id;
+
+    useHashStore().updatePath(path.value);
+
+
+
+    console.log(`Saved data  attachment from ${orgPath && JSON.stringify(orgPath, 2)}  to ${path.value && JSON.stringify(path.value)}`);
+
+
+
+
   }
 
   async function addTab(tabId, title) {
@@ -173,7 +161,7 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
-  async function loadTabData(tab,data){
+  async function loadTabData(tab, data) {
     tabsDataMapRef.value[tab.id] = data;
   }
 
@@ -204,7 +192,7 @@ export const useAppStore = defineStore('app', () => {
     }
   }
 
- 
+
 
   async function setActiveTab(index) {
     try {
@@ -247,8 +235,8 @@ export const useAppStore = defineStore('app', () => {
     tabs.value = newTabs;
   }
 
-  function resetPath(){
-    path.value =  null;
+  function resetPath() {
+    path.value = null;
     useHashStore().updatePath(path.value)
   }
 
@@ -256,7 +244,7 @@ export const useAppStore = defineStore('app', () => {
 
   return {
     initLoadTabsData,
-    tabs,path,
+    tabs, path,
     activeTabRef,
     treeRef,
     configRef,
@@ -269,7 +257,7 @@ export const useAppStore = defineStore('app', () => {
     saveData,
     loadActiveTab,
     getCurrentTab,
-    importToNewTab,loadFile,showPopUp,updateShowUp,loading,
+    importToNewTab, loadFile, loading,
     resetPath
   };
 });
