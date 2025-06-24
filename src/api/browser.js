@@ -9,7 +9,7 @@ export async function readJsonAttachment(path) {
         const storedData = localStorage.getItem(storageKey);
 
         if (!storedData) {
-            throw new Error(`No data found with filename ${path.id}`);
+            throw {code:404,error:`No data found with filename ${path.id}`};
         }
 
         const content = jsonParse(storedData);
