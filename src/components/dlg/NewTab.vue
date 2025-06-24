@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
@@ -156,6 +156,7 @@ const selectTemplate = async (event, template) => {
       data.config.cols.map(col => col.id = uuidv4());
       loopTree(data.data, (node) => node.id = uuidv4());
       useAppStore().importToNewTab(newTabId, data);
+    
     } else {
       appStore.addTab(newTabId, tabName);
     }
@@ -163,7 +164,10 @@ const selectTemplate = async (event, template) => {
     loadFile(event);
   }
   useAppStore().saveData();
-  closePopup();
+ await nextTick();
+  emit('confirm');
+  
+
 };
 
 const closePopup = () => {
