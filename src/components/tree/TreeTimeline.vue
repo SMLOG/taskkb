@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative min-w-full" :class="{ drag: isDragging, move: isMoving }" @keyup.enter="handleEnterKeyUp">
+  <div class="table-container relative min-w-full" :class="{ drag: isDragging, move: isMoving }" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"

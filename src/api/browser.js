@@ -29,7 +29,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
         const jsonString = JSON.stringify(dataObject, null, 2);
         
         localStorage.setItem(storageKey, jsonString);
-        return { id: path.fileName };
+        return {...path };
 
 }
 export const type = "Browser";
