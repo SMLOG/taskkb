@@ -19,9 +19,9 @@ import { nextTick, ref } from 'vue';
 const isOpen = ref(false);
 const componentName = ref(null)
 
-const closePopup = () => {
+const closePopup = (ret) => {
   isOpen.value = false;
-  returnReject.value();
+  returnReject.value(ret);
 };
 const handleConfirm = (ret)=>{
   returnResolve.value(ret);
