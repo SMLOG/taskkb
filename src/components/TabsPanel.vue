@@ -8,7 +8,6 @@
       </svg>
     </button>
   </Tabs>
-  <NewTabPopup v-if="showNewTabPopup" v-model="showNewTabPopup" />
   <ConfirmPopUp v-if="showRmoveConfirmRef > -1" @cancel="showRmoveConfirmRef = -1" @confirm="confirmRemoveTab()" />
 </template>
 
@@ -16,16 +15,16 @@
 import { ref } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import Tabs from '@/components/Tabs.vue';
-import NewTabPopup from '@/components/dlg/NewTabDlg.vue';
 import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
 import { onMounted } from 'vue';
+import { useDialog } from '@/composables/useDialog';
+import NewTab from './dlg/NewTab.vue';
 
 const appStore = useAppStore();
 
-const showNewTabPopup = ref(false);
 
-const addTab = () => {
-  showNewTabPopup.value = true;
+const addTab = async () => {
+  useDialog().dialog().open(NewTab);
 };
 
 const showRmoveConfirmRef = ref(-1);
@@ -37,7 +36,7 @@ const confirmRemoveTab = () => {
 
 onMounted(() => {
   if (appStore.tabs.length === 0) {
-    showNewTabPopup.value=true;
+    addTab();
   }
 });
 </script>
