@@ -6,13 +6,13 @@ import FormatTool from "@/components/tools/FormatTool.vue";
 import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
-import StorageOptions from './components/storage/StorageOptions.vue';
-import NoFound from '@/components/storage/NoFound.vue';
+import StorageOptions from './components/dlg/StorageOptions.vue';
+import NoFound from '@/components/dlg/NoFound.vue';
 import { storeToRefs } from 'pinia';
 import { useAuthDialog } from '@/composables/useAuthDialog';
 import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
-import AuthorizationDialog from '@/components/storage/AuthorizationDialog.vue'
+import AuthorizationDialog from '@/components/dlg/AuthorizationDialog.vue'
 import About from '@/components/About.vue';
 
 const authDialog = ref(null);

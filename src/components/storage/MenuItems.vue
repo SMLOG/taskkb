@@ -65,6 +65,9 @@ const submenuPositions = ref({});
 
 // Centralized action handler
 const handleAction = (id) => {
+  if(id==='new'){
+    
+  }
   emit('item-clicked', id);
 };
 

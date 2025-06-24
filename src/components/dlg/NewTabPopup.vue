@@ -64,7 +64,7 @@ import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
-import SaveDialog from '@/components/storage/SaveDialog.vue';
+import SaveDialog from '@/components/dlg/SaveDialog.vue';
 import { storeToRefs } from 'pinia';
 
 const saveDialog = ref(null);

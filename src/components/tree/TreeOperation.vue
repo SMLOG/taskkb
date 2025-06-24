@@ -111,7 +111,7 @@ import { useTree } from '@/composables/useTree';
 import Config from '@/components/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
-import SaveDialog from '@/components/storage/SaveDialog.vue';
+import SaveDialog from '@/components/dlg/SaveDialog.vue';
 
 
 
