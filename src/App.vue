@@ -12,7 +12,7 @@ import { storeToRefs } from 'pinia';
 import { useAuthDialog } from '@/composables/useAuthDialog';
 import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
-import AuthorizationDialog from '@/components/dlg/AuthorizationDialog.vue'
+import AuthorizationDialog from '@/components/dlg/AuthorizationDlg.vue'
 import About from '@/components/About.vue';
 
 const authDialog = ref(null);

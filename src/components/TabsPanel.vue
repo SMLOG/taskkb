@@ -16,7 +16,7 @@
 import { ref } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import Tabs from '@/components/Tabs.vue';
-import NewTabPopup from '@/components/dlg/NewTabPopup.vue';
+import NewTabPopup from '@/components/dlg/NewTabDlg.vue';
 import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
 import { onMounted } from 'vue';
 
