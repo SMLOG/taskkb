@@ -65,10 +65,11 @@ export const useHashStore = defineStore('hash', () => {
 
   function updatePath(path) {
     let newHash;
+    let sp = window.location.hash.split('?');
     if(path ===null ){
-       newHash = window.location.hash.replace(/\/([GBL])-([^/]+)\/([^/?]+)/g, '');
+       newHash = `#/${sp.length==2?"?"+sp[1]:''}`;
     }else{
-       newHash = window.location.hash.replace(/\/([GBL])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tabId}`);
+       newHash = `#/${path.mode}-${path.id}/${path.tabId}${sp.length==2?"?"+sp[1]:''}`;
 
     }
    if(window.location.hash!==newHash){

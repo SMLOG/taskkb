@@ -19,12 +19,21 @@ import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
 import { onMounted } from 'vue';
 import { useDialog } from '@/composables/useDialog';
 import NewTab from './dlg/NewTab.vue';
-
+import Save from './dlg/Save.vue';
 const appStore = useAppStore();
 
 
 const addTab = async () => {
-  useDialog().dialog().open(NewTab);
+
+  if(!appStore.path?.mode){
+    appStore.updatePath( await  useDialog().dialog().open(Save));
+  }
+
+  await useDialog().dialog().open(NewTab);
+
+  await appStore.saveData();
+
+
 };
 
 const showRmoveConfirmRef = ref(-1);

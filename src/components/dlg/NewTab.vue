@@ -55,17 +55,16 @@ import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
-import { storeToRefs } from 'pinia';
-import Save from './Save.vue';
-import { useDialog } from '@/composables/useDialog';
 
 
 const appStore = useAppStore();
 const tabs = computed(() => appStore.tabs);
 
-const {path,updatePath} = storeToRefs(appStore);
 
-
+const props = defineProps({
+  params: {
+  }
+});
 
 const emit = defineEmits(['update:modelValue', 'select-file', 'select-template',"confirm","cancel"]);
 
@@ -131,11 +130,7 @@ function loadFile(event) {
 
 
 const selectTemplate = async (event, template) => {
-  console.log(template)
-  if(!path.value?.mode){
-    
-      updatePath( await  useDialog().dialog().open(Save));
-  }
+
   if (template) {
 
     emit('select-template', template);
@@ -157,7 +152,6 @@ const selectTemplate = async (event, template) => {
   } else {
     loadFile(event);
   }
-  useAppStore().saveData();
  await nextTick();
   emit('confirm');
   

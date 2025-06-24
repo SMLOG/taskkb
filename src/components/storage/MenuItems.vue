@@ -1,19 +1,19 @@
 <template>
-  <div ref="dropdown" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in">
+  <div ref="dropdown"
+    class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in">
     <ul class="py-1">
       <template v-for="(group, groupIndex) in menuItems" :key="`group-${groupIndex}`">
         <!-- Group Heading (optional) -->
-        <li v-if="group.label" class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <li v-if="group.label"
+          class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
           {{ group.label }}
         </li>
         <!-- Group Items -->
-        <li v-for="(item, index) in group.items" :key="`item-${groupIndex}-${index}`" class="relative group" @mouseenter="openSubmenu(groupIndex, index)" @mouseleave="closeSubmenu">
-          <a
-            href="#"
+        <li v-for="(item, index) in group.items" :key="`item-${groupIndex}-${index}`" class="relative group"
+          @mouseenter="openSubmenu(groupIndex, index)" @mouseleave="closeSubmenu">
+          <a href="#"
             class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-            :class="{ 'text-red-600 dark:text-red-400': item.destructive }"
-            @click.prevent="handleItemClick(item)"
-          >
+            :class="{ 'text-red-600 dark:text-red-400': item.destructive }" @click.prevent="handleItemClick(item)">
             <span>{{ item.label }}</span>
             <span v-if="item.shortcut" class="text-xs text-gray-400 dark:text-gray-500">
               {{ item.shortcut }}
@@ -23,23 +23,20 @@
             </span>
           </a>
           <!-- Submenu -->
-          <ul
-            v-if="item.submenu && activeSubmenuIndex?.group === groupIndex && activeSubmenuIndex?.item === index"
+          <ul v-if="item.submenu && activeSubmenuIndex?.group === groupIndex && activeSubmenuIndex?.item === index"
             class="absolute top-0 mt-[-1px] w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-60"
-            :class="submenuPositionClasses[`${groupIndex}-${index}`]"
-            :ref="el => setSubmenuRef(groupIndex, index, el)"
-          >
+            :class="submenuPositionClasses[`${groupIndex}-${index}`]" :ref="el => setSubmenuRef(groupIndex, index, el)">
             <!-- Submenu Group (if any) -->
-            <template v-for="(subGroup, subGroupIndex) in item.submenu" :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
-              <li v-if="subGroup.label" class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            <template v-for="(subGroup, subGroupIndex) in item.submenu"
+              :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
+              <li v-if="subGroup.label"
+                class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
                 {{ subGroup.label }}
               </li>
               <li v-for="(submenuItem, subIndex) in subGroup.items" :key="`subitem-${subGroupIndex}-${subIndex}`">
-                <a
-                  href="#"
+                <a href="#"
                   class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-                  @click.prevent="submenuItem.action"
-                >
+                  @click.prevent="submenuItem.action">
                   {{ submenuItem.label }}
                 </a>
               </li>
@@ -69,16 +66,20 @@ const submenuPositions = ref({});
 // Centralized action handler
 const handleAction = async (id) => {
   emit('close');
-  if(id==='new'){
-    let orgPath = useAppStore().path;
-    useAppStore().resetPath();
-    if(!useAppStore().path?.mode){
-      await useDialog().dialog().open(Save);
-     useAppStore().updatePath(await  useDialog().dialog().open(Save));
-    }
-    await useDialog().dialog().open(NewTab);
+  switch (id) {
+    case 'new':
+      {
+        let orgPath = useAppStore().path;
+        
+        const newPath = await useDialog().dialog().open(Save)
+        
+        await useDialog().dialog().open(NewTab,newPath);
 
 
+      }
+      break;
+    case 'open-from-google-drive':
+      break;
   }
   emit('item-clicked', id);
 };
@@ -204,7 +205,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
-  window.removeEventListener('resize', () => {});
+  window.removeEventListener('resize', () => { });
 });
 </script>
 
@@ -218,6 +219,7 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(-4px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

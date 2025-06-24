@@ -1,37 +1,21 @@
 <template>
   <transition name="dialog-fade">
-    <div 
-      v-if="curShow > -1"
+    <div v-if="curShow > -1"
       class="fixed inset-0 z-[999] flex items-center justify-center bg-black/40 dark:bg-black/60 transition-all duration-300"
-      @click.self="handleBackdropClick"
-    >
+      @click.self="handleBackdropClick">
       <transition name="dialog-scale" appear>
         <div
           class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center relative border border-gray-200 dark:border-gray-700 max-w-[95vw] w-full max-h-[90vh] overflow-y-auto"
-          :class="dialogWidth"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="dialog-title"
-        >
-          <button 
-            @click="handleCancel"
+          :class="dialogWidth" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+          <button @click="handleCancel"
             class="absolute top-3 right-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-1"
-            aria-label="Close"
-          >
+            aria-label="Close">
             &times;
           </button>
-          
-          <div 
-            v-for="(c, index) in componentNameList" 
-            v-show="index === curShow" 
-            :key="index"
-          >
-            <component 
-              :is="c"  
-              @confirm="handleConfirm" 
-              @cancel="handleCancel" 
-              :params="params[index]"
-            /> 
+
+          <div v-for="(c, index) in componentNameList" v-show="index === curShow" :key="index">
+            <component v-if="params[index]" :is="c" @confirm="handleConfirm" @cancel="handleCancel" :params="params[index]" />
+            <component v-else :is="c" @confirm="handleConfirm" @cancel="handleCancel"  />
           </div>
         </div>
       </transition>
@@ -95,7 +79,7 @@ const cleanup = () => {
     componentNameList.value.length = curShow.value;
     params.value.length = curShow.value;
   }
-  
+
   curShow.value--;
 };
 
@@ -112,13 +96,13 @@ defineExpose({
       curShow.value = returnRejectList.value.length - 1;
     });
   },
-  
+
   closeAll() {
     while (curShow.value > -1) {
       handleCancel('force-closed');
     }
   },
-  
+
   getCount() {
     return curShow.value + 1;
   }
