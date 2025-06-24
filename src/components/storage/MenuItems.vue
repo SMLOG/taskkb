@@ -54,8 +54,9 @@
 </template>
 
 <script setup>
+import { useDialog } from '@/composables/useDialog';
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
-
+import NewTab from '../dlg/NewTab.vue';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -64,9 +65,9 @@ const submenu = ref({});
 const submenuPositions = ref({});
 
 // Centralized action handler
-const handleAction = (id) => {
+const handleAction = async (id) => {
   if(id==='new'){
-    
+    await useDialog().dialog().open(NewTab);
   }
   emit('item-clicked', id);
 };

@@ -14,7 +14,7 @@
 </template>
 
 <script setup>
-import { nextTick, ref } from 'vue';
+import { nextTick, ref ,markRaw} from 'vue';
 
 const isOpen = ref(false);
 const componentName = ref(null)
@@ -34,7 +34,7 @@ defineExpose({
     return new Promise((resolve, reject) => {
       returnResolve.value = resolve;
       returnReject.value = reject;
-      componentName.value = name;
+      componentName.value = markRaw(name);
       nextTick().then(()=>{
         isOpen.value = true;
       })

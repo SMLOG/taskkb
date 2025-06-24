@@ -13,11 +13,13 @@ import { useDialog } from '@/composables/useDialog';
 import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
 import AuthorizationDialog from '@/components/dlg/AuthorizationDlg.vue'
+import Dialog from '@/components/dlg/Dialog.vue'
 import About from '@/components/About.vue';
 
 const authDialog = ref(null);
 const noFound = ref(null);
-useDialog(authDialog,noFound);
+const dlg=ref(null);
+useDialog(authDialog,noFound,dlg);
 useHashStore();
 
 const appStore = useAppStore();
@@ -53,7 +55,7 @@ const {activeTabRef} = storeToRefs(appStore);
   <StorageOptions v-if="appStore.showPopUp===1"/>
   <AuthorizationDialog ref="authDialog" />
   <NoFound ref="noFound"/>
-
+<Dialog ref="dlg"/>
 </template>
 
 <style scoped>
