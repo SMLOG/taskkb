@@ -39,18 +39,14 @@
 
 <script setup>
 import { ref } from 'vue';
-import { useModeStore } from "@/stores/modeStore";
 import { getStorageBridgeByName } from '@/api/bridge';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
 import { useAuthDialog } from '@/composables/useAuthDialog';
 
-const authDialog = ref(null);
 
-
-
-const { fileName } = storeToRefs(useModeStore());
+const fileName = ref("Untitled.treegridio");
 const {cacheFolders} = storeToRefs(useUserStore());
 
 
@@ -127,17 +123,24 @@ const save = async () => {
   try{
     const selected = getSelected();
     let rauth = selected;
-    if(selected.accessToken){
 
-    }else{
-      const auth = await useAuthDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
+    const {isAuth} = getStorageBridgeByName(selected.mode);
+    if(isAuth){
 
-      rauth = {...selected,...auth};
-      addOrUpdateAuthCacheList(rauth);
-    }
+        if(selected.accessToken){
+
+        }else{
+
+          const auth = await useAuthDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
+
+          rauth = {...selected,...auth};
+          addOrUpdateAuthCacheList(rauth);
+        }
+  }
+
   isOpen.value = false;
   console.error('resolve')
-  returnResolve.value(rauth);
+  returnResolve.value({...rauth,fileName:fileName.value});
 
   }catch(error){
     

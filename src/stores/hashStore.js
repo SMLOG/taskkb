@@ -60,15 +60,15 @@ export const useHashStore = defineStore('hash', () => {
   window.addEventListener('hashchange', hashLinstern)
 
   function resetHash() {
-    window.location.hash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '');
+    window.location.hash = window.location.hash.replace(/\/([GBL])-([^/]+)\/([^/?]+)/g, '');
   }
 
   function updatePath(path) {
     let newHash;
     if(path ===null ){
-       newHash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '');
+       newHash = window.location.hash.replace(/\/([GBL])-([^/]+)\/([^/?]+)/g, '');
     }else{
-       newHash = window.location.hash.replace(/\/([GB])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tabId}`);
+       newHash = window.location.hash.replace(/\/([GBL])-([^/]+)\/([^/?]+)/g, '').replace(/^#/, `#/${path.mode}-${path.id}/${path.tabId}`);
 
     }
    if(window.location.hash!==newHash){

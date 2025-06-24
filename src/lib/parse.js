@@ -15,7 +15,7 @@ export   const parseHash = (hash) => {
     return { file, tab }
   }
 
-  const pattern = /\/([GB])-([^/]+)\/([^/?]+)/
+  const pattern = /\/([GLB])-([^/]+)\/([^/?]+)/
   const match = hash.match(pattern)
 
   if (match) {

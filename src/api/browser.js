@@ -1,43 +1,35 @@
 import { jsonParse } from '@/lib/parse';
 
-export async function readJsonAttachment(filename) {
-    if (!filename || typeof filename !== 'string') {
-        return { error: 'Invalid or missing filename' };
+export async function readJsonAttachment(path) {
+    if (!path || typeof path !== 'object') {
+        throw new Error('Invalid or missing path')
     }
 
-    try {
-        const storageKey = `${filename}`;
+        const storageKey = `${path.id}`;
         const storedData = localStorage.getItem(storageKey);
 
         if (!storedData) {
-            return { error: `No data found with filename ${filename}` };
+            throw new Error(`No data found with filename ${path.id}`);
         }
 
         const content = jsonParse(storedData);
-        return { content };
-    } catch (error) {
-        console.error(`Error reading from localStorage: ${error.message}`);
-        return { error: error.message };
-    }
+        return { content,path };
+  
 }
 
-export async function writeObjectToJsonAttachment(dataObject, filename) {
+export async function writeObjectToJsonAttachment(dataObject, path) {
     if (!dataObject || typeof dataObject !== 'object') {
-        return { success: false, error: 'Invalid or missing data object' };
+        throw new Error('Invalid or missing data object')
     }
-    if (!filename || typeof filename !== 'string') {
-        return { success: false, error: 'Invalid or missing filename' };
+    if (!path || typeof path !== 'object') {
+        throw new Error('Invalid or missing path')
     }
 
-    try {
-        const storageKey = `${filename}`;
+        const storageKey = `${path.fileName}`;
         const jsonString = JSON.stringify(dataObject, null, 2);
         
         localStorage.setItem(storageKey, jsonString);
-        return { success: true };
-    } catch (error) {
-        console.error(`Error writing to localStorage: ${error.message}`);
-        return { success: false, error: error.message };
-    }
+        return { id: path.fileName };
+
 }
 export const type = "Browser";
