@@ -98,34 +98,37 @@ export const useAppStore = defineStore('app', () => {
   }
 
 
-  async function saveAll() {
+  async function saveData() {
     if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
       const tab = tabs.value[activeTabRef.value];
 
       tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
 
     }
-    let startTime = 0;
-    let endTime = 0;
-    const reCalStartAndCount = (row) => {
-      if (row._tl) {
-        if (row._tl?.start?.date)
-          if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
-            startTime = row._tl.start.date.getTime();
-          }
 
-        if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
-          endTime = row._tl.end.date.getTime();
+    if(treeRef.value){
+      let startTime = 0;
+      let endTime = 0;
+      const reCalStartAndCount = (row) => {
+        if (row._tl) {
+          if (row._tl?.start?.date)
+            if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
+              startTime = row._tl.start.date.getTime();
+            }
+  
+          if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
+            endTime = row._tl.end.date.getTime();
+          }
         }
       }
+      loopTree(treeRef.value, reCalStartAndCount);
+
+      let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
+  
+      configRef.value.startDate = new Date(startTime);
+      configRef.value.weekCount = weekCount;
+
     }
-    loopTree(treeRef.value, reCalStartAndCount);
-
-    let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
-
-    configRef.value.startDate = new Date(startTime);
-    configRef.value.weekCount = weekCount;
-
 
     const { writeObjectToJsonAttachment } = await getStorageBridgeByName(path.value.mode);
 
@@ -225,6 +228,7 @@ export const useAppStore = defineStore('app', () => {
           configRef.value = tabData.config;
         }
         schReadyRef.value = false;
+
       } else {
         activeTabRef.value = index;
         schReadyRef.value = false;
@@ -238,14 +242,6 @@ export const useAppStore = defineStore('app', () => {
 
   }
 
-  async function saveData() {
-    try {
-
-      await saveAll();
-    } catch (error) {
-      console.error('Failed to save data:', error);
-    }
-  }
 
   function setTabs(newTabs) {
     tabs.value = newTabs;

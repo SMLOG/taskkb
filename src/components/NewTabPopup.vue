@@ -145,7 +145,7 @@ function loadFile(event) {
 
 
 const selectTemplate = async (event, template) => {
-  if(!path.value){
+  if(!path.value?.mode){
     try{
      path.value =  await saveDialog.value.open();
 
