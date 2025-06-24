@@ -66,6 +66,7 @@ const submenuPositions = ref({});
 
 // Centralized action handler
 const handleAction = async (id) => {
+  emit('close');
   if(id==='new'){
     await useDialog().dialog().open(NewTab);
   }
