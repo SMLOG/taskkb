@@ -149,7 +149,7 @@ export const useAppStore = defineStore('app', () => {
 
   }
 
-  async function addTab(tabId, title) {
+  async function addTab(tabId, title,data) {
     const tab = { id: tabId, title };
     const tabData = {
       config: { cols: [], title },
@@ -157,21 +157,17 @@ export const useAppStore = defineStore('app', () => {
     };
 
     tabs.value.push(tab);
-    tabsDataMapRef.value[tab.id] = tabData;
+    tabsDataMapRef.value[tab.id] = data??tabData;
 
     return tab;
   }
 
   async function importToNewTab(tabId, data) {
-      const tab = await addTab(tabId, data.config.title);
-      await loadTabData(tab, data);
+      const tab = await addTab(tabId, data.config.title,data);
       await setActiveTab(tabs.value.length - 1);
  
   }
 
-  async function loadTabData(tab, data) {
-    tabsDataMapRef.value[tab.id] = data;
-  }
 
   function getCurrentTab() {
     return tabs.value[activeTabRef.value];
