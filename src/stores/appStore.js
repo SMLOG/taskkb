@@ -284,6 +284,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath
+    resetPath,updatePath
   };
 });

@@ -63,7 +63,7 @@ import { useDialog } from '@/composables/useDialog';
 const appStore = useAppStore();
 const tabs = computed(() => appStore.tabs);
 
-const {path} = storeToRefs(appStore);
+const {path,updatePath} = storeToRefs(appStore);
 
 
 
@@ -133,14 +133,8 @@ function loadFile(event) {
 const selectTemplate = async (event, template) => {
   console.log(template)
   if(!path.value?.mode){
-    try{
-     path.value =  await  useDialog().dialog().open(Save);
-
-    }catch(error){
-      //closePopup();
-      console.error(error)
-      return;
-    }
+    
+      updatePath( await  useDialog().dialog().open(Save));
   }
   if (template) {
 

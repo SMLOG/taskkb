@@ -57,7 +57,7 @@
 import { useDialog } from '@/composables/useDialog';
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
-import useApp from '@/composables/useApp';
+import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
 const emit = defineEmits(['item-clicked', 'close']);
 
@@ -72,7 +72,12 @@ const handleAction = async (id) => {
   if(id==='new'){
     let orgPath = useAppStore().path;
     useAppStore().resetPath();
+    if(!useAppStore().path?.mode){
+      await useDialog().dialog().open(Save);
+     useAppStore().updatePath(await  useDialog().dialog().open(Save));
+    }
     await useDialog().dialog().open(NewTab);
+
 
   }
   emit('item-clicked', id);
