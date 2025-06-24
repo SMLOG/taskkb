@@ -190,27 +190,27 @@ export const useAppStore = defineStore('app', () => {
 
   async function removeTab(index) {
     try {
+      // Store current tab to be removed
       const tab = tabs.value[index];
+  
+      // Adjust active tab index before removal
+      if (tabs.value.length === 1) {
+        setActiveTab(-1);
+      } else if (activeTabRef.value >= index) {
+        await setActiveTab(Math.max(0, activeTabRef.value - 1));
+      }
+  
+      // Remove tab and associated data
       tabs.value.splice(index, 1);
       delete tabsDataMapRef.value[tab.id];
-
-      if (tabs.value.length === 0) {
-        activeTabRef.value = -1;
-        treeRef.value = { _childs: [] };
-        configRef.value = { cols: [] };
-      } else if (activeTabRef.value >= tabs.value.length) {
-        activeTabRef.value = tabs.value.length - 1;
-        await setActiveTab(activeTabRef.value);
-      } else if (activeTabRef.value > index) {
-        activeTabRef.value--;
-        await setActiveTab(activeTabRef.value);
-      }
-
+  
+      // Reset state if no tabs remain
+  
+  
     } catch (error) {
       console.error('Failed to remove tab:', error);
     }
   }
-
 
 
   async function setActiveTab(index) {
@@ -234,10 +234,17 @@ export const useAppStore = defineStore('app', () => {
         schReadyRef.value = false;
       }
 
+      if(index<0){
+        if (tabs.value.length === 0) {
+          treeRef.value = { _childs: [] };
+          configRef.value = { cols: [] };
+        } 
+      }
+
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
-    path.value.tabId = getCurrentTab().id;
+    path.value.tabId = getCurrentTab()?.id;
     useHashStore().updatePath(path.value);
 
   }
