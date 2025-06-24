@@ -1,55 +1,121 @@
 <template>
-  <div ref="dropdown" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in overflow-hidden">
+  <div ref="dropdown" class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in ">
     <ul class="py-1 divide-y divide-gray-100 dark:divide-gray-700">
-      <li v-for="(item, index) in menuItems" :key="index">
+      <li v-for="(item, index) in menuItems" :key="index" 
+          class="relative group"
+          @mouseenter="openSubmenu(index)"
+          @mouseleave="closeSubmenu">
         <a 
           href="#" 
-          class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
+          class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
           :class="{'text-red-600 dark:text-red-400': item.destructive}"
-          @click.prevent="item.action"
+          @click.prevent="handleItemClick(item)"
         >
-          {{ item.label }}
-          <span v-if="item.shortcut" class="float-right text-xs text-gray-400 dark:text-gray-500">
+          <span>{{ item.label }}</span>
+          <span v-if="item.shortcut" class="text-xs text-gray-400 dark:text-gray-500">
             {{ item.shortcut }}
           </span>
+          <span v-if="item.submenu" class="ml-2 text-gray-400">
+            ▶
+          </span>
         </a>
+        <!-- Submenu -->
+        <ul v-if="item.submenu " 
+            class="absolute top-0 mt-[-1px] w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-60"
+            :class="submenuPositionClasses[index]"
+            ref="submenu">
+          <li v-for="(submenuItem, subIndex) in item.submenu" :key="subIndex">
+            <a 
+              href="#" 
+              class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
+              @click.prevent="submenuItem.action"
+            >
+              {{ submenuItem.label }}
+            </a>
+          </li>
+        </ul>
       </li>
     </ul>
   </div>
 </template>
 
 <script setup>
-import { ref,onMounted,onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 
-const emit = defineEmits(['item-clicked','close']);
+const emit = defineEmits(['item-clicked', 'close']);
 
-const menuItems = [
-  { label: 'Save', shortcut: '⌘S', action: () => emit('item-clicked', 'save') },
+const activeSubmenuIndex = ref(null);
+const dropdown = ref(null);
+const submenu = ref(null);
+const submenuPositions = ref({});
+
+const menuItems = ref([
+{ label: 'Save', shortcut: '⌘S', action: () => emit('item-clicked', 'save') },
+{ 
+    label: 'Open From...', 
+    submenu: [
+      { label: 'Google Drive', action: () => emit('item-clicked', 'open-from-google-drive') },
+      { label: 'Browser', action: () => emit('item-clicked', 'open-from-browser') }
+    ]
+  },
   { label: 'Share...', action: () => emit('item-clicked', 'share') },
-  { label: 'Open from', action: () => emit('item-clicked', 'open-from') },
   { label: 'Open Recent', action: () => emit('item-clicked', 'open-recent') },
   { label: 'New...', shortcut: '⌘N', action: () => emit('item-clicked', 'new') },
   { label: 'Rename...', action: () => emit('item-clicked', 'rename') },
-  { label: 'Make a Copy...', action: () => emit('item-clicked', 'copy') },
-  { label: 'Open Folder...', action: () => emit('item-clicked', 'open-folder') },
   { label: 'Import from', action: () => emit('item-clicked', 'import') },
   { label: 'Export as', action: () => emit('item-clicked', 'export') },
-  { label: 'Properties...', action: () => emit('item-clicked', 'properties') },
   { label: 'Close', shortcut: '⌘W', action: () => emit('item-clicked', 'close'), destructive: true },
-];
+]);
 
-
-// Prop to identify the profile button (passed as a ref or selector)
 const props = defineProps({
   showButton: {
     default: null,
   },
 });
 
-// Handle clicks outside the component
-const dropdown = ref(null);
+const handleItemClick = (item) => {
+  if (!item.submenu) {
+    item.action();
+  }
+};
+
+const openSubmenu = (index) => {
+  activeSubmenuIndex.value = index;
+  calculateSubmenuPosition(index);
+};
+
+const closeSubmenu = () => {
+  activeSubmenuIndex.value = null;
+};
+
+const calculateSubmenuPosition = (index) => {
+  if (!submenu.value || !dropdown.value) return;
+
+  const submenuEl = submenu.value[index] || submenu.value;
+  if (!submenuEl) return;
+
+  const dropdownRect = dropdown.value.getBoundingClientRect();
+  const submenuWidth = 224; // w-56 (56 * 4 = 224px)
+  const viewportWidth = window.innerWidth;
+
+  // Check if there's enough space on the right
+  const spaceOnRight = viewportWidth - (dropdownRect.right + submenuWidth);
+  const shouldOpenLeft = spaceOnRight < 0;
+
+  submenuPositions.value[index] = shouldOpenLeft ? 'left' : 'right';
+};
+
+const submenuPositionClasses = computed(() => {
+  return menuItems.value.reduce((acc, item, index) => {
+    acc[index] = submenuPositions.value[index] === 'left' 
+      ? 'left-[-224px]' 
+      : 'left-full';
+    return acc;
+  }, {});
+});
+
 const handleClickOutside = (event) => {
-  const profileButton = props.showButton ;
+  const profileButton = props.showButton;
 
   if (
     dropdown.value &&
@@ -57,18 +123,24 @@ const handleClickOutside = (event) => {
     !(profileButton && (profileButton.contains(event.target) || profileButton === event.target))
   ) {
     emit('close');
+    closeSubmenu();
   }
 };
 
-// Add and remove event listener
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
+  // Recalculate position on window resize
+  window.addEventListener('resize', () => {
+    if (activeSubmenuIndex.value !== null) {
+      calculateSubmenuPosition(activeSubmenuIndex.value);
+    }
+  });
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
+  window.removeEventListener('resize', () => {});
 });
-
 </script>
 
 <style scoped>
@@ -86,16 +158,32 @@ onUnmounted(() => {
     transform: translateY(0);
   }
 }
+
+.group:hover .submenu {
+  display: block;
+}
+
+/* Submenu positioning */
+ul ul {
+  display: none;
+  position: absolute;
+  top: 0;
+  min-width: 200px;
+}
+
+.group:hover ul {
+  display: block;
+}
+
+/* Arrow for items with submenu */
+a:has(+ ul)::after {
+  content: '▶';
+  position: absolute;
+  right: 1rem;
+  color: #9ca3af;
+}
+
 /* Enhanced Dropdown Styles */
-.animate-fade-in {
-  animation: fadeIn 0.2s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
 div[role="menu"] {
   position: absolute;
   top: 100%;
@@ -116,5 +204,10 @@ li a {
 
 li a:hover {
   background-color: #e0f2fe;
+}
+
+/* Flip arrow for left-positioned submenus */
+.left-[-224px] a:has(+ ul)::after {
+  content: '◀';
 }
 </style>
