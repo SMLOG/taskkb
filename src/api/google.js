@@ -394,4 +394,5 @@ export async function writeObjectToJsonAttachment(dataObject, path, auth) {
 
 }
 
+export const isAuth = true;
 export const type = "GoogleDrive";

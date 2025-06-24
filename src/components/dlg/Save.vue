@@ -38,6 +38,7 @@ import { getStorageBridgeByName } from '@/api/bridge';
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
 import { useDialog } from '@/composables/useDialog';
+import Auth  from './Auth.vue';
 
 const emits= defineEmits(["confirm","cancel"]);
 
@@ -119,14 +120,14 @@ const save = async () => {
     const selected = getSelected();
     let rauth = selected;
 
-    const {isAuth} = getStorageBridgeByName(selected.mode);
+    const {isAuth} =  await getStorageBridgeByName(selected.mode);
     if(isAuth){
 
         if(selected.accessToken){
 
         }else{
 
-          const auth = await useDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
+          const auth = await useDialog().dialog().open(Auth,{auth:selected, name:nameMap[selected.mode]});
 
           rauth = {...selected,...auth};
           addOrUpdateAuthCacheList(rauth);

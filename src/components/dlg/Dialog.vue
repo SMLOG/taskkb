@@ -9,7 +9,7 @@
         ×
       </button>
       <div v-for="(c,index) in componentNameList" v-show="index==curShow" :key="index"  >
-        <component :is="c"  @confirm="handleConfirm" @cancel="handleCancel"/> 
+        <component :is="c"  @confirm="handleConfirm" @cancel="handleCancel" :params="params[index]"/> 
       </div>
      
     </div>
@@ -34,6 +34,7 @@ const handleCancel = (ret) => {
   returnResolveList.value.length = curShow.value+1;
   returnRejectList.value.length = curShow.value+1;
   componentNameList.value.length = curShow.value+1;
+  params.value.length = curShow.value+1;
 
 };
 const handleConfirm = (ret)=>{
@@ -47,6 +48,7 @@ const handleConfirm = (ret)=>{
   returnResolveList.value.length = curShow.value+1;
   returnRejectList.value.length = curShow.value+1;
   componentNameList.value.length = curShow.value+1;
+  params.value.length = curShow.value+1;
 
 }
 
@@ -56,16 +58,18 @@ const handleConfirm = (ret)=>{
 const returnResolveList = ref([]);
 const returnRejectList = ref([]);
 const componentNameList = ref([]);
+const params = ref([]);
 
 
 defineExpose({
-  async open(name) {
+  async open(name,param) {
     return new Promise((resolve, reject) => {
    
       const component = markRaw(name);
       returnResolveList.value.push(resolve);
       returnRejectList.value.push(reject);
       componentNameList.value.push(component);
+      params.value.push(param)
       curShow.value = returnRejectList.value.length - 1;
 
      
