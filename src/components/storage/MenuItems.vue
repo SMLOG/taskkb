@@ -56,6 +56,8 @@ import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
 import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
+import {getStorageBridgeByName} from '@/api/bridge';
+import { useUserStore } from '@/stores/userStore';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -66,24 +68,39 @@ const appStore = useAppStore();
 
 // Centralized action handler
 const handleAction = async (id) => {
+  console.log(id)
   emit('close');
   switch (id) {
     case 'new':
       {
         let orgPath = appStore.path;
+
         const newPath = await  useDialog().dialog().open(Save);
         appStore.newFile();
         await useDialog().dialog().open(NewTab);
         appStore.updatePath({...newPath,tabId:appStore.getCurrentTab().id})
         await appStore.saveData();
+      
 
 
       }
       break;
     case 'open-from-google-drive':
-      break;
+    {
+      const { pickFile } = await getStorageBridgeByName('G');
+      const user = useUserStore().getUser();
+      const auth = await pickFile(user);
+      useUserStore().addOrUpdateUser({...auth,mode:'G'});
+      const newPath = {mode:'G',id:auth.file.id}
+      useAppStore().rediret(newPath);
+
+      console.log(auth)
+    
+    }
+    break;
+
   }
-  emit('item-clicked', id);
+  //emit('item-clicked', id);
 };
 
 const menuItems = ref([

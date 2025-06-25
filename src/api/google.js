@@ -32,9 +32,7 @@ export const fetchUserInfo = async (token) => {
     }
 };
 
-// Initialize Google Sign-In
-const initGoogleSignIn = async () => {
-    let returnInfo = {};
+    async function loadJss(){
     if (typeof google === 'undefined' || !google.accounts.oauth2) {
         try {
             await loadScript('https://accounts.google.com/gsi/client');
@@ -43,6 +41,11 @@ const initGoogleSignIn = async () => {
             console.error('Script loading error:', error);
         }
     }
+}
+// Initialize Google Sign-In
+const initGoogleSignIn = async () => {
+    let returnInfo = {};
+    loadJss();
 
     // Ensure Google API is loaded
     if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
@@ -96,7 +99,7 @@ const initGoogleSignIn = async () => {
 
 export async function authorize(auth, rememberMe) {
     console.log('Initializing token client');
-    if (auth.accessToken) return auth;
+    if (auth?.accessToken) return auth;
     else return await initGoogleSignIn(auth, rememberMe);
 
 }
@@ -185,21 +188,26 @@ export const pickFolder = async (auth) => {
 };
 
 // Pick file
-const pickFile = async () => {
-    await authorize();
-    const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes('text/plain');
+export const pickFile = async (auth) => {
+    await loadJss();
+    const newAuth = await authorize(auth);
+    await loadPicker();
+    const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes('application/json').setQuery('*.treegridio');//.setMimeTypes('text/plain');
 
-    const picker = new google.picker.PickerBuilder()
+    return new Promise((resolve,reject)=>{
+        const picker = new google.picker.PickerBuilder()
         .addView(view)
-        .setOAuthToken(accessToken.value)
+        .setOAuthToken(newAuth.accessToken)
         .setCallback((data) => {
             if (data.action === google.picker.Action.PICKED) {
-                selectedFileId.value = data.docs[0].id;
                 console.error('Selected file: ' + data.docs[0].name);
+                resolve({...newAuth,file:data.docs[0]});
             }
         })
         .build();
     picker.setVisible(true);
+    });
+
 };
 
 const writeFile = async (dataObj, path, auth) => {

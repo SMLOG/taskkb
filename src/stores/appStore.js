@@ -81,8 +81,10 @@ export const useAppStore = defineStore('app', () => {
         }
       } else if (rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length) {
         activeTabIndex = rootData.activeTab;
-      } else if (tabs.value.length > 0) {
+      } 
+       if(activeTabIndex===-1){
         activeTabIndex = 0;
+        tabs.value.length>0&&updatePath({...path.value,tabId:tabs.value[activeTabIndex].tabId})
       }
 
       await setActiveTab(activeTabIndex);
@@ -277,6 +279,10 @@ const newFile = ()=>{
 
 
 }
+function rediret(newPath){
+    updatePath(newPath);
+    initLoadTabsData();
+}
   return {
     initLoadTabsData,
     tabs, path,
@@ -293,6 +299,6 @@ const newFile = ()=>{
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath,updatePath,newFile
+    resetPath,updatePath,newFile,rediret
   };
 });

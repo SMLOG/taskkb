@@ -65,6 +65,9 @@ const getSelected = () => {
 
 const addOrUpdateAuthCacheList = (auth)=>{
   console.log(auth)
+
+  useUserStore().addOrUpdateUser(auth);
+  
   if(auth.mode && cacheFolders.value.filter(e=>e.mode==auth.mode).length==0){
     let copy =  [...modesRef.value.filter(e=>e.mode==auth.mode)];
     copy.map(e=>{e.accessToken = auth.accessToken;e.email=auth.email})
