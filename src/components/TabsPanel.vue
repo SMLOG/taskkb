@@ -49,11 +49,14 @@ const showRmoveConfirmRef = ref(-1);
 const confirmRemoveTab = () => {
   appStore.removeTab(showRmoveConfirmRef.value);
   showRmoveConfirmRef.value = -1;
+  if(appStore.tabs.length==0){
+    addTab();
+  }
 
 }
 
 onMounted(() => {
-  if (!appStore.path) {
+  if (!appStore.path||appStore.tabs.length==0) {
     addTab();
   }
 });
