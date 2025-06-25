@@ -55,6 +55,7 @@ import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
+import {deepClone} from '@/lib/parse';
 
 
 const appStore = useAppStore();
@@ -138,7 +139,7 @@ const selectTemplate = async (event, template) => {
     const tabName = `${template.name} ${tabs.value.length + 1}(New)`;
     const newTabId = uuidv4();
 
-    let data = sample[template.id];
+    let data = deepClone(sample[template.id]);
     if (data) {
       data.config.startDate = new Date();
       data.config.title = tabName;

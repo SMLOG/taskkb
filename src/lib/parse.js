@@ -29,3 +29,7 @@ export   const parseHash = (hash) => {
 
   return { file, tab,storageType }
 }
+
+export function deepClone(obj) {
+  return jsonParse(JSON.stringify(obj));
+}
