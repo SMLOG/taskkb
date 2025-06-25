@@ -59,6 +59,7 @@ import { useAppStore } from '@/stores/appStore';
 import {getStorageBridgeByName} from '@/api/bridge';
 import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
+import Rename from '../dlg/Rename.vue';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -133,6 +134,14 @@ const handleAction = async (id) => {
     
     }
     break;
+    case 'rename':
+    {
+
+      await useDialog().dialog().open(Rename);
+    
+    }
+    break;
+    
   }
 
 
