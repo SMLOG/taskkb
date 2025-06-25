@@ -60,7 +60,7 @@ export const useHashStore = defineStore('hash', () => {
   window.addEventListener('hashchange', hashLinstern)
 
   function resetHash() {
-    window.location.hash = window.location.hash.replace(/\/([GBL])-([^/]+)\/([^/?]+)/g, '');
+    window.location.hash = window.location.hash.replace(/\/([A-Z])-([^/]+)\/([^/?]+)/g, '');
   }
 
   function updatePath(path) {

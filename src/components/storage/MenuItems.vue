@@ -43,7 +43,6 @@
             </template>
           </ul>
         </li>
-        <!-- Divider between groups (except for the last group) -->
         <li v-if="groupIndex < menuItems.length - 1" class="border-t border-gray-100 dark:border-gray-700"></li>
       </template>
     </ul>
@@ -52,15 +51,15 @@
 
 <script setup>
 import { useDialog } from '@/composables/useDialog';
-import { ref, computed, nextTick, onMounted, onUnmounted ,inject} from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, inject } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
 import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
-import {getStorageBridgeByName} from '@/api/bridge';
+import { getStorageBridgeByName } from '@/api/bridge';
 import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
-import {downloadJSON} from '@/lib/parse';
+import { downloadJSON } from '@/lib/parse';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -79,86 +78,89 @@ const handleAction = async (id) => {
       {
         let orgPath = appStore.path;
 
-        const newPath = await  useDialog().dialog().open(Save);
+        const newPath = await useDialog().dialog().open(Save);
         appStore.newFile();
         await useDialog().dialog().open(NewTab);
-        appStore.updatePath({...newPath,tabId:appStore.getCurrentTab().id})
+        appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id })
         await appStore.saveData();
-      
+
 
 
       }
       break;
     case 'open-from-google-drive':
-    {
-      const { pickFile } = await getStorageBridgeByName('G');
-      const user = useUserStore().getUser();
-      const auth = await pickFile(user);
-      useUserStore().addOrUpdateUser({...auth,mode:'G'});
-      const newPath = {mode:'G',id:auth.file.id}
-      useAppStore().rediret(newPath);
+      {
+        const { pickFile } = await getStorageBridgeByName('G');
+        const user = useUserStore().getUser();
+        const auth = await pickFile(user);
+        useUserStore().addOrUpdateUser({ ...auth, mode: 'G' });
+        const newPath = { mode: 'G', id: auth.file.id }
+        useAppStore().rediret(newPath);
 
-      console.log(auth)
-    
-    }
-    break;
+        console.log(auth)
+
+      }
+      break;
     case 'open-from-browser':
-    {
-      const { pickFile } = await getStorageBridgeByName('L');
-      const user = useUserStore().getUser();
-      const auth = await pickFile(user);
-      useUserStore().addOrUpdateUser({...auth,mode:'L'});
-      const newPath = {mode:'L',id:auth.file.id}
-      useAppStore().rediret(newPath);
+      {
+        const { pickFile } = await getStorageBridgeByName('L');
+        const user = useUserStore().getUser();
+        const auth = await pickFile(user);
+        useUserStore().addOrUpdateUser({ ...auth, mode: 'L' });
+        const newPath = { mode: 'L', id: auth.file.id }
+        useAppStore().rediret(newPath);
 
-      console.log(auth)
-    
-    }
-    break;
+        console.log(auth)
+
+      }
+      break;
+      case 'open-from-device':
+      {
+        const { pickFile } = await getStorageBridgeByName('D');
+        const user = useUserStore().getUser();
+        const auth = await pickFile(user);
+        useUserStore().addOrUpdateUser({ ...auth, mode: 'D' });
+        const newPath = { mode: 'D', id: auth.file.id }
+        useAppStore().rediret(newPath);
+
+        console.log(auth)
+
+      }
+      break;
     case 'save':
-    {
+      {
 
-      try{
-   await useAppStore().saveData();
-   showNotification('Saved Successful!', 'success');
-    }catch(error){
-      showNotification('Save Fail!', 'error');
-    }
+        try {
+          await useAppStore().saveData();
+          showNotification('Saved Successful!', 'success');
+        } catch (error) {
+          showNotification('Save Fail!', 'error');
+        }
 
-    
-    }
-    break;
+
+      }
+      break;
     case 'configur':
-    {
+      {
 
-      await useDialog().dialog().open(Config);
-    
-    }
-    break;
+        await useDialog().dialog().open(Config);
+
+      }
+      break;
     case 'rename':
-    {
+      {
 
-      await useDialog().dialog().open(Rename);
-    
-    }
-    break;
+        await useDialog().dialog().open(Rename);
+
+      }
+      break;
     case 'export':
-    {
-
-     const datas =   appStore.exportFile();
-      downloadJSON(datas, appStore.path.fileName);
-
-    
-    }
-    break;
-
-
-    
+      {
+        const datas = appStore.exportFile();
+        downloadJSON(datas, appStore.path.fileName);
+      }
+      break;
   }
-
-
-
-  
   //emit('item-clicked', id);
 };
 
@@ -183,6 +185,7 @@ const menuItems = ref([
             items: [
               { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
               { label: 'Browser', action: () => handleAction('open-from-browser') },
+              { label: 'Device', action: () => handleAction('open-from-device') },
             ],
           },
         ],

@@ -34,6 +34,9 @@ export async function getStorageBridgeByName(mode) {
         case "L": {
             return await import('@/api/browser');
         }
+        case "D": {
+            return await import('@/api/device');
+        }
     }
 
 
