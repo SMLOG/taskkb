@@ -46,14 +46,22 @@
 import { ref } from 'vue';
 import Profile from './Profile.vue';
 import MenuItems from './MenuItems.vue';
+import { getStorageBridgeByName } from '@/api/bridge';
+import { useAppStore } from '@/stores/appStore';
+import { useUserStore } from '@/stores/userStore';
 
 const isProfileVisible = ref(false);
 const showProfileButton = ref(null);
 const showMenu = ref(null);
 const isMenuVisible = ref(false);
 
-const share = () => {
-  alert('Sharing functionality to be implemented');
+const share =  async () => {
+
+  const { openShareDialog } = await getStorageBridgeByName('G');
+  
+        const user = useUserStore().getUser();
+        const fileId =useAppStore().path.id
+       await openShareDialog(user,fileId);
 };
 
 const toggleShowProfile = () => {

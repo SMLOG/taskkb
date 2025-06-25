@@ -6,9 +6,6 @@ const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleuserc
 
 let tokenClient = null;
 
-
-
-
 // Fetch user info from Google API
 export const fetchUserInfo = async (token) => {
     try {
@@ -27,12 +24,11 @@ export const fetchUserInfo = async (token) => {
         }
     } catch (error) {
         console.error('Error fetching user info:', error);
-        console.error('Failed to fetch user info: ' + error.message);
         return null;
     }
 };
 
-    async function loadJss(){
+async function loadJss() {
     if (typeof google === 'undefined' || !google.accounts.oauth2) {
         try {
             await loadScript('https://accounts.google.com/gsi/client');
@@ -42,17 +38,17 @@ export const fetchUserInfo = async (token) => {
         }
     }
 }
+
 // Initialize Google Sign-In
 const initGoogleSignIn = async () => {
     let returnInfo = {};
-    loadJss();
+    await loadJss();
 
     // Ensure Google API is loaded
     if (!window.google || !window.google.accounts || !window.google.accounts.oauth2) {
         console.error('Google API script not loaded.');
         throw new Error('Google API is not available. Please try again later.');
     }
-
 
     // Create a promise to handle token response
     const tokenResponse = await new Promise((resolve, reject) => {
@@ -77,7 +73,6 @@ const initGoogleSignIn = async () => {
         tokenClient.requestAccessToken({ prompt: 'consent' });
     });
 
-
     returnInfo.accessToken = tokenResponse.access_token;
 
     // Fetch user info
@@ -90,11 +85,6 @@ const initGoogleSignIn = async () => {
 
     console.error('Invalid user info:', userInfo);
     throw new Error('Failed to fetch user information.');
-
-
-
-
-
 };
 
 export async function authorize(auth, rememberMe) {
@@ -103,9 +93,7 @@ export async function authorize(auth, rememberMe) {
     console.log('Initializing token client');
     if (auth?.accessToken) return auth;
     else return await initGoogleSignIn(auth, rememberMe);
-
 }
-
 
 const loadPicker = async () => {
     if (typeof gapi === 'undefined') {
@@ -114,7 +102,98 @@ const loadPicker = async () => {
     }
     return new Promise((resolve) => {
         gapi.load('picker', { callback: resolve });
-    })
+    });
+};
+
+// Load Google Drive Share Client
+const loadShareClient = async () => {
+    if (typeof gapi === 'undefined') {
+        console.error('Google API Client Library not loaded');
+        return;
+    }
+    return new Promise((resolve) => {
+        gapi.load('drive-share', { callback: resolve });
+    });
+};
+
+// Open Google Drive Share Dialog
+export const openShareDialog = async (auth, fileId) => {
+    if (!auth?.accessToken) {
+        throw new Error('No access token found. Please sign in again.');
+    }
+    if (!fileId) {
+        throw new Error('File or folder ID is required.');
+    }
+
+    const authInfo = await authorize(auth);
+    await loadShareClient();
+
+    try {
+        const shareClient = new gapi.drive.share.ShareClient();
+        shareClient.setOAuthToken(authInfo.accessToken);
+        shareClient.setItemIds([fileId]);
+        shareClient.showSettingsDialog();
+        return { success: true, message: 'Share dialog opened successfully.' };
+    } catch (error) {
+        console.error('Error opening share dialog:', error);
+        throw new Error(`Failed to open share dialog: ${error.message}`);
+    }
+};
+
+// Get share link for a file or folder
+export const getShareLink = async (auth, fileId) => {
+    if (!auth?.accessToken) {
+        throw new Error('No access token found. Please sign in again.');
+    }
+    if (!fileId) {
+        throw new Error('File or folder ID is required.');
+    }
+
+    const authInfo = await authorize(auth);
+
+    try {
+        const response = await fetch(
+            `https://www.googleapis.com/drive/v3/files/${fileId}?fields=webViewLink,permissions&supportsAllDrives=true`,
+            {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${authInfo.accessToken}`,
+                },
+            }
+        );
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                authInfo.accessToken = await refreshAccessToken();
+                const retryResponse = await fetch(
+                    `https://www.googleapis.com/drive/v3/files/${fileId}?fields=webViewLink,permissions&supportsAllDrives=true`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            Authorization: `Bearer ${authInfo.accessToken}`,
+                        },
+                    }
+                );
+
+                if (!retryResponse.ok) {
+                    const errorData = await retryResponse.json();
+                    throw new Error(`Failed to fetch share link: ${errorData.error.message}`);
+                }
+
+                const data = await retryResponse.json();
+                return data.webViewLink || null;
+            } else {
+                const errorData = await response.json();
+                throw new Error(`Failed to fetch share link: ${errorData.error.message}`);
+            }
+        }
+
+        const data = await response.json();
+        return data.webViewLink || null;
+    } catch (error) {
+        console.error('Error fetching share link:', error);
+        throw new Error(`Failed to fetch share link: ${error.message}`);
+    }
 };
 
 // Refresh access token
@@ -125,7 +204,6 @@ const refreshAccessToken = async () => {
                 prompt: '',
                 callback: async (tokenResponse) => {
                     if (tokenResponse && tokenResponse.access_token) {
-                        accessToken.value = tokenResponse.access_token;
                         // Update userStore with new accessToken
                         const userInfo = await fetchUserInfo(tokenResponse.access_token);
                         if (userInfo) {
@@ -137,7 +215,7 @@ const refreshAccessToken = async () => {
                                 console.log('Access token updated in store for:', userInfo.email);
                             }
                         }
-                        resolve(accessToken.value);
+                        resolve(tokenResponse.access_token);
                     } else {
                         reject(new Error('Failed to refresh access token'));
                     }
@@ -154,7 +232,6 @@ export const pickFolder = async (auth) => {
     const authInfo = await authorize(auth);
     await loadPicker();
     const doc = await new Promise((resolve, reject) => {
-
         const pickerCallback = (data) => {
             if (data.action === google.picker.Action.PICKED) {
                 resolve(data.docs[0]);
@@ -172,7 +249,7 @@ export const pickFolder = async (auth) => {
                 new google.picker.DocsView(google.picker.ViewId.DOCS).setLabel('Google Drive').setMimeTypes('application/vnd.google-apps.document')
             )
             .addView(
-                new google.picker.DocsView(google.picker.ViewId.SHARED_WITH_ME).setLabel('Shared drives')
+                new google.picker.DocsView(google.picker.ViewId.SHAREDADA).setLabel('Shared drives')
             )
             .addView(
                 new google.picker.DocsView(google.picker.ViewId.RECENTLY_PICKED).setLabel('Recent')
@@ -183,10 +260,9 @@ export const pickFolder = async (auth) => {
             .build();
         picker.setVisible(true);
     });
-    console.log(doc)
+    console.log(doc);
     authInfo.parent = doc;
     return authInfo;
-
 };
 
 // Pick file
@@ -194,28 +270,26 @@ export const pickFile = async (auth) => {
     await loadJss();
     const newAuth = await authorize(auth);
     await loadPicker();
-    const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes('application/json').setQuery('*.treegridio');//.setMimeTypes('text/plain');
+    const view = new google.picker.DocsView(google.picker.ViewId.DOCS).setMimeTypes('application/json').setQuery('*.treegridio');
 
-    return new Promise((resolve,reject)=>{
+    return new Promise((resolve, reject) => {
         const picker = new google.picker.PickerBuilder()
-        .addView(view)
-        .setOAuthToken(newAuth.accessToken)
-        .setCallback((data) => {
-            if (data.action === google.picker.Action.PICKED) {
-                console.error('Selected file: ' + data.docs[0].name);
-                resolve({...newAuth,file:data.docs[0]});
-            }
-        })
-        .build();
-    picker.setVisible(true);
+            .addView(view)
+            .setOAuthToken(newAuth.accessToken)
+            .setCallback((data) => {
+                if (data.action === google.picker.Action.PICKED) {
+                    console.log('Selected file: ' + data.docs[0].name);
+                    resolve({ ...newAuth, file: data.docs[0] });
+                }
+            })
+            .build();
+        picker.setVisible(true);
     });
-
 };
 
 const writeFile = async (dataObj, path, auth) => {
     if (!dataObj || typeof dataObj !== 'object') {
         throw new Error('Invalid or missing data object');
-
     }
     if (path && typeof path !== 'object') {
         throw new Error('Invalid path');
@@ -257,11 +331,10 @@ const writeFile = async (dataObj, path, auth) => {
         if (!['writer', 'owner'].includes(permissionData.role)) {
             throw new Error('You do not have write permission for the selected folder. Please choose another folder.');
         }
-
     }
 
     // Serialize dataObj to JSON
-    const fileContent = JSON.stringify(dataObj, null, 2); // Pretty-print JSON for readability
+    const fileContent = JSON.stringify(dataObj, null, 2);
     const blob = new Blob([fileContent], { type: 'application/json' });
     const form = new FormData();
 
@@ -275,8 +348,8 @@ const writeFile = async (dataObj, path, auth) => {
     // Include metadata only for new files
     if (!isUpdate) {
         const fileMetadata = {
-            name: path.fileName, // Changed to .json to reflect content type
-            mimeType: 'application/json', // Set MIME type to JSON
+            name: path.fileName,
+            mimeType: 'application/json',
             parents: parentFolderId ? [parentFolderId] : [],
         };
         form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
@@ -284,16 +357,9 @@ const writeFile = async (dataObj, path, auth) => {
 
     form.append('file', blob);
 
-
-
     const boundary = `boundary_${crypto.randomUUID().replace(/-/g, '')}`;
-
-    // Prepare metadata
     const metadata = { name: path.fileName };
-
-    // Encode JSON data as base64
     const base64Data = btoa(fileContent);
-    // Construct multipart body
     const body = [
         `--${boundary}`,
         'Content-Type: application/json; charset=UTF-8',
@@ -306,13 +372,11 @@ const writeFile = async (dataObj, path, auth) => {
         `--${boundary}--`,
     ].join('\r\n');
 
-
-
     // Send request
     const response = await fetch(url, {
         method,
         headers: {
-            'Authorization': `Bearer ${auth.accessToken}`,
+            Authorization: `Bearer ${auth.accessToken}`,
             'Content-Type': `multipart/related; boundary=${boundary}`,
         },
         body,
@@ -323,18 +387,9 @@ const writeFile = async (dataObj, path, auth) => {
         throw new Error(`Upload failed: ${error.error.message}`);
     }
 
-
-
     const data = await response.json();
-    if (response.ok) {
-        console.log(data);
-        console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
-        return data;
-    }
-
-    throw new Error(`Error ${isUpdate ? 'updating' : 'creating'} file:`, data);
-
-
+    console.log(`File ${isUpdate ? 'updated' : 'created'}:`, data);
+    return data;
 };
 
 // Read selected file
@@ -346,8 +401,7 @@ const readFile = async (path, auth) => {
         throw new Error('Please select a file to read first.');
     }
 
-
-    // Step 1: Fetch file metadata (version, modifiedTime, lastModifyingUser, etc.)
+    // Fetch file metadata
     const metadataResponse = await fetch(
         `https://www.googleapis.com/drive/v3/files/${path.id}?fields=id,name,version,modifiedTime,description,lastModifyingUser&supportsAllDrives=true`,
         {
@@ -375,33 +429,26 @@ const readFile = async (path, auth) => {
     if (contentResponse.ok) {
         const content = await contentResponse.text();
         return {
-            content, // File content as text
-            metadata, // File metadata (version, modifiedTime, lastModifyingUser, etc.)
+            content,
+            metadata,
         };
     }
     const errorData = await contentResponse.json();
     throw new Error('Error reading file content:', errorData);
-
-
 };
-
-
 
 export async function readJsonAttachment(path, auth) {
     if (!path || typeof path !== 'object') {
-        throw 'Invalid path';
+        throw new Error('Invalid path');
     }
 
     let result = await readFile(path, auth);
     let content = result?.content ? jsonParse(result.content) : null;
-    return { path, content, };
-
-
+    return { path, content };
 }
 
 export async function writeObjectToJsonAttachment(dataObject, path, auth) {
     return await writeFile(dataObject, path, auth);
-
 }
 
 export const isAuth = true;

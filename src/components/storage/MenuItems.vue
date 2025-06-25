@@ -199,7 +199,7 @@ const menuItems = ref([
               { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
               { label: 'Browser', action: () => handleAction('open-from-browser') },
               { label: 'Device', action: () => handleAction('open-from-device') },
-              { label: 'LocalStorage', action: () => handleAction('open-from-local') },
+              { label: 'LocalStorage(deprecated)', action: () => handleAction('open-from-local') },
             ],
           },
         ],
