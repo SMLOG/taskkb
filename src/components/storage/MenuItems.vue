@@ -98,6 +98,19 @@ const handleAction = async (id) => {
     
     }
     break;
+    case 'open-from-browser':
+    {
+      const { pickFile } = await getStorageBridgeByName('L');
+      const user = useUserStore().getUser();
+      const auth = await pickFile(user);
+      useUserStore().addOrUpdateUser({...auth,mode:'L'});
+      const newPath = {mode:'L',id:auth.file.id}
+      useAppStore().rediret(newPath);
+
+      console.log(auth)
+    
+    }
+    break;
 
   }
   //emit('item-clicked', id);
@@ -124,8 +137,7 @@ const menuItems = ref([
             label: 'Cloud Storage',
             items: [
               { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
-              { label: 'Dropbox', action: () => handleAction('open-from-dropbox') },
-              { label: 'OneDrive', action: () => handleAction('open-from-onedrive') },
+              { label: 'Browser', action: () => handleAction('open-from-browser') },
             ],
           },
         ],

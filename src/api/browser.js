@@ -1,4 +1,7 @@
 import { jsonParse } from '@/lib/parse';
+import { pickFile as pf } from './browserPickfile';
+
+export const pickFile = pf;
 
 export async function readJsonAttachment(path) {
     if (!path || typeof path !== 'object') {
@@ -32,4 +35,8 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
         return {...path,id:path.fileName };
 
 }
+
+
+
+
 export const type = "Browser";
