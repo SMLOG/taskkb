@@ -133,7 +133,7 @@ const handleAction = async (id) => {
         const user = useUserStore().getUser();
         const auth = await pickFile(user);
         useUserStore().addOrUpdateUser({ ...auth, mode: 'L' });
-        const newPath = { mode: 'D', id: auth.file.id }
+        const newPath = { mode: 'L', id: auth.file.id }
         useAppStore().rediret(newPath);
 
         console.log(auth)

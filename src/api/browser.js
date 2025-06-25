@@ -1,5 +1,5 @@
 import { jsonParse } from '@/lib/parse';
-import { pickFile as pf } from './browserPickfile';
+import { pickFile as pf } from './localStoragePickfile';
 
 const typeCode = 'B';
 // Function to open the IndexedDB database
