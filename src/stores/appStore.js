@@ -34,9 +34,9 @@ export const useAppStore = defineStore('app', () => {
 
   }
 
-  function updatePath(newPathValue){
+  function updatePath(newPathValue,updateHash=true){
     path.value = newPathValue;
-    if(hashStore.updatePath)hashStore.updatePath(path.value);
+    if(hashStore.updatePath && updateHash)hashStore.updatePath(path.value);
 
   }
   async function initLoadTabsData() {
@@ -252,7 +252,7 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
-    updatePath({...path.value,tabId:getCurrentTab()?.id});
+    path.value&&updatePath({...path.value,tabId:getCurrentTab()?.id});
 
 
   }
@@ -267,9 +267,8 @@ export const useAppStore = defineStore('app', () => {
   }
 
 
-const newFile = (newPath)=>{
+const newFile = ()=>{
   resetPath();
-  path.value = newPath;
   tabs.value.length=0;
   tabsDataMapRef.value = {};
   activeTabRef.value = -1;

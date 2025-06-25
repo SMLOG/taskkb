@@ -25,11 +25,20 @@ const appStore = useAppStore();
 
 const addTab = async () => {
 
-  if(!appStore.path){
-    appStore.newFile( await  useDialog().dialog().open(Save));
+
+  const isNew = !appStore.path;
+  if(isNew){
+    appStore.newFile( );
   }
 
   await useDialog().dialog().open(NewTab);
+
+  if(isNew){
+    console.log(appStore.path)
+    
+    const newPath  = await  useDialog().dialog().open(Save);
+    appStore.updatePath( {...newPath,tabId:appStore.getCurrentTab().id});
+  }
 
   await appStore.saveData();
 
