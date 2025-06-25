@@ -58,6 +58,7 @@ import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
 import {getStorageBridgeByName} from '@/api/bridge';
 import { useUserStore } from '@/stores/userStore';
+import Config from '../dlg/Config.vue';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -125,8 +126,16 @@ const handleAction = async (id) => {
     
     }
     break;
+    case 'configur':
+    {
 
+      await useDialog().dialog().open(Config);
+    
+    }
+    break;
   }
+
+
 
   
   //emit('item-clicked', id);
@@ -159,7 +168,6 @@ const menuItems = ref([
         ],
       },
       { label: 'Open Recent', action: () => handleAction('open-recent') },
-      { label: 'Open Folder...', action: () => handleAction('open-folder') },
     ],
   },
   {
@@ -170,9 +178,9 @@ const menuItems = ref([
     ],
   },
   {
-    label: 'Properties',
+    label: 'Configure',
     items: [
-      { label: 'Properties...', action: () => handleAction('properties') },
+      { label: 'Configure...', action: () => handleAction('configur') },
     ],
   },
 ]);

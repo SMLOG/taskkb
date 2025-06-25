@@ -5,18 +5,22 @@
       @click.self="handleBackdropClick">
       <transition name="dialog-scale" appear>
         <div
-          class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center relative border border-gray-200 dark:border-gray-700 max-w-[95vw] w-full max-h-[90vh] overflow-y-auto"
-          :class="dialogWidth" role="dialog" aria-modal="true" aria-labelledby="dialog-title">
+          :class="dialogWidth" role="dialog" aria-modal="true" aria-labelledby="dialog-title"
+          class="flex bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center relative border border-gray-200 dark:border-gray-700 max-w-[95vw] w-full max-h-[90vh] relative"
+          >
           <button @click="handleCancel"
-            class="absolute top-3 right-3 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-1"
+            class="absolute top-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-1"
             aria-label="Close">
             &times;
           </button>
-
-          <div v-for="(c, index) in componentNameList" v-show="index === curShow" :key="index">
+          <div class="overflow-y-auto flex-1">
+            <div v-for="(c, index) in componentNameList" v-show="index === curShow" :key="index">
             <component v-if="params[index]" :is="c" @confirm="handleConfirm" @cancel="handleCancel" :params="params[index]" />
             <component v-else :is="c" @confirm="handleConfirm" @cancel="handleCancel"  />
           </div>
+          </div>
+
+
         </div>
       </transition>
     </div>

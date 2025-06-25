@@ -2,7 +2,6 @@
   <div id="operation" class="sticky bottom-0 left-0 z-5 bg-white dark:bg-gray-900 shadow-lg">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex flex-col sticky left-0 bottom-0 active">
-        <Config v-if="showConfig" :config="configRef" :isOpen="showConfig" :close="()=>showConfig=false"></Config>
         <div class="flex flex-wrap items-center gap-2 py-3">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="addRow(1)" class="btn-secondary">
@@ -20,7 +19,7 @@
             <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
               💾 Save {{ savingRef?"...":"" }} 
             </button>
-            <button @click="showConfig = !showConfig" class="btn-secondary">
+            <button @click="openConfig" class="btn-secondary">
               ⚙ Config
             </button>
           </div>
@@ -74,7 +73,6 @@
       </div>
     </div>
   </div>
-  <SaveDialog ref="saveDialog" />
 </template>
 
 <style>
@@ -108,10 +106,10 @@ button {
 <script setup>
 import { ref, watch, inject, onMounted, onBeforeUnmount } from 'vue';
 import { useTree } from '@/composables/useTree';
-import Config from '@/components/Config.vue';
+import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
-import SaveDialog from '@/components/dlg/SaveDlg.vue';
+import { useDialog } from '@/composables/useDialog';
 
 
 
@@ -119,12 +117,12 @@ const showNotification = inject('showNotification');
 
 const tree = useTree();
 
-const saveDialog = ref(null);
+const openConfig = async()=>{
+  await useDialog().dialog().open(Config);
+}
 
 
-const openDialog = () => {
-  saveDialog.value.open();
-};
+
 
 const { selectDepths } = tree;
 const showConfig = ref(false);

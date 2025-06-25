@@ -1,14 +1,7 @@
 <template>
   <!-- Popup Modal -->
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center"
-    @click.self="close()">
-    <button class="absolute right-4 top-4 text-gray-600 hover:text-gray-800 dark:text-gray-200 dark:hover:text-white" @click="close()">
-      <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-    <div
-      class="relative mx-4 max-h-[80vh] w-full max-w-3xl overflow-y-auto rounded-lg border-2 border-gray-300 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-gray-100 shadow-lg">
+
+    <div>
         
       <div class="flex flex-col h-full min-h-0">
         <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between bg-white dark:bg-gray-800">
@@ -98,13 +91,13 @@
     </div>
   </div>
 </div>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue';
 import { cpList } from '@/components/cpList';
 import { v4 as uuidv4 } from 'uuid';
+import { useAppStore } from '@/stores/appStore';
 
 // Interfaces
 interface Column {
@@ -118,19 +111,9 @@ interface Column {
   options?: string;
 }
 
-interface Config {
-  cols: Column[];
-  showSch: boolean;
-  autoSave: boolean;
-  fix: boolean;
-}
 
-// Props
-const props = defineProps<{
-  config: Config;
-  isOpen: Boolean,
-  close: Function
-}>();
+const emit = defineEmits(["confirm", "cancel"]);
+
 
 // Reactive state
 const dragStartIndex = ref<number | null>(null);
@@ -138,8 +121,11 @@ const showConfirm = ref(false);
 const confirmColIndex = ref<number | null>(null);
 const confirmColName = ref<string>('');
 
+
+
 // Computed properties
-const cols = computed(() => props.config.cols);
+const cols = computed(() => useAppStore().configRef?.cols);
+const config = computed(() => useAppStore().configRef);
 
 // Methods
 const dragstart = (event: DragEvent, row: Column, index: number) => {
