@@ -52,7 +52,7 @@
 
 <script setup>
 import { useDialog } from '@/composables/useDialog';
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted ,inject} from 'vue';
 import NewTab from '../dlg/NewTab.vue';
 import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
@@ -65,6 +65,7 @@ const dropdown = ref(null);
 const submenu = ref({});
 const submenuPositions = ref({});
 const appStore = useAppStore();
+const showNotification = inject('showNotification');
 
 // Centralized action handler
 const handleAction = async (id) => {
@@ -111,8 +112,23 @@ const handleAction = async (id) => {
     
     }
     break;
+    case 'save':
+    {
+
+      try{
+   await useAppStore().saveData();
+   showNotification('Saved Successful!', 'success');
+    }catch(error){
+      showNotification('Save Fail!', 'error');
+    }
+
+    
+    }
+    break;
 
   }
+
+  
   //emit('item-clicked', id);
 };
 
