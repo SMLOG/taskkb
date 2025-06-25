@@ -71,9 +71,10 @@ const handleAction = async (id) => {
     case 'new':
       {
         let orgPath = appStore.path;
-        appStore.newFile( await  useDialog().dialog().open(Save));
-        
+        const newPath = await  useDialog().dialog().open(Save);
+        appStore.newFile();
         await useDialog().dialog().open(NewTab);
+        appStore.updatePath({...newPath,tabId:appStore.getCurrentTab().id})
         await appStore.saveData();
 
 
