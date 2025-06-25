@@ -18,14 +18,14 @@ export const useAppStore = defineStore('app', () => {
   const configRef = ref(null);
   const typeRef = ref(null);
   const loading = ref(true);
-  const hashStore  = useHashStore();
+  const hashStore = useHashStore();
 
 
 
 
   async function loadFile(storageType, fileId, tabId) {
 
-    storageType && fileId&& updatePath({
+    storageType && fileId && updatePath({
       mode: storageType,
       id: fileId,
       tabId
@@ -34,9 +34,9 @@ export const useAppStore = defineStore('app', () => {
 
   }
 
-  function updatePath(newPathValue,updateHash=true){
+  function updatePath(newPathValue, updateHash = true) {
     path.value = newPathValue;
-    if(hashStore.updatePath && updateHash)hashStore.updatePath(path.value);
+    if (hashStore.updatePath && updateHash) hashStore.updatePath(path.value);
 
   }
   async function initLoadTabsData() {
@@ -81,10 +81,10 @@ export const useAppStore = defineStore('app', () => {
         }
       } else if (rootData.activeTab >= 0 && rootData.activeTab < tabs.value.length) {
         activeTabIndex = rootData.activeTab;
-      } 
-       if(activeTabIndex===-1){
+      }
+      if (activeTabIndex === -1) {
         activeTabIndex = 0;
-        tabs.value.length>0&&updatePath({...path.value,tabId:tabs.value[activeTabIndex].tabId})
+        tabs.value.length > 0 && updatePath({ ...path.value, tabId: tabs.value[activeTabIndex].tabId })
       }
 
       await setActiveTab(activeTabIndex);
@@ -109,42 +109,11 @@ export const useAppStore = defineStore('app', () => {
 
 
   async function saveData() {
-    if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
-      const tab = tabs.value[activeTabRef.value];
-
-      tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
-
-    }
-
-    if (treeRef.value) {
-      let startTime = new Date().getTime();
-      let endTime = startTime;
-      const reCalStartAndCount = (row) => {
-        if (row._tl) {
-          if (row._tl?.start?.date)
-            if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
-              startTime = row._tl.start.date.getTime();
-            }
-
-          if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
-            endTime = row._tl.end.date.getTime();
-          }
-        }
-      }
-      loopTree(treeRef.value, reCalStartAndCount);
-
-      let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
-
-      configRef.value.startDate = new Date(startTime);
-      configRef.value.weekCount = weekCount;
-
-    }
-
+    const alldata = exportFileData();
     const { writeObjectToJsonAttachment } = await getStorageBridgeByName(path.value.mode);
 
-
     const result = await writeObjectToJsonAttachment(
-      { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value }, path.value, useUserStore().getUser());
+      alldata, path.value, useUserStore().getUser());
     let orgPath = JSON.parse(JSON.stringify(path.value));
     Object.assign(path.value, result);
 
@@ -254,7 +223,7 @@ export const useAppStore = defineStore('app', () => {
     } catch (error) {
       console.error('Failed to set active tab:', error);
     }
-    path.value&&updatePath({...path.value,tabId:getCurrentTab()?.id});
+    path.value && updatePath({ ...path.value, tabId: getCurrentTab()?.id });
 
 
   }
@@ -269,20 +238,59 @@ export const useAppStore = defineStore('app', () => {
   }
 
 
-const newFile = ()=>{
-  resetPath();
-  tabs.value.length=0;
-  tabsDataMapRef.value = {};
-  activeTabRef.value = -1;
-  treeRef.value = null;
-  configRef.value = null;
+  const newFile = () => {
+    resetPath();
+    tabs.value.length = 0;
+    tabsDataMapRef.value = {};
+    activeTabRef.value = -1;
+    treeRef.value = null;
+    configRef.value = null;
 
 
-}
-function rediret(newPath){
+  }
+  function exportFileData() {
+
+    if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
+      const tab = tabs.value[activeTabRef.value];
+
+      tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
+
+    }
+
+    if (treeRef.value) {
+      let startTime = new Date().getTime();
+      let endTime = startTime;
+      const reCalStartAndCount = (row) => {
+        if (row._tl) {
+          if (row._tl?.start?.date)
+            if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
+              startTime = row._tl.start.date.getTime();
+            }
+
+          if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
+            endTime = row._tl.end.date.getTime();
+          }
+        }
+      }
+      loopTree(treeRef.value, reCalStartAndCount);
+
+      let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
+
+      configRef.value.startDate = new Date(startTime);
+      configRef.value.weekCount = weekCount;
+
+    }
+
+
+    let alldata = { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value };
+    return alldata;
+  }
+
+  function rediret(newPath) {
     updatePath(newPath);
     initLoadTabsData();
-}
+  }
+
   return {
     initLoadTabsData,
     tabs, path,
@@ -299,6 +307,6 @@ function rediret(newPath){
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath,updatePath,newFile,rediret
+    resetPath, updatePath, newFile, rediret,exportFile: exportFileData
   };
 });

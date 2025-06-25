@@ -157,7 +157,6 @@ const menuItems = ref([
       { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
       { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
       { label: 'Rename...', action: () => handleAction('rename') },
-      { label: 'Make a Copy...', action: () => handleAction('copy') },
       { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
     ],
   },
