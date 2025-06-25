@@ -77,14 +77,21 @@ export async function pickFile() {
                     height: 100%;
                 }
                 .file-picker {
-                    padding: 20px;
                     width: 100%;
                     height: 100%;
-                    box-sizing: border-box;
-                    position: relative;
-                    display: flex;
-                    flex-direction: column;
+       
                 }
+                    .container{
+                        padding: 20px;
+                        box-sizing: border-box;
+                        position: relative;
+                        display: flex
+                    ;
+                        flex-direction: column;
+                        flex-grow: 1;
+                        position: absolute;
+                        inset: 0;
+                    }
                 .close-btn {
                     position: absolute;
                     top: 10px;
@@ -101,7 +108,6 @@ export async function pickFile() {
                 .search-bar {
                     display: flex;
                     align-items: center;
-                    margin-bottom: 15px;
                     gap: 8px;
                 }
                 #searchInput {
@@ -136,12 +142,14 @@ export async function pickFile() {
                     border-radius: 4px;
                     display: flex;
                     justify-content: space-between;
+                    transition: background-color 0.2s;
                 }
                 #itemList p:hover {
                     background-color: #f5f5f5;
                 }
                 #itemList p.selected {
                     background-color: #e0f0ff;
+                    border-left: 4px solid #4a90e2;
                 }
                 .file-size {
                     color: #666;
@@ -168,26 +176,24 @@ export async function pickFile() {
         </head>
         <body>
             <div class="file-picker">
+            <div class="container">
                 <button class="close-btn" onclick="closeDialog()">×</button>
                 <h3>Select a .treegridio file</h3>
                 <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search .treegridio files..." onkeyup="filterItems()">
+                    <input type="text" id="searchInput" placeholder="Search .treegreeio files..." onkeyup="filterItems()">
                     <button onclick="searchItems()">Search</button>
                     <button onclick="sortItems()">A-Z</button>
                 </div>
                 <div id="itemList">
                     <p class="no-items" id="noItems">No .treegridio files found</p>
                 </div>
-                <div class="button-container">
-                    <button onclick="selectItem()">Select</button>
-                    <button onclick="cancel()">Cancel</button>
-                </div>
+            </div>
             </div>
             <script>
                 const instanceId = "${instanceId}";
                 let selectedItem = null;
 
-                function getAlltreegridioFiles() {
+                function getAllTreegridioFiles() {
                     const files = [];
                     for (let i = 0; i < localStorage.length; i++) {
                         const key = localStorage.key(i);
@@ -211,7 +217,7 @@ export async function pickFile() {
                 }
 
                 function loadItems() {
-                    const files = getAlltreegridioFiles();
+                    const files = getAllTreegridioFiles();
                     const list = document.getElementById('itemList');
                     const noItems = document.getElementById('noItems');
                     list.innerHTML = '';
@@ -226,12 +232,17 @@ export async function pickFile() {
                                 <span>\${file.name}</span>
                                 <span class="file-size">\${formatFileSize(file.size)}</span>
                             \`;
+                            
+                            // Single click to select
                             p.onclick = () => {
                                 const prevSelected = list.querySelector('.selected');
                                 if (prevSelected) prevSelected.classList.remove('selected');
                                 p.classList.add('selected');
                                 selectedItem = file.name;
+                                selectItem();
                             };
+                            
+                            
                             list.appendChild(p);
                         });
                     }
@@ -239,7 +250,7 @@ export async function pickFile() {
 
                 function filterItems() {
                     const input = document.getElementById('searchInput').value.toLowerCase();
-                    const files = getAlltreegridioFiles();
+                    const files = getAllTreegridioFiles();
                     const list = document.getElementById('itemList');
                     list.innerHTML = '';
                     selectedItem = null;
@@ -259,12 +270,15 @@ export async function pickFile() {
                                 <span>\${file.name}</span>
                                 <span class="file-size">\${formatFileSize(file.size)}</span>
                             \`;
+                            
                             p.onclick = () => {
                                 const prevSelected = list.querySelector('.selected');
                                 if (prevSelected) prevSelected.classList.remove('selected');
                                 p.classList.add('selected');
                                 selectedItem = file.name;
+                                 selectItem();
                             };
+  
                             list.appendChild(p);
                         });
                     }
@@ -275,7 +289,7 @@ export async function pickFile() {
                 }
 
                 function sortItems() {
-                    const files = getAlltreegridioFiles().sort((a, b) => 
+                    const files = getAllTreegridioFiles().sort((a, b) => 
                         a.name.localeCompare(b.name)
                     );
                     const list = document.getElementById('itemList');
@@ -292,12 +306,22 @@ export async function pickFile() {
                                 <span>\${file.name}</span>
                                 <span class="file-size">\${formatFileSize(file.size)}</span>
                             \`;
+                            
                             p.onclick = () => {
                                 const prevSelected = list.querySelector('.selected');
                                 if (prevSelected) prevSelected.classList.remove('selected');
                                 p.classList.add('selected');
                                 selectedItem = file.name;
                             };
+                            
+                            p.ondblclick = () => {
+                                const prevSelected = list.querySelector('.selected');
+                                if (prevSelected) prevSelected.classList.remove('selected');
+                                p.classList.add('selected');
+                                selectedItem = file.name;
+                                selectItem();
+                            };
+                            
                             list.appendChild(p);
                         });
                     }
