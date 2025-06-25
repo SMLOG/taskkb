@@ -60,6 +60,7 @@ import {getStorageBridgeByName} from '@/api/bridge';
 import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
+import {downloadJSON} from '@/lib/parse';
 const emit = defineEmits(['item-clicked', 'close']);
 
 const activeSubmenuIndex = ref(null);
@@ -141,6 +142,17 @@ const handleAction = async (id) => {
     
     }
     break;
+    case 'export':
+    {
+
+     const datas =   appStore.exportFile();
+      downloadJSON(datas, appStore.path.fileName);
+
+    
+    }
+    break;
+
+
     
   }
 
@@ -181,7 +193,6 @@ const menuItems = ref([
   {
     label: 'Import/Export',
     items: [
-      { label: 'Import from', action: () => handleAction('import') },
       { label: 'Export as', action: () => handleAction('export') },
     ],
   },

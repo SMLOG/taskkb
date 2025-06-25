@@ -33,3 +33,14 @@ export   const parseHash = (hash) => {
 export function deepClone(obj) {
   return jsonParse(JSON.stringify(obj));
 }
+
+export function downloadJSON(jsonData, filename = 'data.json') {
+  const jsonString = JSON.stringify(jsonData);
+  const encodedJsonString = encodeURIComponent(jsonString);
+  const downloadLink = document.createElement("a");
+  downloadLink.setAttribute("href", "data:application/json;charset=utf-8," + encodedJsonString);
+  downloadLink.setAttribute("download", filename);
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+}

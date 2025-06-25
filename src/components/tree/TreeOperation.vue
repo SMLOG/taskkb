@@ -110,6 +110,7 @@ import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
 import { useDialog } from '@/composables/useDialog';
+import {downloadJSON} from '@/lib/parse';
 
 
 
@@ -172,16 +173,7 @@ function toggleFullscreen() {
   }
 }
 
-function downloadJSON(jsonData, filename = 'data.json') {
-  const jsonString = JSON.stringify(jsonData);
-  const encodedJsonString = encodeURIComponent(jsonString);
-  const downloadLink = document.createElement("a");
-  downloadLink.setAttribute("href", "data:application/json;charset=utf-8," + encodedJsonString);
-  downloadLink.setAttribute("download", filename);
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  document.body.removeChild(downloadLink);
-}
+
 
 const handleShowDropdown = () => {
   if (!moreButton.value) return;
