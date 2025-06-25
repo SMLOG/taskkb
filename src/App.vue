@@ -12,6 +12,7 @@ import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
 import Dialog from '@/components/dlg/Dialog.vue'
 import About from '@/components/About.vue';
+import CtrlSave from './components/CtrlSave.vue';
 
 const dlg=ref(null);
 useDialog(dlg);
@@ -47,6 +48,7 @@ const {activeTabRef} = storeToRefs(appStore);
     </NotificationProvider>
   </main>
 <Dialog ref="dlg"/>
+<CtrlSave/>
 </template>
 
 <style scoped>

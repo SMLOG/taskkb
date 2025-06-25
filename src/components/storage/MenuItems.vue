@@ -298,6 +298,9 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
   window.removeEventListener('resize', () => { });
 });
+
+
+
 </script>
 
 <style scoped>

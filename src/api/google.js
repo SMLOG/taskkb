@@ -98,6 +98,8 @@ const initGoogleSignIn = async () => {
 };
 
 export async function authorize(auth, rememberMe) {
+    await loadJss();
+
     console.log('Initializing token client');
     if (auth?.accessToken) return auth;
     else return await initGoogleSignIn(auth, rememberMe);
