@@ -119,7 +119,7 @@ const showNotification = inject('showNotification');
 const tree = useTree();
 
 const openConfig = async()=>{
-  await useDialog().dialog().open(Config);
+  await useDialog().dialog().open(Config,null,{size:'2md'});
 }
 
 

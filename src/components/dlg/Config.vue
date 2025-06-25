@@ -3,7 +3,7 @@
 
     <div>
         
-      <div class="flex flex-col h-full min-h-0">
+      <div class="flex flex-col space-y-3 max-h-[90vh] overflow-y-auto min-h-0">
         <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between bg-white dark:bg-gray-800">
           <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Columns Configuration</h3>
           <button class="rounded bg-blue-500 px-3 py-1.5 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700" @click="addCol">
@@ -12,7 +12,7 @@
         </div>
 
         <!-- Columns List -->
-        <div class="space-y-3 p-6">
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto ">
           <div v-for="(col, index) in cols" :key="index"
             class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
             <div class="w-12 text-center text-gray-500 dark:text-gray-400" draggable="true" @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
@@ -52,7 +52,7 @@
         </div>
 
         <!-- General Settings -->
-        <div class="mt-6 flex gap-6 sticky bottom-0 p-6 bg-white dark:bg-gray-800">
+        <div class="mt-6 flex gap-6 sticky bottom-0  bg-white dark:bg-gray-800">
           <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
             <input type="checkbox" v-model="config.showSch" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
             Show Schedule

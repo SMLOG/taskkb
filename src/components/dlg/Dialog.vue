@@ -36,7 +36,7 @@ const returnResolveList = ref([]);
 const returnRejectList = ref([]);
 const componentNameList = ref([]);
 const params = ref([]);
-const size = ref('md'); // 'sm', 'md', 'lg', 'xl'
+const size = ref('lg'); // 'sm', 'md', 'lg', 'xl'
 
 // Computed
 const dialogWidth = computed(() => {
@@ -45,7 +45,8 @@ const dialogWidth = computed(() => {
     'md': 'max-w-md',
     'lg': 'max-w-lg',
     'xl': 'max-w-xl',
-    'full': 'max-w-[90vw]'
+    'full': 'max-w-[90vw]',
+    '2md': 'max-w-2md'
   }[size.value];
 });
 
