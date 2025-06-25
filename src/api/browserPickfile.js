@@ -23,8 +23,8 @@ export async function pickFile() {
     `;
     
     iframe.style.cssText = `
-        width: 450px;
-        height: 300px;
+        width: 500px;
+        height: 400px;
         border: none;
         position: absolute;
         top: 50%;
@@ -74,6 +74,7 @@ export async function pickFile() {
                     margin: 0;
                     padding: 0;
                     font-family: Arial, sans-serif;
+                    height: 100%;
                 }
                 .file-picker {
                     padding: 20px;
@@ -122,7 +123,7 @@ export async function pickFile() {
                 }
                 #itemList {
                     flex-grow: 1;
-                    max-height: 180px;
+                    max-height: 250px;
                     overflow-y: auto;
                     border: 1px solid #eee;
                     padding: 10px;
@@ -133,12 +134,18 @@ export async function pickFile() {
                     padding: 8px;
                     cursor: pointer;
                     border-radius: 4px;
+                    display: flex;
+                    justify-content: space-between;
                 }
                 #itemList p:hover {
                     background-color: #f5f5f5;
                 }
                 #itemList p.selected {
                     background-color: #e0f0ff;
+                }
+                .file-size {
+                    color: #666;
+                    font-size: 0.9em;
                 }
                 .no-items {
                     color: #777;
@@ -162,14 +169,14 @@ export async function pickFile() {
         <body>
             <div class="file-picker">
                 <button class="close-btn" onclick="closeDialog()">×</button>
-                <h3>Select a file</h3>
+                <h3>Select a .treegridio file</h3>
                 <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="*.tregridio" onkeyup="filterItems()">
+                    <input type="text" id="searchInput" placeholder="Search .treegridio files..." onkeyup="filterItems()">
                     <button onclick="searchItems()">Search</button>
                     <button onclick="sortItems()">A-Z</button>
                 </div>
                 <div id="itemList">
-                    <p class="no-items" id="noItems">No items found</p>
+                    <p class="no-items" id="noItems">No .treegridio files found</p>
                 </div>
                 <div class="button-container">
                     <button onclick="selectItem()">Select</button>
@@ -180,24 +187,50 @@ export async function pickFile() {
                 const instanceId = "${instanceId}";
                 let selectedItem = null;
 
+                function getAlltreegridioFiles() {
+                    const files = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.endsWith('.treegridio')) {
+                            const value = localStorage.getItem(key);
+                            files.push({
+                                name: key,
+                                size: value ? new Blob([value]).size : 0
+                            });
+                        }
+                    }
+                    return files;
+                }
+
+                function formatFileSize(bytes) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+                }
+
                 function loadItems() {
-                    const items = JSON.parse(localStorage.getItem('files') || '[]');
+                    const files = getAlltreegridioFiles();
                     const list = document.getElementById('itemList');
                     const noItems = document.getElementById('noItems');
                     list.innerHTML = '';
                     
-                    if (items.length === 0) {
+                    if (files.length === 0) {
                         noItems.style.display = 'block';
                     } else {
                         noItems.style.display = 'none';
-                        items.forEach(item => {
+                        files.forEach(file => {
                             const p = document.createElement('p');
-                            p.textContent = item;
+                            p.innerHTML = \`
+                                <span>\${file.name}</span>
+                                <span class="file-size">\${formatFileSize(file.size)}</span>
+                            \`;
                             p.onclick = () => {
                                 const prevSelected = list.querySelector('.selected');
                                 if (prevSelected) prevSelected.classList.remove('selected');
                                 p.classList.add('selected');
-                                selectedItem = item;
+                                selectedItem = file.name;
                             };
                             list.appendChild(p);
                         });
@@ -206,26 +239,31 @@ export async function pickFile() {
 
                 function filterItems() {
                     const input = document.getElementById('searchInput').value.toLowerCase();
-                    const items = JSON.parse(localStorage.getItem('files') || '[]');
+                    const files = getAlltreegridioFiles();
                     const list = document.getElementById('itemList');
                     list.innerHTML = '';
                     selectedItem = null;
                     
-                    const filtered = items.filter(item => item.toLowerCase().includes(input));
+                    const filtered = files.filter(file => 
+                        file.name.toLowerCase().includes(input)
+                    );
                     const noItems = document.getElementById('noItems');
                     
                     if (filtered.length === 0) {
                         noItems.style.display = 'block';
                     } else {
                         noItems.style.display = 'none';
-                        filtered.forEach(item => {
+                        filtered.forEach(file => {
                             const p = document.createElement('p');
-                            p.textContent = item;
+                            p.innerHTML = \`
+                                <span>\${file.name}</span>
+                                <span class="file-size">\${formatFileSize(file.size)}</span>
+                            \`;
                             p.onclick = () => {
                                 const prevSelected = list.querySelector('.selected');
                                 if (prevSelected) prevSelected.classList.remove('selected');
                                 p.classList.add('selected');
-                                selectedItem = item;
+                                selectedItem = file.name;
                             };
                             list.appendChild(p);
                         });
@@ -237,9 +275,32 @@ export async function pickFile() {
                 }
 
                 function sortItems() {
-                    const items = JSON.parse(localStorage.getItem('files') || '[]').sort();
-                    localStorage.setItem('files', JSON.stringify(items));
-                    loadItems();
+                    const files = getAlltreegridioFiles().sort((a, b) => 
+                        a.name.localeCompare(b.name)
+                    );
+                    const list = document.getElementById('itemList');
+                    list.innerHTML = '';
+                    selectedItem = null;
+                    
+                    if (files.length === 0) {
+                        document.getElementById('noItems').style.display = 'block';
+                    } else {
+                        document.getElementById('noItems').style.display = 'none';
+                        files.forEach(file => {
+                            const p = document.createElement('p');
+                            p.innerHTML = \`
+                                <span>\${file.name}</span>
+                                <span class="file-size">\${formatFileSize(file.size)}</span>
+                            \`;
+                            p.onclick = () => {
+                                const prevSelected = list.querySelector('.selected');
+                                if (prevSelected) prevSelected.classList.remove('selected');
+                                p.classList.add('selected');
+                                selectedItem = file.name;
+                            };
+                            list.appendChild(p);
+                        });
+                    }
                 }
 
                 function selectItem() {
@@ -279,13 +340,6 @@ export async function pickFile() {
                 });
 
                 // Initialize
-                if (!localStorage.getItem('files')) {
-                    localStorage.setItem('files', JSON.stringify([
-                        'document1.tregridio',
-                        'report2.tregridio',
-                        'project3.tregridio'
-                    ]));
-                }
                 document.getElementById('searchInput').focus();
                 loadItems();
             </script>
@@ -310,7 +364,10 @@ export async function pickFile() {
 
             if (event.data.type === 'select') {
                 cleanup();
-                resolve(event.data.value);
+                resolve({
+                    filename: event.data.value,
+                    content: localStorage.getItem(event.data.value)
+                });
             } else if (event.data.type === 'cancel') {
                 cleanup();
                 reject(new Error(event.data.error));
