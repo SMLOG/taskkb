@@ -79,19 +79,16 @@ export async function pickFile() {
                 .file-picker {
                     width: 100%;
                     height: 100%;
-       
                 }
-                    .container{
-                        padding: 20px;
-                        box-sizing: border-box;
-                        position: relative;
-                        display: flex
-                    ;
-                        flex-direction: column;
-                        flex-grow: 1;
-                        position: absolute;
-                        inset: 0;
-                    }
+                .container {
+                    padding: 20px;
+                    box-sizing: border-box;
+                    display: flex;
+                    flex-direction: column;
+                    flex-grow: 1;
+                    position: absolute;
+                    inset: 0;
+                }
                 .close-btn {
                     position: absolute;
                     top: 10px;
@@ -133,7 +130,7 @@ export async function pickFile() {
                     overflow-y: auto;
                     border: 1px solid #eee;
                     padding: 10px;
-                    margin-bottom: 15px;
+                    margin-top: 15px;
                 }
                 #itemList p {
                     margin: 5px 0;
@@ -159,6 +156,7 @@ export async function pickFile() {
                     color: #777;
                     text-align: center;
                     padding: 20px;
+                    display: none; /* Start hidden */
                 }
                 .button-container {
                     display: flex;
@@ -176,18 +174,16 @@ export async function pickFile() {
         </head>
         <body>
             <div class="file-picker">
-            <div class="container">
-                <button class="close-btn" onclick="closeDialog()">×</button>
-                <h3>Select a .treegridio file</h3>
-                <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Search .treegreeio files..." onkeyup="filterItems()">
-                    <button onclick="searchItems()">Search</button>
-                    <button onclick="sortItems()">A-Z</button>
+                <div class="container">
+                    <button class="close-btn" onclick="closeDialog()">×</button>
+                    <h3>Select a .treegridio file</h3>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="Search .treegridio files..." onkeyup="filterItems()">
+                        <button onclick="searchItems()">Search</button>
+                    </div>
+                    <div id="itemList"></div>
+                    <p class="no-items" id="noItems">No .treegridio files found</p> <!-- Moved outside of itemList -->
                 </div>
-                <div id="itemList">
-                    <p class="no-items" id="noItems">No .treegridio files found</p>
-                </div>
-            </div>
             </div>
             <script>
                 const instanceId = "${instanceId}";
@@ -242,7 +238,6 @@ export async function pickFile() {
                                 selectItem();
                             };
                             
-                            
                             list.appendChild(p);
                         });
                     }
@@ -258,8 +253,8 @@ export async function pickFile() {
                     const filtered = files.filter(file => 
                         file.name.toLowerCase().includes(input)
                     );
-                    const noItems = document.getElementById('noItems');
                     
+                    const noItems = document.getElementById('noItems');                    
                     if (filtered.length === 0) {
                         noItems.style.display = 'block';
                     } else {
@@ -296,10 +291,11 @@ export async function pickFile() {
                     list.innerHTML = '';
                     selectedItem = null;
                     
+                    const noItems = document.getElementById('noItems');                    
                     if (files.length === 0) {
-                        document.getElementById('noItems').style.display = 'block';
+                        noItems.style.display = 'block';
                     } else {
-                        document.getElementById('noItems').style.display = 'none';
+                        noItems.style.display = 'none';
                         files.forEach(file => {
                             const p = document.createElement('p');
                             p.innerHTML = \`
