@@ -24,15 +24,12 @@ const saveFileToSessionStorage = (fileName) => {
   }
 };
 
-// Function to pick a file using File System Access API or fallback to input element
-export const pickFile = async () => {
-  if (isFileSystemAccessSupported) {
-    try {
-      const [fileHandle] = await window.showOpenFilePicker({
+async function pick(){
+    const [fileHandle] = await window.showOpenFilePicker({
         types: [
           {
             description: 'JSON Files',
-            accept: { 'application/json': ['.json', '.treegridio'] },
+            accept: { '*/*': ['.json', '.treegridio'] },
           },
         ],
       });
@@ -40,6 +37,13 @@ export const pickFile = async () => {
       const fileId = file.name; // Use file name as unique ID
       fileCache.set(fileId, { file, handle: fileHandle }); // Cache both File and handle
       saveFileToSessionStorage(fileId); // Save file name to sessionStorage
+      return [file,fileHandle,fileId];
+}
+// Function to pick a file using File System Access API or fallback to input element
+export const pickFile = async () => {
+  if (isFileSystemAccessSupported) {
+    try {
+          const[file,fileHandle,fileId,] = await pick();
       return { mode: 'D', file: { handle: fileHandle, name: file.name, id: fileId } };
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -81,23 +85,16 @@ export async function readJsonAttachment(path) {
     file = cached.file; // Use cached File object
   } else if (isFileSystemAccessSupported) {
     try {
-      const [fileHandle] = await window.showOpenFilePicker({
-        types: [
-          {
-            description: 'JSON Files',
-            accept: { 'application/json': ['.json', '.treegridio'] },
-          },
-        ],
-        suggestedName: path.id,
-      });
-      file = await fileHandle.getFile();
-      fileCache.set(path.id, { file, handle: fileHandle }); // Cache both File and handle
-      saveFileToSessionStorage(path.id); // Update sessionStorage
+
+
+      const[afile] = await pick();
+      file = afile;
+
     } catch (error) {
       if (error.name === 'AbortError') {
         throw new Error('File selection was canceled');
-      }
-      throw { code: 404, error: `No data found with filename ${path.id}` };
+      }else throw error;
+     // throw { code: 404, error: `No data found with filename ${path.id}` };
     }
   } else if (path.rawFile) {
     file = path.rawFile;
@@ -190,5 +187,9 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
     return { ...path, id: path.fileName };
   }
 };
+
+export function authorize(){
+    return true;
+}
 
 export const type = "Browser";

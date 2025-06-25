@@ -6,6 +6,8 @@ import { useAppStore } from '@/stores/appStore'
 import { useUserStore } from '@/stores/userStore'
 import { parseHash } from '@/lib/parse';
 import { useDialog } from '@/composables/useDialog';
+import NoFoundDlg from '@/components/dlg/NoFoundDlg.vue'
+import Auth from '@/components/dlg/Auth.vue'
 
 
 export const useHashStore = defineStore('hash', () => {
@@ -36,10 +38,10 @@ export const useHashStore = defineStore('hash', () => {
       } catch (error) {
         console.error(error)
         if(error?.code===404){
-          await useDialog().globalNoFoundDlg.value.open();
+          await useDialog().dialog().open(NoFoundDlg);
 
         }else{
-          await useDialog().globalAuthDlg.value.open({ mode: storageType }, true);
+          await useDialog().dialog().open(Auth,{auth:useAppStore().path});
           await appStore.loadFile(storageType, newFile, newTab);
         }
 

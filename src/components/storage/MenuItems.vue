@@ -103,11 +103,11 @@ const handleAction = async (id) => {
       break;
     case 'open-from-browser':
       {
-        const { pickFile } = await getStorageBridgeByName('L');
+        const { pickFile } = await getStorageBridgeByName('B');
         const user = useUserStore().getUser();
         const auth = await pickFile(user);
-        useUserStore().addOrUpdateUser({ ...auth, mode: 'L' });
-        const newPath = { mode: 'L', id: auth.file.id }
+        useUserStore().addOrUpdateUser({ ...auth, mode: 'B' });
+        const newPath = { mode: 'B', id: auth.file.id }
         useAppStore().rediret(newPath);
 
         console.log(auth)
@@ -120,6 +120,19 @@ const handleAction = async (id) => {
         const user = useUserStore().getUser();
         const auth = await pickFile(user);
         useUserStore().addOrUpdateUser({ ...auth, mode: 'D' });
+        const newPath = { mode: 'D', id: auth.file.id }
+        useAppStore().rediret(newPath);
+
+        console.log(auth)
+
+      }
+      break;
+      case 'open-from-local':
+      {
+        const { pickFile } = await getStorageBridgeByName('L');
+        const user = useUserStore().getUser();
+        const auth = await pickFile(user);
+        useUserStore().addOrUpdateUser({ ...auth, mode: 'L' });
         const newPath = { mode: 'D', id: auth.file.id }
         useAppStore().rediret(newPath);
 
@@ -186,6 +199,7 @@ const menuItems = ref([
               { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
               { label: 'Browser', action: () => handleAction('open-from-browser') },
               { label: 'Device', action: () => handleAction('open-from-device') },
+              { label: 'LocalStorage', action: () => handleAction('open-from-local') },
             ],
           },
         ],

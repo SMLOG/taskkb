@@ -53,7 +53,7 @@ const confirmRemoveTab = () => {
 }
 
 onMounted(() => {
-  if (appStore.tabs.length === 0) {
+  if (!appStore.path) {
     addTab();
   }
 });

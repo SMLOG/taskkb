@@ -1,6 +1,7 @@
 import { jsonParse } from '@/lib/parse';
-import { pickFile as pf } from './browserPickfile';
+import { pickFile as pf } from './localStoragePickfile';
 
+const typeCode = 'B';
 // Function to open the IndexedDB database
 function openDatabase(dbName, storeName) {
     return new Promise((resolve, reject) => {
@@ -26,7 +27,7 @@ function openDatabase(dbName, storeName) {
 
 export const pickFile = async () => {
     const file = await pf();
-    return { mode: 'L', file: { ...file, id: file.filename } };
+    return { mode: typeCode, file: { ...file, id: file.filename } };
 };
 
 export async function readJsonAttachment(path) {

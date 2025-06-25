@@ -6,21 +6,15 @@ import FormatTool from "@/components/tools/FormatTool.vue";
 import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
-import StorageOptions from './components/dlg/StorageOptions.vue';
-import NoFound from '@/components/dlg/NoFoundDlg.vue';
 import { storeToRefs } from 'pinia';
 import { useDialog } from '@/composables/useDialog';
 import {useHashStore} from '@/stores/hashStore';
 import { ref } from 'vue';
-import AuthorizationDialog from '@/components/dlg/AuthorizationDlg.vue'
 import Dialog from '@/components/dlg/Dialog.vue'
 import About from '@/components/About.vue';
-import Save from './components/dlg/Save.vue';
 
-const authDialog = ref(null);
-const noFound = ref(null);
 const dlg=ref(null);
-useDialog(authDialog,noFound,dlg);
+useDialog(dlg);
 useHashStore();
 
 const appStore = useAppStore();
@@ -52,9 +46,6 @@ const {activeTabRef} = storeToRefs(appStore);
       </div>
     </NotificationProvider>
   </main>
-  <StorageOptions v-if="appStore.showPopUp===1"/>
-  <AuthorizationDialog ref="authDialog" />
-  <NoFound ref="noFound"/>
 <Dialog ref="dlg"/>
 </template>
 

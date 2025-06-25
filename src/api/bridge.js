@@ -31,11 +31,14 @@ export async function getStorageBridgeByName(mode) {
         case "J": {
             return await import('@/api/jira');
         }
-        case "L": {
+        case "B": {
             return await import('@/api/browser');
         }
         case "D": {
             return await import('@/api/device');
+        }
+        case "L": {
+            return await import('@/api/localStorage');
         }
     }
 
