@@ -6,6 +6,24 @@ const isFileSystemAccessSupported = 'showOpenFilePicker' in window && 'showSaveF
 // In-memory cache for File objects and FileSystemFileHandle
 const fileCache = new Map();
 
+// SessionStorage key for storing file metadata
+const SESSION_STORAGE_KEY = 'cachedFiles';
+
+// Function to load cached file names from sessionStorage
+const loadCachedFilesFromSessionStorage = () => {
+  const cachedFiles = sessionStorage.getItem(SESSION_STORAGE_KEY);
+  return cachedFiles ? JSON.parse(cachedFiles) : [];
+};
+
+// Function to save file name to sessionStorage
+const saveFileToSessionStorage = (fileName) => {
+  const cachedFiles = loadCachedFilesFromSessionStorage();
+  if (!cachedFiles.includes(fileName)) {
+    cachedFiles.push(fileName);
+    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(cachedFiles));
+  }
+};
+
 // Function to pick a file using File System Access API or fallback to input element
 export const pickFile = async () => {
   if (isFileSystemAccessSupported) {
@@ -21,6 +39,7 @@ export const pickFile = async () => {
       const file = await fileHandle.getFile();
       const fileId = file.name; // Use file name as unique ID
       fileCache.set(fileId, { file, handle: fileHandle }); // Cache both File and handle
+      saveFileToSessionStorage(fileId); // Save file name to sessionStorage
       return { mode: 'D', file: { handle: fileHandle, name: file.name, id: fileId } };
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -41,6 +60,7 @@ export const pickFile = async () => {
         } else {
           const fileId = file.name; // Use file name as unique ID
           fileCache.set(fileId, { file, handle: null }); // Cache File with null handle
+          saveFileToSessionStorage(fileId); // Save file name to sessionStorage
           resolve({ mode: 'D', file: { name: file.name, id: fileId, rawFile: file } });
         }
       };
@@ -59,30 +79,31 @@ export async function readJsonAttachment(path) {
   const cached = fileCache.get(path.id);
   if (cached) {
     file = cached.file; // Use cached File object
-  } else if (isFileSystemAccessSupported && cached?.handle) {
+  } else if (isFileSystemAccessSupported) {
     try {
-      file = await cached.handle.getFile();
-      fileCache.set(path.id, { file, handle: path.handle }); // Cache both File and handle
+      const [fileHandle] = await window.showOpenFilePicker({
+        types: [
+          {
+            description: 'JSON Files',
+            accept: { 'application/json': ['.json', '.treegridio'] },
+          },
+        ],
+        suggestedName: path.id,
+      });
+      file = await fileHandle.getFile();
+      fileCache.set(path.id, { file, handle: fileHandle }); // Cache both File and handle
+      saveFileToSessionStorage(path.id); // Update sessionStorage
     } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error('File selection was canceled');
+      }
       throw { code: 404, error: `No data found with filename ${path.id}` };
     }
   } else if (path.rawFile) {
     file = path.rawFile;
     fileCache.set(path.id, { file, handle: null }); // Cache File with null handle
-  } else if(window.showOpenFilePicker){
-    const [fileHandle] = await window.showOpenFilePicker({
-        types: [
-          {
-            description: 'JSON Files',
-            accept: { 'application/json': ['.json','.treegridio'] },
-          },
-        ],
-      });
-       file = await fileHandle.getFile();
-
-      const fileId = file.name; // Use file name as unique ID
-      fileCache.set(fileId, { file, handle: fileHandle }); // Cache both File and handle
-  }else {
+    saveFileToSessionStorage(path.id); // Update sessionStorage
+  } else {
     throw { code: 404, error: `No data found with filename ${path.id}` };
   }
 
@@ -112,7 +133,25 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
       const cached = fileCache.get(path.fileName);
       const fileHandle = cached?.handle;
       if (!fileHandle) {
-        throw new Error(`No file handle available for ${path.fileName}. Cannot overwrite file.`);
+        // Check sessionStorage and prompt re-selection if needed
+        const cachedFiles = loadCachedFilesFromSessionStorage();
+        if (cachedFiles.includes(path.fileName)) {
+          const [newFileHandle] = await window.showOpenFilePicker({
+            types: [
+              {
+                description: 'JSON Files',
+                accept: { 'application/json': ['.json', '.treegridio'] },
+              },
+            ],
+            suggestedName: path.fileName,
+          });
+          const file = await newFileHandle.getFile();
+          fileCache.set(path.fileName, { file, handle: newFileHandle });
+          saveFileToSessionStorage(path.fileName); // Update sessionStorage
+          return writeObjectToJsonAttachment(dataObject, { ...path, handle: newFileHandle }); // Retry with new handle
+        } else {
+          throw new Error(`No file handle available for ${path.fileName}. Cannot overwrite file.`);
+        }
       }
       // Verify write permission
       const permission = await fileHandle.queryPermission({ mode: 'readwrite' });
@@ -125,6 +164,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
       // Update cache with new File object and existing handle after writing
       const file = await fileHandle.getFile();
       fileCache.set(path.fileName, { file, handle: fileHandle });
+      saveFileToSessionStorage(path.fileName); // Update sessionStorage
       return { ...path, id: path.fileName, handle: fileHandle };
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -146,6 +186,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
     // Update cache with new Blob-based File object
     const file = new File([blob], path.fileName, { type: 'application/json' });
     fileCache.set(path.fileName, { file, handle: null }); // No handle for fallback
+    saveFileToSessionStorage(path.fileName); // Update sessionStorage
     return { ...path, id: path.fileName };
   }
 };
