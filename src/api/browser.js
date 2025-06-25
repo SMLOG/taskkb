@@ -1,7 +1,10 @@
 import { jsonParse } from '@/lib/parse';
 import { pickFile as pf } from './browserPickfile';
 
-export const pickFile = pf;
+export const pickFile = async ()=>{
+    const file = await pf();
+    return {mode:'L',file:{...file,id:file.filename}}
+};
 
 export async function readJsonAttachment(path) {
     if (!path || typeof path !== 'object') {
