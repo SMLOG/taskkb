@@ -212,7 +212,7 @@ export async function pickFile() {
                 let selectedItem = null;
 
                 async function getAllTreegridioFiles() {
-                    const db = await openDatabase('myDatabase', 'files');
+                    const db = await openDatabase('database', 'files');
                     return new Promise((resolve, reject) => {
                         const transaction = db.transaction(['files'], 'readonly');
                         const store = transaction.objectStore('files');

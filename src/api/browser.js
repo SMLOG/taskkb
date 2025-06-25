@@ -35,7 +35,7 @@ export async function readJsonAttachment(path) {
         throw new Error('Invalid or missing path');
     }
 
-    const db = await openDatabase('myDatabase', 'files');
+    const db = await openDatabase('database', 'files');
     
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(['files'], 'readonly');
@@ -66,7 +66,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
         throw new Error('Invalid or missing path');
     }
 
-    const db = await openDatabase('myDatabase', 'files');
+    const db = await openDatabase('database', 'files');
     
     return new Promise((resolve, reject) => {
         const transaction = db.transaction(['files'], 'readwrite');
