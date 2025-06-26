@@ -69,112 +69,69 @@ const submenuPositions = ref({});
 const appStore = useAppStore();
 const showNotification = inject('showNotification');
 
-// Centralized action handler
 const handleAction = async (id) => {
-  console.log(id)
+  console.log(id); // Consider removing in production if not needed for debugging
   emit('close');
+
+  const storageActions = {
+    'open-from-google-drive': 'G',
+    'open-from-browser': 'B',
+    'open-from-device': 'D',
+    'open-from-local': 'L',
+  };
+
+  if (storageActions[id]) {
+    return await handleStorageAction(id, storageActions[id]);
+  }
+
   switch (id) {
     case 'new':
-      {
-        let orgPath = appStore.path;
-
-        const newPath = await useDialog().dialog().open(Save);
-        appStore.newFile();
-        await useDialog().dialog().open(NewTab);
-        appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id })
-        await appStore.saveData();
-
-
-
-      }
-      break;
-    case 'open-from-google-drive':
-      {
-        const { pickFile } = await getStorageBridgeByName('G');
-        const user = useUserStore().getUser();
-        const auth = await pickFile(user);
-        useUserStore().addOrUpdateUser({ ...auth, mode: 'G' });
-        const newPath = { mode: 'G', id: auth.file.id }
-        useAppStore().rediret(newPath);
-
-        console.log(auth)
-
-      }
-      break;
-    case 'open-from-browser':
-      {
-        const { pickFile } = await getStorageBridgeByName('B');
-        const user = useUserStore().getUser();
-        const auth = await pickFile(user);
-        useUserStore().addOrUpdateUser({ ...auth, mode: 'B' });
-        const newPath = { mode: 'B', id: auth.file.id }
-        useAppStore().rediret(newPath);
-
-        console.log(auth)
-
-      }
-      break;
-      case 'open-from-device':
-      {
-        const { pickFile } = await getStorageBridgeByName('D');
-        const user = useUserStore().getUser();
-        const auth = await pickFile(user);
-        useUserStore().addOrUpdateUser({ ...auth, mode: 'D' });
-        const newPath = { mode: 'D', id: auth.file.id }
-        useAppStore().rediret(newPath);
-
-        console.log(auth)
-
-      }
-      break;
-      case 'open-from-local':
-      {
-        const { pickFile } = await getStorageBridgeByName('L');
-        const user = useUserStore().getUser();
-        const auth = await pickFile(user);
-        useUserStore().addOrUpdateUser({ ...auth, mode: 'L' });
-        const newPath = { mode: 'L', id: auth.file.id }
-        useAppStore().rediret(newPath);
-
-        console.log(auth)
-
-      }
-      break;
+      return await handleNewFile();
     case 'save':
-      {
-
-        try {
-          await useAppStore().saveData();
-          showNotification('Saved Successful!', 'success');
-        } catch (error) {
-          showNotification('Save Fail!', 'error');
-        }
-
-
-      }
-      break;
+      return await handleSave();
     case 'configur':
-      {
-
-        await useDialog().dialog().open(Config);
-
-      }
-      break;
+      return await useDialog().dialog().open(Config);
     case 'rename':
-      {
-
-        await useDialog().dialog().open(Rename);
-
-      }
-      break;
+      return await useDialog().dialog().open(Rename);
     case 'export':
-      {
-        const datas = appStore.exportFile();
-        downloadJSON(datas, appStore.path.fileName);
-      }
-      break;
+      return handleExport();
+    default:
+      return; // Handle unknown actions gracefully
   }
-  //emit('item-clicked', id);
+};
+
+const handleStorageAction = async (id, mode) => {
+  const { pickFile } = await getStorageBridgeByName(mode);
+  const user = useUserStore().getUser();
+  const auth = await pickFile(user);
+  useUserStore().addOrUpdateUser({ ...auth, mode });
+  const newPath = { mode, id: auth.file.id };
+  useAppStore().redirect(newPath); // Fixed typo: 'rediret' → 'redirect'
+  console.log(auth); // Consider removing in production
+};
+
+const handleNewFile = async () => {
+  const orgPath = appStore.path;
+  const newPath = await useDialog().dialog().open(Save);
+  appStore.newFile();
+  await useDialog().dialog().open(NewTab);
+  appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
+  await appStore.saveData();
+};
+
+const handleSave = async () => {
+  try {
+    await useAppStore().saveData();
+    showNotification('Saved Successfully!', 'success');
+  } catch (error) {
+    showNotification('Save Failed!', 'error');
+    throw error; // Consider re-throwing for proper error handling
+  }
+};
+
+const handleExport = () => {
+  const data = appStore.exportFile();
+  downloadJSON(data, appStore.path.fileName);
 };
 
 const menuItems = ref([
