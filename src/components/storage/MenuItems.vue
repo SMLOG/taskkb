@@ -1,42 +1,54 @@
 <template>
-  <div ref="dropdown"
-    class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in">
+  <div
+    ref="dropdown"
+    class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-50 animate-fade-in"
+  >
     <ul class="py-1">
       <template v-for="(group, groupIndex) in menuItems" :key="`group-${groupIndex}`">
-        <!-- Group Heading (optional) -->
-        <li v-if="group.label"
-          class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+        <li
+          v-if="group.label"
+          class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+        >
           {{ group.label }}
         </li>
-        <!-- Group Items -->
-        <li v-for="(item, index) in group.items" :key="`item-${groupIndex}-${index}`" class="relative group"
-          @mouseenter="openSubmenu(groupIndex, index)" @mouseleave="closeSubmenu">
-          <a href="#"
+        <li
+          v-for="(item, index) in group.items"
+          :key="`item-${groupIndex}-${index}`"
+          class="relative group"
+          @mouseenter="openSubmenu(groupIndex, index)"
+          @mouseleave="closeSubmenu"
+        >
+          <a
+            href="#"
             class="flex items-center justify-between px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-            :class="{ 'text-red-600 dark:text-red-400': item.destructive }" @click.prevent="handleItemClick(item)">
+            :class="{ 'text-red-600 dark:text-red-400': item.destructive }"
+            @click.prevent="handleItemClick(item)"
+          >
             <span>{{ item.label }}</span>
             <span v-if="item.shortcut" class="text-xs text-gray-400 dark:text-gray-500">
               {{ item.shortcut }}
             </span>
-            <span v-if="item.submenu" class="ml-2 text-gray-400">
-              ▶
-            </span>
+            <span v-if="item.submenu" class="ml-2 text-gray-400">▶</span>
           </a>
-          <!-- Submenu -->
-          <ul v-if="item.submenu && activeSubmenuIndex?.group === groupIndex && activeSubmenuIndex?.item === index"
+          <ul
+            v-if="item.submenu && activeSubmenuIndex?.group === groupIndex && activeSubmenuIndex?.item === index"
             class="absolute top-0 mt-[-1px] w-56 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-xl z-60"
-            :class="submenuPositionClasses[`${groupIndex}-${index}`]" :ref="el => setSubmenuRef(groupIndex, index, el)">
-            <!-- Submenu Group (if any) -->
-            <template v-for="(subGroup, subGroupIndex) in item.submenu"
-              :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
-              <li v-if="subGroup.label"
-                class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+            :class="getSubmenuPositionClass(groupIndex, index)"
+            :ref="el => setSubmenuRef(groupIndex, index, el)"
+          >
+            <template v-for="(subGroup, subGroupIndex) in item.submenu" :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
+              <li
+                v-if="subGroup.label"
+                class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
+              >
                 {{ subGroup.label }}
               </li>
               <li v-for="(submenuItem, subIndex) in subGroup.items" :key="`subitem-${subGroupIndex}-${subIndex}`">
-                <a href="#"
+                <a
+                  href="#"
                   class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-                  @click.prevent="submenuItem.action">
+                  @click.prevent="submenuItem.action"
+                >
                   {{ submenuItem.label }}
                 </a>
               </li>
@@ -51,7 +63,7 @@
 
 <script setup>
 import { useDialog } from '@/composables/useDialog';
-import { ref, computed, nextTick, onMounted, onUnmounted, inject } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
 import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
@@ -60,63 +72,91 @@ import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
 import { downloadJSON } from '@/lib/parse';
-const emit = defineEmits(['item-clicked', 'close']);
 
+const emit = defineEmits(['item-clicked', 'close']);
 const activeSubmenuIndex = ref(null);
 const dropdown = ref(null);
 const submenu = ref({});
 const submenuPositions = ref({});
 const appStore = useAppStore();
-const showNotification = inject('showNotification');
+
+// Debounce utility for resize events
+const debounce = (fn, delay) => {
+  let timeout;
+  return (...args) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn(...args), delay);
+  };
+};
 
 const handleAction = async (id) => {
-  console.log(id); // Consider removing in production if not needed for debugging
-  emit('close');
+  try {
+    emit('close');
+    const storageActions = {
+      'open-from-google-drive': 'G',
+      'open-from-browser': 'B',
+      'open-from-device': 'D',
+      'open-from-local': 'L',
+    };
 
-  const storageActions = {
-    'open-from-google-drive': 'G',
-    'open-from-browser': 'B',
-    'open-from-device': 'D',
-    'open-from-local': 'L',
-  };
+    if (storageActions[id]) {
+      return await handleStorageAction(id, storageActions[id]);
+    }
 
-  if (storageActions[id]) {
-    return await handleStorageAction(id, storageActions[id]);
-  }
-
-  switch (id) {
-    case 'new':
-      return await handleNewFile();
-    case 'save':
-      return await handleSave();
-    case 'configur':
-      return await useDialog().dialog().open(Config);
-    case 'rename':
-      return await useDialog().dialog().open(Rename);
-    case 'export':
-      return handleExport();
-    default:
-      return; // Handle unknown actions gracefully
+    switch (id) {
+      case 'new':
+        await handleNewFile();
+        break;
+      case 'save':
+        await handleSave();
+        break;
+      case 'configur':
+        await useDialog().dialog().open(Config);
+        break;
+      case 'rename':
+        await useDialog().dialog().open(Rename);
+        break;
+      case 'export':
+        handleExport();
+        break;
+      default:
+        break;
+    }
+  } catch (error) {
+    //useDialog().notification().open({message:`Action failed: ${id}`})
   }
 };
 
+function showNotification(message,type){
+      useDialog().notification().open({message:message,type:type})
+
+}
 const handleStorageAction = async (id, mode) => {
-  const { pickFile } = await getStorageBridgeByName(mode);
-  const user = useUserStore().getUser();
-  const auth = await pickFile(user);
-  useUserStore().addOrUpdateUser({ ...auth, mode });
-  const newPath = { mode, id: auth.file.id };
-  useAppStore().redirect(newPath); // Fixed typo: 'rediret' → 'redirect'
-  console.log(auth); // Consider removing in production
+  try {
+    const { pickFile } = await getStorageBridgeByName(mode);
+    const user = useUserStore().getUser();
+    const auth = await pickFile(user);
+    useUserStore().addOrUpdateUser({ ...auth, mode });
+    const newPath = { mode, id: auth.file.id};
+    appStore.redirect(newPath);
+  } catch (error) {
+    showNotification(`Failed to open from ${mode}`, 'error');
+    throw error;
+  }
 };
 
 const handleNewFile = async () => {
-  const orgPath = appStore.path;
-  const newPath = await useDialog().dialog().open(Save);
-  appStore.newFile();
-  await useDialog().dialog().open(NewTab);
-  appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
-  await appStore.saveData();
+  try {
+    const orgPath = appStore.path;
+    const newPath = await useDialog().dialog().open(Save);
+    appStore.newFile();
+    await useDialog().dialog().open(NewTab);
+    appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
+    await appStore.saveData();
+  } catch (error) {
+    showNotification('Failed to create new file', 'error');
+    throw error;
+  }
 };
 
 const handleSave = async () => {
@@ -125,13 +165,18 @@ const handleSave = async () => {
     showNotification('Saved Successfully!', 'success');
   } catch (error) {
     showNotification('Save Failed!', 'error');
-    throw error; // Consider re-throwing for proper error handling
+    throw error;
   }
 };
 
 const handleExport = () => {
-  const data = appStore.exportFile();
-  downloadJSON(data, appStore.path.fileName);
+  try {
+    const data = appStore.exportFile();
+    downloadJSON(data, appStore.path.fileName);
+  } catch (error) {
+    showNotification('Export Failed!', 'error');
+    throw error;
+  }
 };
 
 const menuItems = ref([
@@ -180,6 +225,7 @@ const menuItems = ref([
 
 const props = defineProps({
   showButton: {
+    type: [Object, null],
     default: null,
   },
 });
@@ -213,51 +259,40 @@ const calculateSubmenuPosition = (groupIndex, itemIndex) => {
   const dropdownRect = dropdown.value.getBoundingClientRect();
   const submenuWidth = 224; // w-56 (56 * 4 = 224px)
   const viewportWidth = window.innerWidth;
-
   const spaceOnRight = viewportWidth - (dropdownRect.right + submenuWidth);
-  const shouldOpenLeft = spaceOnRight < 0;
-
-  submenuPositions.value[`${groupIndex}-${itemIndex}`] = shouldOpenLeft ? 'left' : 'right';
+  submenuPositions.value[`${groupIndex}-${itemIndex}`] = spaceOnRight < 0 ? 'left' : 'right';
 };
 
-const submenuPositionClasses = computed(() => {
-  return menuItems.value.reduce((acc, group, groupIndex) => {
-    group.items.forEach((_, itemIndex) => {
-      acc[`${groupIndex}-${itemIndex}`] = submenuPositions.value[`${groupIndex}-${itemIndex}`] === 'left' ? 'left-[-224px]' : 'left-full';
-    });
-    return acc;
-  }, {});
+const getSubmenuPositionClass = computed(() => (groupIndex, itemIndex) => {
+  return submenuPositions.value[`${groupIndex}-${itemIndex}`] === 'left' ? 'left-[-224px]' : 'left-full';
 });
 
 const handleClickOutside = (event) => {
-  const profileButton = props.showButton;
-
   if (
     dropdown.value &&
     !dropdown.value.contains(event.target) &&
-    !(profileButton && (profileButton.contains(event.target) || profileButton === event.target))
+    !(props.showButton && (props.showButton.contains(event.target) || props.showButton === event.target))
   ) {
     emit('close');
     closeSubmenu();
   }
 };
 
+const debouncedCalculatePosition = debounce((groupIndex, itemIndex) => {
+  if (activeSubmenuIndex.value) {
+    calculateSubmenuPosition(groupIndex, itemIndex);
+  }
+}, 100);
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
-  window.addEventListener('resize', () => {
-    if (activeSubmenuIndex.value) {
-      calculateSubmenuPosition(activeSubmenuIndex.value.group, activeSubmenuIndex.value.item);
-    }
-  });
+  window.addEventListener('resize', () => debouncedCalculatePosition(activeSubmenuIndex.value?.group, activeSubmenuIndex.value?.item));
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
-  window.removeEventListener('resize', () => { });
+  window.removeEventListener('resize', () => {});
 });
-
-
-
 </script>
 
 <style scoped>
@@ -270,58 +305,9 @@ onUnmounted(() => {
     opacity: 0;
     transform: translateY(-4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.group:hover .submenu {
-  display: block;
-}
-
-ul ul {
-  display: none;
-  position: absolute;
-  top: 0;
-  min-width: 200px;
-}
-
-.group:hover ul {
-  display: block;
-}
-
-a:has(+ ul)::after {
-  content: '▶';
-  position: absolute;
-  right: 1rem;
-  color: #9ca3af;
-}
-
-.left-[-224px] a:has(+ ul)::after {
-  content: '◀';
-}
-
-div[role="menu"] {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li a {
-  text-decoration: none;
-  color: #374151;
-}
-
-li a:hover {
-  background-color: #e0f2fe;
 }
 </style>
