@@ -1,11 +1,26 @@
 import { jsonParse } from '@/lib/parse';
 import { loadScript } from '@/lib/net';
+import base64js from 'base64-js';
 
 // Constants
 const clientId = '111515033736-dffaqu4qg36n2ovfhpaa7qgtndd3u4q2.apps.googleusercontent.com';
 
 let tokenClient = null;
 
+function toBase64(fileContent) {
+    try {
+      // Handle string input
+      if (typeof fileContent === 'string') {
+        fileContent = new TextEncoder().encode(fileContent);
+      }
+      // Handle ArrayBuffer or Uint8Array
+      return base64js.fromByteArray(fileContent);
+    } catch (e) {
+      console.error('Error encoding to Base64:', e);
+      throw e;
+    }
+  }
+  
 // Fetch user info from Google API
 export const fetchUserInfo = async (token) => {
     try {
@@ -309,7 +324,7 @@ export const writeFile = async (dataObj, path, auth) => {
         mimeType: 'application/json',
         ...(isUpdate ? {} : { parents: parentFolderId ? [parentFolderId] : [] }),
     };
-    const base64Data = btoa(fileContent);
+    const base64Data = toBase64(fileContent);
     const body = [
         `--${boundary}`,
         'Content-Type: application/json; charset=UTF-8',
