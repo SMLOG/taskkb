@@ -12,7 +12,7 @@
           {{ group.label }}
         </li>
         <li
-          v-for="(item, index) in group.items"
+          v-for="(item, index) in group.items||group.items?.values"
           :key="`item-${groupIndex}-${index}`"
           class="relative group"
           @mouseenter="openSubmenu(groupIndex, index)"
@@ -72,6 +72,7 @@ import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
 import { downloadJSON } from '@/lib/parse';
 import {showNotification,showDialog} from '@/composables/useSystem';
+import { useRecentStore } from '@/stores/recentsStore';
 
 const emit = defineEmits(['item-clicked', 'close']);
 const props = defineProps({
@@ -81,13 +82,17 @@ const props = defineProps({
   },
 });
 
+
+
+
+
 const menuItems = ref([
   {
     label: 'File Operations',
     items: [
-    { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
-    { label: 'Save as', action: () => handleAction('save-as') },
-    { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
+      { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
+      { label: 'Save as', action: () => handleAction('save-as') },
+      { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
       { label: 'Rename...', action: () => handleAction('rename') },
       { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
     ],
@@ -109,7 +114,10 @@ const menuItems = ref([
           },
         ],
       },
-      { label: 'Open Recent', action: () => handleAction('open-recent') },
+      {
+        label: 'Open Recent',
+        action: () => handleAction('open-recent'),
+      },
     ],
   },
   {
@@ -121,7 +129,7 @@ const menuItems = ref([
   {
     label: 'Configure',
     items: [
-      { label: 'Configure...', action: () => handleAction('configur') },
+      { label: 'Configure...', action: () => handleAction('configure') }, // Fixed typo
     ],
   },
 ]);
@@ -144,6 +152,7 @@ const debounce = (fn, delay) => {
 };
 
 const handleAction = async (id) => {
+  console.log(recentSubmenu)
   try {
     emit('close');
     const storageActions = {
@@ -186,12 +195,15 @@ const handleAction = async (id) => {
 
 const handleStorageAction = async (id, mode) => {
   try {
+    console.log(menuItems.value)
     const { pickFile } = await getStorageBridgeByName(mode);
     const user = useUserStore().getUser();
     const auth = await pickFile(user);
     useUserStore().addOrUpdateUser({ ...auth, mode });
-    const newPath = { mode, id: auth.file.id};
+    const newPath = { mode, id: auth.file.id,fileName:auth.file.filename};
     appStore.redirect(newPath);
+    useRecentStore().addOrUpdateRemoveRecent(appStore.path);
+
   } catch (error) {
     showNotification(`Failed to open from ${mode}`, 'error');
     throw error;
@@ -206,6 +218,7 @@ const handleNewFile = async () => {
     await showDialog(NewTab);
     appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
     await appStore.saveData();
+    useRecentStore().addOrUpdateRemoveRecent(appStore.path);
   } catch (error) {
     showNotification('Failed to create new file', 'error');
     throw error;
