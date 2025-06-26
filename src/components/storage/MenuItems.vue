@@ -231,7 +231,7 @@ const handleAction = async (id) => {
         break;
     }
   } catch (error) {
-    showNotification(`Action failed: ${error.message}`, 'error');
+   if(error?.message) showNotification(`Action failed: ${error.message}`, 'error');
   }
 };
 
