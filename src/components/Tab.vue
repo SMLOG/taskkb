@@ -1,13 +1,14 @@
 <template>
   <div 
-    class="tab flex flex-1 items-center justify-between px-4 py-1 cursor-pointer text-sm font-medium relative" 
+    class="tab flex flex-1 items-center justify-between pr-4 pl-2 py-1 cursor-pointer text-sm font-medium relative" 
     :class="{ 'active': isActive }" 
     @click="$emit('click')"
     @dblclick="startEditing"
   >
+    <span v-if="tab.emoji" class="flex-none mr-1">{{ tab.emoji }}</span>
     <span 
       v-if="!isEditing" 
-      :class="`truncate max-w-[${isActive?260:130}px]`"
+      :class="`truncate flex-1 max-w-[${isActive ? 260 : 130}px]`"
     >
       {{ tab.title }}
     </span>
@@ -24,7 +25,8 @@
       type="text"
     >
     <button 
-    class="close-btn absolute top-1 right-1 w-2 h-2 flex items-center justify-center text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900 dark:text-gray-300 dark:hover:text-red-400 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0"      style="padding: 0;"
+      class="close-btn absolute top-1 right-1 w-2 h-2 flex items-center justify-center text-gray-600 hover:text-red-600 bg-gray-100 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900 dark:text-gray-300 dark:hover:text-red-400 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0"
+      style="padding: 0;"
       @click.stop="$emit('removeTab')"
       aria-label="Close tab"
     >
@@ -32,62 +34,68 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
-    <div v-if="!tab.saved" class="absolute top-4 right-2 w-1 h-1 flex items-center justify-center text-gray-600 hover:text-red-600 bg-blue-300 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900 dark:text-gray-300 dark:hover:text-red-400 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0"></div>
+    <div 
+      v-if="!tab.saved" 
+      class="absolute top-4 right-2 w-1 h-1 flex items-center justify-center text-gray-600 hover:text-red-600 bg-blue-300 hover:bg-red-100 dark:bg-gray-700 dark:hover:bg-red-900 dark:text-gray-300 dark:hover:text-red-400 rounded-full m-0 transition-all duration-200 ease-in-out transform hover:scale-110 focus:outline-none focus:ring-0"
+    ></div>
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    tab: {
-      type: Object,
-      required: true,
-    },
-    isActive: Boolean,
-  },
-  data() {
-    return {
-      isEditing: false,
-      editedTitle: '',
-      inputWidth: 100,
-    };
-  },
-  methods: {
-    startEditing() {
-      this.isEditing = true;
-      this.editedTitle = this.tab.title;
-      this.$nextTick(() => {
-        this.$refs.titleInput.focus();
-        this.updateInputWidth();
-      });
-    },
-    saveTitle() {
-      if (this.editedTitle.trim()) {
-        this.$emit('update:tab', { ...this.tab, title: this.editedTitle.trim() });
-        this.tab.title = this.editedTitle.trim();
-      }
-      this.isEditing = false;
-    },
-    cancelEditing() {
-      this.isEditing = false;
-      this.editedTitle = this.tab.title;
-    },
-    updateInputWidth() {
-      const canvas = document.createElement('canvas');
-      const context = canvas.getContext('2d');
-      context.font = '14px sans-serif';
-      const textWidth = context.measureText(this.editedTitle || ' ').width;
+<script setup>
+import { ref, nextTick } from 'vue';
 
-      const padding = 16;
-      let newWidth = textWidth + padding;
-
-      const minWidth = 50;
-      const maxWidth = 130;
-      newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
-
-      this.inputWidth = newWidth;
-    },
+const props = defineProps({
+  tab: {
+    type: Object,
+    required: true,
   },
+  isActive: Boolean,
+});
+
+const emit = defineEmits(['click', 'removeTab', 'update:tab']);
+
+const isEditing = ref(false);
+const editedTitle = ref('');
+const inputWidth = ref(100);
+const emoji = ref('');
+const titleInput = ref(null);
+
+const startEditing = () => {
+  isEditing.value = true;
+  editedTitle.value = props.tab.title;
+  nextTick(() => {
+    titleInput.value?.focus();
+    updateInputWidth();
+  });
+};
+
+const saveTitle = () => {
+  if (editedTitle.value.trim()) {
+    emit('update:tab', { ...props.tab, title: editedTitle.value.trim() });
+    props.tab.title = editedTitle.value.trim();
+  }
+  isEditing.value = false;
+};
+
+const cancelEditing = () => {
+  isEditing.value = false;
+  editedTitle.value = props.tab.title;
+};
+
+const updateInputWidth = () => {
+  const canvas = document.createElement('canvas');
+  const context = canvas.getContext('2d');
+  context.font = '14px sans-serif';
+  const textWidth = context.measureText(editedTitle.value || ' ').width;
+
+  const padding = 16;
+  let newWidth = textWidth + padding;
+
+  const minWidth = 50;
+  const maxWidth = 130;
+  newWidth = Math.max(minWidth, Math.min(newWidth, maxWidth));
+
+  inputWidth.value = newWidth;
 };
 </script>
 
@@ -95,7 +103,9 @@ export default {
 .tab {
   max-width: 200px;
 }
-.tab.active{font-weight: bold;}
+.tab.active {
+  font-weight: bold;
+}
 
 input {
   box-sizing: border-box;
