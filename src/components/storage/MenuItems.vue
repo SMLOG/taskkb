@@ -36,23 +36,28 @@
             :class="getSubmenuPositionClass(groupIndex, index)"
             :ref="el => setSubmenuRef(groupIndex, index, el)"
           >
-            <template v-for="(subGroup, subGroupIndex) in item.submenu" :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
-              <li
-                v-if="subGroup.label"
-                class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
-              >
-                {{ subGroup.label }}
-              </li>
-              <li v-for="(submenuItem, subIndex) in subGroup.items" :key="`subitem-${subGroupIndex}-${subIndex}`">
-                <a
-                  href="#"
-                  class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
-                  @click.prevent="submenuItem.action"
+            <template v-if="item.submenu.length > 0 && item.submenu[0].items.length > 0">
+              <template v-for="(subGroup, subGroupIndex) in item.submenu" :key="`subgroup-${groupIndex}-${index}-${subGroupIndex}`">
+                <li
+                  v-if="subGroup.label"
+                  class="px-4 py-1.5 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide"
                 >
-                  {{ submenuItem.label }}
-                </a>
-              </li>
+                  {{ subGroup.label }}
+                </li>
+                <li v-for="(submenuItem, subIndex) in subGroup.items" :key="`subitem-${subGroupIndex}-${subIndex}`">
+                  <a
+                    href="#"
+                    class="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/50 transition-colors duration-150"
+                    @click.prevent="submenuItem.action"
+                  >
+                    {{ submenuItem.label }}
+                  </a>
+                </li>
+              </template>
             </template>
+            <li v-else class="px-4 py-2.5 text-sm text-gray-500 dark:text-gray-400">
+              No recent items
+            </li>
           </ul>
         </li>
         <li v-if="groupIndex < menuItems.length - 1" class="border-t border-gray-100 dark:border-gray-700"></li>
@@ -62,7 +67,7 @@
 </template>
 
 <script setup>
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted, watch } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
 import Save from '../dlg/Save.vue';
 import { useAppStore } from '@/stores/appStore';
@@ -81,10 +86,6 @@ const props = defineProps({
     default: null,
   },
 });
-
-
-
-
 
 const menuItems = ref([
   {
@@ -116,7 +117,7 @@ const menuItems = ref([
       },
       {
         label: 'Open Recent',
-        action: () => handleAction('open-recent'),
+        submenu: [], // Will be populated dynamically
       },
     ],
   },
@@ -129,18 +130,60 @@ const menuItems = ref([
   {
     label: 'Configure',
     items: [
-      { label: 'Configure...', action: () => handleAction('configure') }, // Fixed typo
+      { label: 'Configure...', action: () => handleAction('configure') },
     ],
   },
 ]);
-
-
 
 const activeSubmenuIndex = ref(null);
 const dropdown = ref(null);
 const submenu = ref({});
 const submenuPositions = ref({});
 const appStore = useAppStore();
+const recentStore = useRecentStore();
+
+const recentSubmenu = computed(() => {
+  const recentItems = recentStore.recents;
+  
+
+  if (!recentItems || recentItems.length === 0) {
+    return [
+      {
+        items: [
+          { label: 'No recent files', action: () => {} }
+        ]
+      }
+    ];
+  }
+
+  return [
+    {
+      items: recentItems.map(item => ({
+        label: item.fileName || 'Untitled',
+        action: () => openRecentFile(item)
+      }))
+    }
+  ];
+});
+
+const openRecentFile = async (recentItem) => {
+  try {
+    emit('close');
+    appStore.redirect(recentItem);
+  } catch (error) {
+    showNotification(`Failed to open recent file: ${error.message}`, 'error');
+  }
+};
+
+const updateRecentSubmenu = () => {
+  const openOptionsGroup = menuItems.value.find(group => group.label === 'Open Options');
+  if (openOptionsGroup) {
+    const recentItem = openOptionsGroup.items.find(item => item.label === 'Open Recent');
+    if (recentItem) {
+      recentItem.submenu = recentSubmenu.value;
+    }
+  }
+};
 
 // Debounce utility for resize events
 const debounce = (fn, delay) => {
@@ -152,7 +195,6 @@ const debounce = (fn, delay) => {
 };
 
 const handleAction = async (id) => {
-  console.log(recentSubmenu)
   try {
     emit('close');
     const storageActions = {
@@ -173,10 +215,10 @@ const handleAction = async (id) => {
       case 'save':
         await handleSave();
         break;
-        case 'save-as':
+      case 'save-as':
         await handleSaveAs();
         break;
-      case 'configur':
+      case 'configure':
         await showDialog(Config);
         break;
       case 'rename':
@@ -189,23 +231,21 @@ const handleAction = async (id) => {
         break;
     }
   } catch (error) {
+    showNotification(`Action failed: ${error.message}`, 'error');
   }
 };
 
-
 const handleStorageAction = async (id, mode) => {
   try {
-    console.log(menuItems.value)
     const { pickFile } = await getStorageBridgeByName(mode);
     const user = useUserStore().getUser();
     const auth = await pickFile(user);
     useUserStore().addOrUpdateUser({ ...auth, mode });
-    const newPath = { mode, id: auth.file.id,fileName:auth.file.filename};
+    const newPath = { mode, id: auth.file.id, fileName: auth.file.filename };
     appStore.redirect(newPath);
     useRecentStore().addOrUpdateRemoveRecent(appStore.path);
-
   } catch (error) {
-    showNotification(`Failed to open from ${mode}`, 'error');
+    showNotification(`Failed to open from ${mode}: ${error.message}`, 'error');
     throw error;
   }
 };
@@ -224,30 +264,30 @@ const handleNewFile = async () => {
     throw error;
   }
 };
+
 const handleSaveAs = async () => {
   try {
     const orgPath = appStore.path;
     const newPath = await showDialog(Save);
     appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
     await appStore.saveData();
+    useRecentStore().addOrUpdateRemoveRecent(appStore.path);
   } catch (error) {
-    showNotification('Failed to create new file', 'error');
+    showNotification('Failed to save file', 'error');
     throw error;
   }
 };
-
 
 const handleSave = async () => {
   try {
     await useAppStore().saveData();
     showNotification('Saved Successfully!', 'success');
+    useRecentStore().addOrUpdateRemoveRecent(appStore.path);
   } catch (error) {
     showNotification('Save Failed!', 'error');
     throw error;
   }
 };
-
-
 
 const handleExport = () => {
   try {
@@ -258,8 +298,6 @@ const handleExport = () => {
     throw error;
   }
 };
-
-
 
 const handleItemClick = (item) => {
   if (!item.submenu) {
@@ -318,12 +356,17 @@ const debouncedCalculatePosition = debounce((groupIndex, itemIndex) => {
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
   window.addEventListener('resize', () => debouncedCalculatePosition(activeSubmenuIndex.value?.group, activeSubmenuIndex.value?.item));
+  updateRecentSubmenu();
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
   window.removeEventListener('resize', () => {});
 });
+
+watch(() => recentStore.recents, () => {
+  updateRecentSubmenu();
+}, { deep: true });
 </script>
 
 <style scoped>
