@@ -57,7 +57,7 @@ body * {
   display: block;
   position: absolute;
   height: 2px;
-  background-color: pink;
+  background-color: #34a853;
   left: var(--the-child-left);
   right: 0;
   bottom: 0;
