@@ -286,7 +286,7 @@ export const useAppStore = defineStore('app', () => {
     return alldata;
   }
 
-  function rediret(newPath) {
+  function redirect(newPath) {
     updatePath(newPath);
     initLoadTabsData();
   }
@@ -307,6 +307,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath, updatePath, newFile, rediret,exportFile: exportFileData
+    resetPath, updatePath, newFile, redirect,exportFile: exportFileData
   };
 });

@@ -53,7 +53,8 @@ const nameMap = {
 const modesRef = ref([
   { mode: 'G', name: "My Drive" }
   , { mode: 'G', name: "Pick a folder...", folder: true }
-  , { mode: 'L', name: "Browser" }
+  , { mode: 'B', name: "Browser" }
+  , { mode: 'L', name: "Local Storage(Deprecated)" }
   , { mode: 'D', name: "Device" }
 ])
 

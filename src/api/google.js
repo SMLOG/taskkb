@@ -287,78 +287,28 @@ export const pickFile = async (auth) => {
     });
 };
 
-const writeFile = async (dataObj, path, auth) => {
+export const writeFile = async (dataObj, path, auth) => {
     if (!dataObj || typeof dataObj !== 'object') {
         throw new Error('Invalid or missing data object');
     }
-    if (path && typeof path !== 'object') {
+    if (!path || typeof path !== 'object') {
         throw new Error('Invalid path');
     }
 
     const parentFolderId = path?.parent?.id;
-    if (parentFolderId) {
-        let permissionData;
-        const permissionCheck = await fetch(
-            `https://www.googleapis.com/drive/v3/files/${parentFolderId}/permissions/me?supportsAllDrives=true`,
-            {
-                method: 'GET',
-                headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
-            }
-        );
-
-        if (permissionCheck.status === 401) {
-            auth.accessToken = await refreshAccessToken();
-            const retryCheck = await fetch(
-                `https://www.googleapis.com/drive/v3/files/${parentFolderId}/permissions/me?supportsAllDrives=true`,
-                {
-                    headers: new Headers({ Authorization: `Bearer ${auth.accessToken}` }),
-                }
-            );
-
-            if (!retryCheck.ok) {
-                const errorData = await retryCheck.json();
-                throw new Error(`Failed to verify permissions: ${errorData.error.message}`);
-            }
-
-            permissionData = await retryCheck.json();
-        } else if (!permissionCheck.ok) {
-            const errorData = await permissionCheck.json();
-            throw new Error(`Failed to check permissions: ${errorData.error.message}`);
-        } else {
-            permissionData = await permissionCheck.json();
-        }
-
-        if (!['writer', 'owner'].includes(permissionData.role)) {
-            throw new Error('You do not have write permission for the selected folder. Please choose another folder.');
-        }
-    }
-
-    // Serialize dataObj to JSON
     const fileContent = JSON.stringify(dataObj, null, 2);
-    const blob = new Blob([fileContent], { type: 'application/json' });
-    const form = new FormData();
-
-    // Determine if we're creating a new file or updating an existing one
-    const isUpdate = path?.id !== undefined && path?.id?.trim() !== '';
+    const isUpdate = path?.id && path?.id.trim() !== '';
     const url = isUpdate
-        ? `https://www.googleapis.com/upload/drive/v3/files/${path?.id?.trim()}?uploadType=multipart&fields=id&supportsAllDrives=true`
+        ? `https://www.googleapis.com/upload/drive/v3/files/${path.id.trim()}?uploadType=multipart&fields=id&supportsAllDrives=true`
         : 'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&supportsAllDrives=true';
     const method = isUpdate ? 'PATCH' : 'POST';
 
-    // Include metadata only for new files
-    if (!isUpdate) {
-        const fileMetadata = {
-            name: path.fileName,
-            mimeType: 'application/json',
-            parents: parentFolderId ? [parentFolderId] : [],
-        };
-        form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
-    }
-
-    form.append('file', blob);
-
     const boundary = `boundary_${crypto.randomUUID().replace(/-/g, '')}`;
-    const metadata = { name: path.fileName };
+    const metadata = {
+        name: path.fileName,
+        mimeType: 'application/json',
+        ...(isUpdate ? {} : { parents: parentFolderId ? [parentFolderId] : [] }),
+    };
     const base64Data = btoa(fileContent);
     const body = [
         `--${boundary}`,
@@ -366,13 +316,13 @@ const writeFile = async (dataObj, path, auth) => {
         '',
         JSON.stringify(metadata),
         `--${boundary}`,
+        'Content-Type: application/json',
         'Content-Transfer-Encoding: base64',
         '',
         base64Data,
         `--${boundary}--`,
     ].join('\r\n');
 
-    // Send request
     const response = await fetch(url, {
         method,
         headers: {

@@ -13,7 +13,7 @@
         </svg>
       </button>
       <button
-        @click="share"
+        @click="handleShare"
         class="bg-blue-500 text-white dark:bg-blue-700 dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-blue-600 dark:hover:bg-blue-800 flex items-center transition-colors duration-200"
       >
         <svg class="w-3 h-3 mr-0.5" fill="currentColor" viewBox="0 0 24 24">
@@ -49,14 +49,29 @@ import MenuItems from './MenuItems.vue';
 import { getStorageBridgeByName } from '@/api/bridge';
 import { useAppStore } from '@/stores/appStore';
 import { useUserStore } from '@/stores/userStore';
+import { showDialog } from '@/composables/useSystem';
+import ConfirmShare from '../dlg/ConfirmShare.vue';
 
 const isProfileVisible = ref(false);
 const showProfileButton = ref(null);
 const showMenu = ref(null);
 const isMenuVisible = ref(false);
 
-const share =  async () => {
+const handleShare =  async () => {
 
+  if(useAppStore().path.mode!='G'){
+    await showDialog(ConfirmShare);
+    const { pickFolder } = await getStorageBridgeByName('G');
+    const user = useUserStore().getUser();
+    const auth = await pickFolder(user);
+    const mode = 'G';
+    useUserStore().addOrUpdateUser({ ...auth, mode });
+    const newPath = { mode, id: undefined,parent:{id:auth.parent.id}};
+    const appStore = useAppStore();
+    appStore.updatePath({ ... appStore.path,...newPath });
+    await appStore.saveData();
+  }
+  
   const { openShareDialog } = await getStorageBridgeByName('G');
   
         const user = useUserStore().getUser();
