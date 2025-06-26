@@ -74,6 +74,60 @@ import { downloadJSON } from '@/lib/parse';
 import {showNotification,showDialog} from '@/composables/useSystem';
 
 const emit = defineEmits(['item-clicked', 'close']);
+const props = defineProps({
+  showButton: {
+    type: [Object, null],
+    default: null,
+  },
+});
+
+const menuItems = ref([
+  {
+    label: 'File Operations',
+    items: [
+    { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
+    { label: 'Save as', action: () => handleAction('save-as') },
+    { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
+      { label: 'Rename...', action: () => handleAction('rename') },
+      { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
+    ],
+  },
+  {
+    label: 'Open Options',
+    items: [
+      {
+        label: 'Open From...',
+        submenu: [
+          {
+            label: 'Cloud Storage',
+            items: [
+              { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
+              { label: 'Browser', action: () => handleAction('open-from-browser') },
+              { label: 'Device', action: () => handleAction('open-from-device') },
+              { label: 'LocalStorage(deprecated)', action: () => handleAction('open-from-local') },
+            ],
+          },
+        ],
+      },
+      { label: 'Open Recent', action: () => handleAction('open-recent') },
+    ],
+  },
+  {
+    label: 'Import/Export',
+    items: [
+      { label: 'Export as', action: () => handleAction('export') },
+    ],
+  },
+  {
+    label: 'Configure',
+    items: [
+      { label: 'Configure...', action: () => handleAction('configur') },
+    ],
+  },
+]);
+
+
+
 const activeSubmenuIndex = ref(null);
 const dropdown = ref(null);
 const submenu = ref({});
@@ -109,6 +163,9 @@ const handleAction = async (id) => {
         break;
       case 'save':
         await handleSave();
+        break;
+        case 'save-as':
+        await handleSaveAs();
         break;
       case 'configur':
         await showDialog(Config);
@@ -154,6 +211,18 @@ const handleNewFile = async () => {
     throw error;
   }
 };
+const handleSaveAs = async () => {
+  try {
+    const orgPath = appStore.path;
+    const newPath = await showDialog(Save);
+    appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
+    await appStore.saveData();
+  } catch (error) {
+    showNotification('Failed to create new file', 'error');
+    throw error;
+  }
+};
+
 
 const handleSave = async () => {
   try {
@@ -165,6 +234,8 @@ const handleSave = async () => {
   }
 };
 
+
+
 const handleExport = () => {
   try {
     const data = appStore.exportFile();
@@ -175,56 +246,7 @@ const handleExport = () => {
   }
 };
 
-const menuItems = ref([
-  {
-    label: 'File Operations',
-    items: [
-      { label: 'Save', shortcut: '⌘S', action: () => handleAction('save') },
-      { label: 'New...', shortcut: '⌘N', action: () => handleAction('new') },
-      { label: 'Rename...', action: () => handleAction('rename') },
-      { label: 'Close', shortcut: '⌘W', action: () => handleAction('close'), destructive: true },
-    ],
-  },
-  {
-    label: 'Open Options',
-    items: [
-      {
-        label: 'Open From...',
-        submenu: [
-          {
-            label: 'Cloud Storage',
-            items: [
-              { label: 'Google Drive', action: () => handleAction('open-from-google-drive') },
-              { label: 'Browser', action: () => handleAction('open-from-browser') },
-              { label: 'Device', action: () => handleAction('open-from-device') },
-              { label: 'LocalStorage(deprecated)', action: () => handleAction('open-from-local') },
-            ],
-          },
-        ],
-      },
-      { label: 'Open Recent', action: () => handleAction('open-recent') },
-    ],
-  },
-  {
-    label: 'Import/Export',
-    items: [
-      { label: 'Export as', action: () => handleAction('export') },
-    ],
-  },
-  {
-    label: 'Configure',
-    items: [
-      { label: 'Configure...', action: () => handleAction('configur') },
-    ],
-  },
-]);
 
-const props = defineProps({
-  showButton: {
-    type: [Object, null],
-    default: null,
-  },
-});
 
 const handleItemClick = (item) => {
   if (!item.submenu) {
