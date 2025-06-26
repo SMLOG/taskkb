@@ -3,38 +3,38 @@
 import TreeOperation from '@/components/tree/TreeOperation.vue'
 
 import FormatTool from "@/components/tools/FormatTool.vue";
-import NotificationProvider from '@/components/NotificationProvider.vue';
 import TabsContainer from './components/TabsContainer.vue';
 import { useAppStore } from '@/stores/appStore';
 import { storeToRefs } from 'pinia';
 import { useDialog } from '@/composables/useDialog';
-import {useHashStore} from '@/stores/hashStore';
+import { useHashStore } from '@/stores/hashStore';
 import { ref } from 'vue';
 import Dialog from '@/components/dlg/Dialog.vue'
 import About from '@/components/About.vue';
 import CtrlSave from './components/CtrlSave.vue';
 import Notification from '@/components/notify/Notification.vue'
 
-const dlg=ref(null);
-const notification=ref(null);
-useDialog(dlg,notification);
+const dlg = ref(null);
+const notification = ref(null);
+useDialog(dlg, notification);
 useHashStore();
 
 const appStore = useAppStore();
 
-const {activeTabRef} = storeToRefs(appStore);
+const { activeTabRef } = storeToRefs(appStore);
 
 
 
 </script>
 
 <template>
-  <main class="flex-grow relative" >
-    <About v-if="appStore.loading"/>
-    <NotificationProvider class="h-full" v-if="!appStore.loading">
-      <div class="flex flex-col h-full">
-        <div> <TabsContainer /></div>
-        <div class="flex-1  flex ">
+  <main class="flex-grow relative">
+    <About v-if="appStore.loading" />
+    <div class="flex flex-col h-full">
+      <div>
+        <TabsContainer />
+      </div>
+      <div class="flex-1  flex ">
 
         <div class="flex-1 relative flex">
           <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full mx-1">
@@ -42,16 +42,15 @@ const {activeTabRef} = storeToRefs(appStore);
               <router-view>
               </router-view>
             </FormatTool>
-            <TreeOperation v-if="activeTabRef!=-1" />
+            <TreeOperation v-if="activeTabRef != -1" />
           </div>
         </div>
-        </div>
       </div>
-    </NotificationProvider>
+    </div>
   </main>
-<Dialog ref="dlg" />
-<Notification ref="notification" />
-<CtrlSave/>
+  <Dialog ref="dlg" />
+  <Notification ref="notification" />
+  <CtrlSave />
 
 </template>
 

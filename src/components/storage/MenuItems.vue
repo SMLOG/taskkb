@@ -72,6 +72,7 @@ import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
 import { downloadJSON } from '@/lib/parse';
+import {showNotification} from '@/composables/useSystem';
 
 const emit = defineEmits(['item-clicked', 'close']);
 const activeSubmenuIndex = ref(null);
@@ -127,10 +128,7 @@ const handleAction = async (id) => {
   }
 };
 
-function showNotification(message,type){
-      useDialog().notification().open({message:message,type:type})
 
-}
 const handleStorageAction = async (id, mode) => {
   try {
     const { pickFile } = await getStorageBridgeByName(mode);

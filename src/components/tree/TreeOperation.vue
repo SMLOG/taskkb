@@ -111,10 +111,9 @@ import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
 import { useDialog } from '@/composables/useDialog';
 import {downloadJSON} from '@/lib/parse';
+import {showNotification} from '@/composables/useSystem';
 
 
-
-const showNotification = inject('showNotification');
 
 const tree = useTree();
 
