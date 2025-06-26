@@ -123,8 +123,7 @@ const cols = computed(() => appStore.configRef?.cols);
 const config = computed(() => appStore.configRef);
 
 // Emoji validation regex (basic, covers most common emojis)
-const emojiRegex = /^[\p{Emoji}\u200D]+$/u;
-
+const emojiRegex = /[\u{2700}-\u{27BF}]/u;
 // Debounced update function
 const debouncedUpdateEmoji = debounce((emoji: string) => {
   appStore.updateTabEmoj(config.value.icon, emoji);
