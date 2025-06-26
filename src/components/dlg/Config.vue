@@ -2,7 +2,7 @@
   <!-- Popup Modal -->
   <div>
     <div class="flex flex-col space-y-3 max-h-[90vh] overflow-y-auto min-h-0">
-      <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between bg-white dark:bg-gray-800">
+      <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 flex justify-between bg-white dark:bg-gray-800">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Columns Configuration</h3>
         <button class="rounded bg-blue-500 px-3 py-1.5 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700" @click="addCol">
           + Add Column

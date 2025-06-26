@@ -9,7 +9,7 @@
           class="flex bg-white dark:bg-gray-800 p-6 rounded-lg shadow-xl text-center relative border border-gray-200 dark:border-gray-700 max-w-[95vw] w-full max-h-[90vh] relative"
           >
           <button @click="handleCancel"
-            class="absolute top-2 right-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-1"
+            class="absolute top-0 right-0 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 rounded-full p-1"
             aria-label="Close">
             &times;
           </button>
