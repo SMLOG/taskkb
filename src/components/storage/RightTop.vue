@@ -2,16 +2,16 @@
   <div class="max-w-md mx-2 mt-1 relative">
     <div class="flex space-x-2">
       <button
-        @click="showDropDownMenuItems"
-        ref="showMenu"
-        class="text-white dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center transition-colors duration-200"
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="4" cy="12" r="2" fill="black"/>
-          <circle cx="12" cy="12" r="2" fill="black"/>
-          <circle cx="20" cy="12" r="2" fill="black"/>
-        </svg>
-      </button>
+  @click="showDropDownMenuItems"
+  ref="showMenu"
+  class="text-white dark:text-gray-100 px-0.5 py-0.25 text-[8px] rounded hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center transition-colors duration-200"
+>
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="4" cy="12" r="1" fill="black"/>
+    <circle cx="12" cy="12" r="1" fill="black"/>
+    <circle cx="20" cy="12" r="1" fill="black"/>
+  </svg>
+</button>
       <button
         @click="handleShare"
         class="bg-blue-500 text-white dark:bg-blue-700 dark:text-gray-100 px-1.5 py-0.5 text-xs rounded hover:bg-blue-600 dark:hover:bg-blue-800 flex items-center transition-colors duration-200"
@@ -21,7 +21,6 @@
             d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7l-7.05 4.11c-.54-.5-1.25-.81-2.04-.81-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"
           />
         </svg>
-        Share
       </button>
       <button
         ref="showProfileButton"
