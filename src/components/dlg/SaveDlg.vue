@@ -43,7 +43,6 @@ import { getStorageBridgeByName } from '@/api/bridge';
 
 import { storeToRefs } from 'pinia';
 import { useUserStore } from '@/stores/userStore';
-import { useDialog } from '@/composables/useDialog';
 
 
 const fileName = ref("Untitled.treegridio");

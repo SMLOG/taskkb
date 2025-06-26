@@ -109,16 +109,16 @@ import { useTree } from '@/composables/useTree';
 import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
-import { useDialog } from '@/composables/useDialog';
 import {downloadJSON} from '@/lib/parse';
 import {showNotification} from '@/composables/useSystem';
+import {showDialog} from '@/composables/useSystem';
 
 
 
 const tree = useTree();
 
 const openConfig = async()=>{
-  await useDialog().dialog().open(Config,null,{size:'2md'});
+  await showDialog(Config,null,{size:'2md'});
 }
 
 

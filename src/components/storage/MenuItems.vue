@@ -62,7 +62,6 @@
 </template>
 
 <script setup>
-import { useDialog } from '@/composables/useDialog';
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import NewTab from '../dlg/NewTab.vue';
 import Save from '../dlg/Save.vue';
@@ -72,7 +71,7 @@ import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
 import { downloadJSON } from '@/lib/parse';
-import {showNotification} from '@/composables/useSystem';
+import {showNotification,showDialog} from '@/composables/useSystem';
 
 const emit = defineEmits(['item-clicked', 'close']);
 const activeSubmenuIndex = ref(null);
@@ -112,10 +111,10 @@ const handleAction = async (id) => {
         await handleSave();
         break;
       case 'configur':
-        await useDialog().dialog().open(Config);
+        await showDialog(Config);
         break;
       case 'rename':
-        await useDialog().dialog().open(Rename);
+        await showDialog(Rename);
         break;
       case 'export':
         handleExport();
@@ -124,7 +123,6 @@ const handleAction = async (id) => {
         break;
     }
   } catch (error) {
-    //useDialog().notification().open({message:`Action failed: ${id}`})
   }
 };
 
@@ -146,9 +144,9 @@ const handleStorageAction = async (id, mode) => {
 const handleNewFile = async () => {
   try {
     const orgPath = appStore.path;
-    const newPath = await useDialog().dialog().open(Save);
+    const newPath = await showDialog(Save);
     appStore.newFile();
-    await useDialog().dialog().open(NewTab);
+    await showDialog(NewTab);
     appStore.updatePath({ ...newPath, tabId: appStore.getCurrentTab().id });
     await appStore.saveData();
   } catch (error) {

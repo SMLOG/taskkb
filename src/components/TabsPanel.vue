@@ -17,9 +17,10 @@ import { useAppStore } from "@/stores/appStore";
 import Tabs from '@/components/Tabs.vue';
 import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
 import { onMounted } from 'vue';
-import { useDialog } from '@/composables/useDialog';
 import NewTab from './dlg/NewTab.vue';
 import Save from './dlg/Save.vue';
+import {showDialog} from '@/composables/useSystem';
+
 const appStore = useAppStore();
 
 
@@ -31,12 +32,12 @@ const addTab = async () => {
     appStore.newFile( );
   }
 
-  await useDialog().dialog().open(NewTab);
+  await showDialog(NewTab);
 
   if(isNew){
     console.log(appStore.path)
     
-    const newPath  = await  useDialog().dialog().open(Save);
+    const newPath  = await  showDialog(Save);
     appStore.updatePath( {...newPath,tabId:appStore.getCurrentTab().id});
   }
 
