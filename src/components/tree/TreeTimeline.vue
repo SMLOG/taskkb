@@ -6,6 +6,8 @@
       @mousedown.left="handleMouseDown"
       @dragstart="dragstart"
       @dragover="dragOver"
+      @dragenter="dragenter"
+      @dragleave="dragleave"
       @drop="drop"
       @mousemove="handleMouseCellsMove"
       @mouseup.left="handleMouseUp"
@@ -72,7 +74,7 @@ const thRefs = ref([]);
 const appStore = useAppStore();
 
 const {
-  dragOver,
+  dragOver,dragenter,dragleave,
   handleMouseDown,
   handleMouseCellsMove,
   handleMouseUp,

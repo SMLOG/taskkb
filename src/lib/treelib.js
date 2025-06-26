@@ -51,10 +51,14 @@ export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStar
   let xDiff = event.clientX - dragStartClientX;
 
   for (let depth of selectDepths.sort((a, b) => b.localeCompare(a))) {
+
+    if(selectDetphEnd.indexOf(depth)==0)return;
+
     let srcNode = deleteNode(rootTree, depth);
 
     if (xDiff > 50) {
       // Make srcNode a child of targetNode
+
       if (!targetNode._childs) targetNode._childs = [];
       targetNode._childs.push(...srcNode);
     } else {

@@ -69,6 +69,7 @@ export function useTree() {
 
   const dragOver = (event) => {
     event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
   };
 
   const selectRowSch = (row, event) => {
@@ -370,6 +371,8 @@ export function useTree() {
     }
 
     isDraging.value = true;
+
+    interceptor.classList.add('dragging');
   };
 
   const drop = (event) => {
@@ -383,6 +386,7 @@ export function useTree() {
     moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
     selectDepths.length = 0;
     isDrag.value = false;
+    interceptor.classList.remove('drop-highlight');
   };
 
   const getCacWidth = () => {
@@ -548,15 +552,55 @@ export function useTree() {
       .join("\n");
     return text;
   }
+
+  function dragenter(e) {
+    const target = e.target.closest('.row');
+    if(!target) return;
+
+    const { depth } = target.dataset;
+
+    console.log('dragenter',depth)
+    if (target && !target.classList.contains('dragging')) {
+        target.classList.add('drop-highlight');
+    }
+}
+function dragleave(e) {
+  const target = e.target.closest('.row');
+  
+  if (!target) return;
+  
+  const { depth } = target.dataset;
+  console.log('dragleave', depth);
+
+  // Check if the mouse is still within the target or its children
+  const relatedTarget = e.relatedTarget;
+  const element = document.body;
+
+  let xDiff = e.clientX - dragStartClientX;
+  console.log(xDiff)
+
+  element.style.setProperty('--the-child-left', xDiff>=50?'50px':'0px');
+  if (relatedTarget && target.contains(relatedTarget)) {
+    return; // Mouse is still within the target, so do nothing
+  }
+
+  // Proceed with removing the highlight if the mouse has truly left the target
+  target.classList.remove('drop-highlight');
+  element.style.setProperty('--the-child-left', '0px');
+
+}
+
   return {
     calDiffDates,
-    dragOver,
     handleMouseDown,
     handleMouseCellsMove,
     handleMouseUp,
     weeksRef,
     cellClass,
     dragstart,
+    dragOver,
+    dragenter,
+    dragleave,
     drop,
     getCacWidth,
     handleKeyDown,
