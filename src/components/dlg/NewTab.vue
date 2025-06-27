@@ -13,7 +13,15 @@
           </svg>
         </button>
         <input type="file" ref="fileInput" @change="selectTemplate" accept=".json" class="hidden" />
-
+        <button @click="createFromJson"
+          class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
+          <span class="text-gray-800 dark:text-gray-200">create from json file</span>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+        </button>
       </div>
 
       <div class="flex items-center my-4">
@@ -56,6 +64,8 @@ import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
 import {deepClone} from '@/lib/parse';
+import { showDialog } from '@/composables/useSystem';
+import JsonDataMapper from '@/data/JsonDataMapper.vue';
 
 
 const appStore = useAppStore();
@@ -99,6 +109,9 @@ const openFile = () => {
 
 };
 
+async function createFromJson(){
+  await showDialog(JsonDataMapper);
+}
 function loadFile(event) {
   const file = event.target.files[0];
   if (file && file.type === "application/json") {

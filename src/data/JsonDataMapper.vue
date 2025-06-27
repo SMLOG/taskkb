@@ -4,6 +4,8 @@ import { ref, computed } from 'vue';
 const jsonData = ref({});
 const selectedList = ref([]);
 const columnMappings = ref({});
+const columnNames = ref({});
+const columnExpressions = ref({});
 const listProperty = ref('');
 const mappingSectionVisible = ref(false);
 const tableSectionVisible = ref(false);
@@ -16,7 +18,6 @@ const findArrayProperties = (obj, prefix = '') => {
     const fullKey = prefix ? `${prefix}.${key}` : key;
     if (Array.isArray(obj[key])) {
       arrayProps.push(fullKey);
-      // Recursively check elements of the array if they are objects
       if (obj[key].length > 0 && typeof obj[key][0] === 'object' && !Array.isArray(obj[key][0])) {
         obj[key].forEach((item, index) => {
           if (typeof item === 'object' && item !== null) {
@@ -61,7 +62,6 @@ const handleFileUpload = (event) => {
 // Handle list property selection
 const handleListSelection = () => {
   if (listProperty.value) {
-    // Access nested property using dot notation and array indexing
     let selected = jsonData.value;
     const keys = listProperty.value.split('.').reduce((acc, key) => {
       if (key.includes('[')) {
@@ -87,6 +87,12 @@ const handleListSelection = () => {
         return;
       }
       columnMappings.value = {};
+      columnNames.value = {};
+      columnExpressions.value = {};
+      jsonProperties.value.forEach(prop => {
+        columnNames.value[prop] = prop; // Default column name
+        columnExpressions.value[prop] = 'value'; // Default expression
+      });
       mappingSectionVisible.value = true;
     } catch (err) {
       alert('Error accessing selected property');
@@ -115,8 +121,32 @@ const drop = (e, column) => {
   columnMappings.value = { ...columnMappings.value, [column]: property };
 };
 
+// Update column name
+const updateColumnName = (prop, value) => {
+  columnNames.value = { ...columnNames.value, [prop]: value };
+};
+
+// Update column expression
+const updateColumnExpression = (prop, value) => {
+  columnExpressions.value = { ...columnExpressions.value, [prop]: value || 'value' };
+};
+
+// Evaluate expression safely
+const evaluateExpression = (expression, value, item, index, list) => {
+  try {
+    const fn = new Function('value', 'item', 'index', 'list', `return ${expression}`);
+    return fn(value, item, index, list);
+  } catch (err) {
+    return `Error: ${err.message}`;
+  }
+};
+
 // Generate table
 const generateTable = () => {
+  if (Object.keys(columnMappings.value).length === 0) {
+    alert('Please map at least one column before generating the table.');
+    return;
+  }
   tableSectionVisible.value = true;
 };
 </script>
@@ -160,9 +190,14 @@ const generateTable = () => {
           <div class="mt-2 space-y-2">
             <div v-for="prop in jsonProperties" :key="prop" class="dropzone p-2 border rounded"
               @dragover="dragOver" @dragleave="dragLeave" @drop="drop($event, prop)">
-              <span class="font-medium">Column: {{ prop }}</span>
-              <br v-if="columnMappings[prop]">
-              <span v-if="columnMappings[prop]">Mapped to: {{ columnMappings[prop] }}</span>
+              <label class="block text-sm font-medium text-gray-700">Column Name:</label>
+              <input type="text" v-model="columnNames[prop]" @input="updateColumnName(prop, $event.target.value)"
+                class="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm">
+              <label class="block text-sm font-medium text-gray-700 mt-2">Value Expression:</label>
+              <input type="text" v-model="columnExpressions[prop]" @input="updateColumnExpression(prop, $event.target.value)"
+                class="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm"
+                placeholder="e.g., value.toUpperCase() or item.name + ' (' + index + ')'">
+              <span v-if="columnMappings[prop]" class="block mt-1">Mapped to: {{ columnMappings[prop] }}</span>
             </div>
           </div>
         </div>
@@ -180,14 +215,14 @@ const generateTable = () => {
           <thead>
             <tr class="bg-gray-200">
               <th v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2">
-                {{ column }}
+                {{ columnNames[column] || column }}
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in selectedList" :key="index">
               <td v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2">
-                {{ item[columnMappings[column]] || '' }}
+                {{ columnMappings[column] ? evaluateExpression(columnExpressions[column], item[columnMappings[column]], item, index, selectedList) : '' }}
               </td>
             </tr>
           </tbody>
@@ -203,7 +238,7 @@ const generateTable = () => {
   user-select: none;
 }
 .dropzone {
-  min-height: 40px;
+  min-height: 100px;
   border: 2px dashed #ccc;
 }
 .dropzone.dragover {
