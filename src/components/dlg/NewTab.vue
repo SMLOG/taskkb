@@ -110,7 +110,7 @@ const openFile = () => {
 };
 
 async function createFromJson(){
-  await showDialog(JsonDataMapper);
+  await showDialog(JsonDataMapper,null,{size:'2md'});
 }
 function loadFile(event) {
   const file = event.target.files[0];

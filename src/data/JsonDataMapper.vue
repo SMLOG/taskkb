@@ -14,21 +14,32 @@ const listSelectionVisible = ref(false);
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
   const arrayProps = [];
-  Object.keys(obj).forEach(key => {
-    const fullKey = prefix ? `${prefix}.${key}` : key;
-    if (Array.isArray(obj[key])) {
-      arrayProps.push(fullKey);
-      if (obj[key].length > 0 && typeof obj[key][0] === 'object' && !Array.isArray(obj[key][0])) {
-        obj[key].forEach((item, index) => {
-          if (typeof item === 'object' && item !== null) {
-            arrayProps.push(...findArrayProperties(item, `${fullKey}[${index}]`));
-          }
-        });
+  // Check if the root is an array
+  if (Array.isArray(obj)) {
+    arrayProps.push('root');
+    // Process each item in the root array if they are objects
+    obj.forEach((item, index) => {
+      if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
+        arrayProps.push(...findArrayProperties(item, `root[${index}]`));
       }
-    } else if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      arrayProps.push(...findArrayProperties(obj[key], fullKey));
-    }
-  });
+    });
+  } else if (typeof obj === 'object' && obj !== null) {
+    Object.keys(obj).forEach(key => {
+      const fullKey = prefix ? `${prefix}.${key}` : key;
+      if (Array.isArray(obj[key])) {
+        arrayProps.push(fullKey);
+        if (obj[key].length > 0 && typeof obj[key][0] === 'object' && !Array.isArray(obj[key][0])) {
+          obj[key].forEach((item, index) => {
+            if (typeof item === 'object' && item !== null) {
+              arrayProps.push(...findArrayProperties(item, `${fullKey}[${index}]`));
+            }
+          });
+        }
+      } else if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        arrayProps.push(...findArrayProperties(obj[key], fullKey));
+      }
+    });
+  }
   return arrayProps;
 };
 
@@ -63,40 +74,46 @@ const handleFileUpload = (event) => {
 const handleListSelection = () => {
   if (listProperty.value) {
     let selected = jsonData.value;
-    const keys = listProperty.value.split('.').reduce((acc, key) => {
-      if (key.includes('[')) {
-        const [prop, index] = key.split('[');
-        acc.push(prop, parseInt(index.replace(']', '')));
-      } else {
-        acc.push(key);
-      }
-      return acc;
-    }, []);
-    
-    try {
-      for (const key of keys) {
-        selected = selected[key];
-        if (!selected) {
-          alert('Invalid property path');
-          return;
+    if (listProperty.value === 'root') {
+      selected = jsonData.value; // Root is the array
+    } else {
+      const keys = listProperty.value.split('.').reduce((acc, key) => {
+        if (key.includes('[')) {
+          const [prop, index] = key.split('[');
+          acc.push(prop, parseInt(index.replace(']', '')));
+        } else {
+          acc.push(key);
         }
-      }
-      selectedList.value = selected;
-      if (!Array.isArray(selectedList.value) || selectedList.value.length === 0 || typeof selectedList.value[0] !== 'object' || Array.isArray(selectedList.value[0])) {
-        alert('Selected property must be an array of objects');
+        return acc;
+      }, []);
+      
+      try {
+        for (const key of keys) {
+          selected = selected[key];
+          if (!selected) {
+            alert('Invalid property path');
+            return;
+          }
+        }
+      } catch (err) {
+        alert('Error accessing selected property');
         return;
       }
-      columnMappings.value = {};
-      columnNames.value = {};
-      columnExpressions.value = {};
-      jsonProperties.value.forEach(prop => {
-        columnNames.value[prop] = prop; // Default column name
-        columnExpressions.value[prop] = 'value'; // Default expression
-      });
-      mappingSectionVisible.value = true;
-    } catch (err) {
-      alert('Error accessing selected property');
     }
+    
+    selectedList.value = selected;
+    if (!Array.isArray(selectedList.value) || selectedList.value.length === 0 || typeof selectedList.value[0] !== 'object' || Array.isArray(selectedList.value[0])) {
+      alert('Selected property must be an array of objects');
+      return;
+    }
+    columnMappings.value = {};
+    columnNames.value = {};
+    columnExpressions.value = {};
+    jsonProperties.value.forEach(prop => {
+      columnNames.value[prop] = prop; // Default column name
+      columnExpressions.value[prop] = 'value'; // Default expression
+    });
+    mappingSectionVisible.value = true;
   }
 };
 
