@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { useAppStore } from "@/stores/appStore";
 import Tabs from '@/components/Tabs.vue';
 import ConfirmPopUp from '@/components/ConfirmPopUp.vue';
@@ -56,7 +56,8 @@ const confirmRemoveTab = () => {
 
 }
 
-onMounted(() => {
+onMounted(async() => {
+  await new Promise((resolve)=>setTimeout(resolve,1000));
   if (!appStore.path) {
     addTab();
   }

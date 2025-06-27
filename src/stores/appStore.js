@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
 import { getStorageBridge, getStorageBridgeByName } from '@/api/bridge';
 import { loopTree } from '@/lib/treelib';
 import { weeksBetween } from '@/lib/schedule';
@@ -33,7 +33,7 @@ export const useAppStore = defineStore('app', () => {
     })
     else{
       const recents = useRecentStore().recents;
-      if(recents.length>0)redirect(recents[recents.length-1])
+      if(recents.length>0)return redirect(recents[recents.length-1])
     }
     await initLoadTabsData();
 
@@ -291,9 +291,10 @@ export const useAppStore = defineStore('app', () => {
     return alldata;
   }
 
-  function redirect(newPath) {
+ async function redirect(newPath) {
     //updatePath(newPath);
-    hashStore.redirect(newPath);
+    await nextTick();
+    return hashStore.redirect(newPath);
     //initLoadTabsData();
   }
 
