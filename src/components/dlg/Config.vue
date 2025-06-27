@@ -2,7 +2,7 @@
   <!-- Popup Modal -->
   <div>
     <div class="flex flex-col space-y-3 max-h-[90vh] overflow-y-auto min-h-0">
-      <div class="sticky top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 flex justify-between bg-white dark:bg-gray-800">
+      <div class="sticky!important top-0 z-10 pb-4 border-b border-gray-200 dark:border-gray-700 flex justify-between bg-white dark:bg-gray-800">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Columns Configuration</h3>
         <button class="rounded bg-blue-500 px-3 py-1.5 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700" @click="addCol">
           + Add Column
@@ -43,7 +43,7 @@
       </div>
 
       <!-- General Settings -->
-      <div class="mt-6 flex gap-6 sticky bottom-0 bg-white dark:bg-gray-800">
+      <div class="mt-6 flex gap-6 sticky!important bottom-0 bg-white dark:bg-gray-800 ">
         <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
           <input type="checkbox" v-model="config.showSch" class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
           Show Schedule
