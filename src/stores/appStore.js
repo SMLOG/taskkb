@@ -5,6 +5,7 @@ import { loopTree } from '@/lib/treelib';
 import { weeksBetween } from '@/lib/schedule';
 import { useUserStore } from './userStore';
 import { useHashStore } from './hashStore';
+import { useRecentStore } from './recentsStore';
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -25,11 +26,15 @@ export const useAppStore = defineStore('app', () => {
 
   async function loadFile(storageType, fileId, tabId) {
 
-    storageType && fileId && updatePath({
+    if(storageType && fileId ) updatePath({
       mode: storageType,
       id: fileId,
       tabId
-    });
+    })
+    else{
+      const recents = useRecentStore().recents;
+      if(recents.length>0)redirect(recents[recents.length-1])
+    }
     await initLoadTabsData();
 
   }
@@ -194,7 +199,7 @@ export const useAppStore = defineStore('app', () => {
 
   async function setActiveTab(index) {
     try {
-      if (activeTabRef.value === index) return;
+      //if (activeTabRef.value === index) return;
       if (index >= 0 && index < tabs.value.length) {
         activeTabRef.value = index;
         const tab = tabs.value[index];
@@ -287,8 +292,9 @@ export const useAppStore = defineStore('app', () => {
   }
 
   function redirect(newPath) {
-    updatePath(newPath);
-    initLoadTabsData();
+    //updatePath(newPath);
+    hashStore.redirect(newPath);
+    //initLoadTabsData();
   }
 
   function updateTabEmoj(icon,emj){
