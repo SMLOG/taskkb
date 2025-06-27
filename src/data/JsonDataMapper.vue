@@ -10,6 +10,7 @@ const listProperty = ref('');
 const mappingSectionVisible = ref(false);
 const tableSectionVisible = ref(false);
 const listSelectionVisible = ref(false);
+const draggedColumn = ref(null);
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -104,18 +105,21 @@ const handleListSelection = () => {
       alert('Selected property must be an array of objects');
       return;
     }
+    // Automatically map all properties to columns
     columnMappings.value = {};
     columnNames.value = {};
     columnExpressions.value = {};
     jsonProperties.value.forEach(prop => {
-      columnNames.value[prop] = prop; // Default column name
-      columnExpressions.value[prop] = 'value'; // Default expression
+      columnMappings.value[prop] = prop;
+      columnNames.value[prop] = prop;
+      columnExpressions.value[prop] = 'value';
     });
     mappingSectionVisible.value = true;
+    tableSectionVisible.value = true;
   }
 };
 
-// Drag and drop handlers
+// Drag and drop handlers for property mapping
 const dragStart = (e, property) => {
   e.dataTransfer.setData('text/plain', property);
 };
@@ -134,6 +138,51 @@ const drop = (e, column) => {
   e.currentTarget.classList.remove('dragover');
   const property = e.dataTransfer.getData('text/plain');
   columnMappings.value = { ...columnMappings.value, [column]: property };
+};
+
+// Drag and drop handlers for column reordering
+const dragStartColumn = (e, column) => {
+  draggedColumn.value = column;
+  e.dataTransfer.setData('text/plain', column);
+};
+
+const dragOverColumn = (e) => {
+  e.preventDefault();
+  e.currentTarget.classList.add('dragover-column');
+};
+
+const dragLeaveColumn = (e) => {
+  e.currentTarget.classList.remove('dragover-column');
+};
+
+const dropColumn = (e, targetColumn) => {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover-column');
+  if (draggedColumn.value && draggedColumn.value !== targetColumn) {
+    const columns = Object.keys(columnMappings.value);
+    const fromIndex = columns.indexOf(draggedColumn.value);
+    const toIndex = columns.indexOf(targetColumn);
+    
+    // Reorder columns
+    const newColumns = [...columns];
+    newColumns.splice(fromIndex, 1);
+    newColumns.splice(toIndex, 0, draggedColumn.value);
+    
+    // Update columnMappings, columnNames, and columnExpressions
+    const newMappings = {};
+    const newNames = {};
+    const newExpressions = {};
+    newColumns.forEach(col => {
+      newMappings[col] = columnMappings.value[col];
+      newNames[col] = columnNames.value[col];
+      newExpressions[col] = columnExpressions.value[col];
+    });
+    
+    columnMappings.value = newMappings;
+    columnNames.value = newNames;
+    columnExpressions.value = newExpressions;
+  }
+  draggedColumn.value = null;
 };
 
 // Remove mapping
@@ -163,10 +212,10 @@ const evaluateExpression = (expression, value, item, index, list) => {
   }
 };
 
-// Generate table
+// Generate table (for manual refresh if needed)
 const generateTable = () => {
   if (Object.keys(columnMappings.value).length === 0) {
-    alert('Please map at least one column before generating the table.');
+    alert('No columns are mapped. Please select a list to map columns.');
     return;
   }
   tableSectionVisible.value = true;
@@ -196,7 +245,7 @@ const generateTable = () => {
 
     <!-- Column Mapping UI -->
     <div v-if="mappingSectionVisible" class="mb-6">
-      <h2 class="text-lg font-semibold mb-2">Map JSON Properties to Table Columns</h2>
+      <h2 class="text-lg font-semibold mb-2">Customize Table Columns</h2>
       <div class="grid grid-cols-2 gap-4">
         <div>
           <h3 class="text-sm font-medium text-gray-700">Available JSON Properties</h3>
@@ -230,7 +279,7 @@ const generateTable = () => {
         </div>
       </div>
       <button @click="generateTable" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-        Generate Table
+        Refresh Table
       </button>
     </div>
 
@@ -241,8 +290,11 @@ const generateTable = () => {
         <table class="min-w-full bg-white border border-gray-300">
           <thead>
             <tr class="bg-gray-200">
-              <th v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2">
-                {{ columnNames[column] || column }}
+              <th v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2 cursor-move"
+                draggable="true" @dragstart="dragStartColumn($event, column)"
+                @dragover="dragOverColumn" @dragleave="dragLeaveColumn" @drop="dropColumn($event, column)">
+                <input type="text" v-model="columnNames[column]" @input="updateColumnName(column, $event.target.value)"
+                  class="w-full bg-transparent border-none text-center font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
               </th>
             </tr>
           </thead>
@@ -269,6 +321,9 @@ const generateTable = () => {
   border: 2px dashed #ccc;
 }
 .dropzone.dragover {
+  background-color: #e0f7fa;
+}
+th.dragover-column {
   background-color: #e0f7fa;
 }
 </style>
