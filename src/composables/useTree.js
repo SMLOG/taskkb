@@ -589,6 +589,23 @@ function dragleave(e) {
   element.style.setProperty('--the-child-left', '0px');
 
 }
+function handleDrag(e){
+  const target = e.target.closest('.row');
+  
+  if (!target) return;
+  
+  const { depth } = target.dataset;
+  console.log('dragleave', depth);
+
+  // Check if the mouse is still within the target or its children
+  const relatedTarget = e.relatedTarget;
+  const element = document.body;
+
+  let xDiff = e.clientX - dragStartClientX;
+  console.log(xDiff)
+
+  element.style.setProperty('--the-child-left', xDiff>=50?'50px':'0px');
+}
 
   return {
     calDiffDates,
@@ -600,7 +617,7 @@ function dragleave(e) {
     dragstart,
     dragOver,
     dragenter,
-    dragleave,
+    dragleave,handleDrag,
     drop,
     getCacWidth,
     handleKeyDown,

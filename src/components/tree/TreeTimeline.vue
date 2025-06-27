@@ -6,6 +6,7 @@
       @mousedown.left="handleMouseDown"
       @dragstart="dragstart"
       @dragover="dragOver"
+      @drag="handleDrag"
       @dragenter="dragenter"
       @dragleave="dragleave"
       @drop="drop"
@@ -81,7 +82,7 @@ const {
   cellClass,
   handleKeyDown,
   selectStartRef,
-  dragstart,
+  dragstart,handleDrag,
   drop,
   moveType,
   dblclickHandle,

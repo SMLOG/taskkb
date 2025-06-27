@@ -48,20 +48,19 @@ body * {
 
 
 .row.drop-highlight {
-  background-color: #d0eaff;
-  border: 2px dashed #007bff;
   position: relative;
 }
 .row.drop-highlight::after{
   content: "";
   display: block;
   position: absolute;
-  height: 2px;
-  background-color: #34a853;
+  height: 100%;
   left: var(--the-child-left);
   right: 0;
   bottom: 0;
   z-index: 999;
+  border: 2px dashed #007bff;
+
 }
 .row.dropped {
   animation: fadeIn 0.5s ease;
