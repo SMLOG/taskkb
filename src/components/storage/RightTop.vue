@@ -69,7 +69,7 @@ import MenuItems from './MenuItems.vue';
 import { getStorageBridgeByName } from '@/api/bridge';
 import { useAppStore } from '@/stores/appStore';
 import { useUserStore } from '@/stores/userStore';
-import { showDialog } from '@/composables/useSystem';
+import { showDialog, showNotification } from '@/composables/useSystem';
 import ConfirmShare from '../dlg/ConfirmShare.vue';
 
 // State
@@ -108,10 +108,7 @@ const handleShare = async () => {
   } catch (error) {
     console.error('Share operation failed:', error);
     // Optionally show error dialog to user
-    await showDialog({
-      message: 'Failed to share content. Please try again.',
-      type: 'error'
-    });
+    await showNotification( 'Failed to share content. Please try again.', 'error');
   }
 };
 
