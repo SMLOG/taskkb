@@ -47,7 +47,7 @@ const dialogWidth = computed(() => {
     'xl': 'max-w-xl',
     'full': 'max-w-[90vw]',
     '2md': 'max-w-2md'
-  }[size.value];
+  }[optionsRef.value.size||'md'];
 });
 
 // Methods
@@ -67,6 +67,7 @@ const handleConfirm = (ret) => {
 
 const handleBackdropClick = () => {
   // Only close if clicking on backdrop (not children)
+  if(optionsRef.value.backdrop!==false)
   handleCancel('backdrop-click');
 };
 
@@ -88,6 +89,8 @@ const cleanup = () => {
   curShow.value--;
 };
 
+const optionsRef=ref({});
+
 // Exposed API
 defineExpose({
   async open(name, param, options = {}) {
@@ -97,7 +100,7 @@ defineExpose({
       returnRejectList.value.push(reject);
       componentNameList.value.push(component);
       params.value.push(param);
-      size.value = options.size || 'md';
+      optionsRef.value = options;
       curShow.value = returnRejectList.value.length - 1;
     });
   },

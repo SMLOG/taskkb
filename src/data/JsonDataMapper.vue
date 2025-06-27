@@ -14,10 +14,8 @@ const listSelectionVisible = ref(false);
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
   const arrayProps = [];
-  // Check if the root is an array
   if (Array.isArray(obj)) {
     arrayProps.push('root');
-    // Process each item in the root array if they are objects
     obj.forEach((item, index) => {
       if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
         arrayProps.push(...findArrayProperties(item, `root[${index}]`));
@@ -75,7 +73,7 @@ const handleListSelection = () => {
   if (listProperty.value) {
     let selected = jsonData.value;
     if (listProperty.value === 'root') {
-      selected = jsonData.value; // Root is the array
+      selected = jsonData.value;
     } else {
       const keys = listProperty.value.split('.').reduce((acc, key) => {
         if (key.includes('[')) {
@@ -136,6 +134,13 @@ const drop = (e, column) => {
   e.currentTarget.classList.remove('dragover');
   const property = e.dataTransfer.getData('text/plain');
   columnMappings.value = { ...columnMappings.value, [column]: property };
+};
+
+// Remove mapping
+const removeMapping = (column) => {
+  const newMappings = { ...columnMappings.value };
+  delete newMappings[column];
+  columnMappings.value = newMappings;
 };
 
 // Update column name
@@ -214,7 +219,12 @@ const generateTable = () => {
               <input type="text" v-model="columnExpressions[prop]" @input="updateColumnExpression(prop, $event.target.value)"
                 class="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm"
                 placeholder="e.g., value.toUpperCase() or item.name + ' (' + index + ')'">
-              <span v-if="columnMappings[prop]" class="block mt-1">Mapped to: {{ columnMappings[prop] }}</span>
+              <div v-if="columnMappings[prop]" class="mt-1">
+                <span class="block">Mapped to: {{ columnMappings[prop] }}</span>
+                <button @click="removeMapping(prop)" class="text-red-500 hover:text-red-700 text-sm">
+                  Remove Mapping
+                </button>
+              </div>
             </div>
           </div>
         </div>
