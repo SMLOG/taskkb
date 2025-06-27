@@ -33,8 +33,9 @@ export const useAppStore = defineStore('app', () => {
     })
     else{
       const recents = useRecentStore().recents;
-      if(recents.length>0)return redirect(recents[recents.length-1])
+      if(recents.length>0)return redirect(recents[0])
     }
+    useRecentStore().addOrUpdateRemoveRecent(path.value);
     await initLoadTabsData();
 
   }

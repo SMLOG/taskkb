@@ -87,7 +87,7 @@ export const useHashStore = defineStore('hash', () => {
     if (path === null) {
         newHash = `#/${sp.length == 2 ? "?" + sp[1] : ''}`;
     } else {
-        newHash = `#/${path.mode}-${path.id}/${path.tabId}${sp.length == 2 ? "?" + sp[1] : ''}`;
+        newHash = `#/${path.mode}-${encodeURIComponent(path.id)}/${path.tabId}${sp.length == 2 ? "?" + sp[1] : ''}`;
     }
     if (window.location.hash !== newHash) {
         window.location.assign(newHash);

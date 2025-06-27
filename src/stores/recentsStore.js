@@ -34,7 +34,6 @@ export const useRecentStore = defineStore('recents', () => {
   }
 
   // Watch recents for changes and save to localStorage
-  watch(recents, saveToLocalStorage, { deep: true });
 
   function addOrUpdateRemoveRecent(path, isRemove) {
     if (!path || !path.id) {
@@ -63,6 +62,7 @@ export const useRecentStore = defineStore('recents', () => {
       // Sort by timestamp (newest first)
       recents.value = recents.value.sort((a, b) => b.timestamp - a.timestamp);
     }
+    saveToLocalStorage();
   }
 
   return {
