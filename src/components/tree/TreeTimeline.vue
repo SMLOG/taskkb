@@ -132,12 +132,6 @@ watch(
   },
   { immediate: true }
 );
-watch(
-  () => [activeTabRef?.value],
-  () => {
-  },
-  { immediate: true }
-);
 
 onMounted(() => {
   appStore.loadActiveTab();
