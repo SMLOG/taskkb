@@ -14,11 +14,10 @@
 
 <script setup>
 import { useTree } from '@/composables/useTree';
-import { defineProps, watch } from 'vue';
+import { defineProps } from 'vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import Cell from '@/components/tree/Cell.vue';
 import ScheduleCol from '@/components/tree/ScheduleCol.vue';
-import { resolveComponent } from '@/components/cpList';
 
 // Composable
 const {
@@ -68,16 +67,6 @@ const props = defineProps({
 // Drag and drop composable
 const { isDrag, selectDepths } = useTree();
 
-// Column style function
-const colStyle = (col, isH, index) => {
-    let style = {};
-    if (col.sticky) {
-        style.left = `var(--sticky-left-${index})`;
-    } else {
-        style.left = 'auto';
-    }
-    return style;
-};
 </script>
 
 <style src="@/components/tree/tree.css" scoped></style>

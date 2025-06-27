@@ -4,12 +4,12 @@
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
       @mousedown.left="handleMouseDown"
-      @dragstart="dragstart"
-      @dragover="dragOver"
+      @dragstart="handleDragstart"
+      @dragover="handleDragOver"
       @drag="handleDrag"
-      @dragenter="dragenter"
-      @dragleave="dragleave"
-      @drop="drop"
+      @dragenter="handleDragenter"
+      @dragleave="handleDragleave"
+      @drop="handleDrop"
       @mousemove="handleMouseCellsMove"
       @mouseup.left="handleMouseUp"
       @dblclick="dblclickHandle"
@@ -75,15 +75,15 @@ const thRefs = ref([]);
 const appStore = useAppStore();
 
 const {
-  dragOver,dragenter,dragleave,
+  handleDragOver,handleDragenter,handleDragleave,
   handleMouseDown,
   handleMouseCellsMove,
   handleMouseUp,
   cellClass,
   handleKeyDown,
   selectStartRef,
-  dragstart,handleDrag,
-  drop,
+  handleDragstart,handleDrag,
+  handleDrop,
   moveType,
   dblclickHandle,
   weeksRef,

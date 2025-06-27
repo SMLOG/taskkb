@@ -67,7 +67,7 @@ export function useTree() {
   let selectDetphStart;
   let selectDetphEnd;
 
-  const dragOver = (event) => {
+  const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   };
@@ -364,7 +364,7 @@ export function useTree() {
     };
   };
 
-  const dragstart = (event) => {
+  const handleDragstart = (event) => {
     let interceptor = event.target.closest(".row");
     if (interceptor && isDrag.value) {
       dragStartClientX = event.clientX;
@@ -375,7 +375,7 @@ export function useTree() {
     interceptor.classList.add('dragging');
   };
 
-  const drop = (event) => {
+  const handleDrop = (event) => {
     let interceptor = event.target.closest(".row");
     if (!interceptor) {
       return;
@@ -553,24 +553,24 @@ export function useTree() {
     return text;
   }
 
-  function dragenter(e) {
+  function handleDragenter(e) {
     const target = e.target.closest('.row');
     if(!target) return;
 
     const { depth } = target.dataset;
 
-    console.log('dragenter',depth)
+    console.log('handledragenter',depth)
     if (target && !target.classList.contains('dragging')) {
         target.classList.add('drop-highlight');
     }
 }
-function dragleave(e) {
+function handleDragleave(e) {
   const target = e.target.closest('.row');
   
   if (!target) return;
   
   const { depth } = target.dataset;
-  console.log('dragleave', depth);
+  console.log('handleDragleave', depth);
 
   // Check if the mouse is still within the target or its children
   const relatedTarget = e.relatedTarget;
@@ -595,10 +595,9 @@ function handleDrag(e){
   if (!target) return;
   
   const { depth } = target.dataset;
-  console.log('dragleave', depth);
+  console.log('handleDragleave', depth);
 
-  // Check if the mouse is still within the target or its children
-  const relatedTarget = e.relatedTarget;
+
   const element = document.body;
 
   let xDiff = e.clientX - dragStartClientX;
@@ -614,11 +613,12 @@ function handleDrag(e){
     handleMouseUp,
     weeksRef,
     cellClass,
-    dragstart,
-    dragOver,
-    dragenter,
-    dragleave,handleDrag,
-    drop,
+    handleDragstart,
+    handleDragOver,
+    handleDragenter,
+    handleDragleave,
+    handleDrag,
+    handleDrop,
     getCacWidth,
     handleKeyDown,
     selectRowSch,
