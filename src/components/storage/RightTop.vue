@@ -85,9 +85,7 @@ const handleShare = async () => {
     const userStore = useUserStore();
 
     if (appStore.path.mode !== 'G') {
-      const confirmed = await showDialog(ConfirmShare);
-      if (!confirmed) return;
-
+      await showDialog(ConfirmShare);
       const { pickFolder } = await getStorageBridgeByName('G');
       const user = userStore.getUser();
       const auth = await pickFolder(user);
