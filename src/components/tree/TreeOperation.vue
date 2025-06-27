@@ -36,6 +36,7 @@
               @mouseenter="handleShowDropdown"
               @focus="handleShowDropdown"
               @click="handleShowDropdown"
+              @mouseleave="handleMouseLeave"
               class="btn-secondary"
             >
               ⋮ Export
@@ -48,6 +49,7 @@
               ]"
               tabindex="-1"
               @mouseleave="showDropdown = false"
+              @mouseenter="cleanTimeout"
             >
               <button @click="download" class="btn-link w-full text-left px-3 py-2">
                 📤 Export(JSON)
@@ -183,7 +185,20 @@ const handleShowDropdown = () => {
 
   dropdownPosition.value = spaceAbove < DROPDOWN_HEIGHT && spaceBelow >= DROPDOWN_HEIGHT ? 'bottom' : 'top';
   showDropdown.value = true;
+  cleanTimeout();
 };
+
+const timeout = ref(0);
+const handleMouseLeave=()=>{
+  timeout.value = setTimeout(()=>{
+    showDropdown.value = false;
+
+  },200);
+}
+const cleanTimeout = ()=>{
+  window.clearTimeout(timeout.value);
+
+}
 
 function download() {
   let data = JSON.parse(JSON.stringify(treeRef.value));
