@@ -360,7 +360,8 @@ export const writeFile = async (dataObj, path, auth) => {
 // Read selected file
 const readFile = async (path, auth) => {
     if (!auth?.accessToken) {
-        throw new Error('No access token found. Please sign in again.');
+
+        throw 'No access token found. Please sign in again.';
     }
     if (!path?.id) {
         throw new Error('Please select a file to read first.');
@@ -409,7 +410,8 @@ export async function readJsonAttachment(path, auth) {
 
     let result = await readFile(path, auth);
     let content = result?.content ? jsonParse(result.content) : null;
-    return { path, content };
+    let fileName = result?.metadata?.name;
+    return { path: { ...path, fileName }, content };
 }
 
 export async function writeObjectToJsonAttachment(dataObject, path, auth) {
