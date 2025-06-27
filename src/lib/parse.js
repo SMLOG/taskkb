@@ -20,7 +20,7 @@ export   const parseHash = (hash) => {
 
   if (match) {
     storageType = match[1]
-    file = match[2]
+    file = decodeURIComponent(match[2])
     tab = match[3]
     console.log(storageType,file,tab)
   } else if (hash) {

@@ -20,6 +20,9 @@ export async function getStorageBridgeByName(mode) {
         case "L": {
             return await import('@/api/localStorage');
         }
+        case "U": {
+            return await import('@/api/url');
+        }
     }
 
 
