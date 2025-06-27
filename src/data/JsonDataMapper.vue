@@ -6,11 +6,15 @@ const selectedList = ref([]);
 const columnMappings = ref({});
 const columnNames = ref({});
 const columnExpressions = ref({});
+const columnWidths = ref({});
 const listProperty = ref('');
 const mappingSectionVisible = ref(false);
 const tableSectionVisible = ref(false);
 const listSelectionVisible = ref(false);
 const draggedColumn = ref(null);
+const resizingColumn = ref(null);
+const startX = ref(0);
+const startWidth = ref(0);
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -109,10 +113,12 @@ const handleListSelection = () => {
     columnMappings.value = {};
     columnNames.value = {};
     columnExpressions.value = {};
+    columnWidths.value = {};
     jsonProperties.value.forEach(prop => {
       columnMappings.value[prop] = prop;
       columnNames.value[prop] = prop;
       columnExpressions.value[prop] = 'value';
+      columnWidths.value[prop] = '150px';
     });
     mappingSectionVisible.value = true;
     tableSectionVisible.value = true;
@@ -142,11 +148,16 @@ const drop = (e, column) => {
 
 // Drag and drop handlers for column reordering
 const dragStartColumn = (e, column) => {
+  if (resizingColumn.value) {
+    e.preventDefault();
+    return;
+  }
   draggedColumn.value = column;
   e.dataTransfer.setData('text/plain', column);
 };
 
 const dragOverColumn = (e) => {
+  if (resizingColumn.value) return;
   e.preventDefault();
   e.currentTarget.classList.add('dragover-column');
 };
@@ -156,6 +167,7 @@ const dragLeaveColumn = (e) => {
 };
 
 const dropColumn = (e, targetColumn) => {
+  if (resizingColumn.value) return;
   e.preventDefault();
   e.currentTarget.classList.remove('dragover-column');
   if (draggedColumn.value && draggedColumn.value !== targetColumn) {
@@ -163,33 +175,62 @@ const dropColumn = (e, targetColumn) => {
     const fromIndex = columns.indexOf(draggedColumn.value);
     const toIndex = columns.indexOf(targetColumn);
     
-    // Reorder columns
     const newColumns = [...columns];
     newColumns.splice(fromIndex, 1);
     newColumns.splice(toIndex, 0, draggedColumn.value);
     
-    // Update columnMappings, columnNames, and columnExpressions
     const newMappings = {};
     const newNames = {};
     const newExpressions = {};
+    const newWidths = {};
     newColumns.forEach(col => {
       newMappings[col] = columnMappings.value[col];
       newNames[col] = columnNames.value[col];
       newExpressions[col] = columnExpressions.value[col];
+      newWidths[col] = columnWidths.value[col] || '150px';
     });
     
     columnMappings.value = newMappings;
     columnNames.value = newNames;
     columnExpressions.value = newExpressions;
+    columnWidths.value = newWidths;
   }
   draggedColumn.value = null;
+};
+
+// Resize handlers
+const startResize = (e, column) => {
+  e.stopPropagation();
+  resizingColumn.value = column;
+  startX.value = e.clientX;
+  const th = e.target.parentElement;
+  startWidth.value = th.getBoundingClientRect().width;
+  document.addEventListener('mousemove', resize);
+  document.addEventListener('mouseup', stopResize);
+};
+
+const resize = (e) => {
+  if (resizingColumn.value) {
+    const delta = e.clientX - startX.value;
+    const newWidth = Math.max(50, startWidth.value + delta);
+    columnWidths.value = { ...columnWidths.value, [resizingColumn.value]: `${newWidth}px` };
+  }
+};
+
+const stopResize = () => {
+  resizingColumn.value = null;
+  document.removeEventListener('mousemove', resize);
+  document.removeEventListener('mouseup', stopResize);
 };
 
 // Remove mapping
 const removeMapping = (column) => {
   const newMappings = { ...columnMappings.value };
+  const newWidths = { ...columnWidths.value };
   delete newMappings[column];
+  delete newWidths[column];
   columnMappings.value = newMappings;
+  columnWidths.value = newWidths;
 };
 
 // Update column name
@@ -290,17 +331,28 @@ const generateTable = () => {
         <table class="min-w-full bg-white border border-gray-300">
           <thead>
             <tr class="bg-gray-200">
-              <th v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2 cursor-move"
+              <th v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2 cursor-move relative"
+                :style="{ width: columnWidths[column] || '250px' }"
                 draggable="true" @dragstart="dragStartColumn($event, column)"
                 @dragover="dragOverColumn" @dragleave="dragLeaveColumn" @drop="dropColumn($event, column)">
-                <input type="text" v-model="columnNames[column]" @input="updateColumnName(column, $event.target.value)"
-                  class="w-full bg-transparent border-none text-center font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded">
+                <div class="flex flex-col">
+                  <input type="text" v-model="columnNames[column]" @input="updateColumnName(column, $event.target.value)"
+                    class="w-full bg-transparent border-none text-center font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded mb-1"
+                    placeholder="Column Name">
+                  <input type="text" v-model="columnExpressions[column]" @input="updateColumnExpression(column, $event.target.value)"
+                    class="w-full bg-transparent border border-gray-300 text-center text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                    placeholder="e.g., value.toUpperCase()">
+                </div>
+                <div class="absolute right-0 top-0 h-full w-2 cursor-col-resize bg-gray-400 opacity-0 hover:opacity-100"
+                  @mousedown="startResize($event, column)">
+                </div>
               </th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(item, index) in selectedList" :key="index">
-              <td v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2">
+              <td v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2"
+                :style="{ width: columnWidths[column] || '250px' }">
                 {{ columnMappings[column] ? evaluateExpression(columnExpressions[column], item[columnMappings[column]], item, index, selectedList) : '' }}
               </td>
             </tr>
