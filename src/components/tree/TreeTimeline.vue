@@ -41,7 +41,7 @@
         <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch" :selectStartRef="selectStartRef" :config="configRef" />
       </div>
       <TreeTime
-        :row="root"
+        :row="treeRef"
         :depth="''"
         :showSch="configRef?.showSch"
         :weeks="weeksRef"
@@ -51,7 +51,7 @@
         :cols="cols"
         :gridStyle="{ gridTemplateColumns: gridColumns }"
         :schReady="schReadyRef"
-        v-if="root"
+        v-if="treeRef"
       ></TreeTime>
     </div>
   </div>
@@ -89,7 +89,6 @@ const {
   weeksRef,
 } = useTree();
 
-const root = ref(null);
 const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
 
 const colStyle = (col, index) => ({
@@ -136,7 +135,6 @@ watch(
 watch(
   () => [activeTabRef?.value],
   () => {
-    root.value = treeRef.value;
   },
   { immediate: true }
 );

@@ -35,7 +35,6 @@ export const useAppStore = defineStore('app', () => {
       const recents = useRecentStore().recents;
       if(recents.length>0)return redirect(recents[0])
     }
-    useRecentStore().addOrUpdateRemoveRecent(path.value);
     await initLoadTabsData();
 
   }
@@ -92,6 +91,7 @@ export const useAppStore = defineStore('app', () => {
         activeTabIndex = 0;
         tabs.value.length > 0 && updatePath({ ...path.value, tabId: tabs.value[activeTabIndex].tabId })
       }
+      useRecentStore().addOrUpdateRemoveRecent(path.value);
 
       await setActiveTab(activeTabIndex);
 

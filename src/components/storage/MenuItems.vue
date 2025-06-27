@@ -159,7 +159,7 @@ const recentSubmenu = computed(() => {
   return [
     {
       items: recentItems.map(item => ({
-        label: item.fileName || 'Untitled',
+        label: `${item.mode}\t${item.fileName}` ,
         action: () => openRecentFile(item)
       }))
     }
