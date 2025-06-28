@@ -16,6 +16,7 @@ const resizingColumn = ref(null);
 const startX = ref(0);
 const startWidth = ref(0);
 const newColumnName = ref('');
+const columnToMap = ref('');
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -134,12 +135,13 @@ const addNewColumn = () => {
   }
   
   const columnKey = `custom_${Date.now()}`;
-  columnMappings.value[columnKey] = ''; // No property mapped initially
+  columnMappings.value[columnKey] = columnToMap.value;
   columnNames.value[columnKey] = newColumnName.value;
   columnExpressions.value[columnKey] = 'value';
   columnWidths.value[columnKey] = '150px';
   
   newColumnName.value = '';
+  columnToMap.value = '';
 };
 
 // Drag and drop handlers for property mapping
@@ -315,8 +317,14 @@ const generateTable = () => {
           <div class="mt-4">
             <h3 class="text-sm font-medium text-gray-700">Add New Column</h3>
             <div class="mt-2 flex">
-              <input v-model="newColumnName" type="text" placeholder="New column name"
-                class="flex-1 border border-gray-300 rounded-l-md p-2 text-sm">
+              <div class="flex-1 flex">
+                <select v-model="columnToMap" class="border border-gray-300 rounded-l-md p-2 text-sm w-1/3">
+                  <option value="">Select Property</option>
+                  <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
+                </select>
+                <input v-model="newColumnName" type="text" placeholder="New column name"
+                  class="flex-1 border border-gray-300 border-l-0 p-2 text-sm">
+              </div>
               <button @click="addNewColumn" class="bg-green-500 text-white px-4 py-2 rounded-r-md hover:bg-green-600">
                 Add
               </button>
