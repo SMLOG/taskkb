@@ -103,10 +103,6 @@ export function useTree() {
     }
 
 
-    if (!isDrag.value) {
-      selectDepths.length = 0;
-      //selectDepths.push(depth);
-    }
 
     // Handle row-specific logic
     if (rowEl) {
@@ -132,9 +128,9 @@ export function useTree() {
           if(selectDepths.indexOf(depth) ==-1){
             selectDepths.push(depth);
             selectDetphStart = depth;
-            enableDragTimeout.value = setTimeout(()=>{
+           /* enableDragTimeout.value = setTimeout(()=>{
               isDrag.value =true;
-            },300);
+            },300);*/
           }
          //handleNumClick(depth);
         },300);
@@ -166,6 +162,10 @@ export function useTree() {
 
 
   const handleMouseUp = (event) => {
+
+
+
+
     isMouseDown = false;
   
     clearTimeout(enableSelectionTimeout.value);
@@ -175,6 +175,7 @@ export function useTree() {
     if (!rowEl) return;
     const { depth } = rowEl.dataset;
 
+  
     isDrag.value = false;
     if (moveType.value) {
       event.stopPropagation();
