@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative min-w-full" :class="{ drag: isDragging, move: isMoving }" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
+  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving }" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
@@ -86,6 +86,7 @@ const {
   handleDrop,
   moveType,
   dblclickHandle,
+  isDrag,
   weeksRef,
 } = useTree();
 
@@ -150,8 +151,8 @@ const cols = computed(() => configRef.value?.cols?.filter((col) => col.show) ?? 
 const gridColumns = computed(() =>
   cols.value.length > 0 ? cols.value.map((col) => `${col.width}px`).join(' ') + ' 1fr' : '1fr'
 );
-const isDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
-const isMoving = computed(() => moveType.value?.type === 'move');
+const isHDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
+const isMoving = computed(() => moveType.value?.type === 'move'||isDrag.value);
 
 
 const handleEnterKeyUp = (event) => {

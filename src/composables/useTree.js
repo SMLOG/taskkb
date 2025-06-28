@@ -29,6 +29,7 @@ const isDrag = ref(false);
 const isDraging = ref(false);
 const dragMode = ref(false);
 const moveType = ref(null);
+const mouseDownTimeout = ref(0);
 
 function getDate(i) {
   const weekIndex = parseInt(i / 7);
@@ -103,15 +104,24 @@ export function useTree() {
 
     isMouseDown = true;
 
+
+
     // Handle row-specific logic
     if (rowEl) {
       const { depth } = rowEl.dataset;
       const target = event.target;
 
       // Handle number cell click
+
+
       if (target.classList.contains("num")) {
         handleNumClick(depth);
         return;
+      }else{
+        mouseDownTimeout.value = setTimeout(()=>{
+          if(selectDepths.indexOf(depth) ==-1)selectDepths.push(depth);
+          handleNumClick(depth);
+        },300);
       }
 
       // Clear selection if not a number cell
@@ -154,6 +164,7 @@ export function useTree() {
       isDraging.value = false;
       return;
     }
+    clearTimeout(mouseDownTimeout.value);
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
     const { depth } = rowEl.dataset;
@@ -590,7 +601,7 @@ function handleDragleave(e) {
 
 }
 function handleDrag(e){
-  const target = e.target.closest('.row');
+  const target = e.target?.closest('.row');
   
   if (!target) return;
   
