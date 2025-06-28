@@ -171,7 +171,7 @@ export function useTree() {
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
     const { depth } = rowEl.dataset;
-    if (isDrag.value) {
+    if (!isDrag.value) {
       selectDepths.length = 0;
       //selectDepths.push(depth);
     }
