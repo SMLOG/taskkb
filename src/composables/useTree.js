@@ -29,7 +29,7 @@ const isDrag = ref(false);
 const dragMode = ref(false);
 const moveType = ref(null);
 const enableSelectionTimeout = ref(0);
-
+const enableDragTimeout = ref(0);
 function getDate(i) {
   const weekIndex = parseInt(i / 7);
 
@@ -129,6 +129,9 @@ export function useTree() {
           if(selectDepths.indexOf(depth) ==-1){
             selectDepths.push(depth);
             selectDetphStart = depth;
+            enableDragTimeout.value = setTimeout(()=>{
+              isDrag.value =true;
+            },200);
           }
          //handleNumClick(depth);
         },300);
@@ -163,6 +166,8 @@ export function useTree() {
     isMouseDown = false;
   
     clearTimeout(enableSelectionTimeout.value);
+    clearTimeout(enableDragTimeout.value);
+    
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
     const { depth } = rowEl.dataset;
@@ -261,6 +266,8 @@ export function useTree() {
     if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
       handleSelection(rowEl);
     }
+
+    clearTimeout(enableDragTimeout.value);
 
     const sch = event.target.closest(".sch");
     if (sch) {

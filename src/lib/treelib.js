@@ -46,33 +46,77 @@ export function copyNode(rootTree, depth) {
   parentChilds.splice(index, 0, deepCopyObject(parentChilds[index]));
 
 }
-export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
-  let targetNode = getRowFromDepth(rootTree, selectDetphEnd);
-  let xDiff = event.clientX - dragStartClientX;
 
-  let detachNodeDepths = [];
-  for (let depth of selectDepths.sort((a, b) => b.localeCompare(a))) {
+function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = false) {
+  // Validate inputs
+  if (!Array.isArray(nodesToMove) || !targetParent || !treeRoot) {
+    throw new Error('Invalid input: nodesToMove must be an array, and targetParent and treeRoot must be defined');
+  }
 
-    if(selectDetphEnd.indexOf(depth)==0)return;
+  // Find the parent of targetParent if isBrother is true
+  let newParent = targetParent;
+  if (isBrother) {
+    // Helper function to find the parent of targetParent
+    function findParent(currentNode, target) {
+      if (!currentNode._childs) return null;
+      if (currentNode._childs.includes(target)) return currentNode;
+      for (let child of currentNode._childs) {
+        const found = findParent(child, target);
+        if (found) return found;
+      }
+      return null;
+    }
 
-    let srcNode = getRowFromDepth(rootTree, depth);
-    detachNodeDepths.push(depth)
-    if (xDiff > 50) {
-      // Make srcNode a child of targetNode
-
-      if (!targetNode._childs) targetNode._childs = [];
-      targetNode._childs.push(srcNode);
-    } else {
-      // Move srcNode next to targetNode at same level
-
-      let targetParentDepth = selectDetphEnd.replace(/\.\d+$/, '');
-      let targetParent = getRowFromDepth(rootTree, targetParentDepth);
-      let parentChilds = targetParent._childs;
-      let targetIndex = parentChilds.findIndex(node => node === targetNode);
-      parentChilds.splice(targetIndex + 1, 0,srcNode);
+    newParent = findParent(treeRoot, targetParent);
+    if (!newParent) {
+      throw new Error('Target parent has no parent in the tree; cannot relocate as brother');
     }
   }
-  detachNodeDepths.map(e=>deleteNode(rootTree,e));
+
+  // Ensure _childs property exists on newParent
+  if (!newParent._childs) {
+    newParent._childs = [];
+  }
+
+  // Helper function to remove a node from its parent's _childs
+  function removeNodeFromParent(node, currentNode) {
+    if (!currentNode._childs) return false;
+    
+    const index = currentNode._childs.indexOf(node);
+    if (index !== -1) {
+      currentNode._childs.splice(index, 1);
+      return true;
+    }
+    
+    // Recursively search in children
+    return currentNode._childs.some(child => removeNodeFromParent(node, child));
+  }
+
+  // Process each node to move
+  nodesToMove.forEach(node => {
+    if (!node) return; // Skip invalid nodes
+    
+    // Remove node from its current parent's _childs
+    if (node !== treeRoot) { // Avoid removing root if it's in nodesToMove
+      removeNodeFromParent(node, treeRoot);
+    }
+    
+    // Add node to newParent's _childs
+    if (!newParent._childs.includes(node)) {
+      newParent._childs.push(node);
+    }
+  });
+
+  return treeRoot; // Return the modified tree
+}
+
+export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
+  let xDiff = event.clientX - dragStartClientX;
+
+  let nodes = selectDepths.map(depth=>getRowFromDepth(rootTree, depth));
+  const targetParent = getRowFromDepth(rootTree, selectDetphEnd);
+  relocateTreeNodes(nodes,targetParent,rootTree,xDiff<50)
+ 
 }
 
 export function getRows(rootRow,level,depth) {
