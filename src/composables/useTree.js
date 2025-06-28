@@ -29,7 +29,7 @@ const isDrag = ref(false);
 const isDraging = ref(false);
 const dragMode = ref(false);
 const moveType = ref(null);
-const mouseDownTimeout = ref(0);
+const enableSelectionTimeout = ref(0);
 
 function getDate(i) {
   const weekIndex = parseInt(i / 7);
@@ -114,13 +114,24 @@ export function useTree() {
       // Handle number cell click
 
 
-      if (target.classList.contains("num")) {
-        handleNumClick(depth);
+      if (selectDepths.length>0) {
+        if (selectDepths.includes(depth)) {
+          isDrag.value = true;
+        }else{
+          selectDepths.length=0;
+          isDrag.value = false;
+          
+
+        }
+       // handleNumClick(depth);
         return;
       }else{
-        mouseDownTimeout.value = setTimeout(()=>{
-          if(selectDepths.indexOf(depth) ==-1)selectDepths.push(depth);
-          handleNumClick(depth);
+        enableSelectionTimeout.value = setTimeout(()=>{
+          if(selectDepths.indexOf(depth) ==-1){
+            selectDepths.push(depth);
+            selectDetphStart = depth;
+          }
+         //handleNumClick(depth);
         },300);
       }
 
@@ -162,15 +173,16 @@ export function useTree() {
   const handleMouseUp = (event) => {
     if (isDraging.value) {
       isDraging.value = false;
+      isMouseDown = false;
       return;
     }
-    clearTimeout(mouseDownTimeout.value);
+    clearTimeout(enableSelectionTimeout.value);
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
     const { depth } = rowEl.dataset;
     if (isDrag.value) {
       selectDepths.length = 0;
-      selectDepths.push(depth);
+      //selectDepths.push(depth);
     }
     isDrag.value = isMouseDown = false;
     if (moveType.value) {
@@ -262,9 +274,10 @@ export function useTree() {
     }
   };
 
-  const handleMouseCellsMove = (event) => {
+  const handleMouseMove = (event) => {
     const rowEl = event.target.closest(".row");
     if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
+      console.log('handleSelection',isMouseDown,isDrag.value,selectDepths.length)
       handleSelection(rowEl);
     }
 
@@ -620,7 +633,7 @@ function handleDrag(e){
   return {
     calDiffDates,
     handleMouseDown,
-    handleMouseCellsMove,
+    handleMouseCellsMove: handleMouseMove,
     handleMouseUp,
     weeksRef,
     cellClass,

@@ -68,7 +68,7 @@ export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStar
       let targetParent = getRowFromDepth(rootTree, targetParentDepth);
       let parentChilds = targetParent._childs;
       let targetIndex = parentChilds.findIndex(node => node === targetNode);
-      parentChilds.splice(targetIndex + (xDiff < 0 ? 0 : 1), 0, ...srcNode);
+      parentChilds.splice(targetIndex + 1, 0, ...srcNode);
     }
   }
 }
