@@ -55,22 +55,26 @@ function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = fals
 
   // Find the parent of targetParent if isBrother is true
   let newParent = targetParent;
+  let targetIndex = -1;
   if (isBrother) {
-    // Helper function to find the parent of targetParent
-    function findParent(currentNode, target) {
+    // Helper function to find the parent of targetParent and its index
+    function findParentAndIndex(currentNode, target) {
       if (!currentNode._childs) return null;
-      if (currentNode._childs.includes(target)) return currentNode;
+      const index = currentNode._childs.indexOf(target);
+      if (index !== -1) return { parent: currentNode, index };
       for (let child of currentNode._childs) {
-        const found = findParent(child, target);
+        const found = findParentAndIndex(child, target);
         if (found) return found;
       }
       return null;
     }
 
-    newParent = findParent(treeRoot, targetParent);
-    if (!newParent) {
+    const result = findParentAndIndex(treeRoot, targetParent);
+    if (!result) {
       throw new Error('Target parent has no parent in the tree; cannot relocate as brother');
     }
+    newParent = result.parent;
+    targetIndex = result.index;
   }
 
   // Ensure _childs property exists on newParent
@@ -103,7 +107,14 @@ function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = fals
     
     // Add node to newParent's _childs
     if (!newParent._childs.includes(node)) {
-      newParent._childs.push(node);
+      if (isBrother && targetIndex !== -1) {
+        // Insert after targetParent
+        newParent._childs.splice(targetIndex + 1, 0, node);
+        targetIndex++; // Increment index to maintain order for subsequent insertions
+      } else {
+        // Add as child or at end if not a brother
+        newParent._childs.push(node);
+      }
     }
   });
 
