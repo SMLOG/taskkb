@@ -18,6 +18,7 @@ const startWidth = ref(0);
 const newColumnName = ref('');
 const columnToMap = ref('');
 const newColumnExpression = ref('value');
+const selectedColumn = ref(null);
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -128,22 +129,33 @@ const handleListSelection = () => {
   }
 };
 
-// Add a new column
+// Handle column header click to populate form
+const handleColumnClick = (column) => {
+  selectedColumn.value = column;
+  newColumnName.value = columnNames.value[column];
+  columnToMap.value = columnMappings.value[column];
+  newColumnExpression.value = columnExpressions.value[column];
+};
+
+// Add a new column or update existing
 const addNewColumn = () => {
   if (!newColumnName.value.trim()) {
     alert('Please enter a column name');
     return;
   }
+
+  const columnKey = selectedColumn.value || `custom_${Date.now()}`;
   
-  const columnKey = `custom_${Date.now()}`;
   columnMappings.value[columnKey] = columnToMap.value;
   columnNames.value[columnKey] = newColumnName.value;
   columnExpressions.value[columnKey] = newColumnExpression.value || 'value';
-  columnWidths.value[columnKey] = '150px';
+  columnWidths.value[columnKey] = columnWidths.value[columnKey] || '150px';
   
+  // Reset form
   newColumnName.value = '';
   columnToMap.value = '';
   newColumnExpression.value = 'value';
+  selectedColumn.value = null;
 };
 
 // Drag and drop handlers for property mapping
@@ -258,6 +270,13 @@ const removeMapping = (column) => {
   columnNames.value = newNames;
   columnExpressions.value = newExpressions;
   columnWidths.value = newWidths;
+  
+  if (selectedColumn.value === column) {
+    selectedColumn.value = null;
+    newColumnName.value = '';
+    columnToMap.value = '';
+    newColumnExpression.value = 'value';
+  }
 };
 
 // Update column name
@@ -317,24 +336,36 @@ const generateTable = () => {
       <div class="grid grid-cols-2 gap-4">
         <div>
           <div class="mt-4">
-            <h3 class="text-sm font-medium text-gray-700">Add New Column</h3>
+            <h3 class="text-sm font-medium text-gray-700">
+              {{ selectedColumn ? 'Edit Column' : 'Add New Column' }}
+              <span v-if="selectedColumn" class="text-xs text-gray-500 ml-2">(Editing: {{ columnNames[selectedColumn] }})</span>
+            </h3>
             <div class="mt-2 space-y-2">
               <div class="flex">
                 <select v-model="columnToMap" class="border border-gray-300 rounded-l-md p-2 text-sm w-1/3">
                   <option value="">Select Property</option>
                   <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
                 </select>
-                <input v-model="newColumnName" type="text" placeholder="New column name"
+                <input v-model="newColumnName" type="text" placeholder="Column name"
                   class="flex-1 border border-gray-300 border-l-0 p-2 text-sm">
               </div>
               <div class="flex">
                 <input v-model="newColumnExpression" type="text" placeholder="Column expression (e.g., value.toUpperCase())"
                   class="flex-1 border border-gray-300 rounded-l-md p-2 text-sm">
                 <button @click="addNewColumn" class="bg-green-500 text-white px-4 py-2 rounded-r-md hover:bg-green-600">
-                  Add Column
+                  {{ selectedColumn ? 'Update' : 'Add' }} Column
                 </button>
               </div>
               <p class="text-xs text-gray-500">Note: Use 'value' to reference the mapped property in expressions</p>
+              <div v-if="selectedColumn" class="flex space-x-2">
+                <button @click="selectedColumn = null; newColumnName.value = ''; columnToMap.value = ''; newColumnExpression.value = 'value';" 
+                  class="text-xs text-blue-500 hover:text-blue-700">
+                  Clear selection
+                </button>
+                <button @click="removeMapping(selectedColumn)" class="text-xs text-red-500 hover:text-red-700">
+                  Remove this column
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -351,10 +382,15 @@ const generateTable = () => {
         <table class="min-w-full bg-white border border-gray-300">
           <thead>
             <tr class="bg-gray-200">
-              <th v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2 cursor-move relative"
-                :style="{ width: columnWidths[column] || '250px' }"
-                draggable="true" @dragstart="dragStartColumn($event, column)"
-                @dragover="dragOverColumn" @dragleave="dragLeaveColumn" @drop="dropColumn($event, column)">
+              <th v-for="column in Object.keys(columnMappings)" :key="column" 
+                class="border px-4 py-2 cursor-move relative hover:bg-gray-300 transition-colors"
+                :style="{ width: columnWidths[column] || '250px', backgroundColor: selectedColumn === column ? '#dbeafe' : '' }"
+                draggable="true" 
+                @dragstart="dragStartColumn($event, column)"
+                @dragover="dragOverColumn" 
+                @dragleave="dragLeaveColumn" 
+                @drop="dropColumn($event, column)"
+                @click="handleColumnClick(column)">
                 <div class="flex flex-col">
                   <input type="text" v-model="columnNames[column]" @input="updateColumnName(column, $event.target.value)"
                     class="w-full bg-transparent border-none text-center font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded mb-1"
@@ -398,5 +434,8 @@ const generateTable = () => {
 }
 th.dragover-column {
   background-color: #e0f7fa;
+}
+th {
+  transition: background-color 0.2s ease;
 }
 </style>
