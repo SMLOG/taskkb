@@ -158,6 +158,41 @@ const addNewColumn = () => {
   selectedColumn.value = null;
 };
 
+// Remove mapping and auto-select next column
+const removeMapping = (column) => {
+  const columns = Object.keys(columnMappings.value);
+  const currentIndex = columns.indexOf(column);
+  
+  const newMappings = { ...columnMappings.value };
+  const newNames = { ...columnNames.value };
+  const newExpressions = { ...columnExpressions.value };
+  const newWidths = { ...columnWidths.value };
+  
+  delete newMappings[column];
+  delete newNames[column];
+  delete newExpressions[column];
+  delete newWidths[column];
+  
+  columnMappings.value = newMappings;
+  columnNames.value = newNames;
+  columnExpressions.value = newExpressions;
+  columnWidths.value = newWidths;
+  
+  // Auto-select next column if available
+  if (selectedColumn.value === column) {
+    const remainingColumns = Object.keys(newMappings);
+    if (remainingColumns.length > 0) {
+      const nextIndex = currentIndex < remainingColumns.length ? currentIndex : remainingColumns.length - 1;
+      handleColumnClick(remainingColumns[nextIndex]);
+    } else {
+      selectedColumn.value = null;
+      newColumnName.value = '';
+      columnToMap.value = '';
+      newColumnExpression.value = 'value';
+    }
+  }
+};
+
 // Drag and drop handlers for property mapping
 const dragStart = (e, property) => {
   e.dataTransfer.setData('text/plain', property);
@@ -254,29 +289,6 @@ const stopResize = () => {
   resizingColumn.value = null;
   document.removeEventListener('mousemove', resize);
   document.removeEventListener('mouseup', stopResize);
-};
-
-// Remove mapping
-const removeMapping = (column) => {
-  const newMappings = { ...columnMappings.value };
-  const newNames = { ...columnNames.value };
-  const newExpressions = { ...columnExpressions.value };
-  const newWidths = { ...columnWidths.value };
-  delete newMappings[column];
-  delete newNames[column];
-  delete newExpressions[column];
-  delete newWidths[column];
-  columnMappings.value = newMappings;
-  columnNames.value = newNames;
-  columnExpressions.value = newExpressions;
-  columnWidths.value = newWidths;
-  
-  if (selectedColumn.value === column) {
-    selectedColumn.value = null;
-    newColumnName.value = '';
-    columnToMap.value = '';
-    newColumnExpression.value = 'value';
-  }
 };
 
 // Update column name
