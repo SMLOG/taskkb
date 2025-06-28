@@ -137,6 +137,14 @@ const handleColumnClick = (column) => {
   newColumnExpression.value = columnExpressions.value[column];
 };
 
+// Clear selection handler
+const clearSelection = () => {
+  selectedColumn.value = null;
+  newColumnName.value = '';
+  columnToMap.value = '';
+  newColumnExpression.value = 'value';
+};
+
 // Add a new column or update existing
 const addNewColumn = () => {
   if (!newColumnName.value.trim()) {
@@ -151,11 +159,7 @@ const addNewColumn = () => {
   columnExpressions.value[columnKey] = newColumnExpression.value || 'value';
   columnWidths.value[columnKey] = columnWidths.value[columnKey] || '150px';
   
-  // Reset form
-  newColumnName.value = '';
-  columnToMap.value = '';
-  newColumnExpression.value = 'value';
-  selectedColumn.value = null;
+  clearSelection();
 };
 
 // Remove mapping and auto-select next column
@@ -185,15 +189,12 @@ const removeMapping = (column) => {
       const nextIndex = currentIndex < remainingColumns.length ? currentIndex : remainingColumns.length - 1;
       handleColumnClick(remainingColumns[nextIndex]);
     } else {
-      selectedColumn.value = null;
-      newColumnName.value = '';
-      columnToMap.value = '';
-      newColumnExpression.value = 'value';
+      clearSelection();
     }
   }
 };
 
-// Drag and drop handlers for property mapping
+// Drag and drop handlers
 const dragStart = (e, property) => {
   e.dataTransfer.setData('text/plain', property);
 };
@@ -214,7 +215,7 @@ const drop = (e, column) => {
   columnMappings.value = { ...columnMappings.value, [column]: property };
 };
 
-// Drag and drop handlers for column reordering
+// Column reordering handlers
 const dragStartColumn = (e, column) => {
   if (resizingColumn.value) {
     e.preventDefault();
@@ -307,11 +308,12 @@ const evaluateExpression = (expression, value, item, index, list) => {
     const fn = new Function('value', 'item', 'index', 'list', `return ${expression}`);
     return fn(value, item, index, list);
   } catch (err) {
+    console.error('Expression error:', err);
     return `Error: ${err.message}`;
   }
 };
 
-// Generate table (for manual refresh if needed)
+// Generate table
 const generateTable = () => {
   if (Object.keys(columnMappings.value).length === 0) {
     alert('No columns are mapped. Please select a list to map columns.');
@@ -319,6 +321,11 @@ const generateTable = () => {
   }
   tableSectionVisible.value = true;
 };
+
+// Explicitly expose functions needed in template
+defineExpose({
+  evaluateExpression
+});
 </script>
 
 <template>
@@ -370,8 +377,7 @@ const generateTable = () => {
               </div>
               <p class="text-xs text-gray-500">Note: Use 'value' to reference the mapped property in expressions</p>
               <div v-if="selectedColumn" class="flex space-x-2">
-                <button @click="selectedColumn = null; newColumnName.value = ''; columnToMap.value = ''; newColumnExpression.value = 'value';" 
-                  class="text-xs text-blue-500 hover:text-blue-700">
+                <button @click="clearSelection" class="text-xs text-blue-500 hover:text-blue-700">
                   Clear selection
                 </button>
                 <button @click="removeMapping(selectedColumn)" class="text-xs text-red-500 hover:text-red-700">
@@ -421,8 +427,15 @@ const generateTable = () => {
             <tr v-for="(item, index) in selectedList" :key="index">
               <td v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2"
                 :style="{ width: columnWidths[column] || '250px' }">
-                {{ columnMappings[column] ? evaluateExpression(columnExpressions[column], item[columnMappings[column]], item, index, selectedList) : 
-                   evaluateExpression(columnExpressions[column], null, item, index, selectedList) }}
+                {{
+                  evaluateExpression(
+                    columnExpressions[column],
+                    columnMappings[column] ? item[columnMappings[column]] : null,
+                    item,
+                    index,
+                    selectedList
+                  )
+                }}
               </td>
             </tr>
           </tbody>
