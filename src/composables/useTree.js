@@ -87,6 +87,7 @@ export function useTree() {
     }
   };
   const handleMouseDown = (event) => {
+    isMouseDown = true;
     const rowEl = event.target.closest(".row");
     const cell = event.target.closest("div.col");
 
@@ -102,7 +103,6 @@ export function useTree() {
       document.activeElement.blur();
     }
 
-    isMouseDown = true;
 
 
 
@@ -159,21 +159,11 @@ export function useTree() {
     }
   };
 
-  // Helper function for number cell click
-  const handleNumClick = (depth) => {
-    if (selectDepths.includes(depth)) {
-      isDrag.value = true;
-    } else {
-      selectDepths.length = 0;
-      selectDepths.push(depth);
-      selectDetphStart = depth;
-    }
-  };
 
   const handleMouseUp = (event) => {
+    isMouseDown = false;
     if (isDraging.value) {
       isDraging.value = false;
-      isMouseDown = false;
       return;
     }
     clearTimeout(enableSelectionTimeout.value);
@@ -184,7 +174,7 @@ export function useTree() {
       selectDepths.length = 0;
       //selectDepths.push(depth);
     }
-    isDrag.value = isMouseDown = false;
+    isDrag.value = false;
     if (moveType.value) {
       event.stopPropagation();
 
@@ -277,7 +267,6 @@ export function useTree() {
   const handleMouseMove = (event) => {
     const rowEl = event.target.closest(".row");
     if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
-      console.log('handleSelection',isMouseDown,isDrag.value,selectDepths.length)
       handleSelection(rowEl);
     }
 
