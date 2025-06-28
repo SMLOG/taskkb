@@ -132,6 +132,7 @@ onMounted(() => {
   const table = props.table;
   const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
+      console.log(entry)
       document.documentElement.style.setProperty(
         '--table-height',
         `${table.offsetHeight}px`
