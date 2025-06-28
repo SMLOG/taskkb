@@ -329,117 +329,165 @@ defineExpose({
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow">
-    <h1 class="text-2xl font-bold mb-4">JSON to Table Mapper</h1>
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <header class="mb-8 text-center">
+      <h1 class="text-3xl font-bold text-blue-600 mb-2">JSON to Table Mapper</h1>
+      <p class="text-gray-600">Transform your JSON data into customizable tables</p>
+    </header>
 
-    <!-- File Input -->
-    <div class="mb-4">
-      <label class="block text-sm font-medium text-gray-700 mb-2">Upload JSON File</label>
-      <input type="file" accept=".json" @change="handleFileUpload"
-        class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <!-- Left Panel - Data Input -->
+      <div class="lg:col-span-1 bg-gray-50 p-6 rounded-lg">
+        <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Data Input</h2>
+        
+        <div class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Upload JSON File</label>
+            <input type="file" accept=".json" @change="handleFileUpload"
+              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition-colors">
+          </div>
 
-    <!-- List Property Selection -->
-    <div v-if="listSelectionVisible" class="mb-4">
-      <label class="block text-sm font-medium text-gray-700 mb-2">Select JSON Property Containing the List</label>
-      <select v-model="listProperty" @change="handleListSelection"
-        class="block w-full border border-gray-300 rounded-md p-2">
-        <option value="">Select a property</option>
-        <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
-      </select>
-    </div>
+          <div v-if="listSelectionVisible">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
+            <select v-model="listProperty" @change="handleListSelection"
+              class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+              <option value="">Select a property</option>
+              <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
-    <!-- Column Mapping UI -->
-    <div v-if="mappingSectionVisible" class="mb-6">
-      <h2 class="text-lg font-semibold mb-2">Customize Table Columns</h2>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <div class="mt-4">
-            <h3 class="text-sm font-medium text-gray-700">
-              {{ selectedColumn ? 'Edit Column' : 'Add New Column' }}
-              <span v-if="selectedColumn" class="text-xs text-gray-500 ml-2">(Editing: {{ columnNames[selectedColumn] }})</span>
+      <!-- Middle Panel - Column Management -->
+      <div class="lg:col-span-1 bg-gray-50 p-6 rounded-lg" v-if="mappingSectionVisible">
+        <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Column Management</h2>
+        
+        <div class="space-y-4">
+          <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="font-medium text-gray-700 mb-3">
+              {{ selectedColumn ? `Editing: ${columnNames[selectedColumn]}` : 'Create New Column' }}
             </h3>
-            <div class="mt-2 space-y-2">
-              <div class="flex">
-                <select v-model="columnToMap" class="border border-gray-300 rounded-l-md p-2 text-sm w-1/3">
-                  <option value="">Select Property</option>
+            
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Column Name</label>
+                <input v-model="newColumnName" type="text" placeholder="Enter column name"
+                  class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+              </div>
+              
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Map to Property</label>
+                <select v-model="columnToMap" 
+                  class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                  <option value="">Select property (optional)</option>
                   <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
                 </select>
-                <input v-model="newColumnName" type="text" placeholder="Column name"
-                  class="flex-1 border border-gray-300 border-l-0 p-2 text-sm">
               </div>
-              <div class="flex">
-                <input v-model="newColumnExpression" type="text" placeholder="Column expression (e.g., value.toUpperCase())"
-                  class="flex-1 border border-gray-300 rounded-l-md p-2 text-sm">
-                <button @click="addNewColumn" class="bg-green-500 text-white px-4 py-2 rounded-r-md hover:bg-green-600">
-                  {{ selectedColumn ? 'Update' : 'Add' }} Column
+              
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Transformation</label>
+                <input v-model="newColumnExpression" type="text" placeholder="value.toUpperCase()"
+                  class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                <p class="text-xs text-gray-400 mt-1">Use 'value' to reference the mapped property</p>
+              </div>
+              
+              <div class="flex space-x-2 pt-2">
+                <button @click="addNewColumn" 
+                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors">
+                  {{ selectedColumn ? 'Update' : 'Add' }}
+                </button>
+                
+                <button v-if="selectedColumn" @click="clearSelection" 
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                  Cancel
                 </button>
               </div>
-              <p class="text-xs text-gray-500">Note: Use 'value' to reference the mapped property in expressions</p>
-              <div v-if="selectedColumn" class="flex space-x-2">
-                <button @click="clearSelection" class="text-xs text-blue-500 hover:text-blue-700">
-                  Clear selection
-                </button>
-                <button @click="removeMapping(selectedColumn)" class="text-xs text-red-500 hover:text-red-700">
-                  Remove this column
+              
+              <div v-if="selectedColumn" class="pt-2 border-t">
+                <button @click="removeMapping(selectedColumn)" 
+                  class="w-full text-red-500 hover:text-red-700 text-sm flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                  Remove Column
                 </button>
               </div>
             </div>
           </div>
+          
+          <div class="bg-white p-4 rounded-lg shadow">
+            <h3 class="font-medium text-gray-700 mb-3">Quick Actions</h3>
+            <button @click="generateTable" 
+              class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">
+              Refresh Table View
+            </button>
+          </div>
         </div>
       </div>
-      <button @click="generateTable" class="mt-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-        Refresh Table
-      </button>
-    </div>
 
-    <!-- Table Output -->
-    <div v-if="tableSectionVisible" class="mt-6">
-      <h2 class="text-lg font-semibold mb-2">Generated Table</h2>
-      <div class="overflow-x-auto">
-        <table class="min-w-full bg-white border border-gray-300">
-          <thead>
-            <tr class="bg-gray-200">
-              <th v-for="column in Object.keys(columnMappings)" :key="column" 
-                class="border px-4 py-2 cursor-move relative hover:bg-gray-300 transition-colors"
-                :style="{ width: columnWidths[column] || '250px', backgroundColor: selectedColumn === column ? '#dbeafe' : '' }"
-                draggable="true" 
-                @dragstart="dragStartColumn($event, column)"
-                @dragover="dragOverColumn" 
-                @dragleave="dragLeaveColumn" 
-                @drop="dropColumn($event, column)"
-                @click="handleColumnClick(column)">
-                <div class="flex flex-col">
-                  <input type="text" v-model="columnNames[column]" @input="updateColumnName(column, $event.target.value)"
-                    class="w-full bg-transparent border-none text-center font-semibold text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded mb-1"
-                    placeholder="Column Name">
-                  <input type="text" v-model="columnExpressions[column]" @input="updateColumnExpression(column, $event.target.value)"
-                    class="w-full bg-transparent border border-gray-300 text-center text-sm text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
-                    placeholder="e.g., value.toUpperCase()">
-                </div>
-                <div class="absolute right-0 top-0 h-full w-2 cursor-col-resize bg-gray-400 opacity-0 hover:opacity-100"
-                  @mousedown="startResize($event, column)">
-                </div>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(item, index) in selectedList" :key="index">
-              <td v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2"
-                :style="{ width: columnWidths[column] || '250px' }">
-                {{
-                  evaluateExpression(
-                    columnExpressions[column],
-                    columnMappings[column] ? item[columnMappings[column]] : null,
-                    item,
-                    index,
-                    selectedList
-                  )
-                }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Right Panel - Table Output -->
+      <div class="lg:col-span-1 lg:col-span-2" v-if="tableSectionVisible">
+        <div class="bg-white p-6 rounded-lg shadow">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-semibold text-blue-500">Table Preview</h2>
+            <span class="text-sm text-gray-500">{{ selectedList.length }} rows</span>
+          </div>
+          
+          <div class="overflow-x-auto border rounded-lg">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th v-for="column in Object.keys(columnMappings)" :key="column" 
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-move relative group"
+                    :style="{ width: columnWidths[column] || '180px' }"
+                    draggable="true"
+                    @dragstart="dragStartColumn($event, column)"
+                    @dragover="dragOverColumn" 
+                    @dragleave="dragLeaveColumn" 
+                    @drop="dropColumn($event, column)"
+                    @click="handleColumnClick(column)">
+                    
+                    <div class="flex items-center justify-between">
+                      <span class="truncate">{{ columnNames[column] }}</span>
+                      <span class="text-gray-400 text-xs ml-2">{{ columnMappings[column] || 'custom' }}</span>
+                    </div>
+                    
+                    <div class="absolute right-0 top-0 h-full w-1 cursor-col-resize bg-gray-200 opacity-0 group-hover:opacity-100"
+                      @mousedown="startResize($event, column)">
+                    </div>
+                    
+                    <div v-if="selectedColumn === column" class="absolute inset-0 border-2 border-blue-400 pointer-events-none"></div>
+                  </th>
+                </tr>
+              </thead>
+              
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="(item, index) in selectedList.slice(0, 50)" :key="index" class="hover:bg-gray-50">
+                  <td v-for="column in Object.keys(columnMappings)" :key="column" class="px-4 py-2 text-sm text-gray-700"
+                    :style="{ width: columnWidths[column] || '180px' }">
+                    <div class="truncate">
+                      {{
+                        evaluateExpression(
+                          columnExpressions[column],
+                          columnMappings[column] ? item[columnMappings[column]] : null,
+                          item,
+                          index,
+                          selectedList
+                        )
+                      }}
+                    </div>
+                  </td>
+                </tr>
+                
+                <tr v-if="selectedList.length > 50">
+                  <td :colspan="Object.keys(columnMappings).length" class="px-4 py-2 text-sm text-center text-gray-500">
+                    Showing first 50 of {{ selectedList.length }} rows
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -459,8 +507,6 @@ defineExpose({
 }
 th.dragover-column {
   background-color: #e0f7fa;
-}
-th {
-  transition: background-color 0.2s ease;
+  border: 2px dashed #93c5fd;
 }
 </style>
