@@ -15,6 +15,7 @@ const draggedColumn = ref(null);
 const resizingColumn = ref(null);
 const startX = ref(0);
 const startWidth = ref(0);
+const newColumnName = ref('');
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -125,6 +126,22 @@ const handleListSelection = () => {
   }
 };
 
+// Add a new column
+const addNewColumn = () => {
+  if (!newColumnName.value.trim()) {
+    alert('Please enter a column name');
+    return;
+  }
+  
+  const columnKey = `custom_${Date.now()}`;
+  columnMappings.value[columnKey] = ''; // No property mapped initially
+  columnNames.value[columnKey] = newColumnName.value;
+  columnExpressions.value[columnKey] = 'value';
+  columnWidths.value[columnKey] = '150px';
+  
+  newColumnName.value = '';
+};
+
 // Drag and drop handlers for property mapping
 const dragStart = (e, property) => {
   e.dataTransfer.setData('text/plain', property);
@@ -226,10 +243,16 @@ const stopResize = () => {
 // Remove mapping
 const removeMapping = (column) => {
   const newMappings = { ...columnMappings.value };
+  const newNames = { ...columnNames.value };
+  const newExpressions = { ...columnExpressions.value };
   const newWidths = { ...columnWidths.value };
   delete newMappings[column];
+  delete newNames[column];
+  delete newExpressions[column];
   delete newWidths[column];
   columnMappings.value = newMappings;
+  columnNames.value = newNames;
+  columnExpressions.value = newExpressions;
   columnWidths.value = newWidths;
 };
 
@@ -289,32 +312,14 @@ const generateTable = () => {
       <h2 class="text-lg font-semibold mb-2">Customize Table Columns</h2>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <h3 class="text-sm font-medium text-gray-700">Available JSON Properties</h3>
-          <div class="mt-2 space-y-2">
-            <div v-for="prop in jsonProperties" :key="prop" class="draggable bg-blue-100 p-2 rounded"
-              draggable="true" @dragstart="dragStart($event, prop)">
-              {{ prop }}
-            </div>
-          </div>
-        </div>
-        <div>
-          <h3 class="text-sm font-medium text-gray-700">Table Columns</h3>
-          <div class="mt-2 space-y-2">
-            <div v-for="prop in jsonProperties" :key="prop" class="dropzone p-2 border rounded"
-              @dragover="dragOver" @dragleave="dragLeave" @drop="drop($event, prop)">
-              <label class="block text-sm font-medium text-gray-700">Column Name:</label>
-              <input type="text" v-model="columnNames[prop]" @input="updateColumnName(prop, $event.target.value)"
-                class="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm">
-              <label class="block text-sm font-medium text-gray-700 mt-2">Value Expression:</label>
-              <input type="text" v-model="columnExpressions[prop]" @input="updateColumnExpression(prop, $event.target.value)"
-                class="mt-1 block w-full border border-gray-300 rounded-md p-1 text-sm"
-                placeholder="e.g., value.toUpperCase() or item.name + ' (' + index + ')'">
-              <div v-if="columnMappings[prop]" class="mt-1">
-                <span class="block">Mapped to: {{ columnMappings[prop] }}</span>
-                <button @click="removeMapping(prop)" class="text-red-500 hover:text-red-700 text-sm">
-                  Remove Mapping
-                </button>
-              </div>
+          <div class="mt-4">
+            <h3 class="text-sm font-medium text-gray-700">Add New Column</h3>
+            <div class="mt-2 flex">
+              <input v-model="newColumnName" type="text" placeholder="New column name"
+                class="flex-1 border border-gray-300 rounded-l-md p-2 text-sm">
+              <button @click="addNewColumn" class="bg-green-500 text-white px-4 py-2 rounded-r-md hover:bg-green-600">
+                Add
+              </button>
             </div>
           </div>
         </div>
@@ -353,7 +358,8 @@ const generateTable = () => {
             <tr v-for="(item, index) in selectedList" :key="index">
               <td v-for="column in Object.keys(columnMappings)" :key="column" class="border px-4 py-2"
                 :style="{ width: columnWidths[column] || '250px' }">
-                {{ columnMappings[column] ? evaluateExpression(columnExpressions[column], item[columnMappings[column]], item, index, selectedList) : '' }}
+                {{ columnMappings[column] ? evaluateExpression(columnExpressions[column], item[columnMappings[column]], item, index, selectedList) : 
+                   evaluateExpression(columnExpressions[column], null, item, index, selectedList) }}
               </td>
             </tr>
           </tbody>
