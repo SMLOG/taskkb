@@ -17,6 +17,7 @@ const startX = ref(0);
 const startWidth = ref(0);
 const newColumnName = ref('');
 const columnToMap = ref('');
+const newColumnExpression = ref('value');
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -137,11 +138,12 @@ const addNewColumn = () => {
   const columnKey = `custom_${Date.now()}`;
   columnMappings.value[columnKey] = columnToMap.value;
   columnNames.value[columnKey] = newColumnName.value;
-  columnExpressions.value[columnKey] = 'value';
+  columnExpressions.value[columnKey] = newColumnExpression.value || 'value';
   columnWidths.value[columnKey] = '150px';
   
   newColumnName.value = '';
   columnToMap.value = '';
+  newColumnExpression.value = 'value';
 };
 
 // Drag and drop handlers for property mapping
@@ -316,8 +318,8 @@ const generateTable = () => {
         <div>
           <div class="mt-4">
             <h3 class="text-sm font-medium text-gray-700">Add New Column</h3>
-            <div class="mt-2 flex">
-              <div class="flex-1 flex">
+            <div class="mt-2 space-y-2">
+              <div class="flex">
                 <select v-model="columnToMap" class="border border-gray-300 rounded-l-md p-2 text-sm w-1/3">
                   <option value="">Select Property</option>
                   <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
@@ -325,9 +327,14 @@ const generateTable = () => {
                 <input v-model="newColumnName" type="text" placeholder="New column name"
                   class="flex-1 border border-gray-300 border-l-0 p-2 text-sm">
               </div>
-              <button @click="addNewColumn" class="bg-green-500 text-white px-4 py-2 rounded-r-md hover:bg-green-600">
-                Add
-              </button>
+              <div class="flex">
+                <input v-model="newColumnExpression" type="text" placeholder="Column expression (e.g., value.toUpperCase())"
+                  class="flex-1 border border-gray-300 rounded-l-md p-2 text-sm">
+                <button @click="addNewColumn" class="bg-green-500 text-white px-4 py-2 rounded-r-md hover:bg-green-600">
+                  Add Column
+                </button>
+              </div>
+              <p class="text-xs text-gray-500">Note: Use 'value' to reference the mapped property in expressions</p>
             </div>
           </div>
         </div>
