@@ -50,17 +50,18 @@ export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStar
   let targetNode = getRowFromDepth(rootTree, selectDetphEnd);
   let xDiff = event.clientX - dragStartClientX;
 
+  let detachNodeDepths = [];
   for (let depth of selectDepths.sort((a, b) => b.localeCompare(a))) {
 
     if(selectDetphEnd.indexOf(depth)==0)return;
 
-    let srcNode = deleteNode(rootTree, depth);
-
+    let srcNode = getRowFromDepth(rootTree, depth);
+    detachNodeDepths.push(depth)
     if (xDiff > 50) {
       // Make srcNode a child of targetNode
 
       if (!targetNode._childs) targetNode._childs = [];
-      targetNode._childs.push(...srcNode);
+      targetNode._childs.push(srcNode);
     } else {
       // Move srcNode next to targetNode at same level
 
@@ -68,9 +69,10 @@ export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStar
       let targetParent = getRowFromDepth(rootTree, targetParentDepth);
       let parentChilds = targetParent._childs;
       let targetIndex = parentChilds.findIndex(node => node === targetNode);
-      parentChilds.splice(targetIndex + 1, 0, ...srcNode);
+      parentChilds.splice(targetIndex + 1, 0,srcNode);
     }
   }
+  detachNodeDepths.map(e=>deleteNode(rootTree,e));
 }
 
 export function getRows(rootRow,level,depth) {

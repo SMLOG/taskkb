@@ -26,7 +26,6 @@ const selectDepthsRef = ref([]);
 const selectDepths = selectDepthsRef.value;
 const selectStartRef = ref(null);
 const isDrag = ref(false);
-const isDraging = ref(false);
 const dragMode = ref(false);
 const moveType = ref(null);
 const enableSelectionTimeout = ref(0);
@@ -162,10 +161,7 @@ export function useTree() {
 
   const handleMouseUp = (event) => {
     isMouseDown = false;
-    if (isDraging.value) {
-      isDraging.value = false;
-      return;
-    }
+  
     clearTimeout(enableSelectionTimeout.value);
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
@@ -256,11 +252,7 @@ export function useTree() {
         selectStartRef.value = null;
       }
     } else {
-      //if (selectStartRef.value && row !== selectStartRef.value.row) {
-       // selectStartRef.value = null;
-      //} else {
         selectRowSch(row, event);
-      //}
     }
   };
 
@@ -383,7 +375,6 @@ export function useTree() {
       dragStartClientX = event.clientX;
     }
 
-    isDraging.value = true;
 
     interceptor.classList.add('dragging');
   };
