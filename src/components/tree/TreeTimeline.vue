@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving }" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
+  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving,draging:isDraging }" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
@@ -152,7 +152,8 @@ const gridColumns = computed(() =>
   cols.value.length > 0 ? cols.value.map((col) => `${col.width}px`).join(' ') + ' 1fr' : '1fr'
 );
 const isHDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
-const isMoving = computed(() => moveType.value?.type === 'move'||isDrag.value);
+const isMoving = computed(() => moveType.value?.type === 'move');
+const isDraging = computed(() => isDrag.value);
 
 
 const handleEnterKeyUp = (event) => {
