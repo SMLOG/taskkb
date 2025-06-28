@@ -633,7 +633,7 @@ function handleDrag(e){
   return {
     calDiffDates,
     handleMouseDown,
-    handleMouseCellsMove: handleMouseMove,
+    handleMouseMove,
     handleMouseUp,
     weeksRef,
     cellClass,

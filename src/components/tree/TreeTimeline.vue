@@ -10,7 +10,7 @@
       @dragenter="handleDragenter"
       @dragleave="handleDragleave"
       @drop="handleDrop"
-      @mousemove="handleMouseCellsMove"
+      @mousemove="handleMouseMove"
       @mouseup.left="handleMouseUp"
       @dblclick="dblclickHandle"
     >
@@ -77,7 +77,7 @@ const appStore = useAppStore();
 const {
   handleDragOver,handleDragenter,handleDragleave,
   handleMouseDown,
-  handleMouseCellsMove,
+  handleMouseMove,
   handleMouseUp,
   cellClass,
   handleKeyDown,
