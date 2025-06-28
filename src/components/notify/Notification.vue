@@ -1,7 +1,7 @@
 <template>
   <transition name="dialog-fade" v-if="curShow>-1" >
     <div 
-       :class="`fixed z-50 top-5 left-1/2 transform -translate-x-1/2 p-4 rounded-lg shadow-lg transition-opacity duration-300 `"
+       :class="`fixed  top-5 left-1/2 z-999 transform -translate-x-1/2 p-4 transition-opacity duration-300 `"
        @click="hide">
        <div :class="`${params[curShow].type === 'success' ? 'bg-green-500' : 'bg-red-500'}`">
           <span class="text-white">{{ params[curShow].message }}</span>
