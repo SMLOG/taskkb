@@ -13,9 +13,9 @@
           </svg>
         </button>
         <input type="file" ref="fileInput" @change="selectTemplate" accept=".json" class="hidden" />
-        <button @click="createFromJson"
+        <button @click="startImportFromJson"
           class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
-          <span class="text-gray-800 dark:text-gray-200">create from json file</span>
+          <span class="text-gray-800 dark:text-gray-200">Import from JSON file</span>
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
             viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -109,7 +109,7 @@ const openFile = () => {
 
 };
 
-async function createFromJson(){
+async function startImportFromJson(){
  const {headers,rows} = await showDialog(JsonDataMapper,null,{size:'2md',backdrop:false});
   if (headers && rows) {
     const newTabId = uuidv4();
@@ -137,8 +137,7 @@ async function createFromJson(){
       })}
     };
     useAppStore().importToNewTab(newTabId, data);
-    emit('select-file');
-    emit('update:modelValue', false);
+    emit('confirm');
   }
 
 }
