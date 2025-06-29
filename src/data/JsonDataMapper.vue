@@ -329,111 +329,111 @@ defineExpose({
 </script>
 
 <template>
-  <div class="max-w-5xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+  <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg">
     <header class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-blue-600 mb-2">JSON to Table Mapper</h1>
       <p class="text-gray-600">Transform your JSON data into customizable tables</p>
     </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Left Panel - Data Input -->
-      <div class="lg:col-span-1 bg-gray-50 p-6 rounded-lg">
-        <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Data Input</h2>
-        
-        <div class="space-y-6">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Upload JSON File</label>
-            <input type="file" accept=".json" @change="handleFileUpload"
-              class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition-colors">
-          </div>
+    <div class="flex flex-col lg:flex-row gap-6">
+      <!-- Left Sidebar - Controls -->
+      <div class="lg:w-80 flex flex-col gap-6">
+        <!-- Data Input Card -->
+        <div class="bg-gray-50 p-5 rounded-lg shadow">
+          <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Data Input</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Upload JSON File</label>
+              <input type="file" accept=".json" @change="handleFileUpload"
+                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition-colors">
+            </div>
 
-          <div v-if="listSelectionVisible">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
-            <select v-model="listProperty" @change="handleListSelection"
-              class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
-              <option value="">Select a property</option>
-              <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- Middle Panel - Column Management -->
-      <div class="lg:col-span-1 bg-gray-50 p-6 rounded-lg" v-if="mappingSectionVisible">
-        <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Column Management</h2>
-        
-        <div class="space-y-4">
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h3 class="font-medium text-gray-700 mb-3">
-              {{ selectedColumn ? `Editing: ${columnNames[selectedColumn]}` : 'Create New Column' }}
-            </h3>
-            
-            <div class="space-y-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Column Name</label>
-                <input v-model="newColumnName" type="text" placeholder="Enter column name"
-                  class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-              </div>
-              
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Map to Property</label>
-                <select v-model="columnToMap" 
-                  class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                  <option value="">Select property (optional)</option>
-                  <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
-                </select>
-              </div>
-              
-              <div>
-                <label class="block text-xs font-medium text-gray-500 mb-1">Transformation</label>
-                <input v-model="newColumnExpression" type="text" placeholder="value.toUpperCase()"
-                  class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
-                <p class="text-xs text-gray-400 mt-1">Use 'value' to reference the mapped property</p>
-              </div>
-              
-              <div class="flex space-x-2 pt-2">
-                <button @click="addNewColumn" 
-                  class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors">
-                  {{ selectedColumn ? 'Update' : 'Add' }}
-                </button>
-                
-                <button v-if="selectedColumn" @click="clearSelection" 
-                  class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg transition-colors">
-                  Cancel
-                </button>
-              </div>
-              
-              <div v-if="selectedColumn" class="pt-2 border-t">
-                <button @click="removeMapping(selectedColumn)" 
-                  class="w-full text-red-500 hover:text-red-700 text-sm flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                  Remove Column
-                </button>
-              </div>
+            <div v-if="listSelectionVisible">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
+              <select v-model="listProperty" @change="handleListSelection"
+                class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                <option value="">Select a property</option>
+                <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
+              </select>
             </div>
           </div>
-          
-          <div class="bg-white p-4 rounded-lg shadow">
-            <h3 class="font-medium text-gray-700 mb-3">Quick Actions</h3>
-            <button @click="generateTable" 
-              class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">
-              Refresh Table View
-            </button>
+        </div>
+
+        <!-- Column Management Card -->
+        <div class="bg-gray-50 p-5 rounded-lg shadow" v-if="mappingSectionVisible">
+          <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Column Management</h2>
+          <div class="space-y-4">
+            <div>
+              <h3 class="font-medium text-gray-700 mb-3">
+                {{ selectedColumn ? `Editing: ${columnNames[selectedColumn]}` : 'Create New Column' }}
+              </h3>
+              
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Column Name</label>
+                  <input v-model="newColumnName" type="text" placeholder="Enter column name"
+                    class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Map to Property</label>
+                  <select v-model="columnToMap" 
+                    class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Select property (optional)</option>
+                    <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
+                  </select>
+                </div>
+                
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Transformation</label>
+                  <input v-model="newColumnExpression" type="text" placeholder="value.toUpperCase()"
+                    class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
+                  <p class="text-xs text-gray-400 mt-1">Use 'value' to reference the mapped property</p>
+                </div>
+                
+                <div class="flex space-x-2 pt-2">
+                  <button @click="addNewColumn" 
+                    class="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors">
+                    {{ selectedColumn ? 'Update' : 'Add' }}
+                  </button>
+                  
+                  <button v-if="selectedColumn" @click="clearSelection" 
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg transition-colors">
+                    Cancel
+                  </button>
+                </div>
+                
+                <div v-if="selectedColumn" class="pt-2 border-t">
+                  <button @click="removeMapping(selectedColumn)" 
+                    class="w-full text-red-500 hover:text-red-700 text-sm flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                    Remove Column
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div class="pt-2 border-t">
+              <button @click="generateTable" 
+                class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">
+                Refresh Table View
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Panel - Table Output -->
-      <div class="lg:col-span-1 lg:col-span-2" v-if="tableSectionVisible">
-        <div class="bg-white p-6 rounded-lg shadow">
+      <!-- Main Table Area -->
+      <div class="flex-1" v-if="tableSectionVisible">
+        <div class="bg-white p-6 rounded-lg shadow h-full">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-blue-500">Table Preview</h2>
             <span class="text-sm text-gray-500">{{ selectedList.length }} rows</span>
           </div>
           
-          <div class="overflow-x-auto border rounded-lg">
+          <div class="overflow-x-auto border rounded-lg h-[calc(100%-3rem)]">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
@@ -462,7 +462,7 @@ defineExpose({
               </thead>
               
               <tbody class="bg-white divide-y divide-gray-200">
-                <tr v-for="(item, index) in selectedList.slice(0, 50)" :key="index" class="hover:bg-gray-50">
+                <tr v-for="(item, index) in selectedList.slice(0, 100)" :key="index" class="hover:bg-gray-50">
                   <td v-for="column in Object.keys(columnMappings)" :key="column" class="px-4 py-2 text-sm text-gray-700"
                     :style="{ width: columnWidths[column] || '180px' }">
                     <div class="truncate">
@@ -479,9 +479,9 @@ defineExpose({
                   </td>
                 </tr>
                 
-                <tr v-if="selectedList.length > 50">
+                <tr v-if="selectedList.length > 100">
                   <td :colspan="Object.keys(columnMappings).length" class="px-4 py-2 text-sm text-center text-gray-500">
-                    Showing first 50 of {{ selectedList.length }} rows
+                    Showing first 100 of {{ selectedList.length }} rows
                   </td>
                 </tr>
               </tbody>
@@ -508,5 +508,22 @@ defineExpose({
 th.dragover-column {
   background-color: #e0f7fa;
   border: 2px dashed #93c5fd;
+}
+
+/* Improved scrollbar for table */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 </style>
