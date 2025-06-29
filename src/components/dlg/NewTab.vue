@@ -14,14 +14,15 @@
         </button>
         <input type="file" ref="fileInput" @change="selectTemplate" accept=".json" class="hidden" />
         <button @click="startImportFromJson"
-          class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
-          <span class="text-gray-800 dark:text-gray-200">Import from JSON file</span>
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
-            viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
-        </button>
+  class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
+  <span class="text-gray-800 dark:text-gray-200">Import from JSON file</span>
+  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <!-- JSON curly braces icon -->
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3v4a1 1 0 001 1h4m-5 10h-4a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V16a2 2 0 01-2 2h-1"/>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 9v2a1 1 0 01-1 1H5m0 3v-2a1 1 0 011-1h1"/>
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9v2a1 1 0 001 1h1m0 3v-2a1 1 0 00-1-1h-1"/>
+  </svg>
+</button>
       </div>
 
       <div class="flex items-center my-4">
