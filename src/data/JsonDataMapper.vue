@@ -427,15 +427,16 @@ defineExpose({
 
       <!-- Main Table Area -->
       <div class="flex-1" v-if="tableSectionVisible">
-        <div class="bg-white p-6 rounded-lg shadow h-full">
+        <div class="bg-white p-6 rounded-lg shadow h-full flex flex-col">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-blue-500">Table Preview</h2>
             <span class="text-sm text-gray-500">{{ selectedList.length }} rows</span>
           </div>
           
-          <div class="overflow-x-auto border rounded-lg h-[calc(100%-3rem)]">
+          <!-- Table Container with Sticky Headers -->
+          <div class="overflow-auto border rounded-lg flex-1 relative max-h-[70vh]">
             <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+              <thead class="bg-gray-50 sticky top-0 z-10">
                 <tr>
                   <th v-for="column in Object.keys(columnMappings)" :key="column" 
                     class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-move relative group"
@@ -525,5 +526,27 @@ th.dragover-column {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+/* Sticky header implementation */
+.relative {
+  position: relative;
+}
+.max-h-[70vh] {
+  max-height: 70vh;
+}
+.sticky {
+  position: sticky;
+}
+.top-0 {
+  top: 0;
+}
+.z-10 {
+  z-index: 10;
+}
+
+/* Header shadow when scrolled */
+.scrolled thead {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 </style>
