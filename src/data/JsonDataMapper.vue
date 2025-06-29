@@ -194,26 +194,6 @@ const removeMapping = (column) => {
   }
 };
 
-// Drag and drop handlers
-const dragStart = (e, property) => {
-  e.dataTransfer.setData('text/plain', property);
-};
-
-const dragOver = (e) => {
-  e.preventDefault();
-  e.currentTarget.classList.add('dragover');
-};
-
-const dragLeave = (e) => {
-  e.currentTarget.classList.remove('dragover');
-};
-
-const drop = (e, column) => {
-  e.preventDefault();
-  e.currentTarget.classList.remove('dragover');
-  const property = e.dataTransfer.getData('text/plain');
-  columnMappings.value = { ...columnMappings.value, [column]: property };
-};
 
 // Column reordering handlers
 const dragStartColumn = (e, column) => {
@@ -322,6 +302,26 @@ const generateTable = () => {
   tableSectionVisible.value = true;
 };
 
+function handleImport() {
+  if (selectedList.value.length === 0) {
+    alert('No data selected. Please select a valid JSON array.');
+    return;
+  }
+  
+  // Here you can handle the import logic, e.g., creating a new tab with the selected data
+  console.log('Importing data:', selectedList.value);
+  
+  // Reset state after import
+  jsonData.value = {};
+  selectedList.value = [];
+  columnMappings.value = {};
+  columnNames.value = {};
+  columnExpressions.value = {};
+  columnWidths.value = {};
+  listProperty.value = '';
+  mappingSectionVisible.value = false;
+  tableSectionVisible.value = false;
+}
 // Explicitly expose functions needed in template
 defineExpose({
   evaluateExpression
@@ -332,7 +332,7 @@ defineExpose({
   <div class="h-[85vh] flex flex-col">
     <header class="text-left flex justify-between items-center">
       <h1 class="text-3xl font-bold text-blue-600 mb-2 border-b">Import JSON List to create Tab</h1>
-      <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">OK</button>
+      <button @click="handleImport" class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">OK</button>
     </header>
 
     <div class="flex flex-col flex-1 lg:flex-row gap-6">
