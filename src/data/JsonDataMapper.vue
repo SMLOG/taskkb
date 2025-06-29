@@ -330,8 +330,9 @@ defineExpose({
 
 <template>
   <div class="h-[85vh] flex flex-col">
-    <header class="text-left">
+    <header class="text-left flex justify-between items-center">
       <h1 class="text-3xl font-bold text-blue-600 mb-2 border-b">Import JSON List to create Tab</h1>
+      <button class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">OK</button>
     </header>
 
     <div class="flex flex-col flex-1 lg:flex-row gap-6">
