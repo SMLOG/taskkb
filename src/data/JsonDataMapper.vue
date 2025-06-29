@@ -365,10 +365,10 @@ defineExpose({
 
     <div class="flex-1 relative">
       <div class="absolute inset-0 overflow-auto">
-        <div class="flex lg:flex-row gap-6 h-full">
+        <div class="flex flex-col lg:flex-row gap-6 h-full">
           <!-- Left Sidebar - Controls -->
           <div class="lg:w-80 flex flex-col gap-6 relative">
-            <div class="lg:absolute inset-0 overflow-y-auto">
+            <div class="lg:absolute inset-0 lg:overflow-y-auto">
               <!-- Data Input Card -->
               <div class="bg-gray-50 p-5 rounded-lg shadow">
                 <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Data Input</h2>
@@ -469,7 +469,7 @@ defineExpose({
 
               <div class="flex-1 relative">
                 <!-- Table Container with Sticky Headers -->
-                <div class="overflow-auto border rounded-lg flex-1 absolute h-full w-full inset-0">
+                <div class="lg:overflow-auto border rounded-lg flex-1 absolute h-full w-full inset-0">
                   <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50 sticky top-0 z-10">
                       <tr>
