@@ -329,16 +329,17 @@ defineExpose({
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+  <div class="h-[85vh] flex flex-col">
     <header class="mb-8 text-center">
       <h1 class="text-3xl font-bold text-blue-600 mb-2">JSON to Table Mapper</h1>
       <p class="text-gray-600">Transform your JSON data into customizable tables</p>
     </header>
 
-    <div class="flex flex-col lg:flex-row gap-6">
+    <div class="flex flex-col flex-1 lg:flex-row gap-6">
       <!-- Left Sidebar - Controls -->
-      <div class="lg:w-80 flex flex-col gap-6">
-        <!-- Data Input Card -->
+      <div class="lg:w-80 flex flex-col gap-6 relative">
+        <div class="absolute inset-0 overflow-y-auto">
+                  <!-- Data Input Card -->
         <div class="bg-gray-50 p-5 rounded-lg shadow">
           <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Data Input</h2>
           <div class="space-y-4">
@@ -423,18 +424,20 @@ defineExpose({
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Main Table Area -->
-      <div class="flex-1" v-if="tableSectionVisible">
-        <div class="bg-white p-6 rounded-lg shadow h-full flex flex-col">
+      <div class="flex flex-1" v-if="tableSectionVisible">
+        <div class="flex flex-1 flex-col">
           <div class="flex justify-between items-center mb-4">
             <h2 class="text-xl font-semibold text-blue-500">Table Preview</h2>
             <span class="text-sm text-gray-500">{{ selectedList.length }} rows</span>
           </div>
           
-          <!-- Table Container with Sticky Headers -->
-          <div class="overflow-auto border rounded-lg flex-1 relative max-h-[70vh]">
+<div class="flex-1 relative">
+            <!-- Table Container with Sticky Headers -->
+          <div class="overflow-auto border rounded-lg flex-1 absolute h-full w-full inset-0">
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50 sticky top-0 z-10">
                 <tr>
@@ -488,6 +491,7 @@ defineExpose({
               </tbody>
             </table>
           </div>
+</div>
         </div>
       </div>
     </div>

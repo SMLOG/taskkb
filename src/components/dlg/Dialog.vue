@@ -13,7 +13,7 @@
             aria-label="Close">
             &times;
           </button>
-          <div class="overflow-y-auto flex-1">
+          <div class="overflow-hidden flex-1">
             <div v-for="(c, index) in componentNameList" v-show="index === curShow" :key="index">
             <component v-if="params[index]" :is="c" @confirm="handleConfirm" @cancel="handleCancel" :params="params[index]" />
             <component v-else :is="c" @confirm="handleConfirm" @cancel="handleCancel"  />
