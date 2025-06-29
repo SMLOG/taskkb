@@ -20,6 +20,8 @@ const columnToMap = ref('');
 const newColumnExpression = ref('value');
 const selectedColumn = ref(null);
 
+
+
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
   const arrayProps = [];
@@ -356,7 +358,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="h-[85vh] flex flex-col relative">
+  <div class="h-[80vh] flex flex-col relative">
     <header class="text-left flex justify-between items-center">
       <h1 class="text-3xl font-bold text-blue-600 mb-2 border-b">Import JSON List to create Tab</h1>
       <button @click="handleImport"
@@ -371,13 +373,23 @@ defineExpose({
             <div class="lg:absolute inset-0 lg:overflow-y-auto">
               <!-- Data Input Card -->
               <div class="bg-gray-50 p-5 rounded-lg shadow">
-                <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Data Input</h2>
                 <div class="space-y-4">
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload JSON File</label>
-                    <input type="file" accept=".json" @change="handleFileUpload"
-                      class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200 transition-colors">
-                  </div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <span 
+                      class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
+                    >
+                      Upload JSON File
+                    </span>
+                    <input 
+                      type="file" 
+                      ref="fileInput"
+                      accept=".json" 
+                      @change="handleFileUpload" 
+                      class="hidden"
+                    >
+                  </label>
+                    </div>
 
                   <div v-if="listSelectionVisible">
                     <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
@@ -392,7 +404,7 @@ defineExpose({
 
               <!-- Column Management Card -->
               <div class="bg-gray-50 p-5 rounded-lg shadow" v-if="mappingSectionVisible">
-                <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Column Management</h2>
+                <h2 class="text-xl font-semibold mb-4 text-blue-500 border-b pb-2">Column Setting</h2>
                 <div class="space-y-4">
                   <div>
                     <h3 class="font-medium text-gray-700 mb-3">
