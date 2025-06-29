@@ -330,9 +330,8 @@ defineExpose({
 
 <template>
   <div class="h-[85vh] flex flex-col">
-    <header class="mb-8 text-center">
-      <h1 class="text-3xl font-bold text-blue-600 mb-2">JSON to Table Mapper</h1>
-      <p class="text-gray-600">Transform your JSON data into customizable tables</p>
+    <header class="text-left">
+      <h1 class="text-3xl font-bold text-blue-600 mb-2 border-b">Import JSON List to create Tab</h1>
     </header>
 
     <div class="flex flex-col flex-1 lg:flex-row gap-6">
