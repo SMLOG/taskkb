@@ -110,7 +110,37 @@ const openFile = () => {
 };
 
 async function createFromJson(){
-  await showDialog(JsonDataMapper,null,{size:'2md',backdrop:false});
+ const {headers,rows} = await showDialog(JsonDataMapper,null,{size:'2md',backdrop:false});
+  if (headers && rows) {
+    const newTabId = uuidv4();
+    const tabName = `New Tab ${tabs.value.length + 1}`;
+    const data = {
+      config: {
+        title: tabName,
+        startDate: new Date(),
+        cols: headers.map((header, index) => ({
+          id: uuidv4(),
+          fn: index + 1,
+          name: header['name'],
+          cp: 'ColDropText',
+          sticky: false,
+          show:true,
+          width:100,field: {}
+        }))
+      },
+      data: {_childs:rows.map((row, rowIndex) => {
+        const newRow = { id: uuidv4() };
+        headers.forEach((cell, cellIndex) => {
+          newRow[`c${cellIndex + 1}`] = ""+row[cell.id];
+        });
+        return newRow;
+      })}
+    };
+    useAppStore().importToNewTab(newTabId, data);
+    emit('select-file');
+    emit('update:modelValue', false);
+  }
+
 }
 function loadFile(event) {
   const file = event.target.files[0];

@@ -302,25 +302,52 @@ const generateTable = () => {
   tableSectionVisible.value = true;
 };
 
+const emit = defineEmits(["confirm","cancel"]);
+
 function handleImport() {
   if (selectedList.value.length === 0) {
     alert('No data selected. Please select a valid JSON array.');
     return;
   }
   
-  // Here you can handle the import logic, e.g., creating a new tab with the selected data
-  console.log('Importing data:', selectedList.value);
+  // Prepare the table header data
+  const headers = Object.keys(columnMappings.value).map(column => ({
+    id: column,
+    name: columnNames.value[column],
+    mappedProperty: columnMappings.value[column],
+    expression: columnExpressions.value[column],
+    width: columnWidths.value[column]
+  }));
   
-  // Reset state after import
-  jsonData.value = {};
-  selectedList.value = [];
-  columnMappings.value = {};
-  columnNames.value = {};
-  columnExpressions.value = {};
-  columnWidths.value = {};
-  listProperty.value = '';
-  mappingSectionVisible.value = false;
-  tableSectionVisible.value = false;
+  // Prepare the table rows data (limited to first 100 rows)
+  const rows = selectedList.value.slice(0, 100).map((item, index) => {
+    const rowData = {};
+    Object.keys(columnMappings.value).forEach(column => {
+      rowData[column] = evaluateExpression(
+        columnExpressions.value[column],
+        columnMappings.value[column] ? item[columnMappings.value[column]] : null,
+        item,
+        index,
+        selectedList.value
+      );
+    });
+    return rowData;
+  });
+  
+  // Log the data to console
+  console.log('----- TABLE HEADERS -----');
+  console.log(headers);
+  console.log('----- TABLE ROWS -----');
+  console.log(rows);
+  console.log('Total rows:', selectedList.value.length);
+
+  emit('confirm', {
+    headers: headers,
+    rows: rows,
+    totalRows: selectedList.value.length
+  });
+  
+
 }
 // Explicitly expose functions needed in template
 defineExpose({

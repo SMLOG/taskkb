@@ -94,7 +94,11 @@ const sanitizePaste = (e) => {
 
 const convertMarkdownToHtml = (markdown) => {
   const tempElement = document.createElement("div");
+  try{
   tempElement.innerHTML = marked.parse(markdown);
+  }catch(e){
+ tempElement.innerHTML =markdown;
+  }
   const links = tempElement.getElementsByTagName('a');
   for (let i = 0; i < links.length; i++) {
     links[i].setAttribute('target', '_blank');
