@@ -68,7 +68,7 @@ import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
-import { deepClone } from '@/lib/parse';
+import { deepClone, jsonParse } from '@/lib/parse';
 import { showDialog } from '@/composables/useSystem';
 import JsonDataMapper from '@/data/JsonDataMapper.vue';
 
@@ -154,7 +154,7 @@ function loadFile(event) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        let data = JSON.parse(e.target.result);
+        let data = jsonParse(e.target.result);
         if (data && data.data && data.config) {
           const newTabId = uuidv4();
 

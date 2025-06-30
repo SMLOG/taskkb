@@ -117,16 +117,14 @@ const renderToHtml = (modelValue) => {
 };
 
 function truncateHTMLWithLinks(html, charLimit) {
-  // Create a temporary div to parse the HTML
   const tempDiv = document.createElement('div');
   tempDiv.innerHTML = html;
 
-  // Function to traverse nodes and count characters
   let charCount = 0;
   let shouldTruncate = false;
-  let truncatedNodes = [];
+  const truncatedNodes = [];
 
-  function traverseNodes(node) {
+  function processNode(node) {
     if (shouldTruncate) return;
 
     if (node.nodeType === Node.TEXT_NODE) {
@@ -137,10 +135,14 @@ function truncateHTMLWithLinks(html, charLimit) {
       }
 
       if (node.textContent.length > remainingChars) {
-        // Truncate this text node
         const truncatedText = node.textContent.substring(0, remainingChars);
         const newNode = document.createTextNode(truncatedText + '...');
-        truncatedNodes.push({ parent: node.parentNode, original: node, newNode });
+        truncatedNodes.push({
+          parent: node.parentNode,
+          original: node,
+          newNode,
+          nextSibling: node.nextSibling
+        });
         node.parentNode.replaceChild(newNode, node);
         charCount += remainingChars;
         shouldTruncate = true;
@@ -148,24 +150,43 @@ function truncateHTMLWithLinks(html, charLimit) {
         charCount += node.textContent.length;
       }
     } else if (node.nodeType === Node.ELEMENT_NODE) {
-      // For element nodes, traverse their children
-      for (let i = 0; i < node.childNodes.length; i++) {
-        traverseNodes(node.childNodes[i]);
+      // Skip certain elements that don't contain visible text
+      if (['br', 'hr', 'img'].includes(node.tagName.toLowerCase())) {
+        return;
+      }
+      
+      // Process child nodes
+      const children = Array.from(node.childNodes);
+      for (const child of children) {
+        processNode(child);
         if (shouldTruncate) break;
       }
     }
   }
 
-  // Start traversal
-  for (let i = 0; i < tempDiv.childNodes.length; i++) {
-    traverseNodes(tempDiv.childNodes[i]);
+  // Process all top-level nodes
+  const children = Array.from(tempDiv.childNodes);
+  for (const child of children) {
+    processNode(child);
     if (shouldTruncate) break;
   }
 
+  // Remove any remaining content after truncation point
+  if (shouldTruncate) {
+    for (const {parent, newNode, nextSibling} of truncatedNodes) {
+      let node = nextSibling;
+      while (node) {
+        const next = node.nextSibling;
+        parent.removeChild(node);
+        node = next;
+      }
+    }
 
+  }
 
   return tempDiv.innerHTML;
 }
+
 
 function handleEditorClick(event){
   if(event.target.classList.contains('show')){
@@ -178,6 +199,7 @@ function handleEditorClick(event){
 }
 
 function truncateText(){
+  if( props.modelValue==undefined)return "";
   const html = renderToHtml(props.modelValue)
   return truncateHTMLWithLinks(html,50);
 }
