@@ -1,8 +1,8 @@
 <template>
   <div class="editable-dropdown h-full" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick">
     <div  class="flex flex-1 h-full justify-between">
-      <div ref="contentEditable" @dblclick="dblclick"  :contenteditable="editable" @paste="sanitizePaste" @keyup.enter="handleEnterUp"  @keydown.enter="handleEnterDown"
-        @focus="showDropdown = true" class="text h-full flex-1" v-html="renderToHtml(modelValue)">
+      <div ref="contentEditable" @dblclick="dblclick" @click="handleEditorClick"  :contenteditable="editable" @paste="sanitizePaste" @keyup.enter="handleEnterUp"  @keydown.enter="handleEnterDown"
+        @focus="showDropdown = true" class="text h-full flex-1" v-html="editable?renderToHtml(modelValue):truncateText(modelValue)">
       </div>
       <div v-if="editable" class="dropdown-toggle absolute right-0 top-0 flex items-center justify-between p-0 mt-1 py-0 bg-white dark:bg-gray-800 border-none border-gray-300 dark:border-gray-600 rounded-md" @click="toggleDropdown">
         <svg class="w-3 h-3 m-0 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -115,6 +115,73 @@ const renderToHtml = (modelValue) => {
   }
   return modelValue ? modelValue.replace(/\n/g, '<br>') : modelValue;
 };
+
+function truncateHTMLWithLinks(html, charLimit) {
+  // Create a temporary div to parse the HTML
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+
+  // Function to traverse nodes and count characters
+  let charCount = 0;
+  let shouldTruncate = false;
+  let truncatedNodes = [];
+
+  function traverseNodes(node) {
+    if (shouldTruncate) return;
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      const remainingChars = charLimit - charCount;
+      if (remainingChars <= 0) {
+        shouldTruncate = true;
+        return;
+      }
+
+      if (node.textContent.length > remainingChars) {
+        // Truncate this text node
+        const truncatedText = node.textContent.substring(0, remainingChars);
+        const newNode = document.createTextNode(truncatedText + '...');
+        truncatedNodes.push({ parent: node.parentNode, original: node, newNode });
+        node.parentNode.replaceChild(newNode, node);
+        charCount += remainingChars;
+        shouldTruncate = true;
+      } else {
+        charCount += node.textContent.length;
+      }
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+      // For element nodes, traverse their children
+      for (let i = 0; i < node.childNodes.length; i++) {
+        traverseNodes(node.childNodes[i]);
+        if (shouldTruncate) break;
+      }
+    }
+  }
+
+  // Start traversal
+  for (let i = 0; i < tempDiv.childNodes.length; i++) {
+    traverseNodes(tempDiv.childNodes[i]);
+    if (shouldTruncate) break;
+  }
+
+
+
+  return tempDiv.innerHTML;
+}
+
+function handleEditorClick(event){
+  if(event.target.classList.contains('show')){
+   const isMore = event.target.classList.contains('more');
+    event.target.classList.remove(isMore?'more':'less');
+    event.target.classList.add(isMore?'less':'more');
+    event.target.innerHTML=isMore?'Less':'More';
+
+  }
+}
+
+function truncateText(){
+  const html = renderToHtml(props.modelValue)
+  return truncateHTMLWithLinks(html,50);
+}
+
 
 const moveCursorToEnd = (element) => {
   element.focus();
