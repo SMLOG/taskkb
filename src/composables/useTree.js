@@ -6,6 +6,7 @@ import {
   getRowFromDepth,
   moveNode,
   deleteNode,
+  deleteNodes,
   copyNode,
   getRows,
   appendNodeNextTo,
@@ -465,9 +466,7 @@ export function useTree() {
   };
   const delSelectedNode = () => {
     let rootObj = useAppStore().treeRef;
-    for (let depth of selectDepths) {
-      deleteNode(rootObj, depth);
-    }
+      deleteNodes(rootObj, selectDepths);
     selectDepths.length = 0;
   };
   const copySelectedNode = () => {

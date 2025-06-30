@@ -35,6 +35,7 @@ export function deleteNode(rootTree, depth) {
   return parentNode._childs.splice(index, 1);
 
 }
+
 function deepCopyObject(obj) {
   return JSON.parse(JSON.stringify(obj));
 }
@@ -46,6 +47,59 @@ export function copyNode(rootTree, depth) {
   parentChilds.splice(index, 0, deepCopyObject(parentChilds[index]));
 
 }
+
+function removeChildNodes(tree, nodesArray) {
+  // Input validation
+  if (!tree || typeof tree !== 'object' || !Array.isArray(tree._childs)) {
+      throw new TypeError('Tree must be an object with a _childs array');
+  }
+  if (!Array.isArray(nodesArray)) {
+      throw new TypeError('nodesArray must be an array');
+  }
+
+  // Create a set of nodes to remove for efficient lookup
+  const nodesToRemove = new Set(nodesArray.filter(node => node && typeof node === 'object'));
+  let removedCount = 0;
+
+  // Map to store parent references
+  const parentMap = new Map();
+
+  // Helper function to find parents by traversing the tree
+  function findParents(currentNode, parent = null) {
+      if (!currentNode || !Array.isArray(currentNode._childs)) return;
+
+      // Map each child to its parent
+      currentNode._childs.forEach(child => {
+          if (nodesToRemove.has(child)) {
+              parentMap.set(child, currentNode);
+          }
+          findParents(child, currentNode);
+      });
+  }
+
+  // Find parents for all nodes in nodesToRemove
+  findParents(tree);
+
+  // Remove nodes from their parents' _childs arrays
+  for (const node of nodesToRemove) {
+      const parent = parentMap.get(node);
+      if (parent && Array.isArray(parent._childs)) {
+          const initialLength = parent._childs.length;
+          parent._childs = parent._childs.filter(child => child !== node);
+          removedCount += initialLength - parent._childs.length;
+      }
+  }
+
+  return removedCount;
+}
+
+export function deleteNodes(rootTree,depts){
+  const nodes = depts.map(depth=>getRowFromDepth(rootTree, depth));
+
+  return removeChildNodes(rootTree,nodes);
+}
+
+
 
 function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = false) {
   // Validate inputs
