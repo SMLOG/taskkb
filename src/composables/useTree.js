@@ -111,9 +111,10 @@ export function useTree() {
       const target = event.target;
 
       // Handle number cell click
+     const schDrag =   target.closest('.selectStartRef');
 
-
-      if (selectDepths.length>0) {
+     if(!schDrag){
+      if (selectDepths.length>0 ) {
         if (selectDepths.includes(depth)) {
           isDrag.value = true;
         }else{
@@ -136,6 +137,8 @@ export function useTree() {
          //handleNumClick(depth);
         },300);
       }
+     }
+
 
       // Clear selection if not a number cell
       selectDepths.length = 0;
@@ -265,13 +268,14 @@ export function useTree() {
 
   const handleMouseMove = (event) => {
     const rowEl = event.target.closest(".row");
+    const sch = event.target.closest(".sch");
+
     if (rowEl && isMouseDown && !isDrag.value && selectDepths.length) {
       handleSelection(rowEl);
     }
 
     clearTimeout(enableDragTimeout.value);
 
-    const sch = event.target.closest(".sch");
     if (sch) {
       const { left, width: totalWidth } = sch.getBoundingClientRect();
       const x = event.clientX - left;
