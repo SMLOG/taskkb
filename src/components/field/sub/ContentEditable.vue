@@ -159,7 +159,16 @@ function truncateHTMLWithLinks(html, charLimit) {
       const children = Array.from(node.childNodes);
       for (const child of children) {
         processNode(child);
-        if (shouldTruncate) break;
+        if (shouldTruncate) {
+          // Remove remaining siblings in this parent
+          let next = child.nextSibling;
+          while (next) {
+            const toRemove = next;
+            next = next.nextSibling;
+            node.removeChild(toRemove);
+          }
+          break;
+        }
       }
     }
   }
@@ -168,20 +177,26 @@ function truncateHTMLWithLinks(html, charLimit) {
   const children = Array.from(tempDiv.childNodes);
   for (const child of children) {
     processNode(child);
-    if (shouldTruncate) break;
+    if (shouldTruncate) {
+      // Remove remaining top-level siblings
+      let next = child.nextSibling;
+      while (next) {
+        const toRemove = next;
+        next = next.nextSibling;
+        tempDiv.removeChild(toRemove);
+      }
+      break;
+    }
   }
 
-  // Remove any remaining content after truncation point
-  if (shouldTruncate) {
-    for (const {parent, newNode, nextSibling} of truncatedNodes) {
-      let node = nextSibling;
-      while (node) {
-        const next = node.nextSibling;
-        parent.removeChild(node);
-        node = next;
-      }
+  // Apply any text node truncations
+  for (const {parent, newNode, nextSibling} of truncatedNodes) {
+    let node = nextSibling;
+    while (node) {
+      const next = node.nextSibling;
+      parent.removeChild(node);
+      node = next;
     }
-
   }
 
   return tempDiv.innerHTML;
