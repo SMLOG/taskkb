@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="tab flex flex-1 items-center justify-between pr-4 pl-2 py-1 cursor-pointer text-sm font-medium relative" 
+    class="tab flex flex-1 items-center justify-between pr-4 pl-2 py-1 cursor-pointer text-sm font-medium relative [container-type:inline-size]" 
     :class="{ 'active': isActive }" 
     @click="$emit('click')"
     @dblclick="startEditing"
