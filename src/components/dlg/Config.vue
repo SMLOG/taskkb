@@ -11,8 +11,9 @@
 
       <!-- Columns List -->
       <div class="space-y-3 max-h-[60vh] overflow-y-auto">
-        <div v-for="(col, index) in cols" :key="col.id" class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
-          <div class="w-12 text-center text-gray-500 dark:text-gray-400" draggable="true" @dragstart="dragstart($event, col, index)" @dragover.prevent="dragOver" @drop="drop($event, col, index)">{{ index + 1 }}</div>
+        <VueDraggable ref="el" v-model="cols" :animation="150">
+        <div v-for="(col, index) in cols" :key="col.id"   class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <div class="w-12 text-center text-gray-500 dark:text-gray-400" >{{ index + 1 }}</div>
           <div class="w-20">
             <select v-model="col.cp" class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400">
               <option v-for="cp in cpList" :key="cp.type" :value="cp.type">{{ cp.name }}</option>
@@ -40,6 +41,7 @@
             x
           </button>
         </div>
+        </VueDraggable>
       </div>
 
       <!-- General Settings -->
@@ -93,6 +95,7 @@ import { cpList } from '@/components/cpList';
 import { v4 as uuidv4 } from 'uuid';
 import { useAppStore } from '@/stores/appStore';
 import { debounce } from 'lodash';
+import { VueDraggable } from 'vue-draggable-plus'
 
 // Interfaces
 interface Column {
@@ -109,7 +112,6 @@ interface Column {
 const emit = defineEmits(['confirm', 'cancel']);
 
 // Reactive state
-const dragStartIndex = ref<number | null>(null);
 const showConfirm = ref(false);
 const confirmColIndex = ref<number | null>(null);
 const confirmColName = ref<string>('');
@@ -119,12 +121,10 @@ const emojiError = ref<string>('');
 const appStore = useAppStore();
 
 // Computed properties
-const cols = computed(() => appStore.configRef?.cols);
+const cols = ref(appStore.configRef?.cols)
 const config = computed(() => appStore.configRef);
 
-const dragstart = (event: DragEvent, row: Column, index: number) => {
-  dragStartIndex.value = index;
-};
+
 
 // Emoji validation regex (basic, covers most common emojis)
 const emojiRegex = /[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2B50}\u{2B55}\u{FE00}-\u{FE0F}\u{1F1E6}-\u{1F1FF}]/u;
@@ -181,20 +181,14 @@ watch(
   { immediate: true }
 );
 
-const dragOver = (event: DragEvent) => {
-  event.preventDefault();
-};
 
-const drop = (event: DragEvent, row: Column, endIndex: number) => {
-  if (dragStartIndex.value === null) return;
-
-  const startIndex = dragStartIndex.value;
-  const startRow = cols.value.splice(startIndex, 1)[0];
-  const adjustedEndIndex = endIndex > startIndex ? endIndex - 1 : endIndex;
-  const endRow = cols.value.splice(adjustedEndIndex, 1, startRow)[0];
-  cols.value.splice(startIndex, 0, endRow);
-  dragStartIndex.value = null;
-};
+watch(
+  () => cols.value,
+  (newCols) => {
+    config.value.cols = newCols ;
+  },
+  { immediate: true }
+);
 
 const findMissingNumber = (list: number[]): number => {
   const sorted = [...list].sort((a, b) => a - b);
