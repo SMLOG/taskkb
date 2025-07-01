@@ -1,8 +1,10 @@
 <template>
   <div >
     <div class="container mx-auto p-0 pb-0 min-w-full select-none flex just-between">
-      <TabsPanel />
-      <RightTop/>
+      <div class="flex-1 flex"><TabsPanel /></div>
+      <div><RightTop/></div>
+      
+      
     </div>
   </div>
 </template>
