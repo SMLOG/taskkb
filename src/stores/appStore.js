@@ -177,17 +177,18 @@ export const useAppStore = defineStore('app', () => {
     try {
       // Store current tab to be removed
       const tab = tabs.value[index];
+      tabs.value.splice(index, 1);
+      delete tabsDataMapRef.value[tab.id];
 
       // Adjust active tab index before removal
-      if (tabs.value.length === 1) {
-        setActiveTab(-1);
-      } else if (activeTabRef.value >= index) {
-        await setActiveTab(Math.max(0, activeTabRef.value - 1));
+      if (tabs.value.length === 0) {
+        await setActiveTab(-1);
+      } else {
+        await setActiveTab(Math.max(0, index - 1));
       }
 
       // Remove tab and associated data
-      tabs.value.splice(index, 1);
-      delete tabsDataMapRef.value[tab.id];
+
 
       // Reset state if no tabs remain
 
