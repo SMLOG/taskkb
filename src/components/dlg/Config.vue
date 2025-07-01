@@ -11,7 +11,7 @@
 
       <!-- Columns List -->
       <div class="space-y-3 max-h-[60vh] overflow-y-auto">
-        <VueDraggable ref="el" v-model="cols" :animation="150">
+        <VueDraggable ref="el" v-model="cols" :animation="150"   ghostClass="ghost">
         <div v-for="(col, index) in cols" :key="col.id"   class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
           <div class="w-12 text-center text-gray-500 dark:text-gray-400" >{{ index + 1 }}</div>
           <div class="w-20">
@@ -273,6 +273,11 @@ input[type="text"] {
 /* Smooth transition for popup appearance */
 .fixed {
   animation: fadeIn 0.3s ease-in-out;
+}
+
+.ghost {
+  opacity: 0.5;
+  background: #c8ebfb;
 }
 
 @keyframes fadeIn {
