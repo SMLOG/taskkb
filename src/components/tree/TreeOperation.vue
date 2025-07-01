@@ -24,12 +24,6 @@
             </button>
           </div>
 
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button v-if="false" @click="showConfig = !showConfig" class="btn-secondary">
-              👥 Team
-            </button>
-          </div>
-
           <div class="relative" @blur="showDropdown = false" ref="menuRef">
             <button
               ref="moreButton"
@@ -67,9 +61,7 @@
           </div>
 
           <div class="flex items-center gap-2">
-            <button @click="toggleFullscreen" class="btn-secondary">
-              {{ isFullscreen ? '⤣ Exit Fullscreen' : '⤢ Fullscreen' }}
-            </button>
+            <FullscreenToggle />
           </div>
         </div>
       </div>
@@ -114,6 +106,7 @@ import { storeToRefs } from 'pinia'
 import {downloadJSON} from '@/lib/parse';
 import {showNotification} from '@/composables/useSystem';
 import {showDialog} from '@/composables/useSystem';
+import FullscreenToggle from '../FullscreenToggle.vue';
 
 
 
@@ -127,15 +120,13 @@ const openConfig = async()=>{
 
 
 const { selectDepths } = tree;
-const showConfig = ref(false);
-const { configRef, treeRef,typeRef } = storeToRefs(useAppStore());
+const { configRef, treeRef } = storeToRefs(useAppStore());
 
 const menuRef = ref(null);
 const showDropdown = ref(false);
 const moreButton = ref(null);
 const dropdownPosition = ref('top');
 const DROPDOWN_HEIGHT = 200;
-const isFullscreen = ref(false);
 
 const savingRef = ref(false);
 
@@ -148,7 +139,6 @@ const handleClickOutside = (event) => {
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
-  document.addEventListener('fullscreenchange', handleFullscreenChange);
 });
 
 onBeforeUnmount(() => {
@@ -156,23 +146,8 @@ onBeforeUnmount(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange);
 });
 
-function handleFullscreenChange() {
-  isFullscreen.value = !!document.fullscreenElement;
-}
 
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch((err) => {
-      console.error('Error entering fullscreen:', err);
-      showNotification('Failed to enter fullscreen', 'error');
-    });
-  } else {
-    document.exitFullscreen().catch((err) => {
-      console.error('Error exiting fullscreen:', err);
-      showNotification('Failed to exit fullscreen', 'error');
-    });
-  }
-}
+
 
 
 
