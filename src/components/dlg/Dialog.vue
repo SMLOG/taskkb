@@ -51,9 +51,10 @@ const dialogWidth = computed(() => {
 });
 
 // Methods
-const handleCancel = (ret) => {
+const handleCancel = (event) => {
+    event?.target?.blur(); 
   if (returnRejectList.value[curShow.value]) {
-    returnRejectList.value[curShow.value](ret ?? 'canceled');
+    returnRejectList.value[curShow.value](event ?? 'canceled');
   }
   cleanup();
 };
