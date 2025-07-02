@@ -14,17 +14,17 @@
 </template>
 
 <script setup>
-import { ref,nextTick } from 'vue';
+import { nextTick } from 'vue';
 import { useAppStore } from '@/stores/appStore';
 
+const emit = defineEmits([ "confirm", "cancel"]);
+
+
 // Define reactive variables or functions
-const handleCancel = () => {
-    console.log('Cancel clicked');
-    nextTick(()=>{
-        useAppStore().resetPath();
-    })
-    isOpen.value = false;
-    returnResolve.value();
+const handleCancel = async () => {
+    await nextTick();
+    useAppStore().resetPath();
+    emit('cancel');
 };
 
 const handleTryOpen = () => {
@@ -35,22 +35,6 @@ const handleChangeUser = () => {
     console.log('Change user clicked');
 };
 
-const returnResolve = ref(null);
-const returnReject = ref(null);
-const isOpen = ref(false);
 
-defineExpose({
-  async open() {
-    return new Promise((resolve, reject) => {
-      returnResolve.value = resolve;
-      returnReject.value = reject;
-      isOpen.value = true;
-    })
-  }
-});
 
 </script>
-
-<style scoped>
-/* Add any custom styles here if needed */
-</style>

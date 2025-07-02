@@ -143,7 +143,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
-  document.removeEventListener('fullscreenchange', handleFullscreenChange);
 });
 
 
