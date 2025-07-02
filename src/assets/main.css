@@ -83,3 +83,4 @@ body * {
   cursor: move;
 }
 
+.show.less,.show.more{font-weight: bold;}
