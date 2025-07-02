@@ -124,40 +124,7 @@ export async function pickUrl() {
                 button:hover {
                     background-color: #e0e0e0;
                 }
-                #itemList {
-                    flex-grow: 1;
-                    max-height: 250px;
-                    overflow-y: auto;
-                    border: 1px solid #eee;
-                    padding: 10px;
-                    margin-top: 15px;
-                }
-                #itemList p {
-                    margin: 5px 0;
-                    padding: 8px;
-                    cursor: pointer;
-                    border-radius: 4px;
-                    display: flex;
-                    justify-content: space-between;
-                    transition: background-color 0.2s;
-                }
-                #itemList p:hover {
-                    background-color: #f5f5f5;
-                }
-                #itemList p.selected {
-                    background-color: #e0f0ff;
-                    border-left: 4px solid #4a90e2;
-                }
-                .file-size {
-                    color: #666;
-                    font-size: 0.9em;
-                }
-                .no-items {
-                    color: #777;
-                    text-align: center;
-                    padding: 20px;
-                    display: none; /* Start hidden */
-                }
+    
                 .button-container {
                     display: flex;
                     justify-content: flex-end;
@@ -170,6 +137,19 @@ export async function pickUrl() {
                 .button-container button:first-child:hover {
                     background-color: #3a7bc8;
                 }
+                .confirm-btn {
+                    padding: 10px 16px;
+                    background-color: #4a90e2;
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 14px;
+                    transition: all 0.2s;
+                    white-space: nowrap;
+                }
+
             </style>
         </head>
         <body>
@@ -179,7 +159,7 @@ export async function pickUrl() {
                     <h3>Input a .treegridio URL</h3>
                     <div class="url">
                         <input type="text" id="urlInput" placeholder="input .treegridio url..." >
-                        <button onclick="confirmUrl()"/>
+                        <button class="confirm-btn" onclick="confirmUrl()">Load URL</button>
                     </div>
                     
                 </div>
