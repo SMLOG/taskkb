@@ -47,7 +47,7 @@ const dialogWidth = computed(() => {
     'xl': 'max-w-xl',
     'full': 'max-w-[90vw]',
     '2md': 'max-w-2md'
-  }[optionsRef.value.size||'md'];
+  }[optionsRef.value[optionsRef.value.length-1].size||'md'];
 });
 
 // Methods
@@ -79,18 +79,20 @@ const cleanup = () => {
     returnRejectList.value = [];
     componentNameList.value = [];
     params.value = [];
+    optionsRef.value = [];
   } else {
     // Otherwise just trim the arrays
     returnResolveList.value.length = curShow.value;
     returnRejectList.value.length = curShow.value;
     componentNameList.value.length = curShow.value;
+    optionsRef.value.length = curShow.value;;
     params.value.length = curShow.value;
   }
 
   curShow.value--;
 };
 
-const optionsRef=ref({});
+const optionsRef=ref([]);
 
 // Exposed API
 defineExpose({
@@ -101,7 +103,7 @@ defineExpose({
       returnRejectList.value.push(reject);
       componentNameList.value.push(component);
       params.value.push(param);
-      optionsRef.value = options;
+      optionsRef.value.push(options);
       curShow.value = returnRejectList.value.length - 1;
     });
   },
