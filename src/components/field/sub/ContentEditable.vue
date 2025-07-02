@@ -2,7 +2,7 @@
   <div class="editable-dropdown h-full" ref="container" style="width: 100%;min-width: 1em;" @dblclick="dblclick">
     <div  class="flex flex-1 h-full justify-between">
       <div ref="contentEditable" @dblclick="dblclick" @click="handleEditorClick"  :contenteditable="editable" @paste="sanitizePaste" @keyup.enter="handleEnterUp"  @keydown.enter="handleEnterDown"
-        @focus="showDropdown = true" class="text h-full flex-1" :class="`${editable?'mr-3':''}`" v-html="editable?renderToHtml(modelValue):truncateText(modelValue)">
+        @focus="showDropdown = true" class="text h-full flex-1" :class="`${editable?'mr-3':''}`" v-html="truncateText(modelValue)">
       </div>
       <div v-if="editable" class="dropdown-toggle absolute right-0 top-0 flex items-center justify-between p-0 mt-1 py-0 bg-white dark:bg-gray-800 border-none border-gray-300 dark:border-gray-600 rounded-md" @click="toggleDropdown">
         <svg class="w-3 h-3 m-0 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -136,7 +136,7 @@ function truncateHTMLWithLinks(html, charLimit) {
 
       if (node.textContent.length > remainingChars) {
         const truncatedText = node.textContent.substring(0, remainingChars);
-        const newNode = document.createTextNode(truncatedText + '...');
+        const newNode = document.createTextNode(truncatedText /*+ '...'*/);
         truncatedNodes.push({
           parent: node.parentNode,
           original: node,
@@ -199,7 +199,7 @@ function truncateHTMLWithLinks(html, charLimit) {
     }
   }
 
-  return tempDiv.innerHTML;
+  return tempDiv.innerHTML+(shouldTruncate?"<span>...</span>":"");
 }
 
 
@@ -213,9 +213,13 @@ function handleEditorClick(event){
   }
 }
 
-function truncateText(){
-  if( props.modelValue==undefined)return "";
-  const html = renderToHtml(props.modelValue)
+function truncateText(modelValue){
+  if( modelValue==undefined)return "";
+  
+  const html = renderToHtml(modelValue)
+
+  if(editable.value)return html;
+
   return truncateHTMLWithLinks(html,50);
 }
 
