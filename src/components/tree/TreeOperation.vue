@@ -1,5 +1,5 @@
 <template>
-  <div id="operation" class="sticky bottom-0 left-0 z-5 bg-white dark:bg-gray-900 shadow-lg">
+  <div id="operation" class="sticky bottom-0 left-0 z-7 bg-white dark:bg-gray-900 shadow-lg">
     <div class="max-w-screen-xl mx-auto px-4">
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <div class="flex flex-wrap items-center gap-2 py-3">
