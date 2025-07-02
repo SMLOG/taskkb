@@ -66,6 +66,11 @@
           />
           <span v-if="emojiError" class="text-red-500 dark:text-red-400 text-xs">{{ emojiError }}</span>
         </label>
+
+        <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
+          <button class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" @click="showDescription">Description</button>
+        </label>
+
       </div>
     </div>
 
@@ -96,6 +101,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { useAppStore } from '@/stores/appStore';
 import { debounce } from 'lodash';
 import { VueDraggable } from 'vue-draggable-plus'
+import { showDialog } from '@/composables/useSystem';
+import Description from './Description.vue';
 
 // Interfaces
 interface Column {
@@ -123,6 +130,12 @@ const appStore = useAppStore();
 // Computed properties
 const cols = ref(appStore.configRef?.cols)
 const config = computed(() => appStore.configRef);
+
+
+const showDescription = async()=>{
+  await showDialog(Description)
+  
+}
 
 
 
