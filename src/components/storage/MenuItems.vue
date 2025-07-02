@@ -111,6 +111,7 @@ const menuItems = ref([
               { label: 'Browser', action: () => handleAction('open-from-browser') },
               { label: 'Device', action: () => handleAction('open-from-device') },
               { label: 'LocalStorage(deprecated)', action: () => handleAction('open-from-local') },
+              { label: 'URL', action: () => handleAction('open-from-url') },
             ],
           },
         ],
@@ -202,6 +203,7 @@ const handleAction = async (id) => {
       'open-from-browser': 'B',
       'open-from-device': 'D',
       'open-from-local': 'L',
+      'open-from-url': 'U',
     };
 
     if (storageActions[id]) {
