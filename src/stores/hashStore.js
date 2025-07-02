@@ -28,6 +28,7 @@ export const useHashStore = defineStore('hash', () => {
 
   // Function to update state from hash
   const updateHash = (hash) => {
+    console.log(route)
     const { file: newFile, tab: newTab, storageType } = parseHash(hash)
     file.value = newFile
     tab.value = newTab
@@ -68,10 +69,14 @@ export const useHashStore = defineStore('hash', () => {
   function updatePath(path) {
     let newHash;
     let sp = window.location.hash.split('?');
+    let base = route.path.split('/')[1];
+    if(base.trim())base = `/${base}/`;
+    else base = `/`;
+
     if(path ===null ){
-       newHash = `#/${sp.length==2?"?"+sp[1]:''}`;
+       newHash = `#${base}${sp.length==2?"?"+sp[1]:''}`;
     }else{
-       newHash = `#/${path.mode}-${encodeURIComponent(path.id)}/${path.tabId}${sp.length==2?"?"+sp[1]:''}`;
+       newHash = `#${base}${path.mode}-${encodeURIComponent(path.id)}/${path.tabId}${sp.length==2?"?"+sp[1]:''}`;
 
     }
    if(window.location.hash!==newHash){
@@ -82,12 +87,17 @@ export const useHashStore = defineStore('hash', () => {
   }
 
   function redirect(path) {
+
+    let base = route.path.split('/')[1];
+    if(base.trim())base = `/${base}/`;
+    else base = `/`;
+
     let newHash;
     let sp = window.location.hash.split('?');
     if (path === null) {
-        newHash = `#/${sp.length == 2 ? "?" + sp[1] : ''}`;
+        newHash = `#${base}${sp.length == 2 ? "?" + sp[1] : ''}`;
     } else {
-        newHash = `#/${path.mode}-${encodeURIComponent(path.id)}/${path.tabId}${sp.length == 2 ? "?" + sp[1] : ''}`;
+        newHash = `#${base}${path.mode}-${encodeURIComponent(path.id)}/${path.tabId}${sp.length == 2 ? "?" + sp[1] : ''}`;
     }
     if (window.location.hash !== newHash) {
         window.location.assign(newHash);

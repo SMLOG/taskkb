@@ -1,0 +1,47 @@
+<template>
+  <div class="relative min-w-full">
+    <div
+    >
+      <TreeCard
+        :row="treeRef"
+        :depth="''"
+        :level="0"
+        :cols="cols"
+        v-if="treeRef"
+      ></TreeCard>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { computed, watch, onMounted } from 'vue';
+import { useAppStore } from '@/stores/appStore';
+import { useTree } from '@/composables/useTree';
+import { storeToRefs } from 'pinia';
+import TreeCard from './TreeCard.vue';
+
+
+const appStore = useAppStore();
+
+const {
+  weeksRef,
+} = useTree();
+
+const { configRef, treeRef,schReadyRef } = storeToRefs(appStore);
+
+
+
+
+onMounted(() => {
+  appStore.loadActiveTab();
+});
+
+const cols = computed(() => configRef.value?.cols?.filter((col) => col.show) ?? []);
+
+const gridColumns = computed(() =>
+  cols.value.length > 0 ? cols.value.map((col) => `${col.width}px`).join(' ') + ' 1fr' : '1fr'
+);
+
+</script>
+
+<style src="@/components/tree/tree.css" scoped></style>
