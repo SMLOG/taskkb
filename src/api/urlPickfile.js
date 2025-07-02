@@ -187,15 +187,39 @@ export async function pickUrl() {
                 document.addEventListener('keydown', function(e) {
                     if (e.key === 'Escape') {
                         closeDialog();
-                    } 
+                    }else if(e.key==='Enter'){
+                        confirmUrl();
+                    }
                 });
 
-                 function confirmUrl() {
-                    let selectedItem = document.querySelector('#urlInput').value;
+                const sample = 'https://perfecttodo.com/gdgaoxiao.treegridio';
+                function confirmUrl() {
+                    const urlInput = document.getElementById('urlInput');
+                    const selectedItem = urlInput.value.trim();
+                    
                     if (!selectedItem) {
-                        alert('Please input a url first');
+                        urlInput.focus();
+                        urlInput.setAttribute('placeholder', 'Please enter a valid URL');
+                        urlInput.classList.add('error');
+                        setTimeout(() => {
+                            urlInput.classList.remove('error');
+                            urlInput.setAttribute('placeholder', sample);
+                        }, 2000);
                         return;
                     }
+                    
+                    // Basic URL validation
+                    if (!selectedItem.startsWith('http://') && !selectedItem.startsWith('https://')) {
+                        urlInput.value = '';
+                        urlInput.setAttribute('placeholder', 'URL must start with http:// or https://');
+                        urlInput.classList.add('error');
+                        setTimeout(() => {
+                            urlInput.classList.remove('error');
+                            urlInput.setAttribute('placeholder', sample);
+                        }, 2000);
+                        return;
+                    }
+                    
                     window.parent.postMessage({
                         type: 'select',
                         instanceId: instanceId,
