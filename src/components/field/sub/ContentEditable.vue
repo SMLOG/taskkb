@@ -4,6 +4,7 @@
       <div ref="contentEditable" @dblclick="dblclick" @click="handleEditorClick"  :contenteditable="editable" @paste="sanitizePaste" @keyup.enter="handleEnterUp"  @keydown.enter="handleEnterDown"
         @focus="showDropdown = true" class="text h-full flex-1" :class="`${editable?'mr-3':''}`" v-html="truncateText(modelValue)">
       </div>
+      <div v-if="showMoreLess&false">Less</div>
       <div v-if="editable" class="dropdown-toggle absolute right-0 top-0 flex items-center justify-between p-0 mt-1 py-0 bg-white dark:bg-gray-800 border-none border-gray-300 dark:border-gray-600 rounded-md" @click="toggleDropdown">
         <svg class="w-3 h-3 m-0 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -199,16 +200,17 @@ function truncateHTMLWithLinks(html, charLimit) {
     }
   }
 
-  return tempDiv.innerHTML+(shouldTruncate?"<span>...</span>":"");
+  return tempDiv.innerHTML+(shouldTruncate?"<span class='show more'>...</span>":"");
 }
 
-
+const showMoreLess = ref(false);
 function handleEditorClick(event){
   if(event.target.classList.contains('show')){
    const isMore = event.target.classList.contains('more');
     event.target.classList.remove(isMore?'more':'less');
     event.target.classList.add(isMore?'less':'more');
     event.target.innerHTML=isMore?'Less':'More';
+    showMoreLess.value = !showMoreLess.value;
 
   }
 }
@@ -219,8 +221,11 @@ function truncateText(modelValue){
   const html = renderToHtml(modelValue)
 
   if(editable.value)return html;
+  if(showMoreLess.value){
+    return html+"<span class='show less'>(Less)</span>"
+  }
 
-  return truncateHTMLWithLinks(html,50);
+  return truncateHTMLWithLinks(html,100);
 }
 
 
