@@ -69,7 +69,7 @@ export const useHashStore = defineStore('hash', () => {
   function updatePath(path) {
     let newHash;
     let sp = window.location.hash.split('?');
-    let base = route.path.split('/')[1] ==='cards'?'/cards/':'/';
+    let base = ['cards','calendar'].includes(route.path.split('/')[1] )?`/${route.path.split('/')[1]}/`:'/';
 
 
     if(path ===null ){
@@ -87,7 +87,7 @@ export const useHashStore = defineStore('hash', () => {
 
   function redirect(path) {
 
-    let base = route.path.split('/')[1] ==='cards'?'/cards/':'/';
+    let base = ['cards','calendar'].includes(route.path.split('/')[1] )?`/${route.path.split('/')[1]}/`:'/';
 
 
     let newHash;

@@ -2,11 +2,12 @@ import { createRouter,createWebHashHistory } from 'vue-router';
 
 import TreeTimeline from './components/tree/TreeTimeline.vue';
 import TreeCards from './components/tree/TreeCards.vue';
-
+import CalendarView from './CalendarView.vue';
 const routes = [
   { path: '/', component: TreeTimeline },
   { path: '/cards/:fileId/:tabId', component: TreeCards },
   { path: '/tree/:fileId/:tabId', component: TreeTimeline },
+  { path: '/calendar/:fileId/:tabId', component: CalendarView },
   { path: '/:pathMatch(.*)*', component: TreeTimeline },
 ];
 
