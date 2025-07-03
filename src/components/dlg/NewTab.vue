@@ -195,10 +195,10 @@ const selectTemplate = async (event, template) => {
 
     emit('select-template', template);
     emit('update:modelValue', false);
-    const tabName = `${template.name} ${tabs.value.length + 1}(New)`;
+    const tabName = `${template.title} ${tabs.value.length + 1}(New)`;
     const newTabId = uuidv4();
 
-    let data = deepClone(sample[template.id]);
+    let data = deepClone(sample.datas[template.id]);
     if (data) {
       data.config.startDate = new Date();
       data.config.title = tabName;
