@@ -40,11 +40,11 @@
     <div class="space-y-2">
       <button v-for="template in templates" :key="template.id" @click="selectTemplate($event, template)"
         class="w-full flex text-left p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" :class="template.color">
-          <span class="text-white font-medium">{{ template.icon }}</span>
+        <div class="w-8 h-8 rounded-full flex items-center justify-center mr-3" :style="{background:generateRandomBgColor()}">
+          <span class="font-medium">{{ template.emoji }}</span>
         </div>
         <div>
-          <div class="font-medium text-gray-800 dark:text-gray-200">{{ template.name }}</div>
+          <div class="font-medium text-gray-800 dark:text-gray-200">{{ template.title }}</div>
           <div class="text-xs text-gray-500 dark:text-gray-400">{{ template.description }}</div>
         </div>
       </button>
@@ -84,29 +84,10 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'select-file', 'select-template', "confirm", "cancel"]);
 
-const templates = ref([
-  {
-    id: 1,
-    name: 'Todo List',
-    icon: '✓',
-    description: 'Task list template',
-    color: 'bg-blue-500',
-  },
-  {
-    id: 2,
-    name: 'Project Plan',
-    icon: '🗓',
-    description: 'Project Plan/Timeline',
-    color: 'bg-green-500'
-  },
-  {
-    id: 3,
-    name: 'Blank',
-    icon: '📝',
-    description: 'A blank template',
-    color: 'bg-purple-500'
-  }
-]);
+const sampleTabs = sample.tabs.map(tab=>{
+  return {...sample.datas[tab.id].config,...tab}
+});
+const templates = ref(sampleTabs);
 
 const fileInput = ref(null)
 const openFile = () => {
@@ -177,7 +158,36 @@ function loadFile(event) {
   }
 }
 
+function generateRandomBgColor() {
+  // Tailwind CSS default color palette (subset for brevity)
+  const tailwindColors = {
+    red: {
+      100: '#fef2f2', 200: '#fee2e2', 300: '#fecaca', 400: '#f87171', 500: '#ef4444',
+      600: '#dc2626', 700: '#b91c1c', 800: '#991b1b', 900: '#7f1d1d'
+    },
+    blue: {
+      100: '#eff6ff', 200: '#dbeafe', 300: '#bfdbfe', 400: '#60a5fa', 500: '#3b82f6',
+      600: '#2563eb', 700: '#1d4ed8', 800: '#1e40af', 900: '#1e3a8a'
+    },
+    green: {
+      100: '#f0fdf4', 200: '#dcfce7', 300: '#bbf7d0', 400: '#4ade80', 500: '#22c55e',
+      600: '#16a34a', 700: '#15803d', 800: '#166534', 900: '#14532d'
+    },
+    // Add more colors as needed (yellow, indigo, purple, etc.)
+  };
 
+  // Get list of color names
+  const colors = Object.keys(tailwindColors);
+  // Get list of shades
+  const shades = ['100', '200', '300', '400', '500', '600', '700', '800', '900'];
+
+  // Pick random color and shade
+  const randomColor = colors[Math.floor(Math.random() * colors.length)];
+  const randomShade = shades[Math.floor(Math.random() * shades.length)];
+
+  // Return the hex code
+  return tailwindColors[randomColor][randomShade];
+}
 
 const selectTemplate = async (event, template) => {
 
