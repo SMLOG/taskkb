@@ -6,23 +6,7 @@ const isFileSystemAccessSupported = 'showOpenFilePicker' in window && 'showSaveF
 // In-memory cache for File objects and FileSystemFileHandle
 const fileCache = new Map();
 
-// SessionStorage key for storing file metadata
-const SESSION_STORAGE_KEY = 'cachedFiles';
 
-// Function to load cached file names from sessionStorage
-const loadCachedFilesFromSessionStorage = () => {
-  const cachedFiles = sessionStorage.getItem(SESSION_STORAGE_KEY);
-  return cachedFiles ? JSON.parse(cachedFiles) : [];
-};
-
-// Function to save file name to sessionStorage
-const saveFileToSessionStorage = (fileName) => {
-  const cachedFiles = loadCachedFilesFromSessionStorage();
-  if (!cachedFiles.includes(fileName)) {
-    cachedFiles.push(fileName);
-    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(cachedFiles));
-  }
-};
 
 async function pick(){
     const [fileHandle] = await window.showOpenFilePicker({
@@ -36,7 +20,6 @@ async function pick(){
       const file = await fileHandle.getFile();
       const fileId = file.name; // Use file name as unique ID
       fileCache.set(fileId, { file, handle: fileHandle }); // Cache both File and handle
-      saveFileToSessionStorage(fileId); // Save file name to sessionStorage
       return [file,fileHandle,fileId];
 }
 // Function to pick a file using File System Access API or fallback to input element
@@ -63,8 +46,6 @@ export const pickFile = async () => {
           reject(new Error('No file picked'));
         } else {
           const fileId = file.name; // Use file name as unique ID
-          fileCache.set(fileId, { file, handle: null }); // Cache File with null handle
-          saveFileToSessionStorage(fileId); // Save file name to sessionStorage
           resolve({ mode: 'D', file: { name: file.name, id: fileId, rawFile: file } });
         }
       };
@@ -99,7 +80,6 @@ export async function readJsonAttachment(path) {
   } else if (path.rawFile) {
     file = path.rawFile;
     fileCache.set(path.id, { file, handle: null }); // Cache File with null handle
-    saveFileToSessionStorage(path.id); // Update sessionStorage
   } else {
     throw { code: 404, error: `No data found with filename ${path.id}` };
   }
@@ -128,17 +108,13 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
     try {
       // Retrieve fileHandle from cache
       const cached = fileCache.get(path.fileName);
-      const fileHandle = cached?.handle;
+      let fileHandle = cached?.handle;
       if (!fileHandle) {
-        // Check sessionStorage and prompt re-selection if needed
-        const cachedFiles = loadCachedFilesFromSessionStorage();
-       if(!cachedFiles.includes(path.fileName)) await pickFile();
-        if (!cachedFiles.includes(path.fileName)) {
-          
-          return writeObjectToJsonAttachment(dataObject, { ...path, handle: newFileHandle }); // Retry with new handle
-        } else {
+        const ret = await pickFile();
+        if (!ret) {
           throw new Error(`No file handle available for ${path.fileName}. Cannot overwrite file.`);
         }
+        fileHandle = ret.file.handle;
       }
       // Verify write permission
       const permission = await fileHandle.queryPermission({ mode: 'readwrite' });
@@ -151,7 +127,6 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
       // Update cache with new File object and existing handle after writing
       const file = await fileHandle.getFile();
       fileCache.set(path.fileName, { file, handle: fileHandle });
-      saveFileToSessionStorage(path.fileName); // Update sessionStorage
       return { ...path, id: path.fileName, handle: fileHandle };
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -182,4 +157,4 @@ export function authorize(){
     return true;
 }
 
-export const type = "Browser";
+export const type = "Device";
