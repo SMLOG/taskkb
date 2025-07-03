@@ -12,7 +12,7 @@
       <!-- Columns List -->
       <div class="space-y-3 max-h-[60vh] overflow-y-auto">
         <VueDraggable ref="el" v-model="cols" :animation="150"   ghostClass="ghost">
-        <div v-for="(col, index) in cols" :key="col.id"   class="flex flex-wrap items-center gap-3 rounded-md p-3 hover:bg-gray-100 dark:hover:bg-gray-700">
+        <div v-for="(col, index) in cols" :key="col.id"   class="flex flex-wrap items-center gap-3 rounded-md p-3 bg-[#EAEAEA] mb-1 hover:bg-gray-100 dark:hover:bg-gray-700">
           <div class="w-12 text-center text-gray-500 dark:text-gray-400" >{{ index + 1 }}</div>
           <div class="w-20">
             <select v-model="col.cp" class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400">
