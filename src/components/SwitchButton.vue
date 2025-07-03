@@ -53,17 +53,21 @@
   
   // Compute the slider's style (position, width, and height)
   const sliderStyle = computed(() => {
-    if (!buttons.value.length || !buttons.value[selectedIndex.value]) {
-      return { opacity: 0 } // Hide slider until buttons are rendered
-    }
-    const button = buttons.value[selectedIndex.value]
-    return {
-      width: `${button.offsetWidth}px`,
-      height: `${button.offsetHeight}px`,
-      transform: `translateX(${button.offsetLeft}px) scale(0.98)`, // Subtle scale for polish
-      opacity: 1
-    }
-  })
+  if (!buttons.value.length || !buttons.value[selectedIndex.value]) {
+    return { opacity: 0 }
+  }
+  
+  const button = buttons.value[selectedIndex.value]
+  const buttonRect = button.getBoundingClientRect()
+  const containerRect = button.offsetParent.getBoundingClientRect()
+  
+  return {
+    width: `${button.offsetWidth}px`,
+    height: `${button.offsetHeight}px`,
+    transform: `translateX(${buttonRect.left-4 - containerRect.left}px) scale(0.98)`,
+    opacity: 1
+  }
+})
   
   const selectOption = (value) => {
     emit('update:modelValue', value)
