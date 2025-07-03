@@ -21,7 +21,6 @@
 import { ref, onMounted, onUnmounted, nextTick, reactive,watch } from 'vue';
 import { useAppStore } from '@/stores/appStore';
 import { storeToRefs } from 'pinia'
-import { max } from 'date-fns';
 const appStore = useAppStore();
 
 const {activeTabRef} = storeToRefs(appStore);
@@ -191,6 +190,13 @@ function getFixedPositionWidths(selector) {
         const clone = original.cloneNode(true);
 
         // 3. Append clone to wrapper
+
+        const computedStyles = window.getComputedStyle(original);
+        for (let i = 0; i < computedStyles.length; i++) {
+            const property = computedStyles[i];
+            clone.style[property] = computedStyles.getPropertyValue(property);
+        }
+
         wrapper.appendChild(clone);
 
         // 4. Add wrapper to DOM (required for measurement)
