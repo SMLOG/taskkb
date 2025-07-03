@@ -3,74 +3,62 @@
     <div class="mx-auto px-1">
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <div class="flex just-between">
-        <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="addRow(1)" class="btn-secondary">
-              ＋{{ selectDepths.length>0?selectDepths.length:'' }}
-            </button>
-            <button v-if="selectDepths.length==1" @click="copyNode" class="btn-secondary">
-              ⎘ Copy
-            </button>
-            <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-secondary">
-              ✕ Delete {{ selectDepths.length }}
-            </button>
-          </div>
-
-          <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-            <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
-              💾 Save {{ savingRef?"...":"" }} 
-            </button>
-            <button @click="openConfig" class="btn-secondary">
-              ⚙ Config
-            </button>
-          </div>
-
-          <div class="relative" @blur="showDropdown = false" ref="menuRef">
-            <button
-              ref="moreButton"
-              @mouseenter="handleShowDropdown"
-              @focus="handleShowDropdown"
-              @click="handleShowDropdown"
-              @mouseleave="handleMouseLeave"
-              class="btn-secondary"
-            >
-              ⋮ Export
-            </button>
-            <div
-              v-show="showDropdown"
-              :class="[
-                'absolute left-0 w-55 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
-                dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
-              ]"
-              tabindex="-1"
-              @mouseleave="showDropdown = false"
-              @mouseenter="cleanTimeout"
-            >
-              <button @click="download" class="btn-link w-full text-left px-3 py-2">
-                📤 Export(JSON)
+          <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
+            <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
+              <button @click="addRow(1)" class="btn-secondary">
+                ＋{{ selectDepths.length > 0 ? selectDepths.length : '' }}
               </button>
-              <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
-                📊 Export <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> (CSV)
+              <button v-if="selectDepths.length == 1" @click="copyNode" class="btn-secondary">
+                ⎘ Copy
               </button>
-              <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
-                📝 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(Markdown)
-              </button>
-              <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
-                📋 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(CSV)
+              <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-secondary">
+                ✕ Delete {{ selectDepths.length }}
               </button>
             </div>
+
+            <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
+              <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
+                💾 Save {{ savingRef ? "..." : "" }}
+              </button>
+              <button @click="openConfig" class="btn-secondary">
+                ⚙ Config
+              </button>
+            </div>
+
+            <div class="relative" @blur="showDropdown = false" ref="menuRef">
+              <button ref="moreButton" @mouseenter="handleShowDropdown" @focus="handleShowDropdown"
+                @click="handleShowDropdown" @mouseleave="handleMouseLeave" class="btn-secondary">
+                ⋮ Export
+              </button>
+              <div v-show="showDropdown" :class="[
+                'absolute left-0 w-55 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
+                dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
+              ]" tabindex="-1" @mouseleave="showDropdown = false" @mouseenter="cleanTimeout">
+                <button @click="download" class="btn-link w-full text-left px-3 py-2">
+                  📤 Export(JSON)
+                </button>
+                <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
+                  📊 Export <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> (CSV)
+                </button>
+                <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
+                  📝 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to
+                  Clipboard(Markdown)
+                </button>
+                <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
+                  📋 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(CSV)
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <FullscreenToggle />
+            </div>
+          </div>
+          <div class=" gap-2 py-3">
+            <SwitchButton v-model="activeView" :options="viewOptions" />
           </div>
 
-          <div class="flex items-center gap-2">
-            <FullscreenToggle />
-          </div>
         </div>
-        <div class=" gap-2 py-3">        <SwitchButton
-          v-model="activeView"
-          :options="viewOptions"
-        /></div>
-
-      </div>
       </div>
     </div>
   </div>
@@ -84,23 +72,19 @@ button {
 }
 
 .btn-secondary {
-  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200
-         dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600;
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600;
 }
 
 .btn-info {
-  @apply bg-indigo-600 text-white hover:bg-indigo-700
-         dark:bg-indigo-500 dark:hover:bg-indigo-600;
+  @apply bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600;
 }
 
 .btn-warning {
-  @apply bg-purple-600 text-white hover:bg-purple-700
-         dark:bg-purple-500 dark:hover:bg-purple-600;
+  @apply bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600;
 }
 
 .btn-link {
-  @apply text-blue-600 hover:text-blue-800 hover:bg-gray-100
-         dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-gray-700 no-underline;
+  @apply text-blue-600 hover:text-blue-800 hover:bg-gray-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-gray-700 no-underline;
 }
 </style>
 
@@ -110,21 +94,21 @@ import { useTree } from '@/composables/useTree';
 import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
-import {downloadJSON} from '@/lib/parse';
-import {showNotification} from '@/composables/useSystem';
-import {showDialog} from '@/composables/useSystem';
+import { downloadJSON } from '@/lib/parse';
+import { showNotification } from '@/composables/useSystem';
+import { showDialog } from '@/composables/useSystem';
 import FullscreenToggle from '../FullscreenToggle.vue';
 import SwitchButton from '../SwitchButton.vue';
 
-const activeView = ref('tasks')
+const activeView = ref('list')
 const viewOptions = ref([
-  { value: 'tasks', label: 'Tasks' },
+  { value: 'list', label: 'List' },
   { value: 'calendar', label: 'Calendar' }
 ])
 const tree = useTree();
 
-const openConfig = async()=>{
-  await showDialog(Config,null,{size:'2md'});
+const openConfig = async () => {
+  await showDialog(Config, null, { size: '2md' });
 }
 
 
@@ -174,13 +158,13 @@ const handleShowDropdown = () => {
 };
 
 const timeout = ref(0);
-const handleMouseLeave=()=>{
-  timeout.value = setTimeout(()=>{
+const handleMouseLeave = () => {
+  timeout.value = setTimeout(() => {
     showDropdown.value = false;
 
-  },200);
+  }, 200);
 }
-const cleanTimeout = ()=>{
+const cleanTimeout = () => {
   window.clearTimeout(timeout.value);
 
 }
@@ -191,13 +175,13 @@ function download() {
   downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() }, useAppStore().getCurrentTab().title + ".json");
 }
 
-async function  saveData(bool) {
+async function saveData(bool) {
   if (!bool) {
-    try{
-    savingRef.value = true;
-   await useAppStore().saveData();
-   showNotification('Saved Successful!', 'success');
-    }catch(error){
+    try {
+      savingRef.value = true;
+      await useAppStore().saveData();
+      showNotification('Saved Successful!', 'success');
+    } catch (error) {
       showNotification('Save Fail!', 'error');
     }
     savingRef.value = false;
@@ -214,7 +198,7 @@ function deleteSelectedNodes() {
 }
 
 function addRow(num) {
-  tree.insertNode({ });
+  tree.insertNode({});
 }
 
 function copyNode() {
