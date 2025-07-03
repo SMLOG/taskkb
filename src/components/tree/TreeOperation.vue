@@ -98,7 +98,7 @@ button {
 </style>
 
 <script setup>
-import { ref, watch, inject, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";

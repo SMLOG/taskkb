@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import {
   getRowFromDepth,
   moveNode,
-  deleteNode,
   deleteNodes,
   copyNode,
   getRows,
@@ -31,6 +30,8 @@ const dragMode = ref(false);
 const moveType = ref(null);
 const enableSelectionTimeout = ref(0);
 const enableDragTimeout = ref(0);
+
+
 function getDate(i) {
   const weekIndex = parseInt(i / 7);
 

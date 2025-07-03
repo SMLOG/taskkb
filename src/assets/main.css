@@ -84,3 +84,24 @@ body * {
 }
 
 .show.less,.show.more{font-weight: bold;}
+
+
+.nochilds .collapse-section::after{
+  content: "";
+    width: 0;
+    height: 0;
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid #ddd;
+    border-radius: 2px;
+    margin-left: 3px;
+}
+
+
+.hasChild.collapsed .collapse-section::after{
+  content: "+";
+}
+.hasChild .collapse-section::after{
+  content: "-";
+}
