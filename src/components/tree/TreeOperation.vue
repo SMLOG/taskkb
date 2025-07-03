@@ -1,8 +1,9 @@
 <template>
   <div id="operation" class="sticky bottom-0 left-0 z-7 bg-white dark:bg-gray-900 shadow-lg">
-    <div class="max-w-screen-xl mx-auto px-4">
+    <div class="mx-auto px-1">
       <div class="flex flex-col sticky left-0 bottom-0 active">
-        <div class="flex flex-wrap items-center gap-2 py-3">
+        <div class="flex just-between">
+        <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
           <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
             <button @click="addRow(1)" class="btn-secondary">
               ＋{{ selectDepths.length>0?selectDepths.length:'' }}
@@ -64,6 +65,12 @@
             <FullscreenToggle />
           </div>
         </div>
+        <div class=" gap-2 py-3">        <SwitchButton
+          v-model="activeView"
+          :options="viewOptions"
+        /></div>
+
+      </div>
       </div>
     </div>
   </div>
@@ -107,9 +114,13 @@ import {downloadJSON} from '@/lib/parse';
 import {showNotification} from '@/composables/useSystem';
 import {showDialog} from '@/composables/useSystem';
 import FullscreenToggle from '../FullscreenToggle.vue';
+import SwitchButton from '../SwitchButton.vue';
 
-
-
+const activeView = ref('tasks')
+const viewOptions = ref([
+  { value: 'tasks', label: 'Tasks' },
+  { value: 'calendar', label: 'Calendar' }
+])
 const tree = useTree();
 
 const openConfig = async()=>{
