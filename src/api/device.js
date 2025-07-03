@@ -132,19 +132,9 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
       if (!fileHandle) {
         // Check sessionStorage and prompt re-selection if needed
         const cachedFiles = loadCachedFilesFromSessionStorage();
-        if (cachedFiles.includes(path.fileName)) {
-          const [newFileHandle] = await window.showOpenFilePicker({
-            types: [
-              {
-                description: 'JSON Files',
-                accept: { 'application/json': ['.json', '.treegridio'] },
-              },
-            ],
-            suggestedName: path.fileName,
-          });
-          const file = await newFileHandle.getFile();
-          fileCache.set(path.fileName, { file, handle: newFileHandle });
-          saveFileToSessionStorage(path.fileName); // Update sessionStorage
+       if(!cachedFiles.includes(path.fileName)) await pickFile();
+        if (!cachedFiles.includes(path.fileName)) {
+          
           return writeObjectToJsonAttachment(dataObject, { ...path, handle: newFileHandle }); // Retry with new handle
         } else {
           throw new Error(`No file handle available for ${path.fileName}. Cannot overwrite file.`);
