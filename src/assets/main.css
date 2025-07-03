@@ -105,4 +105,3 @@ body * {
 .hasChild .collapse-section::after{
   content: "-";
 }
-.header .cell{font-weight: bold;}

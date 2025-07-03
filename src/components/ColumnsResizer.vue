@@ -189,14 +189,6 @@ function getFixedPositionWidths(selector) {
         // 2. Clone the current element (deep clone)
         const clone = original.cloneNode(true);
 
-        // 3. Append clone to wrapper
-
-        const computedStyles = window.getComputedStyle(original);
-        for (let i = 0; i < computedStyles.length; i++) {
-            const property = computedStyles[i];
-            clone.style[property] = computedStyles.getPropertyValue(property);
-        }
-
         wrapper.appendChild(clone);
 
         // 4. Add wrapper to DOM (required for measurement)
