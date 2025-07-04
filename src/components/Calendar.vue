@@ -1,268 +1,229 @@
-<!-- InfiniteScrollCalendar.vue -->
 <template>
+  <div 
+    class="calendar-container"
+    ref="calendarContainer"
+    @scroll="handleScroll"
+  >
     <div 
-      class="calendar-container"
-      ref="calendarContainer"
-      @scroll="handleScroll"
-      @wheel="handleWheel"
+      v-for="(month, index) in visibleMonths" 
+      :key="month.key"
+      class="month-container bg-white p-4 rounded shadow mb-4"
     >
-      <div 
-        v-for="(month, index) in visibleMonths" 
-        :key="month.key"
-        class="month-container bg-white p-4 rounded shadow mb-4"
-      >
-        <h2 class="text-lg font-bold mb-2">{{ month.name }} {{ month.year }}</h2>
-        <div class="grid grid-cols-7 gap-1">
-          <div v-for="day in dayNames" :key="day" class="text-center font-semibold">{{ day }}</div>
-          <div 
-            v-for="day in month.days" 
-            :key="`${month.name}-${day.date}`" 
-            class="text-center h-8 flex items-center justify-center"
-            :class="{ 
-              'bg-blue-500 text-white rounded-full': isToday(month, day),
-              'text-gray-400': !day.isCurrentMonth,
-              'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth
-            }"
-          >
-            {{ day.date }}
-          </div>
+      <h2 class="text-lg font-bold mb-2">{{ month.name }} {{ month.year }}</h2>
+      <div class="grid grid-cols-7 gap-1">
+        <div v-for="day in dayNames" :key="day" class="text-center font-semibold">{{ day }}</div>
+        <div 
+          v-for="day in month.days" 
+          :key="`${month.name}-${day.date}`" 
+          class="text-center h-8 flex items-center justify-center"
+          :class="{ 
+            'bg-blue-500 text-white rounded-full': isToday(month, day),
+            'text-gray-400': !day.isCurrentMonth,
+            'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth
+          }"
+        >
+          {{ day.date }}
         </div>
       </div>
-      <div v-if="loading" class="loading-indicator py-4 text-center">
-        Loading more months...
-      </div>
     </div>
-  </template>
-  
-  <script>
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
-  
-  export default {
-    name: 'InfiniteScrollCalendar',
-    props: {
-      initialYear: {
-        type: Number,
-        default: () => new Date().getFullYear()
-      },
-      initialMonth: {
-        type: Number,
-        default: () => new Date().getMonth()
-      },
-      monthsToShow: {
-        type: Number,
-        default: 6
-      },
-      currentDate: {
-        type: Date,
-        default: () => new Date()
-      }
-    },
-    data() {
-      return {
-        loading: false,
-        allMonths: [],
-        startIndex: 0,
-        scrollPosition: 0,
-        bufferMonths: 3 // How many months to load when reaching scroll boundaries
-      };
-    },
-    computed: {
-      dayNames() {
-        return dayNames;
-      },
-      visibleMonths() {
-        return this.allMonths
-      }
-    },
-    methods: {
-      getMonthDays(year, monthIndex) {
-        const firstDay = new Date(year, monthIndex, 1);
-        const lastDay = new Date(year, monthIndex + 1, 0);
-        const firstDayIndex = firstDay.getDay();
-  
-        const days = [];
-  
-        // Previous month days
-        const prevMonthLastDay = new Date(year, monthIndex, 0).getDate();
-        for (let i = 0; i < firstDayIndex; i++) {
-          days.push({ 
-            date: prevMonthLastDay - firstDayIndex + i + 1, 
-            isCurrentMonth: false 
-          });
-        }
-  
-        // Current month days
-        for (let i = 1; i <= lastDay.getDate(); i++) {
-          days.push({ 
-            date: i, 
-            isCurrentMonth: true 
-          });
-        }
-  
-        // Next month days
-        const totalDays = 42; // 6 weeks
-        let nextMonthDay = 1;
-        while (days.length < totalDays) {
-          days.push({ 
-            date: nextMonthDay++, 
-            isCurrentMonth: false 
-          });
-        }
-  
-        return days;
-      },
-      isToday(month, day) {
-        if (!day.isCurrentMonth) return false;
-        return month.year === this.currentDate.getFullYear() &&
-               month.monthIndex === this.currentDate.getMonth() &&
-               day.date === this.currentDate.getDate();
-      },
-      generateMonth(year, monthIndex) {
-        return {
-          key: `${year}-${monthIndex}`,
-          name: monthNames[monthIndex],
-          monthIndex,
-          year,
-          days: this.getMonthDays(year, monthIndex)
-        };
-      },
-      loadMoreMonths(direction) {
-        this.loading = true;
-        
-        setTimeout(() => {
-          if (direction === 'future') {
-            // Load future months
-            const lastMonth = this.allMonths[this.allMonths.length - 1];
-            let year = lastMonth.year;
-            let monthIndex = lastMonth.monthIndex + 1;
-            
-            for (let i = 0; i < this.bufferMonths; i++) {
-              if (monthIndex > 11) {
-                monthIndex = 0;
-                year++;
-              }
-              this.allMonths.push(this.generateMonth(year, monthIndex));
-              monthIndex++;
-            }
-          } else {
-            // Load past months
-            const firstMonth = this.allMonths[0];
-            let year = firstMonth.year;
-            let monthIndex = firstMonth.monthIndex - 1;
-            
-            for (let i = 0; i < this.bufferMonths; i++) {
-              if (monthIndex < 0) {
-                monthIndex = 11;
-                year--;
-              }
-              this.allMonths.unshift(this.generateMonth(year, monthIndex));
-              monthIndex--;
-            }
-            
-            // Adjust startIndex to maintain visual position
-            this.startIndex += this.bufferMonths;
-          }
-          
-          this.loading = false;
-        }, 300); // Simulate async loading
-      },
-      handleWheel(event) {
-    const container = event.target;
-    const { scrollTop, scrollHeight, clientHeight } = container;
+    <div v-if="loading" class="loading-indicator py-4 text-center">
+      Loading more months...
+    </div>
+  </div>
+</template>
 
-    // Detect scroll direction from event.deltaY
-    const isScrollingDown = event.deltaY > 0;
-    const isScrollingUp = event.deltaY < 0;
+<script setup>
+import { ref, computed, onMounted, nextTick } from 'vue';
 
-    // Check if at the bottom and trying to scroll down
-    if (isScrollingDown && scrollHeight - (scrollTop + clientHeight) <= 0) {
-      this.loadMoreMonths('future');
-    }
+const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-    // Check if at the top and trying to scroll up
-    if (isScrollingUp && scrollTop <= 0 && this.startIndex > 0) {
-      this.loadMoreMonths('past');
-    }
+const props = defineProps({
+  initialYear: {
+    type: Number,
+    default: () => new Date().getFullYear()
   },
-      handleScroll(event) {
-        const container = event.target;
-        const { scrollTop, scrollHeight, clientHeight } = container;
-        
-        // Check if scrolled near bottom (loading future months)
-        if (scrollHeight - (scrollTop + clientHeight) < 50 ) {
-          this.loadMoreMonths('future');
-        }
-        
-        // Check if scrolled near top (loading past months)
-        if (scrollTop < 50 && this.startIndex > 0) {
-          this.loadMoreMonths('past');
-        }
-        
-        this.scrollPosition = scrollTop;
-      },
-      initializeMonths() {
-        this.allMonths = [];
-        
-        // Generate initial months (centered around initial date)
-        const startMonth = this.initialMonth - Math.floor(this.monthsToShow / 2);
-        let year = this.initialYear;
-        let monthIndex = startMonth;
-        
-        // Adjust if we went negative
-        if (monthIndex < 0) {
-          year += Math.floor(monthIndex / 12);
-          monthIndex = 12 + (monthIndex % 12);
-        }
-        
-        // Generate enough months for display + buffer
-        for (let i = 0; i < this.monthsToShow + this.bufferMonths * 2; i++) {
-          if (monthIndex > 11) {
-            monthIndex = 0;
-            year++;
-          }
-          this.allMonths.push(this.generateMonth(year, monthIndex));
-          monthIndex++;
-        }
-        
-        this.startIndex = this.bufferMonths;
-      }
-    },
-    mounted() {
-      this.initializeMonths();
-      
-      // Scroll to current month
-      this.$nextTick(() => {
-        const currentMonthIndex = this.allMonths.findIndex(
-          month => month.year === this.currentDate.getFullYear() && 
-                  month.monthIndex === this.currentDate.getMonth()
-        );
-        
-        if (currentMonthIndex !== -1) {
-          const container = this.$refs.calendarContainer;
-          const monthElement = container.children[currentMonthIndex - this.startIndex];
-          if (monthElement) {
-            monthElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }
-        }
-      });
-    }
+  initialMonth: {
+    type: Number,
+    default: () => new Date().getMonth()
+  },
+  monthsToShow: {
+    type: Number,
+    default: 6
+  },
+  currentDate: {
+    type: Date,
+    default: () => new Date()
+  }
+});
+
+const loading = ref(false);
+const allMonths = ref([]);
+const startIndex = ref(0);
+const scrollPosition = ref(0);
+const bufferMonths = 3;
+const calendarContainer = ref(null);
+const isLoadingMore = ref(false); // Guard flag to prevent multiple calls
+
+const visibleMonths = computed(() => allMonths.value);
+
+const getMonthDays = (year, monthIndex) => {
+  const firstDay = new Date(year, monthIndex, 1);
+  const lastDay = new Date(year, monthIndex + 1, 0);
+  const firstDayIndex = firstDay.getDay();
+
+  const days = [];
+  const prevMonthLastDay = new Date(year, monthIndex, 0).getDate();
+  for (let i = 0; i < firstDayIndex; i++) {
+    days.push({ date: prevMonthLastDay - firstDayIndex + i + 1, isCurrentMonth: false });
+  }
+  for (let i = 1; i <= lastDay.getDate(); i++) {
+    days.push({ date: i, isCurrentMonth: true });
+  }
+  const totalDays = 42;
+  let nextMonthDay = 1;
+  while (days.length < totalDays) {
+    days.push({ date: nextMonthDay++, isCurrentMonth: false });
+  }
+  return days;
+};
+
+const isToday = (month, day) => {
+  if (!day.isCurrentMonth) return false;
+  return (
+    month.year === props.currentDate.getFullYear() &&
+    month.monthIndex === props.currentDate.getMonth() &&
+    day.date === props.currentDate.getDate()
+  );
+};
+
+const generateMonth = (year, monthIndex) => {
+  return {
+    key: `${year}-${monthIndex}`,
+    name: monthNames[monthIndex],
+    monthIndex,
+    year,
+    days: getMonthDays(year, monthIndex)
   };
-  </script>
-  
-  <style scoped>
-  .calendar-container {
-    height: 80vh;
-    overflow-y: auto;
-    scroll-behavior: smooth;
+};
+
+const loadMoreMonths = (direction) => {
+  if (isLoadingMore.value) return; // Prevent multiple calls
+  isLoadingMore.value = true;
+  loading.value = true;
+
+  setTimeout(() => {
+    if (direction === 'future') {
+      const lastMonth = allMonths.value[allMonths.value.length - 1];
+      let year = lastMonth.year;
+      let monthIndex = lastMonth.monthIndex + 1;
+
+      for (let i = 0; i < bufferMonths; i++) {
+        if (monthIndex > 11) {
+          monthIndex = 0;
+          year++;
+        }
+        allMonths.value.push(generateMonth(year, monthIndex));
+        monthIndex++;
+      }
+    } else {
+      const firstMonth = allMonths.value[0];
+      let year = firstMonth.year;
+      let monthIndex = firstMonth.monthIndex - 1;
+
+      for (let i = 0; i < bufferMonths; i++) {
+        if (monthIndex < 0) {
+          monthIndex = 11;
+          year--;
+        }
+        allMonths.value.unshift(generateMonth(year, monthIndex));
+        monthIndex--;
+      }
+      startIndex.value += bufferMonths;
+    }
+
+    loading.value = false;
+    isLoadingMore.value = false; // Reset guard
+  }, 300);
+};
+
+const handleScroll = (event) => {
+  const container = event.target;
+  const { scrollTop, scrollHeight, clientHeight } = container;
+
+  // Define threshold (e.g., 200px from top or bottom)
+  const threshold = 200;
+
+  // Near bottom: load future months
+  if (scrollHeight - (scrollTop + clientHeight) <= threshold && !isLoadingMore.value) {
+    loadMoreMonths('future');
   }
-  
-  .month-container {
-    min-height: 250px;
+
+  // Near top: load past months
+  if (scrollTop <= threshold && startIndex.value > 0 && !isLoadingMore.value) {
+    loadMoreMonths('past');
   }
-  
-  .loading-indicator {
-    color: #666;
-    font-style: italic;
+
+  scrollPosition.value = scrollTop;
+};
+
+const initializeMonths = () => {
+  allMonths.value = [];
+  const startMonth = props.initialMonth - Math.floor(props.monthsToShow / 2);
+  let year = props.initialYear;
+  let monthIndex = startMonth;
+
+  if (monthIndex < 0) {
+    year += Math.floor(monthIndex / 12);
+    monthIndex = 12 + (monthIndex % 12);
   }
-  </style>
+
+  for (let i = 0; i < props.monthsToShow + bufferMonths * 2; i++) {
+    if (monthIndex > 11) {
+      monthIndex = 0;
+      year++;
+    }
+    allMonths.value.push(generateMonth(year, monthIndex));
+    monthIndex++;
+  }
+
+  startIndex.value = bufferMonths;
+};
+
+onMounted(() => {
+  initializeMonths();
+
+  nextTick(() => {
+    const currentMonthIndex = allMonths.value.findIndex(
+      (month) =>
+        month.year === props.currentDate.getFullYear() &&
+        month.monthIndex === props.currentDate.getMonth()
+    );
+
+    if (currentMonthIndex !== -1) {
+      const container = calendarContainer.value;
+      const monthElement = container.children[currentMonthIndex - startIndex.value];
+      if (monthElement) {
+        monthElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
+});
+</script>
+
+<style scoped>
+.calendar-container {
+  height: 80vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.month-container {
+  min-height: 250px;
+}
+
+.loading-indicator {
+  color: #666;
+  font-style: italic;
+}
+</style>
