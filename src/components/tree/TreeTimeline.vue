@@ -34,7 +34,7 @@
             v-if="col.show"
           >
             <div class="cell flex flex-1 px-1">
-              <b>
+              <b class="w-full">
               <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component></b>
             </div>
           </div>
