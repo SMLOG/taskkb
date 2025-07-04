@@ -65,16 +65,18 @@ import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
 import { useAppStore } from '@/stores/appStore';
 import { useTree } from '@/composables/useTree';
+import { useSchedule } from '@/composables/useSchedule';
 import { generateWeeks } from '@/lib/schedule';
 import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
-
+import { weeksRef,selectStartRef,moveType } from '@/composables/context';
 const tableRef = ref(null);
 const thRefs = ref([]);
 
 const appStore = useAppStore();
+
 
 const {
   //handleDragOver,handleDragenter,handleDragleave,
@@ -83,14 +85,11 @@ const {
   handleMouseUp,
   cellClass,
   handleKeyDown,
-  selectStartRef,
   //handleDragstart,handleDrag,
   //handleDrop,
-  moveType,
   dblclickHandle,
  // isDrag,
-  weeksRef,
-} = useTree();
+} = useSchedule();
 
 const {
   handleDragstart,
