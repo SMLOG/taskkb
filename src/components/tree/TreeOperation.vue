@@ -116,11 +116,9 @@ const handleNavigation = (targetPath, oldPath) => {
   const currentQuery = { ...route.query };
   let newPath;
   
-  if (targetPath === '' && oldPath) {
-    newPath = route.path.replace(/^\/[^/]+/, '');
-  } else {
-    newPath = route.path.replace(oldPath, targetPath).replace('//', '/'); // Fixed replace('//','') to replace('//','/')
-  }
+
+    newPath = route.path.replace(oldPath??'', targetPath).replace('//', '/'); // Fixed replace('//','') to replace('//','/')
+  
   
   // Ensure path starts with a single slash
   if (oldPath === '') {

@@ -38,7 +38,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick } from 'vue';
+import { ref, computed, onMounted, nextTick,watch } from 'vue';
+import { useCurrentRowStore } from '@/stores/currentRowStore';
+
+
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -72,6 +75,18 @@ const isLoadingMore = ref(false);
 const isDragging = ref(false);
 const startDate = ref(null);
 const endDate = ref(null);
+
+
+const currentRowStore = useCurrentRowStore();
+watch(
+  () => currentRowStore.currentRow, // Use a getter function for deep watching
+  (newValue) => {
+    startDate.value = newValue?._tl?.start?.date;
+    endDate.value = newValue?._tl?.end?.date;
+  },
+  { immediate: true }
+);
+
 
 const visibleMonths = computed(() => allMonths.value);
 
@@ -138,6 +153,13 @@ const endSelection = () => {
   isDragging.value = false;
   if (startDate.value && endDate.value) {
     console.log('Selected range:', startDate.value, 'to', endDate.value);
+    const currentRow = useCurrentRowStore().currentRow;
+    if(!currentRow?._tl)currentRow._tl={start:{date:startDate.value},  end:{date:endDate.value}} 
+      else{
+        currentRow._tl.start.date= startDate.value;
+        currentRow._tl.end.date= endDate.value;
+    }
+
   }
 };
 
