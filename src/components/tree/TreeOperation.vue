@@ -89,7 +89,7 @@ button {
 </style>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
@@ -99,12 +99,50 @@ import { showNotification } from '@/composables/useSystem';
 import { showDialog } from '@/composables/useSystem';
 import FullscreenToggle from '../FullscreenToggle.vue';
 import SwitchButton from '../SwitchButton.vue';
-
-const activeView = ref('list')
+import { useRoute, useRouter } from 'vue-router';
+const activeView = ref('')
 const viewOptions = ref([
-  { value: 'list', label: 'List' },
+  { value: '', label: 'List' },
   { value: 'calendar', label: 'Calendar' }
-])
+]);
+
+const route = useRoute();
+const router = useRouter();
+
+const handleNavigation = (targetPath, oldPath) => {
+
+  
+  // Navigate if not on the target route
+  const currentQuery = { ...route.query };
+  let newPath;
+  
+  if (targetPath === '' && oldPath) {
+    newPath = route.path.replace(/^\/[^/]+/, '');
+  } else {
+    newPath = route.path.replace(oldPath, targetPath).replace('//', '/'); // Fixed replace('//','') to replace('//','/')
+  }
+  
+  // Ensure path starts with a single slash
+  if (oldPath === '') {
+    newPath = '/' + newPath.replace(/^\//, ''); // Added safeguard against double slashes
+  }
+  
+  // Ensure we don't end up with double slashes
+  newPath = newPath.replace(/\/+/g, '/');
+  
+  router.push({
+    path: newPath,
+    query: currentQuery, // Preserve query parameters
+  });
+};
+watch(
+  () => activeView.value,
+  (newValue,oldValue) => {
+    handleNavigation(newValue,oldValue);
+  },
+  { immediate: true }
+);
+
 const tree = useTree();
 
 const openConfig = async () => {
