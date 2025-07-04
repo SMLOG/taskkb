@@ -64,14 +64,13 @@ import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
 import { useAppStore } from '@/stores/appStore';
-import { useTree } from '@/composables/useTree';
 import { useSchedule } from '@/composables/useSchedule';
 import { generateWeeks } from '@/lib/schedule';
 import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
-import { weeksRef,selectStartRef,moveType } from '@/composables/context';
+import { weeksRef,selectStartRef,moveType,isDrag } from '@/composables/context';
 const tableRef = ref(null);
 const thRefs = ref([]);
 
@@ -79,16 +78,12 @@ const appStore = useAppStore();
 
 
 const {
-  //handleDragOver,handleDragenter,handleDragleave,
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
   cellClass,
   handleKeyDown,
-  //handleDragstart,handleDrag,
-  //handleDrop,
   dblclickHandle,
- // isDrag,
 } = useSchedule();
 
 const {
@@ -97,8 +92,7 @@ const {
     handleDragenter,
     handleDragleave,
     handleDrag,
-    handleDrop,
-    isDrag
+    handleDrop
 } = useRowDrag();
 
 const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
