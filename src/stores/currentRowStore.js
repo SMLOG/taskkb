@@ -19,7 +19,7 @@ export const useCurrentRowStore = defineStore('currentRow', () => {
     currentRow.value = null
   }
   function isCurrentRow(row){
-   return currentRow.value !== null && row.id==currentRow.value.id
+   return currentRow.value !== null && row===currentRow.value
   }
   
   return {
