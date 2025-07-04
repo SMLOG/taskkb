@@ -23,19 +23,15 @@
 </template>
 
 <script setup>
-import { useTree } from '@/composables/useTree';
 import { defineProps } from 'vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import Cell from '@/components/tree/Cell.vue';
 import ScheduleCol from '@/components/tree/ScheduleCol.vue';
 import { useCurrentRowStore } from '@/stores/currentRowStore'
 
-import {isDrag,selectDepths} from "@/composables/context";
+import {isDrag,selectDepths,weeksRef} from "@/composables/context";
 
-// Composable
-const {
- weeksRef
-} = useTree();
+
 
 // Define props
 const props = defineProps({
