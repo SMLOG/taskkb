@@ -100,6 +100,8 @@ import { showDialog } from '@/composables/useSystem';
 import FullscreenToggle from '../FullscreenToggle.vue';
 import SwitchButton from '../SwitchButton.vue';
 import { useRoute, useRouter } from 'vue-router';
+import {selectDepths } from '@/composables/context';
+
 const activeView = ref('')
 const viewOptions = ref([
   { value: '', label: 'List' },
@@ -150,7 +152,6 @@ const openConfig = async () => {
 
 
 
-const { selectDepths } = tree;
 const { configRef, treeRef } = storeToRefs(useAppStore());
 
 const menuRef = ref(null);
