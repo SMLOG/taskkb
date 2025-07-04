@@ -4,12 +4,7 @@
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
       @mousedown.left="handleMouseDown"
-      @dragstart="handleDragstart"
-      @dragover="handleDragOver"
-      @drag="handleDrag"
-      @dragenter="handleDragenter"
-      @dragleave="handleDragleave"
-      @drop="handleDrop"
+
       @mousemove="handleMouseMove"
       @mouseup.left="handleMouseUp"
       @dblclick="dblclickHandle"
@@ -93,7 +88,7 @@ const {
     handleDragleave,
     handleDrag,
     handleDrop
-} = useRowDrag();
+} = useRowDrag(tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,});
 
 const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
 

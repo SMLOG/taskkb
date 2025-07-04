@@ -1,6 +1,7 @@
-import { ref } from "vue";
+import { ref,watch } from "vue";
 import { useAppStore } from "@/stores/appStore";
 import { moveNode } from "@/lib/treelib";
+import Sortable, { MultiDrag, Swap } from 'sortablejs';
 
 import {
   selectDepths,
@@ -9,11 +10,33 @@ import {
   selectDetphEnd
 } from "./context";
 
-export function useRowDrag() {
+Sortable.mount(new MultiDrag(), new Swap());
+
+export function useRowDrag(el,options) {
   const handleDragOver = (event) => {
     event.preventDefault();
     event.dataTransfer.dropEffect = 'move';
   };
+const sortable = ref(null);
+  watch(
+    () => el?.value,
+    () => {
+      if (!el?.value) return
+      sortable.value = new Sortable(el.value,options);
+    },
+    { deep: true }
+  );
+  watch(
+    () => selectDepths?.length,
+    () => {
+      if (!sortable?.value) return
+      sortable.value.option("disabled", !selectDepths?.length);
+      setTimeout(()=>document.querySelector('.selected')&&Array.from(document.querySelectorAll('.selected')).map(e=>Sortable.utils.select(e)),10);
+      console.log( selectDepths?.value?.length,sortable.value.option("disabled"))
+    },
+    { deep: true }
+  );
+
 
   const handleDragstart = (event) => {
     let interceptor = event.target.closest(".row");
