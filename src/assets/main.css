@@ -1,9 +1,6 @@
 @import "tailwindcss";
 @import './base.css';
-.row.selected,.selected > *,.selected .col,.row.selected .sticky{
-  @apply bg-blue-50 dark:bg-gray-700	;
 
-}
 
 
 a,
@@ -104,4 +101,14 @@ body * {
 }
 .hasChild .collapse-section::after{
   content: "-";
+}
+
+.row.cur,.row.cur .sticky, .row.cur > *,.selected .col,.row.selected,.selected > *,.selected .col,.row.selected .sticky{
+  @apply bg-blue-50 dark:bg-gray-700	;
+}
+
+
+
+.row.selected{
+  position: relative;
 }
