@@ -30,7 +30,7 @@ import Cell from '@/components/tree/Cell.vue';
 import ScheduleCol from '@/components/tree/ScheduleCol.vue';
 import { useCurrentRowStore } from '@/stores/currentRowStore'
 
-
+import {isDrag,selectDepths} from "@/composables/context";
 
 // Composable
 const {
@@ -77,8 +77,6 @@ const props = defineProps({
   },
 });
 
-// Drag and drop composable
-const { isDrag, selectDepths } = useTree();
 
 
 const currentRowStore = useCurrentRowStore()
