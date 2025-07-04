@@ -39,11 +39,12 @@ const { activeTabRef } = storeToRefs(appStore);
       <div class="flex-1  flex flex-col">
 
         <div class="flex-1 relative flex ">
-          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full mx-1">
+          <div id="mainContent" class="absolute inset-0 overflow-auto min-h-full mx-1 flex flex-col">
             <FormatTool>
               <router-view>
               </router-view>
             </FormatTool>
+            <div class="flex-1 bg-[#eee]" ></div>
           </div>
         </div>
         <TreeOperation v-if="activeTabRef != -1" />
