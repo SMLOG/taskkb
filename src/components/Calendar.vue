@@ -213,7 +213,7 @@ onMounted(() => {
 
 <style scoped>
 .calendar-container {
-  height: 80vh;
+  height: 100%;
   overflow-y: auto;
   scroll-behavior: smooth;
 }
