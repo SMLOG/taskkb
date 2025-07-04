@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import {
   getRowFromDepth,
-  moveNode,
   deleteNodes,
   copyNode,
   getRows,
@@ -29,7 +28,6 @@ import {
   enableSelectionTimeout,
   enableDragTimeout,
   config,
-  dragStartClientX,
 } from "./context";
 
 
@@ -44,7 +42,7 @@ function plusWorkDays(startIndex, days) {
   let total = Math.abs(days);
   let inc = days > 0 ? 1 : -1;
   if (days == 0) return getDate(start);
-  for (; true; ) {
+  for (; true;) {
     start += inc;
     let date = getDate(start);
     if (
@@ -68,14 +66,11 @@ export function useTree() {
   let selectDetphStart;
   let selectDetphEnd;
 
-  const handleDragOver = (event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  };
+
 
   const selectRowSch = (row, event) => {
     if (
-      row?._tl?.start &&row?._tl?.end
+      row?._tl?.start && row?._tl?.end
 
     ) {
       selectStartRef.value = {
@@ -111,33 +106,33 @@ export function useTree() {
       const target = event.target;
 
       // Handle number cell click
-     const schDrag =   target.closest('.selectStartRef');
+      const schDrag = target.closest('.selectStartRef');
 
-     if(!schDrag){
-      if (selectDepths.length>0 ) {
-        if (selectDepths.includes(depth)) {
-          isDrag.value = true;
-        }else{
-          selectDepths.length=0;
-          isDrag.value = false;
-          
+      if (!schDrag) {
+        if (selectDepths.length > 0) {
+          if (selectDepths.includes(depth)) {
+            isDrag.value = true;
+          } else {
+            selectDepths.length = 0;
+            isDrag.value = false;
 
-        }
-       // handleNumClick(depth);
-        return;
-      }else{
-        enableSelectionTimeout.value = setTimeout(()=>{
-          if(selectDepths.indexOf(depth) ==-1){
-            selectDepths.push(depth);
-            selectDetphStart = depth;
-           /* enableDragTimeout.value = setTimeout(()=>{
-              isDrag.value =true;
-            },300);*/
+
           }
-         //handleNumClick(depth);
-        },300);
+          // handleNumClick(depth);
+          return;
+        } else {
+          enableSelectionTimeout.value = setTimeout(() => {
+            if (selectDepths.indexOf(depth) == -1) {
+              selectDepths.push(depth);
+              selectDetphStart = depth;
+              /* enableDragTimeout.value = setTimeout(()=>{
+                 isDrag.value =true;
+               },300);*/
+            }
+            //handleNumClick(depth);
+          }, 300);
+        }
       }
-     }
 
 
       // Clear selection if not a number cell
@@ -154,10 +149,10 @@ export function useTree() {
         handleScheduleClick(row, target, event);
         return;
       }
-    const schEl = target.closest(".sch");
-    if (!schEl) {
-      selectStartRef.value = null;
-    }
+      const schEl = target.closest(".sch");
+      if (!schEl) {
+        selectStartRef.value = null;
+      }
 
       // Handle move or drag operations
       setMoveType(row, target, event);
@@ -171,21 +166,21 @@ export function useTree() {
 
 
     isMouseDown = false;
-  
+
     clearTimeout(enableSelectionTimeout.value);
     clearTimeout(enableDragTimeout.value);
-    
+
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
     const { depth } = rowEl.dataset;
 
-  
+
     isDrag.value = false;
     if (moveType.value) {
       event.stopPropagation();
 
-      selectStartRef.value.row._tl.start = selectStartRef.value.end.n>selectStartRef.value.start.n?selectStartRef.value.start:selectStartRef.value.end;
-      selectStartRef.value.row._tl.end = selectStartRef.value.start.n>selectStartRef.value.end.n?selectStartRef.value.start:selectStartRef.value.end;;
+      selectStartRef.value.row._tl.start = selectStartRef.value.end.n > selectStartRef.value.start.n ? selectStartRef.value.start : selectStartRef.value.end;
+      selectStartRef.value.row._tl.end = selectStartRef.value.start.n > selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end;;
 
       moveType.value = null;
     } else {
@@ -262,7 +257,7 @@ export function useTree() {
         selectStartRef.value = null;
       }
     } else {
-        selectRowSch(row, event);
+      selectRowSch(row, event);
     }
   };
 
@@ -279,7 +274,7 @@ export function useTree() {
     if (sch) {
       const { left, width: totalWidth } = sch.getBoundingClientRect();
       const x = event.clientX - left;
-      const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount* 7);
+      const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
       const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
       if (selectStartRef.value && date) {
@@ -319,8 +314,8 @@ export function useTree() {
 
 
 
-              autoExpanedWeeksIfNeed([Math.max(moveType.value._tl.start.i,moveType.value._tl.end.i)+moveUnits]);
-              
+              autoExpanedWeeksIfNeed([Math.max(moveType.value._tl.start.i, moveType.value._tl.end.i) + moveUnits]);
+
               const startIndex = plusWorkDays(
                 moveType.value._tl.start.i,
                 moveUnits
@@ -332,7 +327,7 @@ export function useTree() {
 
               selectStartRef.value.start =
                 weeksRef.value[Math.floor(startIndex / 7)]?.dates[
-                  startIndex % 7
+                startIndex % 7
                 ];
               selectStartRef.value.end =
                 weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
@@ -343,13 +338,13 @@ export function useTree() {
     }
   };
 
-   function autoExpanedWeeksIfNeed(indexs){
-    for(let i=0;i<indexs.length;i++){
-      let weekIndex = parseInt((indexs[i]+1)/7);
+  function autoExpanedWeeksIfNeed(indexs) {
+    for (let i = 0; i < indexs.length; i++) {
+      let weekIndex = parseInt((indexs[i] + 1) / 7);
 
       if (weeksRef.value.length <= weekIndex) {
         useAppStore().configRef.weekCount = weekIndex + 1;
-    
+
         weeksRef.value = generateWeeks(
           useAppStore().configRef.startDate,
           weekIndex + 1
@@ -382,29 +377,6 @@ export function useTree() {
     };
   };
 
-  const handleDragstart = (event) => {
-    let interceptor = event.target.closest(".row");
-    if (interceptor && isDrag.value) {
-      dragStartClientX = event.clientX;
-    }
-
-
-    interceptor.classList.add('dragging');
-  };
-
-  const handleDrop = (event) => {
-    let interceptor = event.target.closest(".row");
-    if (!interceptor) {
-      return;
-    }
-    selectDetphEnd = interceptor.dataset.depth;
-    if (selectDepths.indexOf(selectDetphEnd) > -1) return;
-    const rootTree = useAppStore().treeRef;
-    moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX);
-    selectDepths.length = 0;
-    isDrag.value = false;
-    interceptor.classList.remove('drop-highlight');
-  };
 
   const getCacWidth = () => {
     return (
@@ -412,7 +384,7 @@ export function useTree() {
         selectStartRef.value.end,
         selectStartRef.value.start
       ) *
-        100 +
+      100 +
       "%"
     );
   };
@@ -444,7 +416,7 @@ export function useTree() {
         rowEl.closest("#mainContent").scrollLeft = plantime.offsetLeft;
     }
   };
-  const dblclickHandle = (event) => {};
+  const dblclickHandle = (event) => { };
 
   const calDiffDates = (firstDay) => {
     return (
@@ -470,7 +442,7 @@ export function useTree() {
   };
   const delSelectedNode = () => {
     let rootObj = useAppStore().treeRef;
-      deleteNodes(rootObj, selectDepths);
+    deleteNodes(rootObj, selectDepths);
     selectDepths.length = 0;
   };
   const copySelectedNode = () => {
@@ -512,18 +484,18 @@ export function useTree() {
 
     let j = 0;
     if (selectDepths.length) {
-    
-    for (let depth of filterChildDepths(selectDepths)) {
-      let item = getRowFromDepth(rootObj, depth);
-      items.push(...getRows(item, 0, ++j));
-    }
-  }else{
 
-    for (let item of rootObj._childs) {
-      items.push(...getRows(item, 0, ++j));
-    }
+      for (let depth of filterChildDepths(selectDepths)) {
+        let item = getRowFromDepth(rootObj, depth);
+        items.push(...getRows(item, 0, ++j));
+      }
+    } else {
 
-  }
+      for (let item of rootObj._childs) {
+        items.push(...getRows(item, 0, ++j));
+      }
+
+    }
 
     let cols = config.cols.filter((col) => col.show && col.cp != "ColSeq");
     let rows = items.map((item, rowIndex) => {
@@ -534,10 +506,10 @@ export function useTree() {
             (i == 0 ? "  ".repeat(item.level) + item.depth + "." + " " : "") +
             (row["c" + col.fn] ? row["c" + col.fn] : "")
         )
-        .concat(config.showSch?[
+        .concat(config.showSch ? [
           row._tl ? formatDate2(row._tl.start.date) : "",
           row._tl ? formatDate2(row._tl.end.date) : "",
-        ]:[]);
+        ] : []);
     });
     let headers = cols.map((c) => c.name);
     if (config.showSch) headers = headers.concat(["Start Date", "End Date"]);
@@ -548,17 +520,16 @@ export function useTree() {
         row
           .map(
             (d) =>
-              `${
-                (d &&
-                  d
-                    .replace(/"/g, '""')
-                    .replace(/<.*?>/g, "")
-                    .replace(/&lt;/g, "<")
-                    .replace(/&gt;/g, ">")
-                    .replace(/&amp;/g, "&")
-                    .replace(/&nbsp;/g, " ")
-                    .replace(/\\n/g, "\\n")) ||
-                ""
+              `${(d &&
+                d
+                  .replace(/"/g, '""')
+                  .replace(/<.*?>/g, "")
+                  .replace(/&lt;/g, "<")
+                  .replace(/&gt;/g, ">")
+                  .replace(/&amp;/g, "&")
+                  .replace(/&nbsp;/g, " ")
+                  .replace(/\\n/g, "\\n")) ||
+              ""
               }`
           )
           .map((d, i) => (onlyText ? `\`${d}\`` : `"${d}"`))
@@ -568,58 +539,7 @@ export function useTree() {
     return text;
   }
 
-  function handleDragenter(e) {
-    const target = e.target.closest('.row');
-    if(!target) return;
 
-    const { depth } = target.dataset;
-
-    console.log('handledragenter',depth)
-    if (target && !target.classList.contains('dragging')) {
-        target.classList.add('drop-highlight');
-    }
-}
-function handleDragleave(e) {
-  const target = e.target.closest('.row');
-  
-  if (!target) return;
-  
-  const { depth } = target.dataset;
-  console.log('handleDragleave', depth);
-
-  // Check if the mouse is still within the target or its children
-  const relatedTarget = e.relatedTarget;
-  const element = document.body;
-
-  let xDiff = e.clientX - dragStartClientX;
-  console.log(xDiff)
-
-  element.style.setProperty('--the-child-left', xDiff>=50?'50px':'0px');
-  if (relatedTarget && target.contains(relatedTarget)) {
-    return; // Mouse is still within the target, so do nothing
-  }
-
-  // Proceed with removing the highlight if the mouse has truly left the target
-  target.classList.remove('drop-highlight');
-  element.style.setProperty('--the-child-left', '0px');
-
-}
-function handleDrag(e){
-  const target = e.target?.closest('.row');
-  
-  if (!target) return;
-  
-  const { depth } = target.dataset;
-  console.log('handleDragleave', depth);
-
-
-  const element = document.body;
-
-  let xDiff = e.clientX - dragStartClientX;
-  console.log(xDiff)
-
-  element.style.setProperty('--the-child-left', xDiff>=50?'50px':'0px');
-}
 
   return {
     calDiffDates,
@@ -628,18 +548,12 @@ function handleDrag(e){
     handleMouseUp,
     weeksRef,
     cellClass,
-    handleDragstart,
-    handleDragOver,
-    handleDragenter,
-    handleDragleave,
-    handleDrag,
-    handleDrop,
+
     getCacWidth,
     handleKeyDown,
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
-    isDrag,
     moveType,
     locateCurSch,
     dragMode,
