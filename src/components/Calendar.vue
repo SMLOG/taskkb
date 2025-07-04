@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="calendar-container"
+    class="calendar-container select-none"
     ref="calendarContainer"
     @scroll="handleScroll"
   >
@@ -19,8 +19,13 @@
           :class="{ 
             'bg-blue-500 text-white rounded-full': isToday(month, day),
             'text-gray-400': !day.isCurrentMonth,
-            'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth
+            'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth && !isSelected(month, day),
+            'bg-blue-200 text-white rounded-full': isSelected(month, day) && !isToday(month, day),
+            'bg-blue-300 text-white rounded-full': isInRange(month, day) && !isToday(month, day)
           }"
+          @mousedown="startSelection(month, day)"
+          @mouseover="updateSelection(month, day)"
+          @mouseup="endSelection"
         >
           {{ day.date }}
         </div>
@@ -63,7 +68,10 @@ const startIndex = ref(0);
 const scrollPosition = ref(0);
 const bufferMonths = 3;
 const calendarContainer = ref(null);
-const isLoadingMore = ref(false); // Guard flag to prevent multiple calls
+const isLoadingMore = ref(false);
+const isDragging = ref(false);
+const startDate = ref(null);
+const endDate = ref(null);
 
 const visibleMonths = computed(() => allMonths.value);
 
@@ -97,6 +105,42 @@ const isToday = (month, day) => {
   );
 };
 
+const isSelected = (month, day) => {
+  if (!day.isCurrentMonth) return false;
+  const date = new Date(month.year, month.monthIndex, day.date);
+  return (
+    (startDate.value && date.getTime() === startDate.value.getTime()) ||
+    (endDate.value && date.getTime() === endDate.value.getTime())
+  );
+};
+
+const isInRange = (month, day) => {
+  if (!day.isCurrentMonth || !startDate.value || !endDate.value) return false;
+  const date = new Date(month.year, month.monthIndex, day.date);
+  const start = Math.min(startDate.value.getTime(), endDate.value.getTime());
+  const end = Math.max(startDate.value.getTime(), endDate.value.getTime());
+  return date.getTime() > start && date.getTime() < end;
+};
+
+const startSelection = (month, day) => {
+  if (!day.isCurrentMonth) return;
+  isDragging.value = true;
+  startDate.value = new Date(month.year, month.monthIndex, day.date);
+  endDate.value = null; // Reset end date when starting a new selection
+};
+
+const updateSelection = (month, day) => {
+  if (!isDragging.value || !day.isCurrentMonth) return;
+  endDate.value = new Date(month.year, month.monthIndex, day.date);
+};
+
+const endSelection = () => {
+  isDragging.value = false;
+  if (startDate.value && endDate.value) {
+    console.log('Selected range:', startDate.value, 'to', endDate.value);
+  }
+};
+
 const generateMonth = (year, monthIndex) => {
   return {
     key: `${year}-${monthIndex}`,
@@ -108,7 +152,7 @@ const generateMonth = (year, monthIndex) => {
 };
 
 const loadMoreMonths = (direction) => {
-  if (isLoadingMore.value) return; // Prevent multiple calls
+  if (isLoadingMore.value) return;
   isLoadingMore.value = true;
   loading.value = true;
 
@@ -143,23 +187,19 @@ const loadMoreMonths = (direction) => {
     }
 
     loading.value = false;
-    isLoadingMore.value = false; // Reset guard
+    isLoadingMore.value = false;
   }, 300);
 };
 
 const handleScroll = (event) => {
   const container = event.target;
   const { scrollTop, scrollHeight, clientHeight } = container;
-
-  // Define threshold (e.g., 200px from top or bottom)
   const threshold = 200;
 
-  // Near bottom: load future months
   if (scrollHeight - (scrollTop + clientHeight) <= threshold && !isLoadingMore.value) {
     loadMoreMonths('future');
   }
 
-  // Near top: load past months
   if (scrollTop <= threshold && startIndex.value > 0 && !isLoadingMore.value) {
     loadMoreMonths('past');
   }
@@ -225,5 +265,13 @@ onMounted(() => {
 .loading-indicator {
   color: #666;
   font-style: italic;
+}
+
+.bg-blue-200 {
+  background-color: #90cdf4; /* Lighter blue for start/end dates */
+}
+
+.bg-blue-300 {
+  background-color: #bee3f8; /* Even lighter blue for in-range dates */
 }
 </style>
