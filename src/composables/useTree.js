@@ -1,4 +1,3 @@
-import { ref } from "vue";
 import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 
@@ -20,16 +19,18 @@ import {
   generateWeeks,
 } from "@/lib/schedule";
 import { debounce } from "lodash";
-
-const weeksRef = ref([]);
-const selectDepthsRef = ref([]);
-const selectDepths = selectDepthsRef.value;
-const selectStartRef = ref(null);
-const isDrag = ref(false);
-const dragMode = ref(false);
-const moveType = ref(null);
-const enableSelectionTimeout = ref(0);
-const enableDragTimeout = ref(0);
+import {
+  weeksRef,
+  selectDepths,
+  selectStartRef,
+  isDrag,
+  dragMode,
+  moveType,
+  enableSelectionTimeout,
+  enableDragTimeout,
+  config,
+  dragStartClientX,
+} from "./context";
 
 
 function getDate(i) {
@@ -60,11 +61,9 @@ function plusWorkDays(startIndex, days) {
   }
 }
 
-let config;
-let dragStartClientX;
+
 
 export function useTree() {
-  config = useAppStore().configRef;
   let isMouseDown;
   let selectDetphStart;
   let selectDetphEnd;

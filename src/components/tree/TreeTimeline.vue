@@ -69,6 +69,7 @@ import { generateWeeks } from '@/lib/schedule';
 import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
+import { useRowDrag } from '@/composables/useRowDrag';
 
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -76,20 +77,30 @@ const thRefs = ref([]);
 const appStore = useAppStore();
 
 const {
-  handleDragOver,handleDragenter,handleDragleave,
+  //handleDragOver,handleDragenter,handleDragleave,
   handleMouseDown,
   handleMouseMove,
   handleMouseUp,
   cellClass,
   handleKeyDown,
   selectStartRef,
-  handleDragstart,handleDrag,
-  handleDrop,
+  //handleDragstart,handleDrag,
+  //handleDrop,
   moveType,
   dblclickHandle,
-  isDrag,
+ // isDrag,
   weeksRef,
 } = useTree();
+
+const {
+  handleDragstart,
+    handleDragOver,
+    handleDragenter,
+    handleDragleave,
+    handleDrag,
+    handleDrop,
+    isDrag
+} = useRowDrag();
 
 const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
 
