@@ -44,7 +44,6 @@ const { activeTabRef } = storeToRefs(appStore);
               <router-view>
               </router-view>
             </FormatTool>
-            <div class="flex-1 bg-[#eee]" ></div>
           </div>
         </div>
         <TreeOperation v-if="activeTabRef != -1" />
