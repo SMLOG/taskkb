@@ -178,7 +178,7 @@ function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = fals
 export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStartClientX) {
   let xDiff = event.clientX - dragStartClientX;
 
-  let nodes = selectDepths.filter(depth=>selectDetphEnd!==depth).map(depth=>getRowFromDepth(rootTree, depth));
+  let nodes = selectDepths.filter(depth=>selectDetphEnd!==depth && selectDetphEnd.indexOf(depth)!=0).map(depth=>getRowFromDepth(rootTree, depth));
   const targetParent = getRowFromDepth(rootTree, selectDetphEnd);
   relocateTreeNodes(nodes,targetParent,rootTree,xDiff<50)
  
