@@ -107,12 +107,5 @@ const sortable = ref(null);
   }
 
   return {
-    handleDragstart,
-    handleDragOver,
-    handleDragenter,
-    handleDragleave,
-    handleDrag,
-    handleDrop,
-    isDrag,
   };
 }

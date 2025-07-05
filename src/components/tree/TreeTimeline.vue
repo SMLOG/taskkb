@@ -82,6 +82,7 @@ const {
 } = useSchedule();
 
 useRowDrag(tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,});
+useContextHandler(tableRef);
 
 
 
@@ -133,9 +134,6 @@ watch(
 onMounted(() => {
   appStore.loadActiveTab();
   document.addEventListener('keydown', handleKeyDown);
-  nextTick(() => {
-    useContextHandler(tableRef);
-  });
   
 });
 
