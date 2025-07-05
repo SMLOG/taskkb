@@ -16,16 +16,12 @@
 <script setup>
 import { computed, watch, onMounted } from 'vue';
 import { useAppStore } from '@/stores/appStore';
-import { useTree } from '@/composables/useTree';
 import { storeToRefs } from 'pinia';
 import TreeCard from './TreeCard.vue';
 
 
 const appStore = useAppStore();
 
-const {
-  weeksRef,
-} = useTree();
 
 const { configRef, treeRef,schReadyRef } = storeToRefs(appStore);
 

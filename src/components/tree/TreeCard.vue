@@ -62,8 +62,6 @@ const props = defineProps({
   },
 });
 
-// Drag and drop composable
-const { isDrag, selectDepths } = useTree();
 
 </script>
 
