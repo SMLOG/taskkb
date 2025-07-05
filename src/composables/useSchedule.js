@@ -317,15 +317,33 @@ export function useSchedule(el) {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
 
-  const locateCurSch = (event) => {
-    let title = event.target.classList.contains("sch");
-    if (title) {
-      let rowEl = event.target.closest(".row");
-      let plantime = rowEl.querySelector(".plantime");
-      if (plantime)
-        rowEl.closest("#mainContent").scrollLeft = plantime.offsetLeft;
-    }
-  };
+const locateCurSch = (event) => {
+  // Check if clicked element or its parent has "sch" class
+  const schElement = event.target.closest(".sch");
+  if (!schElement) return;
+
+  const rowEl = schElement.closest(".row");
+  if (!rowEl) return;
+
+  const plantime = rowEl.querySelector(".plantime");
+  if (!plantime) return;
+
+  const mainContent = document.getElementById("mainContent");
+  if (!mainContent) return;
+
+  // Calculate scroll position
+  const plantimeRect = plantime.getBoundingClientRect();
+  const contentRect = mainContent.getBoundingClientRect();
+  
+  // Scroll to position with some padding if needed
+  const scrollPosition = plantimeRect.left - contentRect.left + mainContent.scrollLeft;
+  
+  // Smooth scroll to the position
+  mainContent.scrollTo({
+    left: scrollPosition,
+    behavior: 'smooth'
+  });
+};
   const dblclickHandle = (event) => { };
 
   const calDiffDates = (firstDay) => {
