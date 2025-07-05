@@ -386,11 +386,9 @@ onBeforeUnmount(() => {
     weeksRef,
     cellClass,
     getCacWidth,
-    selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
     moveType,
-    locateCurSch,
     dragMode,
   };
 }
