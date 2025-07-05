@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
-import { ref } from 'vue';
+import { ref,onBeforeUnmount,watch } from 'vue';
 import {
   getRowFromDepth,
 } from "@/lib/treelib";
@@ -51,7 +51,7 @@ function plusWorkDays(startIndex, days) {
 
 
 
-export function useSchedule() {
+export function useSchedule(el) {
 
   const selectRowSch = (row, event) => {
     if (
@@ -362,10 +362,25 @@ export function useSchedule() {
 
 
 
+  watch(
+    () => el?.value,
+    () => {
+      if (!el?.value) return
+      el.value.addEventListener('mousedown', handleMouseDown);
+      el.value.addEventListener('mousemove', handleMouseMove);
+      el.value.addEventListener('mouseup', handleMouseUp);
+      el.value.addEventListener('dblclick', dblclickHandle);
+      document.addEventListener('keydown', handleKeyDown);
+
+     // sortable.value = new Sortable(el.value,options);
+    },
+    { deep: true }
+  );
 
 
-
-
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeyDown);
+});
 
   return {
     calDiffDates,

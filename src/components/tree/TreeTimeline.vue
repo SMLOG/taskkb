@@ -3,10 +3,6 @@
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
-      @mousedown.left="handleMouseDown"
-      @mousemove="handleMouseMove"
-      @mouseup.left="handleMouseUp"
-      @dblclick="dblclickHandle"
     >
       <ColumnsResizer
         :th="thRefs"
@@ -73,13 +69,9 @@ const appStore = useAppStore();
 
 
 const {
-  handleMouseDown,
-  handleMouseMove,
-  handleMouseUp,
   cellClass,
-  handleKeyDown,
-  dblclickHandle,selectStartRef
-} = useSchedule();
+ selectStartRef
+} = useSchedule(tableRef);
 
 useRowDrag(tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,});
 useContextHandler(tableRef);
@@ -133,12 +125,10 @@ watch(
 
 onMounted(() => {
   appStore.loadActiveTab();
-  document.addEventListener('keydown', handleKeyDown);
   
 });
 
 onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleKeyDown);
   debouncedUpdateWeeks.cancel();
 });
 
