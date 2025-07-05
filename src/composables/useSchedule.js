@@ -372,7 +372,6 @@ export function useSchedule(el) {
       el.value.addEventListener('dblclick', dblclickHandle);
       document.addEventListener('keydown', handleKeyDown);
 
-     // sortable.value = new Sortable(el.value,options);
     },
     { deep: true }
   );
@@ -384,20 +383,14 @@ onBeforeUnmount(() => {
 
   return {
     calDiffDates,
-    handleMouseDown,
-    handleMouseMove,
-    handleMouseUp,
     weeksRef,
     cellClass,
-
     getCacWidth,
-    handleKeyDown,
     selectRowSch,
     selectStartRef,
     calculateDaysBetweenDates,
     moveType,
     locateCurSch,
     dragMode,
-    dblclickHandle,
   };
 }
