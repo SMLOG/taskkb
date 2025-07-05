@@ -4,7 +4,12 @@
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
       @mousedown.left="handleMouseDown"
-
+      @dragstart="handleDragstart"
+      @dragover="handleDragOver"
+      @drag="handleDrag"
+      @dragenter="handleDragenter"
+      @dragleave="handleDragleave"
+      @drop="handleDrop"
       @mousemove="handleMouseMove"
       @mouseup.left="handleMouseUp"
       @dblclick="dblclickHandle"
@@ -66,6 +71,7 @@ import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
 import { weeksRef,moveType,isDrag } from '@/composables/context';
+import {useContextHandler} from  '@/composables/useContextHandler';
 const tableRef = ref(null);
 const thRefs = ref([]);
 
@@ -81,6 +87,8 @@ const {
   dblclickHandle,selectStartRef
 } = useSchedule();
 
+
+
 const {
   handleDragstart,
     handleDragOver,
@@ -88,7 +96,10 @@ const {
     handleDragleave,
     handleDrag,
     handleDrop
-} = useRowDrag(tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,});
+} = useRowDrag(/*tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,}*/);
+
+
+
 
 const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
 
@@ -137,6 +148,10 @@ watch(
 onMounted(() => {
   appStore.loadActiveTab();
   document.addEventListener('keydown', handleKeyDown);
+  nextTick(() => {
+    useContextHandler(tableRef);
+  });
+  
 });
 
 onBeforeUnmount(() => {
