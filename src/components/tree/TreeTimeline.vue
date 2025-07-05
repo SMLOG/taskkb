@@ -68,8 +68,13 @@ const thRefs = ref([]);
 const appStore = useAppStore();
 
 
+const cellClass = (col) => {
+    return {
+      sticky: col.sticky,
+    };
+  };
+
 const {
-  cellClass,
  selectStartRef
 } = useSchedule(tableRef);
 

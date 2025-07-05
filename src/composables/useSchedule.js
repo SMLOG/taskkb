@@ -34,16 +34,6 @@ function plusWorkDays(startIndex, days) {
   if (days == 0) return getDate(start);
   for (; true;) {
     start += inc;
-    let date = getDate(start);
-    if (
-      (date.isWeekend &&
-        config.allowOptions &&
-        config.allowOptions.indexOf("W") == -1) ||
-      (date.holiday &&
-        config.allowOptions &&
-        config.allowOptions.indexOf("H") == -1)
-    )
-      continue;
     k++;
     if (k == total) return getDate(start);
   }
@@ -70,11 +60,8 @@ export function useSchedule(el) {
     const rowEl = event.target.closest(".row");
     const cell = event.target.closest("div.col");
 
-    // Early exit if neither row nor cell is found
     if (!rowEl && !cell) return;
 
-    // Prevent default and blur active element
-    //  event.preventDefault();
     if (
       document.activeElement &&
       !cell?.querySelector("[contenteditable=true]")
@@ -82,9 +69,6 @@ export function useSchedule(el) {
       document.activeElement.blur();
     }
 
-
-
-    // Handle row-specific logic
     if (rowEl) {
       const { depth } = rowEl.dataset;
       const target = event.target;
@@ -302,11 +286,6 @@ export function useSchedule(el) {
     );
   }, 600);
 
-  const cellClass = (col) => {
-    return {
-      sticky: col.sticky,
-    };
-  };
 
 
   const getCacWidth = () => {
@@ -384,7 +363,6 @@ onBeforeUnmount(() => {
   return {
     calDiffDates,
     weeksRef,
-    cellClass,
     getCacWidth,
     selectStartRef,
     calculateDaysBetweenDates,
