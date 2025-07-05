@@ -27,7 +27,7 @@ const sortable = ref(null);
       el.value.addEventListener('drag', handleDrag);
       el.value.addEventListener('dragenter', handleDragenter);
       el.value.addEventListener('dragleave', handleDragleave);
-      el.value.addEventListener('handleDrop', handleDrop);
+      el.value.addEventListener('drop', handleDrop);
 
      // sortable.value = new Sortable(el.value,options);
     },
