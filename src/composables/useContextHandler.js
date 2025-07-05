@@ -12,13 +12,14 @@ import {
       // ... other code ...
       const rowEl = event.target.closest(".row");
       isMouseDown=true;
+      const schDrag = event.target.closest('.selectStartRef');
+      if(schDrag) return;
+
       if (rowEl) {
         const { depth } = rowEl.dataset;
-        const target = event.target;
     
-        const schDrag = target.closest('.selectStartRef');
-    
-        if (!schDrag) {
+
+
           if (selectDepthsRef.value.length > 0) {
             if (selectDepthsRef.value.includes(depth)) {
               isDrag.value = true;
@@ -35,7 +36,7 @@ import {
               }
             }, 300);
           }
-        }
+  
     
         // Clear selection if not a number cell
         selectDepthsRef.value.length = 0;

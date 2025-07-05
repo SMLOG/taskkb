@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
-import {ref} from 'vue';
+import { ref } from 'vue';
 import {
   getRowFromDepth,
 } from "@/lib/treelib";
@@ -52,7 +52,6 @@ function plusWorkDays(startIndex, days) {
 
 
 export function useSchedule() {
-  let isMouseDown;
 
   const selectRowSch = (row, event) => {
     if (
@@ -68,7 +67,6 @@ export function useSchedule() {
     }
   };
   const handleMouseDown = (event) => {
-    isMouseDown = true;
     const rowEl = event.target.closest(".row");
     const cell = event.target.closest("div.col");
 
@@ -112,14 +110,7 @@ export function useSchedule() {
     }
   };
 
-
   const handleMouseUp = (event) => {
-
-
-
-
-    isMouseDown = false;
-
 
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
@@ -212,68 +203,66 @@ export function useSchedule() {
 
   const handleMouseMove = (event) => {
     const sch = event.target.closest(".sch");
+    if (!sch) return;
+    const { left, width: totalWidth } = sch.getBoundingClientRect();
+    const x = event.clientX - left;
+    const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
+    const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
-    if (sch) {
-      const { left, width: totalWidth } = sch.getBoundingClientRect();
-      const x = event.clientX - left;
-      const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
-      const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
+    if (selectStartRef.value && date) {
+      if (!selectStartRef.value.row._tl) {
+        selectStartRef.value.end = date;
+        autoExpanedWeeksIfNeed([date.i])
+        return;
+      }
 
-      if (selectStartRef.value && date) {
-        if (!selectStartRef.value.row._tl) {
-          selectStartRef.value.end = date;
-          autoExpanedWeeksIfNeed([date.i])
+      if (moveType.value) {
+        const unitWidth = totalWidth / (useAppStore().configRef.weekCount * 7);
+        const ox = event.clientX - moveType.value.x;
+
+        let newIndex =
+          moveType.value._tl[
+            moveType.value.type === "rightDrag" ? "end" : "start"
+          ].i + Math.floor(ox / unitWidth);
+
+        const newDate =
+          weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
+        if (!newDate) {
+          debouncedIncreaseWeeks(ox < 0);
+
           return;
         }
+        autoExpanedWeeksIfNeed([newDate.i]);
 
-        if (moveType.value) {
-          const unitWidth = totalWidth / (useAppStore().configRef.weekCount * 7);
-          const ox = event.clientX - moveType.value.x;
-
-          let newIndex =
-            moveType.value._tl[
-              moveType.value.type === "rightDrag" ? "end" : "start"
-            ].i + Math.floor(ox / unitWidth);
-
-          const newDate =
-            weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
-          if (!newDate) {
-            debouncedIncreaseWeeks(ox < 0);
-
-            return;
-          }
-          autoExpanedWeeksIfNeed([newDate.i]);
-
-          switch (moveType.value.type) {
-            case "rightDrag":
-              selectStartRef.value.end = newDate;
-              break;
-            case "leftDrag":
-              selectStartRef.value.start = newDate;
-              break;
-            default: {
-              const moveUnits = Math.floor(ox / unitWidth);
+        switch (moveType.value.type) {
+          case "rightDrag":
+            selectStartRef.value.end = newDate;
+            break;
+          case "leftDrag":
+            selectStartRef.value.start = newDate;
+            break;
+          default: {
+            const moveUnits = Math.floor(ox / unitWidth);
 
 
 
-              autoExpanedWeeksIfNeed([Math.max(moveType.value._tl.start.i, moveType.value._tl.end.i) + moveUnits]);
+            autoExpanedWeeksIfNeed([Math.max(moveType.value._tl.start.i, moveType.value._tl.end.i) + moveUnits]);
 
-              const startIndex = plusWorkDays(
-                moveType.value._tl.start.i,
-                moveUnits
-              ).i;
-              const endIndex = plusWorkDays(
-                moveType.value._tl.end.i,
-                moveUnits
-              ).i;
+            const startIndex = plusWorkDays(
+              moveType.value._tl.start.i,
+              moveUnits
+            ).i;
+            const endIndex = plusWorkDays(
+              moveType.value._tl.end.i,
+              moveUnits
+            ).i;
 
-              selectStartRef.value.start =
-                weeksRef.value[Math.floor(startIndex / 7)]?.dates[
-                startIndex % 7
-                ];
-              selectStartRef.value.end =
-                weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
-            }
+            selectStartRef.value.start =
+              weeksRef.value[Math.floor(startIndex / 7)]?.dates[
+              startIndex % 7
+              ];
+            selectStartRef.value.end =
+              weeksRef.value[Math.floor(endIndex / 7)]?.dates[endIndex % 7];
           }
         }
       }
