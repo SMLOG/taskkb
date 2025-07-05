@@ -2,7 +2,7 @@ import {
   selectDepthsRef,
   isDraggable,
   enableSelectionTimeout,
-  enableDragTimeout, selectDetphStart, selectDetphEnd
+  enableDragTimeout, selectDetphStart, selectDetphEnd,isDragging
 } from "./context";
 import { watch } from 'vue';
 
@@ -63,7 +63,7 @@ export function useContextHandler(elRef) {
     const sch = event.target.closest(".sch");
 
     if(isMouseDown){
-        isDraggable.value = true;
+        isDragging.value = true;
     }
     if(sch)return;
 
