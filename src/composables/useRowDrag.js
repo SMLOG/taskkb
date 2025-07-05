@@ -7,7 +7,7 @@ import {
   selectDepths,
   isDraggable,
   dragStartClientX,
-  selectDetphEnd,resetSelectDepths
+  selectDetphEnd,resetSelectDepths,isDragging
 } from "./context";
 
 Sortable.mount(new MultiDrag(), new Swap());
@@ -66,6 +66,7 @@ const sortable = ref(null);
     
     resetSelectDepths();
     isDraggable.value = false;
+    isDragging.value = false;
     interceptor.classList.remove('drop-highlight');
   };
 

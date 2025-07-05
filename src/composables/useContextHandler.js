@@ -67,15 +67,16 @@ export function useContextHandler(elRef) {
     }
     if(sch)return;
 
-    if (rowEl && isDragging.value ) {
-      handleSelection(rowEl);
+    if (rowEl && isDragging.value &&isDraggable.value==false ) {
+      handleRangeSelection(rowEl);
     }
 
     clearTimeout(enableDragTimeout.value);
-    // ... other code ...
   }
 
-  function handleSelection(rowEl) {
+  function handleRangeSelection(rowEl) {
+    console.log('handleRangeSelection');
+    resetSelectDepths();
     selectDetphEnd.value = rowEl.dataset.depth;
 
     const rows = document.querySelectorAll(".row");
@@ -103,6 +104,7 @@ export function useContextHandler(elRef) {
       elRef.value.addEventListener('mousedown', handleMouseDown)
       elRef.value.addEventListener('mousemove', handleMouseMove);
       elRef.value.addEventListener('mouseup', handleMouseUp);
+      elRef.value.addEventListener('dragend', handleMouseUp);
 
 
     }
