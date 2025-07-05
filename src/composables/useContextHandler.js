@@ -49,10 +49,12 @@ export function useContextHandler(elRef) {
     clearTimeout(enableSelectionTimeout.value);
     clearTimeout(enableDragTimeout.value);
     isMouseDown = false;
-    const rowEl = event.target.closest(".row");
-    if (!rowEl) return;
 
     isDrag.value = false;
+    const rowEl = event.target.closest(".row");
+    if (!rowEl) return;
+    console.log(isDrag.value)
+
     // ... other code ...
   }
 
@@ -97,7 +99,7 @@ export function useContextHandler(elRef) {
     if (elRef?.value) {
       elRef.value.addEventListener('mousedown', handleMouseDown)
       elRef.value.addEventListener('mousemove', handleMouseMove);
-      elRef.value.addEventListener('handleMouseUp', handleMouseUp);
+      elRef.value.addEventListener('mouseup', handleMouseUp);
 
 
     }
