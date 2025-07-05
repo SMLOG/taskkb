@@ -4,12 +4,6 @@
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
       @mousedown.left="handleMouseDown"
-      @dragstart="handleDragstart"
-      @dragover="handleDragOver"
-      @drag="handleDrag"
-      @dragenter="handleDragenter"
-      @dragleave="handleDragleave"
-      @drop="handleDrop"
       @mousemove="handleMouseMove"
       @mouseup.left="handleMouseUp"
       @dblclick="dblclickHandle"
@@ -87,16 +81,7 @@ const {
   dblclickHandle,selectStartRef
 } = useSchedule();
 
-
-
-const {
-  handleDragstart,
-    handleDragOver,
-    handleDragenter,
-    handleDragleave,
-    handleDrag,
-    handleDrop
-} = useRowDrag(/*tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,}*/);
+useRowDrag(tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,});
 
 
 

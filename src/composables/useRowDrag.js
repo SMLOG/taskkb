@@ -22,11 +22,19 @@ const sortable = ref(null);
     () => el?.value,
     () => {
       if (!el?.value) return
-      sortable.value = new Sortable(el.value,options);
+      el.value.addEventListener('dragstart', handleDragstart);
+      el.value.addEventListener('dragover', handleDragOver);
+      el.value.addEventListener('drag', handleDrag);
+      el.value.addEventListener('dragenter', handleDragenter);
+      el.value.addEventListener('dragleave', handleDragleave);
+      el.value.addEventListener('handleDrop', handleDrop);
+
+     // sortable.value = new Sortable(el.value,options);
     },
     { deep: true }
   );
-  watch(
+
+ /* watch(
     () => selectDepths?.length,
     () => {
       if (!sortable?.value) return
@@ -35,7 +43,7 @@ const sortable = ref(null);
       console.log( selectDepths?.value?.length,sortable.value.option("disabled"))
     },
     { deep: true }
-  );
+  );*/
 
 
   const handleDragstart = (event) => {
