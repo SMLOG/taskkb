@@ -28,7 +28,7 @@
 </template>
 
 <script setup>
-import { useTree } from '@/composables/useTree';
+import { useSchedule } from '@/composables/useSchedule';
 import { defineProps, ref } from 'vue';
 
 // Composable
@@ -39,7 +39,7 @@ const {
     dragMode,
     weeksRef: weeks,
     calDiffDates
-} = useTree();
+} = useSchedule();
 
 // Define props
 const props = defineProps({

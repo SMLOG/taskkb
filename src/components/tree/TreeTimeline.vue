@@ -65,7 +65,7 @@ import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
-import { weeksRef,selectStartRef,moveType,isDrag } from '@/composables/context';
+import { weeksRef,moveType,isDrag } from '@/composables/context';
 const tableRef = ref(null);
 const thRefs = ref([]);
 
@@ -78,7 +78,7 @@ const {
   handleMouseUp,
   cellClass,
   handleKeyDown,
-  dblclickHandle,
+  dblclickHandle,selectStartRef
 } = useSchedule();
 
 const {
