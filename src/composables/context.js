@@ -5,7 +5,7 @@ import { ref } from "vue";
 export const weeksRef = ref([]);
 export const selectDepthsRef = ref([]);
 export const selectDepths = selectDepthsRef.value;
-export const isDrag = ref(false);
+export const isDraggable = ref(false);
 export const dragMode = ref(false);
 export const moveType = ref(null);
 export const enableSelectionTimeout = ref(0);

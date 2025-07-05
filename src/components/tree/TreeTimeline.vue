@@ -60,7 +60,7 @@ import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
-import { weeksRef,moveType,isDrag } from '@/composables/context';
+import { weeksRef,moveType,isDraggable } from '@/composables/context';
 import {useContextHandler} from  '@/composables/useContextHandler';
 const tableRef = ref(null);
 const thRefs = ref([]);
@@ -141,7 +141,7 @@ const gridColumns = computed(() =>
 );
 const isHDragging = computed(() => moveType.value?.type === 'leftDrag' || moveType.value?.type === 'rightDrag');
 const isMoving = computed(() => moveType.value?.type === 'move');
-const isDraging = computed(() => isDrag.value);
+const isDraging = computed(() => isDraggable.value);
 
 
 const handleEnterKeyUp = (event) => {

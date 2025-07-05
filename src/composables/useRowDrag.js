@@ -5,7 +5,7 @@ import Sortable, { MultiDrag, Swap } from 'sortablejs';
 
 import {
   selectDepths,
-  isDrag,
+  isDraggable,
   dragStartClientX,
   selectDetphEnd
 } from "./context";
@@ -48,7 +48,7 @@ const sortable = ref(null);
 
   const handleDragstart = (event) => {
     let interceptor = event.target.closest(".row");
-    if (interceptor && isDrag.value) {
+    if (interceptor && isDraggable.value) {
       dragStartClientX.value = event.clientX;
     }
     interceptor.classList.add('dragging');
@@ -64,7 +64,7 @@ const sortable = ref(null);
     const rootTree = useAppStore().treeRef;
     moveNode(rootTree, selectDepths , selectDetphEnd.value , event, dragStartClientX.value );
     selectDepths.length = 0;
-    isDrag.value = false;
+    isDraggable.value = false;
     interceptor.classList.remove('drop-highlight');
   };
 

@@ -1,6 +1,6 @@
 import {
   selectDepthsRef,
-  isDrag,
+  isDraggable,
   enableSelectionTimeout,
   enableDragTimeout, selectDetphStart, selectDetphEnd
 } from "./context";
@@ -20,10 +20,10 @@ export function useContextHandler(elRef) {
 
       if (selectDepthsRef.value.length > 0) {
         if (selectDepthsRef.value.includes(depth)) {
-          isDrag.value = true;
+          isDraggable.value = true;
         } else {
           selectDepthsRef.value.length = 0;
-          isDrag.value = false;
+          isDraggable.value = false;
         }
         return;
       } else {
@@ -50,10 +50,10 @@ export function useContextHandler(elRef) {
     clearTimeout(enableDragTimeout.value);
     isMouseDown = false;
 
-    isDrag.value = false;
+    isDraggable.value = false;
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
-    console.log(isDrag.value)
+    console.log(isDraggable.value)
 
     // ... other code ...
   }
@@ -61,9 +61,13 @@ export function useContextHandler(elRef) {
   function handleMouseMove(event) {
     const rowEl = event.target.closest(".row");
     const sch = event.target.closest(".sch");
+
+    if(isMouseDown){
+        isDraggable.value = true;
+    }
     if(sch)return;
 
-    if (rowEl && isMouseDown && !isDrag.value && selectDepthsRef.value.length) {
+    if (rowEl && isMouseDown && !isDraggable.value && selectDepthsRef.value.length) {
       handleSelection(rowEl);
     }
 

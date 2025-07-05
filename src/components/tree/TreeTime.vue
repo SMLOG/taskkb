@@ -1,6 +1,6 @@
 <template>
     <div class="row grid min-h-7" :data-weeks="1" @mousedown="handleClick" :class="{ cur:isCurrentRow(),selected: selectDepths.indexOf(depth) > -1 ,nochilds:!row._childs||!row._childs.length,collapsed:row._collapsed,hasChild: row._childs && row._childs.length}" :data-depth="depth" :data-level="level" v-if="depth !== ''"
-        :draggable="isDrag" :style="gridStyle" >
+        :draggable="isDraggable" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
                 <Cell :row="row" :col="col" :level="level" :cellIndex="cellIndex" :index="id" :depth="depth" ></Cell>
         </template>
@@ -29,7 +29,7 @@ import Cell from '@/components/tree/Cell.vue';
 import ScheduleCol from '@/components/tree/ScheduleCol.vue';
 import { useCurrentRowStore } from '@/stores/currentRowStore'
 
-import {isDrag,selectDepths,weeksRef} from "@/composables/context";
+import {isDraggable,selectDepths,weeksRef} from "@/composables/context";
 
 
 
