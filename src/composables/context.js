@@ -18,3 +18,8 @@ export const dragStartClientX= ref(null);
 export const isMouseDown= ref(null);
 export const selectDetphStart= ref(null);
 export const selectDetphEnd= ref(null);
+export const resetSelectDepths = () => {
+selectDepthsRef.value.length =0;
+selectDepths.length=0;
+
+}

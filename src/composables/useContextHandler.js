@@ -2,14 +2,13 @@ import {
   selectDepthsRef,
   isDraggable,
   enableSelectionTimeout,
-  enableDragTimeout, selectDetphStart, selectDetphEnd,isDragging
+  enableDragTimeout, selectDetphStart, selectDetphEnd,isDragging,resetSelectDepths
 } from "./context";
 import { watch } from 'vue';
 
 export function useContextHandler(elRef) {
   let isMouseDown = false;
   function handleMouseDown(event) {
-    // ... other code ...
     const rowEl = event.target.closest(".row");
     isMouseDown = true;
     const schDrag = event.target.closest('.selectStartRef');
@@ -22,7 +21,7 @@ export function useContextHandler(elRef) {
         if (selectDepthsRef.value.includes(depth)) {
           isDraggable.value = true;
         } else {
-          selectDepthsRef.value.length = 0;
+         resetSelectDepths()
           isDraggable.value = false;
         }
         return;
@@ -31,16 +30,14 @@ export function useContextHandler(elRef) {
           if (selectDepthsRef.value.indexOf(depth) == -1) {
             selectDepthsRef.value.push(depth);
             selectDetphStart.value = depth;
+            isDragging.value = true;
           }
         }, 300);
       }
 
-
-      // Clear selection if not a number cell
-      selectDepthsRef.value.length = 0;
+      resetSelectDepths();
       selectDetphStart.value = null;
       selectDetphEnd.value = null;
-      // ... other code ...
     }
   }
 
@@ -50,12 +47,15 @@ export function useContextHandler(elRef) {
     clearTimeout(enableDragTimeout.value);
     isMouseDown = false;
 
+    if( isDraggable.value ){
+      resetSelectDepths();
+    }
     isDraggable.value = false;
+    isDragging.value = false;
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
     console.log(isDraggable.value)
 
-    // ... other code ...
   }
 
   function handleMouseMove(event) {
@@ -67,7 +67,7 @@ export function useContextHandler(elRef) {
     }
     if(sch)return;
 
-    if (rowEl && isMouseDown && !isDraggable.value && selectDepthsRef.value.length) {
+    if (rowEl && isDragging.value ) {
       handleSelection(rowEl);
     }
 
@@ -76,7 +76,6 @@ export function useContextHandler(elRef) {
   }
 
   function handleSelection(rowEl) {
-    selectDepthsRef.value.length = 0;
     selectDetphEnd.value = rowEl.dataset.depth;
 
     const rows = document.querySelectorAll(".row");

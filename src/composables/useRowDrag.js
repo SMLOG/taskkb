@@ -7,7 +7,7 @@ import {
   selectDepths,
   isDraggable,
   dragStartClientX,
-  selectDetphEnd
+  selectDetphEnd,resetSelectDepths
 } from "./context";
 
 Sortable.mount(new MultiDrag(), new Swap());
@@ -63,7 +63,8 @@ const sortable = ref(null);
     if (selectDepths.indexOf(selectDetphEnd) > -1) return;
     const rootTree = useAppStore().treeRef;
     moveNode(rootTree, selectDepths , selectDetphEnd.value , event, dragStartClientX.value );
-    selectDepths.length = 0;
+    
+    resetSelectDepths();
     isDraggable.value = false;
     interceptor.classList.remove('drop-highlight');
   };
