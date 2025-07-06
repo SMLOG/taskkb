@@ -87,13 +87,12 @@ export function useSchedule(el) {
       ) {
 
         startRowSchedule(row, target, event);
-        return;
-      }
-
-      setMoveType(row, target, event);
+      
+      }else setMoveType(row, target, event);
     }
   };
 
+  
   function handleMouseUp(event) {
 
     const rowEl = event.target.closest(".row");
