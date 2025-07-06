@@ -27,15 +27,15 @@ function getDate(i) {
 }
 function plusWorkDays(startIndex, days) {
   if (days === 0) return getDate(startIndex);
-  
+
   const total = Math.abs(days);
   const inc = days > 0 ? 1 : -1;
   let currentIndex = startIndex;
-  
+
   for (let k = 0; k < total; k++) {
     currentIndex += inc;
   }
-  
+
   return getDate(currentIndex);
 }
 
@@ -43,7 +43,7 @@ function plusWorkDays(startIndex, days) {
 
 export function useSchedule(el) {
 
-  const selectRowSch = (row, event) => {
+  function selectRowSch(row, event) {
     if (
       row?._tl?.start && row?._tl?.end
 
@@ -57,7 +57,7 @@ export function useSchedule(el) {
       };
     }
   };
-  const handleMouseDown = (event) => {
+  function handleMouseDown(event) {
     const rowEl = event.target.closest(".row");
     const cell = event.target.closest("div.col");
 
@@ -95,7 +95,7 @@ export function useSchedule(el) {
     }
   };
 
-  const handleMouseUp = (event) => {
+  function handleMouseUp(event) {
 
     const rowEl = event.target.closest(".row");
     if (!rowEl) return;
@@ -113,7 +113,7 @@ export function useSchedule(el) {
     }
   };
 
-  const setMoveType = (row, target, event) => {
+  function setMoveType(row, target, event) {
     const { clientX } = event;
     let moveTypeConfig;
 
@@ -154,7 +154,7 @@ export function useSchedule(el) {
     }
   };
 
-  const handleScheduleClick = (row, target, event) => {
+  function handleScheduleClick(row, target, event) {
     const schEl = target.closest(".sch");
     if (!schEl) {
       selectStartRef.value = null;
@@ -189,7 +189,7 @@ export function useSchedule(el) {
   function getFirstDay() {
     return weeksRef.value[0].dates[0].date;
   }
-  const handleMouseMove = (event) => {
+  function handleMouseMove(event) {
     const sch = event.target.closest(".sch");
     if (!sch) return;
     const { left, width: totalWidth } = sch.getBoundingClientRect();
@@ -294,7 +294,7 @@ export function useSchedule(el) {
 
 
 
-  const getCacWidth = () => {
+  function getCacWidth() {
     return (
       calculateDaysBetweenDates(
         selectStartRef.value.end,
@@ -305,7 +305,7 @@ export function useSchedule(el) {
     );
   };
 
-  const handleKeyDown = (event) => {
+  function handleKeyDown(event) {
     if (
       event.key === "Delete" ||
       event.key === "Backspace" ||
@@ -319,10 +319,10 @@ export function useSchedule(el) {
     }
   };
 
-  const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
+  function calculateDaysBetweenDates(d1, d2, exclusiveHolidayWeeken) {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
-  const calculateDaysBetweenDates2 = (d1, d2, exclusiveHolidayWeeken, row) => {
+  function calculateDaysBetweenDates2(d1, d2, exclusiveHolidayWeeken, row) {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
   function jumpToPlanTime(event) {
