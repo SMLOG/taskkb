@@ -21,8 +21,7 @@ const selectStartRef = ref(null);
 
 
 function getDate(i) {
-  const weekIndex = parseInt(i / 7);
-
+  const weekIndex = Math.floor(i / 7);
   return weeksRef.value[weekIndex].dates[i % 7];
 }
 function plusWorkDays(startIndex, days) {
