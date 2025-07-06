@@ -76,9 +76,9 @@ export function useSchedule(el) {
       const row = getRowFromDepth(useAppStore().treeRef, depth);
 
       if (!schEl) {
-          selectStartRef.value = null;
-          return;
-        }
+        selectStartRef.value = null;
+        return;
+      }
       if (
         !row ||
         !row._tl?.start ||
@@ -87,12 +87,12 @@ export function useSchedule(el) {
       ) {
 
         startRowSchedule(row, target, event);
-      
-      }else setMoveType(row, target, event);
+
+      } else setMoveType(row, target, event);
     }
   };
 
-  
+
   function handleMouseUp(event) {
 
     const rowEl = event.target.closest(".row");
@@ -153,15 +153,16 @@ export function useSchedule(el) {
   };
 
   function startRowSchedule(row, target, event) {
-    const schEl = target.closest(".sch");
 
-
-    const { left, width: totalWidth } = schEl.getBoundingClientRect();
-    const x = event.clientX - left;
-    const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
-    const date = weeksRef.value[Math.floor(index / 7)].dates[index % 7];
 
     if (!row._tl?.start) {
+      const schEl = target.closest(".sch");
+
+
+      const { left, width: totalWidth } = schEl.getBoundingClientRect();
+      const x = event.clientX - left;
+      const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
+      const date = weeksRef.value[Math.floor(index / 7)].dates[index % 7];
       if (!selectStartRef.value) {
         selectStartRef.value = { type: 2, row, start: date, end: date };
       } else if (
