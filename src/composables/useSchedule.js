@@ -399,10 +399,6 @@ export function useSchedule(el) {
 
   onBeforeUnmount(() => {
     document.removeEventListener('keydown', handleKeyDown);
-      el.value.removeEventListener('mousedown', handleMouseDown);
-      el.value.removeEventListener('mousemove', handleMouseMove);
-      el.value.removeEventListener('mouseup', handleMouseUp);
-      el.value.removeEventListener('dblclick', dblclickHandle);
 
   });
 

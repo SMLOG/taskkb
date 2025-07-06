@@ -33,7 +33,7 @@ const date = ref('');
 
 const getValue = () => {
   if (props.row?._tl?.start) {
-    date.value = format(props.row._tl.start.date, 'yyyy-MM-dd');
+    date.value = format(props.row._tl.start, 'yyyy-MM-dd');
   }
 };
 
