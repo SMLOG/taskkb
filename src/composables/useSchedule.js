@@ -26,16 +26,17 @@ function getDate(i) {
   return weeksRef.value[weekIndex].dates[i % 7];
 }
 function plusWorkDays(startIndex, days) {
-  let start = startIndex;
-  let k = 0;
-  let total = Math.abs(days);
-  let inc = days > 0 ? 1 : -1;
-  if (days == 0) return getDate(start);
-  for (; true;) {
-    start += inc;
-    k++;
-    if (k == total) return getDate(start);
+  if (days === 0) return getDate(startIndex);
+  
+  const total = Math.abs(days);
+  const inc = days > 0 ? 1 : -1;
+  let currentIndex = startIndex;
+  
+  for (let k = 0; k < total; k++) {
+    currentIndex += inc;
   }
+  
+  return getDate(currentIndex);
 }
 
 
