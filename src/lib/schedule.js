@@ -1,16 +1,18 @@
+import { jsonParse } from "./parse";
+
 export function addDatePeriod(addPeriod) {
   if (addPeriod) {
     let newPeriod = {
       start:
-        addPeriod.start.n > addPeriod.end.n ? addPeriod.end : addPeriod.start,
+        (addPeriod.start.n > addPeriod.end.n ? addPeriod.end : addPeriod.start).date,
       end:
-        addPeriod.start.n < addPeriod.end.n ? addPeriod.end : addPeriod.start,
+        (addPeriod.start.n < addPeriod.end.n ? addPeriod.end : addPeriod.start).date,
     };
     return newPeriod;
   }
 }
 export function deepCopy(obj) {
-  return JSON.parse(JSON.stringify(obj));
+  return jsonParse(JSON.stringify(obj));
 }
 function findTheDateInWeeks(weeks, d) {
 
@@ -57,8 +59,29 @@ export function getPreviousWeekDate(date) {
   result.setDate(date.getDate() - 7);
   return result;
 }
+
+/**
+ * Calculates the number of days between two dates
+ * @param {Date|string} date1 - First date (Date object or string in valid format)
+ * @param {Date|string} date2 - Second date (Date object or string in valid format)
+ * @returns {number} Number of days between the two dates (always positive)
+ */
+export function getDaysBetweenDates(date1, date2) {
+    // Convert inputs to Date objects if they aren't already
+    const d1 = new Date(date1);
+    const d2 = new Date(date2);
+    
+    // Calculate difference in milliseconds
+    const timeDiff = Math.abs(d2.getTime() - d1.getTime());
+    
+    // Convert milliseconds to days
+    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    
+    return daysDiff+1;
+}
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
+    if( d1 instanceof Date)return getDaysBetweenDates(d1, d2);
     let date1 = d1.n > d2.n ? findTheDateInWeeks(weeks,d1) : findTheDateInWeeks(weeks,d2);
     let date2 = d1.n > d2.n ? findTheDateInWeeks(weeks,d2) : findTheDateInWeeks(weeks,d1);
     if (exclusiveHolidayWeeken) {
@@ -94,6 +117,26 @@ export function getPreviousWeekDate(date) {
   return `${day}-${month}-${year}`;
 }
 
+
+export function getDateInfo(targetDate, startDate) {
+  // Convert inputs to Date objects if they aren't already
+  const target = new Date(targetDate);
+  const start = new Date(startDate);
+  
+  // Calculate numeric date representation (YYYYMMDD)
+  const n = getDateAsInteger(target);
+  
+  // Calculate day index (days since startDate)
+  const timeDiff = target.getTime() - start.getTime();
+  const dayDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+  
+  return {
+    date: target,
+    n: n,
+    i: dayDiff,         
+    y: target.getFullYear(),
+  };
+}
 
 function getDateAsInteger  (dateObj)  {
   let year = dateObj.getFullYear();
@@ -194,6 +237,21 @@ const holidays = [
 export function isBetween (a, b, c) {
   return (a <= c && c <= b) || (b <= c && c <= a);
 };
+
+export function isDateBetween(targetDate, fromDate, toDate) {
+  // Convert to timestamps (UTC, time set to 00:00:00)
+  const getDateTimestamp = (date) => {
+    const d = new Date(date);
+    return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
+  };
+
+  const target = getDateTimestamp(targetDate);
+  const from = getDateTimestamp(fromDate);
+  const to = getDateTimestamp(toDate);
+
+  // Compare timestamps (faster than Date objects)
+  return target >= from && target <= to;
+}
 
 export function weeksBetween(date1, date2) {
   // Validate inputs are valid Date objects

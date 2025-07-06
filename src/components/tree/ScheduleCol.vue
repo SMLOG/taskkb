@@ -3,8 +3,8 @@
         <div style="display: flex; flex-wrap: nowrap" class="sch" :style="{width:days*25+'px'}">
             <div :style="{ width: 1 / days * 100 + '%' }" style="position: relative;">
                 <div v-if="row._tl && row._tl.end" :style="{
-                    width: (calculateDaysBetweenDates(row._tl.end, row._tl.start)) * 100 + '%',
-                    marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay) - 1) * 100 + '%'
+                    width: (calculateDaysBetweenDates(row._tl.end, row._tl.start,false)) * 100 + '%',
+                    marginLeft: (calculateDaysBetweenDates2(row._tl.start, firstDay?.date,false,row) -1 ) * 100 + '%'
                 }" class="plantime"
                     :class="{ dragMode: dragMode }">{{
                         calculateDaysBetweenDates(row._tl.end,
@@ -35,7 +35,7 @@ import { defineProps, ref } from 'vue';
 const {
     getCacWidth,
     selectStartRef,
-    calculateDaysBetweenDates,
+    calculateDaysBetweenDates,calculateDaysBetweenDates2,
     dragMode,
     weeksRef: weeks,
     calDiffDates

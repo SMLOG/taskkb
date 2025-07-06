@@ -8,14 +8,13 @@ import {
   deepCopy,
   calcDaysBetween,
   getPreviousWeekDate,
-  generateWeeks,getDateInfo
+  generateWeeks,
 } from "@/lib/schedule";
 import { debounce } from "lodash";
 import {
   weeksRef,
   dragMode,
-  moveType,
-  config,
+  moveType
 } from "./context";
 
 const selectStartRef = ref(null);
@@ -48,12 +47,11 @@ export function useSchedule(el) {
       row?._tl?.start && row?._tl?.end
 
     ) {
-
       selectStartRef.value = {
         type: 1,
         row: row,
-        start: getDateInfo(row._tl.start),
-        end: getDateInfo(row._tl.end),
+        start: row._tl.start,
+        end: row._tl.end,
       };
     }
   };
@@ -104,8 +102,8 @@ export function useSchedule(el) {
     if (moveType.value) {
       event.stopPropagation();
 
-      selectStartRef.value.row._tl.start = (selectStartRef.value.end.n > selectStartRef.value.start.n ? selectStartRef.value.start : selectStartRef.value.end).date;
-      selectStartRef.value.row._tl.end = (selectStartRef.value.start.n > selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end).date;
+      selectStartRef.value.row._tl.start = selectStartRef.value.end.n > selectStartRef.value.start.n ? selectStartRef.value.start : selectStartRef.value.end;
+      selectStartRef.value.row._tl.end = selectStartRef.value.start.n > selectStartRef.value.end.n ? selectStartRef.value.start : selectStartRef.value.end;;
 
       moveType.value = null;
     } else {
@@ -174,8 +172,8 @@ export function useSchedule(el) {
         selectStartRef.value.start
       ) {
         row._tl = addDatePeriod({
-          start: selectStartRef.value.start,
-          end: date,
+          start: selectStartRef.value.start.date,
+          end: date.date,
         });
         console.log(row._tl)
       } else {
@@ -205,11 +203,10 @@ export function useSchedule(el) {
         const unitWidth = totalWidth / (useAppStore().configRef.weekCount * 7);
         const ox = event.clientX - moveType.value.x;
 
-        let dateInfo =  getDateInfo(moveType.value._tl[
+        let newIndex =
+          moveType.value._tl[
             moveType.value.type === "rightDrag" ? "end" : "start"
-          ], weeksRef.value[0].dates[0].date);
-
-        let newIndex = dateInfo.i + Math.floor(ox / unitWidth);
+          ].i + Math.floor(ox / unitWidth);
 
         const newDate =
           weeksRef.value[Math.floor(newIndex / 7)]?.dates[newIndex % 7];
@@ -231,16 +228,15 @@ export function useSchedule(el) {
             const moveUnits = Math.floor(ox / unitWidth);
 
 
-           const startInfo = getDateInfo(moveType.value._tl.start, weeksRef.value[0].dates[0].date);
-           const endInfo = getDateInfo(moveType.value._tl.end, weeksRef.value[0].dates[0].date);
-            autoExpanedWeeksIfNeed([Math.max(startInfo.i, endInfo.i) + moveUnits]);
+
+            autoExpanedWeeksIfNeed([Math.max(moveType.value._tl.start.i, moveType.value._tl.end.i) + moveUnits]);
 
             const startIndex = plusWorkDays(
-              startInfo.i,
+              moveType.value._tl.start.i,
               moveUnits
             ).i;
             const endIndex = plusWorkDays(
-              endInfo.i,
+              moveType.value._tl.end.i,
               moveUnits
             ).i;
 
@@ -293,7 +289,7 @@ export function useSchedule(el) {
 
   const getCacWidth = () => {
     return (
-      calculateDaysBetweenDates(
+      calculateDaysBetween(
         selectStartRef.value.end,
         selectStartRef.value.start
       ) *
@@ -316,12 +312,18 @@ export function useSchedule(el) {
     }
   };
 
-  const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
+  const calculateDaysBetweenDates = (d1, d2) => {
+    console.log(d1,d2)
+    if(typeof d1 !=='Date' && typeof d2 !== 'Date') {
+      return 0;
+    }
+    return getDaysBetweenDates(d1, d2);
+  };
+
+    const calculateDaysBetween = (d1, d2, exclusiveHolidayWeeken) => {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
-  const calculateDaysBetweenDates2 = (d1, d2, exclusiveHolidayWeeken,row) => {
-    return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
-  };
+
 const locateCurSch = (event) => {
   // Check if clicked element or its parent has "sch" class
   const schElement = event.target.closest(".sch");
@@ -390,6 +392,6 @@ onBeforeUnmount(() => {
     selectStartRef,
     calculateDaysBetweenDates,
     moveType,
-    dragMode,calculateDaysBetweenDates2
+    dragMode,calculateDaysBetween
   };
 }

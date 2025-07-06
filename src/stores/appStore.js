@@ -269,13 +269,13 @@ export const useAppStore = defineStore('app', () => {
       let endTime = startTime;
       const reCalStartAndCount = (row) => {
         if (row._tl) {
-          if (row._tl?.start?.date)
-            if (startTime === 0 || row._tl.start.date.getTime() < startTime) {
-              startTime = row._tl.start.date.getTime();
+          if (row._tl?.start)
+            if (startTime === 0 || row._tl.start.getTime() < startTime) {
+              startTime = row._tl.start.getTime();
             }
 
-          if (endTime === 0 || row._tl.end.date.getTime() > endTime) {
-            endTime = row._tl.end.date.getTime();
+          if (endTime === 0 || row._tl.end.getTime() > endTime) {
+            endTime = row._tl.end.getTime();
           }
         }
       }
