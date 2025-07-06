@@ -73,30 +73,23 @@ export function useSchedule(el) {
       const { depth } = rowEl.dataset;
       const target = event.target;
       const schEl = target.closest(".sch");
-
-
-
-
       const row = getRowFromDepth(useAppStore().treeRef, depth);
+
+      if (!schEl) {
+          selectStartRef.value = null;
+          return;
+        }
       if (
         !row ||
         !row._tl?.start ||
         !selectStartRef.value ||
         selectStartRef.value.row !== row
       ) {
-        if (!schEl) {
-          selectStartRef.value = null;
-          return;
-        }
 
         startRowSchedule(row, target, event);
         return;
       }
-      if (!schEl) {
-        selectStartRef.value = null;
-      }
 
-      // Handle move or drag operations
       setMoveType(row, target, event);
     }
   };
