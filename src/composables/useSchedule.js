@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
-import { ref,onBeforeUnmount,watch } from 'vue';
+import { ref, onBeforeUnmount, watch } from 'vue';
 import {
   getRowFromDepth,
 } from "@/lib/treelib";
@@ -8,14 +8,13 @@ import {
   deepCopy,
   calcDaysBetween,
   getPreviousWeekDate,
-  generateWeeks,getDateInfo
+  generateWeeks, getDateInfo
 } from "@/lib/schedule";
 import { debounce } from "lodash";
 import {
   weeksRef,
   dragMode,
-  moveType,
-  config,
+  moveType
 } from "./context";
 
 const selectStartRef = ref(null);
@@ -208,9 +207,9 @@ export function useSchedule(el) {
         const unitWidth = totalWidth / (useAppStore().configRef.weekCount * 7);
         const ox = event.clientX - moveType.value.x;
 
-        let dateInfo =  getDateInfo(moveType.value._tl[
-            moveType.value.type === "rightDrag" ? "end" : "start"
-          ], getFirstDay());
+        let dateInfo = getDateInfo(moveType.value._tl[
+          moveType.value.type === "rightDrag" ? "end" : "start"
+        ], getFirstDay());
 
         let newIndex = dateInfo.i + Math.floor(ox / unitWidth);
 
@@ -234,8 +233,8 @@ export function useSchedule(el) {
             const moveUnits = Math.floor(ox / unitWidth);
 
 
-           const startInfo = getDateInfo(moveType.value._tl.start, getFirstDay());
-           const endInfo = getDateInfo(moveType.value._tl.end, getFirstDay());
+            const startInfo = getDateInfo(moveType.value._tl.start, getFirstDay());
+            const endInfo = getDateInfo(moveType.value._tl.end, getFirstDay());
             autoExpanedWeeksIfNeed([Math.max(startInfo.i, endInfo.i) + moveUnits]);
 
             const startIndex = plusWorkDays(
@@ -322,52 +321,52 @@ export function useSchedule(el) {
   const calculateDaysBetweenDates = (d1, d2, exclusiveHolidayWeeken) => {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
-  const calculateDaysBetweenDates2 = (d1, d2, exclusiveHolidayWeeken,row) => {
+  const calculateDaysBetweenDates2 = (d1, d2, exclusiveHolidayWeeken, row) => {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
-function jumpToPlanTime(event) {
-  // Get the target elements
-  const schElement = event.target.closest(".sch");
-  if (!schElement) return;
-  
-  const rowEl = schElement.closest(".row");
-  if (!rowEl) return;
-  
-  const plantime = rowEl.querySelector(".plantime");
-  if (!plantime) return;
-  
-  const mainContent = document.getElementById("mainContent");
-  if (!mainContent) return;
+  function jumpToPlanTime(event) {
+    // Get the target elements
+    const schElement = event.target.closest(".sch");
+    if (!schElement) return;
 
-  // Get all measurements
-  const containerRect = mainContent.getBoundingClientRect();
-  const elementRect = plantime.getBoundingClientRect();
-  const containerScrollLeft = mainContent.scrollLeft;
-  
-  // Calculate desired scroll position
-  const elementCenter = elementRect.left - containerRect.left + containerScrollLeft;
-  const containerCenter = containerRect.width / 2;
-  const scrollTo = elementCenter - containerCenter + (elementRect.width / 2);
+    const rowEl = schElement.closest(".row");
+    if (!rowEl) return;
 
-  // Apply boundaries
-  const maxScroll = mainContent.scrollWidth - containerRect.width;
-  const boundedScroll = Math.max(0, Math.min(scrollTo, maxScroll));
+    const plantime = rowEl.querySelector(".plantime");
+    if (!plantime) return;
 
-  // Scroll with polyfill for smooth behavior
-  const scrollOptions = {
-    left: boundedScroll,
-    behavior: 'smooth'
-  };
-  
-  if ('scrollBehavior' in document.documentElement.style) {
-    mainContent.scrollTo(scrollOptions);
-  } else {
-    // Fallback for browsers without smooth scroll
-    mainContent.scrollLeft = boundedScroll;
+    const mainContent = document.getElementById("mainContent");
+    if (!mainContent) return;
+
+    // Get all measurements
+    const containerRect = mainContent.getBoundingClientRect();
+    const elementRect = plantime.getBoundingClientRect();
+    const containerScrollLeft = mainContent.scrollLeft;
+
+    // Calculate desired scroll position
+    const elementCenter = elementRect.left - containerRect.left + containerScrollLeft;
+    const containerCenter = containerRect.width / 2;
+    const scrollTo = elementCenter - containerCenter + (elementRect.width / 2);
+
+    // Apply boundaries
+    const maxScroll = mainContent.scrollWidth - containerRect.width;
+    const boundedScroll = Math.max(0, Math.min(scrollTo, maxScroll));
+
+    // Scroll with polyfill for smooth behavior
+    const scrollOptions = {
+      left: boundedScroll,
+      behavior: 'smooth'
+    };
+
+    if ('scrollBehavior' in document.documentElement.style) {
+      mainContent.scrollTo(scrollOptions);
+    } else {
+      // Fallback for browsers without smooth scroll
+      mainContent.scrollLeft = boundedScroll;
+    }
+
+
   }
-
-
-}
   const dblclickHandle = (event) => { };
 
   const calDiffDates = (firstDay) => {
@@ -398,9 +397,9 @@ function jumpToPlanTime(event) {
   );
 
 
-onBeforeUnmount(() => {
-  document.removeEventListener('keydown', handleKeyDown);
-});
+  onBeforeUnmount(() => {
+    document.removeEventListener('keydown', handleKeyDown);
+  });
 
   return {
     calDiffDates,
@@ -409,6 +408,6 @@ onBeforeUnmount(() => {
     selectStartRef,
     calculateDaysBetweenDates,
     moveType,
-    dragMode,calculateDaysBetweenDates2
+    dragMode, calculateDaysBetweenDates2
   };
 }
