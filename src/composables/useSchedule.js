@@ -295,8 +295,8 @@ export function useSchedule(el) {
   function getCacWidth() {
     return (
       calculateDaysBetweenDates(
-        selectStartRef.value.end,
-        selectStartRef.value.start
+        selectStartRef.value.end.n> selectStartRef.value.start.n?selectStartRef.value.end:selectStartRef.value.start,
+        selectStartRef.value.end.n< selectStartRef.value.start.n?selectStartRef.value.end:selectStartRef.value.start,
       ) *
       100 +
       "%"
