@@ -259,17 +259,17 @@ export function useSchedule(el) {
   };
 
   function autoExpanedWeeksIfNeed(dateIndex) {
-      let weekIndex = parseInt((dateIndex+ 1) / 7);
+    let weekIndex = parseInt((dateIndex + 1) / 7);
 
-      if (weeksRef.value.length <= weekIndex) {
-        useAppStore().configRef.weekCount = weekIndex + 1;
+    if (weeksRef.value.length <= weekIndex) {
+      useAppStore().configRef.weekCount = weekIndex + 1;
 
-        weeksRef.value = generateWeeks(
-          useAppStore().configRef.startDate,
-          weekIndex + 1
-        );
-      }
-  
+      weeksRef.value = generateWeeks(
+        useAppStore().configRef.startDate,
+        weekIndex + 1
+      );
+    }
+
 
   }
 
@@ -292,31 +292,31 @@ export function useSchedule(el) {
 
 
 
-function getCacWidth() {
-  // Check if selectStartRef and its value exist
-  if (!selectStartRef?.value) {
-    console.error('selectStartRef or its value is undefined');
-    return '0%';
+  function getCacWidth() {
+    // Check if selectStartRef and its value exist
+    if (!selectStartRef?.value) {
+      console.error('selectStartRef or its value is undefined');
+      return '0%';
+    }
+
+    const { start, end } = selectStartRef.value;
+
+    // Validate that start and end objects exist and have 'n' property
+    if (!start || !end || start.n === undefined || end.n === undefined) {
+      console.error('Invalid start or end values');
+      return '0%';
+    }
+
+    // Determine earlier and later dates
+    const laterDate = start.n > end.n ? start : end;
+    const earlierDate = start.n > end.n ? end : start;
+
+    // Calculate days between dates
+    const daysBetween = calculateDaysBetweenDates(laterDate, earlierDate);
+
+    // Return the width percentage
+    return `${daysBetween * 100}%`;
   }
-
-  const { start, end } = selectStartRef.value;
-
-  // Validate that start and end objects exist and have 'n' property
-  if (!start || !end || start.n === undefined || end.n === undefined) {
-    console.error('Invalid start or end values');
-    return '0%';
-  }
-
-  // Determine earlier and later dates
-  const laterDate = start.n > end.n ? start : end;
-  const earlierDate = start.n > end.n ? end : start;
-
-  // Calculate days between dates
-  const daysBetween = calculateDaysBetweenDates(laterDate, earlierDate);
-
-  // Return the width percentage
-  return `${daysBetween * 100}%`;
-}
 
   function handleKeyDown(event) {
     if (
@@ -383,15 +383,10 @@ function getCacWidth() {
   }
   const dblclickHandle = (event) => { };
 
-  const calDiffDates = (firstDay) => {
-    return (
-      calculateDaysBetweenDates(
-        selectStartRef.value.start.n < selectStartRef.value.end.n
-          ? selectStartRef.value.start
-          : selectStartRef.value.end,
-        firstDay
-      ) - 1
-    );
+  function calDiffDates(firstDay) {
+    const { start, end } = selectStartRef.value;
+    const earlierDate = start.n < end.n ? start : end;
+    return calculateDaysBetweenDates(earlierDate, firstDay) - 1;
   };
 
 
