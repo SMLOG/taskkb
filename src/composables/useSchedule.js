@@ -194,12 +194,12 @@ export function useSchedule(el) {
     const { left, width: totalWidth } = sch.getBoundingClientRect();
     const x = event.clientX - left;
     const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
-    const date = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
+    const dateInfo = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
 
-    if (selectStartRef.value && date) {
+    if (selectStartRef.value && dateInfo) {
       if (!selectStartRef.value.row._tl) {
-        selectStartRef.value.end = date;
-        autoExpanedWeeksIfNeed([date.i])
+        selectStartRef.value.end = dateInfo;
+        autoExpanedWeeksIfNeed(dateInfo.i)
         return;
       }
 
@@ -220,7 +220,7 @@ export function useSchedule(el) {
 
           return;
         }
-        autoExpanedWeeksIfNeed([newDate.i]);
+        autoExpanedWeeksIfNeed(newDate.i);
 
         switch (moveType.value.type) {
           case "rightDrag":
@@ -235,7 +235,7 @@ export function useSchedule(el) {
 
             const startInfo = getDateInfo(moveType.value._tl.start, getFirstDay());
             const endInfo = getDateInfo(moveType.value._tl.end, getFirstDay());
-            autoExpanedWeeksIfNeed([Math.max(startInfo.i, endInfo.i) + moveUnits]);
+            autoExpanedWeeksIfNeed(Math.max(startInfo.i, endInfo.i) + moveUnits);
 
             const startIndex = plusWorkDays(
               startInfo.i,
@@ -258,9 +258,8 @@ export function useSchedule(el) {
     }
   };
 
-  function autoExpanedWeeksIfNeed(indexs) {
-    for (let i = 0; i < indexs.length; i++) {
-      let weekIndex = parseInt((indexs[i] + 1) / 7);
+  function autoExpanedWeeksIfNeed(dateIndex) {
+      let weekIndex = parseInt((dateIndex+ 1) / 7);
 
       if (weeksRef.value.length <= weekIndex) {
         useAppStore().configRef.weekCount = weekIndex + 1;
@@ -270,7 +269,7 @@ export function useSchedule(el) {
           weekIndex + 1
         );
       }
-    }
+  
 
   }
 
