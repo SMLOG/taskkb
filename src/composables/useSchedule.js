@@ -42,7 +42,7 @@ function plusWorkDays(startIndex, days) {
 
 export function useSchedule(el) {
 
-  function selectRowSch(row, event) {
+  function linkRowToSelectStartRef(row, event) {
     if (
       row?._tl?.start && row?._tl?.end
 
@@ -72,6 +72,9 @@ export function useSchedule(el) {
     if (rowEl) {
       const { depth } = rowEl.dataset;
       const target = event.target;
+      const schEl = target.closest(".sch");
+
+
 
 
       const row = getRowFromDepth(useAppStore().treeRef, depth);
@@ -81,10 +84,14 @@ export function useSchedule(el) {
         !selectStartRef.value ||
         selectStartRef.value.row !== row
       ) {
-        handleScheduleClick(row, target, event);
+        if (!schEl) {
+          selectStartRef.value = null;
+          return;
+        }
+
+        startRowSchedule(row, target, event);
         return;
       }
-      const schEl = target.closest(".sch");
       if (!schEl) {
         selectStartRef.value = null;
       }
@@ -153,12 +160,9 @@ export function useSchedule(el) {
     }
   };
 
-  function handleScheduleClick(row, target, event) {
+  function startRowSchedule(row, target, event) {
     const schEl = target.closest(".sch");
-    if (!schEl) {
-      selectStartRef.value = null;
-      return;
-    }
+
 
     const { left, width: totalWidth } = schEl.getBoundingClientRect();
     const x = event.clientX - left;
@@ -181,7 +185,7 @@ export function useSchedule(el) {
         selectStartRef.value = null;
       }
     } else {
-      selectRowSch(row, event);
+      linkRowToSelectStartRef(row, event);
     }
   };
 
