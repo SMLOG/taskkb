@@ -81,8 +81,8 @@ const currentRowStore = useCurrentRowStore();
 watch(
   () => currentRowStore.currentRow, // Use a getter function for deep watching
   (newValue) => {
-    startDate.value = newValue?._tl?.start?.date;
-    endDate.value = newValue?._tl?.end?.date;
+    startDate.value = newValue?._tl?.start;
+    endDate.value = newValue?._tl?.end;
   },
   { immediate: true }
 );
@@ -154,10 +154,10 @@ const endSelection = () => {
   if (startDate.value && endDate.value) {
     console.log('Selected range:', startDate.value, 'to', endDate.value);
     const currentRow = useCurrentRowStore().currentRow;
-    if(!currentRow?._tl)currentRow._tl={start:{date:startDate.value},  end:{date:endDate.value}} 
+    if(!currentRow?._tl)currentRow._tl={start:startDate.value,  end:endDate.value} 
       else{
-        currentRow._tl.start.date= startDate.value;
-        currentRow._tl.end.date= endDate.value;
+        currentRow._tl.start= startDate.value;
+        currentRow._tl.end= endDate.value;
     }
 
   }
