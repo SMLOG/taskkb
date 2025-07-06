@@ -52,8 +52,8 @@ export function useSchedule(el) {
       selectStartRef.value = {
         type: 1,
         row: row,
-        start: getDateInfo(row._tl.start),
-        end: getDateInfo(row._tl.end),
+        start: getDateInfo(row._tl.start, getFirstDay()),
+        end: getDateInfo(row._tl.end, getFirstDay()),
       };
     }
   };
@@ -186,6 +186,9 @@ export function useSchedule(el) {
     }
   };
 
+  function getFirstDay() {
+    return weeksRef.value[0].dates[0].date;
+  }
   const handleMouseMove = (event) => {
     const sch = event.target.closest(".sch");
     if (!sch) return;
@@ -207,7 +210,7 @@ export function useSchedule(el) {
 
         let dateInfo =  getDateInfo(moveType.value._tl[
             moveType.value.type === "rightDrag" ? "end" : "start"
-          ], weeksRef.value[0].dates[0].date);
+          ], getFirstDay());
 
         let newIndex = dateInfo.i + Math.floor(ox / unitWidth);
 
@@ -231,8 +234,8 @@ export function useSchedule(el) {
             const moveUnits = Math.floor(ox / unitWidth);
 
 
-           const startInfo = getDateInfo(moveType.value._tl.start, weeksRef.value[0].dates[0].date);
-           const endInfo = getDateInfo(moveType.value._tl.end, weeksRef.value[0].dates[0].date);
+           const startInfo = getDateInfo(moveType.value._tl.start, getFirstDay());
+           const endInfo = getDateInfo(moveType.value._tl.end, getFirstDay());
             autoExpanedWeeksIfNeed([Math.max(startInfo.i, endInfo.i) + moveUnits]);
 
             const startIndex = plusWorkDays(

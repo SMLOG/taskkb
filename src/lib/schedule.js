@@ -82,8 +82,8 @@ export function getDaysBetweenDates(date1, date2) {
   export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
 
     if( d1 instanceof Date)return getDaysBetweenDates(d1, d2);
-    let date1 = d1.n > d2.n ? findTheDateInWeeks(weeks,d1) : findTheDateInWeeks(weeks,d2);
-    let date2 = d1.n > d2.n ? findTheDateInWeeks(weeks,d2) : findTheDateInWeeks(weeks,d1);
+    let date1 = d1.n > d2.n ? d1 : d2;
+    let date2 = d1.n > d2.n ? d2 : d2;
     if (exclusiveHolidayWeeken) {
       let weekIndex1 = parseInt(date1.i / 7);
       let weekIndex2 = parseInt(date2.i / 7);
