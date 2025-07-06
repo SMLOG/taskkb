@@ -109,7 +109,7 @@ export function useSchedule(el) {
 
       moveType.value = null;
     } else {
-      locateCurSch(event);
+      jumpToPlanTime(event);
     }
   };
 
@@ -322,33 +322,49 @@ export function useSchedule(el) {
   const calculateDaysBetweenDates2 = (d1, d2, exclusiveHolidayWeeken,row) => {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
-const locateCurSch = (event) => {
-  // Check if clicked element or its parent has "sch" class
+function jumpToPlanTime(event) {
+  // Get the target elements
   const schElement = event.target.closest(".sch");
   if (!schElement) return;
-
+  
   const rowEl = schElement.closest(".row");
   if (!rowEl) return;
-
+  
   const plantime = rowEl.querySelector(".plantime");
   if (!plantime) return;
-
+  
   const mainContent = document.getElementById("mainContent");
   if (!mainContent) return;
 
-  // Calculate scroll position
-  const plantimeRect = plantime.getBoundingClientRect();
-  const contentRect = mainContent.getBoundingClientRect();
+  // Get all measurements
+  const containerRect = mainContent.getBoundingClientRect();
+  const elementRect = plantime.getBoundingClientRect();
+  const containerScrollLeft = mainContent.scrollLeft;
   
-  // Scroll to position with some padding if needed
-  const scrollPosition = plantimeRect.left - contentRect.left + mainContent.scrollLeft;
-  
-  // Smooth scroll to the position
-  mainContent.scrollTo({
-    left: scrollPosition,
+  // Calculate desired scroll position
+  const elementCenter = elementRect.left - containerRect.left + containerScrollLeft;
+  const containerCenter = containerRect.width / 2;
+  const scrollTo = elementCenter - containerCenter + (elementRect.width / 2);
+
+  // Apply boundaries
+  const maxScroll = mainContent.scrollWidth - containerRect.width;
+  const boundedScroll = Math.max(0, Math.min(scrollTo, maxScroll));
+
+  // Scroll with polyfill for smooth behavior
+  const scrollOptions = {
+    left: boundedScroll,
     behavior: 'smooth'
-  });
-};
+  };
+  
+  if ('scrollBehavior' in document.documentElement.style) {
+    mainContent.scrollTo(scrollOptions);
+  } else {
+    // Fallback for browsers without smooth scroll
+    mainContent.scrollLeft = boundedScroll;
+  }
+
+
+}
   const dblclickHandle = (event) => { };
 
   const calDiffDates = (firstDay) => {
