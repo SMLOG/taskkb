@@ -187,7 +187,7 @@ export function useSchedule(el) {
   }
   function handleMouseMove(event) {
     const sch = event.target.closest(".sch");
-    if (!sch) return;
+    if (!sch||!selectStartRef.value) return;
     const { left, width: totalWidth } = sch.getBoundingClientRect();
     const x = event.clientX - left;
     const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
