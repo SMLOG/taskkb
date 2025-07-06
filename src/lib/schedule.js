@@ -79,34 +79,48 @@ export function getDaysBetweenDates(date1, date2) {
     
     return daysDiff+1;
 }
-  export function calcDaysBetween  (weeks,d1, d2, exclusiveHolidayWeeken)  {
-
-    if( d1 instanceof Date)return getDaysBetweenDates(d1, d2);
-    let date1 = d1.n > d2.n ? d1 : d2;
-    let date2 = d1.n > d2.n ? d2 : d2;
-    if (exclusiveHolidayWeeken) {
-      let weekIndex1 = parseInt(date1.i / 7);
-      let weekIndex2 = parseInt(date2.i / 7);
-
-      let i = date2.i % 7;
-      let count = 0;
-      for (let w = weekIndex2; w <= weekIndex1; w++) {
-
-        for (; i <= (w < weekIndex1 ? 6 : date1.i % 7); i++) {
-          let day = weeks[w].dates[i];
-          if (day.isWeekend || day.holiday) continue;
-          count++;
-
-        }
-        i = 0;
-      }
-      return count;
-
+export function calcDaysBetween(weeks, d1, d2, exclusiveHolidayWeekend = false) {
+    // Handle Date objects directly
+    if (d1 instanceof Date || d2 instanceof Date) {
+        return getDaysBetweenDates(d1, d2);
     }
-    return date1.i - date2.i + 1;
 
+    // Validate input objects
+    if (!d1 || !d2 || d1.n === undefined || d1.i === undefined || d2.n === undefined || d2.i === undefined) {
+        throw new Error('Invalid date objects provided');
+    }
 
-  }
+    // Determine earlier and later dates
+    const [startDate, endDate] = d1.n > d2.n ? [d2, d1] : [d1, d2];
+
+    if (!exclusiveHolidayWeekend) {
+        // Simple case: just return the difference in indices + 1 (inclusive)
+        return endDate.i - startDate.i + 1;
+    }
+
+    // Complex case: exclude holidays and weekends
+    const startWeekIndex = Math.floor(startDate.i / 7);
+    const endWeekIndex = Math.floor(endDate.i / 7);
+    
+    let count = 0;
+    let currentDayIndex = startDate.i % 7;
+
+    for (let weekIndex = startWeekIndex; weekIndex <= endWeekIndex; weekIndex++) {
+        const lastDayInWeek = weekIndex < endWeekIndex ? 6 : endDate.i % 7;
+        
+        for (; currentDayIndex <= lastDayInWeek; currentDayIndex++) {
+            const day = weeks[weekIndex]?.dates[currentDayIndex];
+            if (!day) continue; // Skip if day doesn't exist
+            
+            if (!day.isWeekend && !day.holiday) {
+                count++;
+            }
+        }
+        currentDayIndex = 0; // Reset for next week
+    }
+
+    return count;
+}
   export function formatDate2(date) {
   const year = date.getFullYear(); // Get last two digits of the year
   const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", 
