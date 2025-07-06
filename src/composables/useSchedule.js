@@ -292,16 +292,31 @@ export function useSchedule(el) {
 
 
 
-  function getCacWidth() {
-    return (
-      calculateDaysBetweenDates(
-        selectStartRef.value.end.n> selectStartRef.value.start.n?selectStartRef.value.end:selectStartRef.value.start,
-        selectStartRef.value.end.n< selectStartRef.value.start.n?selectStartRef.value.end:selectStartRef.value.start,
-      ) *
-      100 +
-      "%"
-    );
-  };
+function getCacWidth() {
+  // Check if selectStartRef and its value exist
+  if (!selectStartRef?.value) {
+    console.error('selectStartRef or its value is undefined');
+    return '0%';
+  }
+
+  const { start, end } = selectStartRef.value;
+
+  // Validate that start and end objects exist and have 'n' property
+  if (!start || !end || start.n === undefined || end.n === undefined) {
+    console.error('Invalid start or end values');
+    return '0%';
+  }
+
+  // Determine earlier and later dates
+  const laterDate = start.n > end.n ? start : end;
+  const earlierDate = start.n > end.n ? end : start;
+
+  // Calculate days between dates
+  const daysBetween = calculateDaysBetweenDates(laterDate, earlierDate);
+
+  // Return the width percentage
+  return `${daysBetween * 100}%`;
+}
 
   function handleKeyDown(event) {
     if (
