@@ -53,6 +53,7 @@ export function useSchedule(el) {
         row: row,
         start: getDateInfo(row._tl.start, getFirstDay()),
         end: getDateInfo(row._tl.end, getFirstDay()),
+        el:event.target.closest(".row"),
       };
     }
   };
@@ -164,7 +165,7 @@ export function useSchedule(el) {
       const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
       const date = weeksRef.value[Math.floor(index / 7)].dates[index % 7];
       if (!selectStartRef.value) {
-        selectStartRef.value = { type: 2, row, start: date, end: date };
+        selectStartRef.value = { type: 2, row, start: date, end: date,el:event.target.closest(".row") };
       } else if (
         selectStartRef.value.row === row &&
         selectStartRef.value.start
@@ -185,13 +186,33 @@ export function useSchedule(el) {
   function getFirstDay() {
     return weeksRef.value[0].dates[0].date;
   }
+
+  function scrollToPlantime(position,plantime) {
+        const mainContent = document.getElementById("mainContent");
+
+    if (position === 'start') {
+        const plantimeRect = plantime.getBoundingClientRect();
+        const mainContentRect = mainContent.getBoundingClientRect();
+        mainContent.scrollLeft += plantimeRect.left - mainContentRect.left;
+    } else if (position === 'end') {
+        const plantimeRect = plantime.getBoundingClientRect();
+        const mainContentRect = mainContent.getBoundingClientRect();
+        mainContent.scrollLeft += plantimeRect.right - mainContentRect.right;
+    }
+}
+
   function handleMouseMove(event) {
     const sch = event.target.closest(".sch");
     if (!sch||!selectStartRef.value) return;
+
+
     const { left, width: totalWidth } = sch.getBoundingClientRect();
     const x = event.clientX - left;
     const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
     const dateInfo = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
+
+
+    //scrollToPlantime(x>0?'end':'start',selectStartRef.value.el.querySelector(".selectStartRef"));
 
     if (selectStartRef.value && dateInfo) {
       if (!selectStartRef.value.row._tl) {
