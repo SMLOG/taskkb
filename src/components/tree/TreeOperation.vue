@@ -116,19 +116,24 @@ const handleNavigation = (targetPath, oldPath) => {
   
   // Navigate if not on the target route
   const currentQuery = { ...route.query };
-  let newPath;
+  let newPath =route.path;
   
+ 
 
-    newPath = route.path.replace(oldPath??'', targetPath).replace('//', '/'); // Fixed replace('//','') to replace('//','/')
   
   
   // Ensure path starts with a single slash
-  if (oldPath === '') {
-    newPath = '/' + newPath.replace(/^\//, ''); // Added safeguard against double slashes
+  if (!oldPath && targetPath) {
+    newPath = targetPath+'/'+newPath.replace(/^\//, ''); // Added safeguard against double slashes
+  }else if(!targetPath &&oldPath){
+    newPath = newPath.replace('/'+oldPath+'/','')
   }
   
   // Ensure we don't end up with double slashes
-  newPath = newPath.replace(/\/+/g, '/');
+  newPath = ('/'+newPath).replace(/\/+/g, '/').replace('//', '/');
+
+  activeView.value=viewOptions.value.filter(e=>e.value==newPath.split('/')[1]).length>0?newPath.split('/')[1]:''
+  
   
   router.push({
     path: newPath,
