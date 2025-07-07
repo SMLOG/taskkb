@@ -1,5 +1,5 @@
 <template>
-    <div class="col flex" v-if="showSch">
+    <div class="col flex" v-if="showSch" :class="{'bg-gray-100 dark:bg-[#121212] ':!row._tl}">
         <div style="display: flex; flex-wrap: nowrap" class="sch" :style="{width:days*25+'px'}">
             <div :style="{ width: 1 / days * 100 + '%' }" class="relative">
                 <div v-if="row._tl && row._tl.end" :style="{
@@ -20,7 +20,8 @@
                 </div>
             </div>
         </div>
-        <div></div>
+        <div>
+        </div>
     </div>
 </template>
 
