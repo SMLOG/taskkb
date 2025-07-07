@@ -116,7 +116,7 @@ const handleNavigation = (targetPath, oldPath) => {
   
   // Navigate if not on the target route
   const currentQuery = { ...route.query };
-  let newPath =route.path;
+  let newPath =location.hash.replace(/^#/,'');
   
  
 
