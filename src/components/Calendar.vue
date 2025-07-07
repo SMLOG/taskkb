@@ -15,19 +15,25 @@
         <div 
           v-for="day in month.days" 
           :key="`${month.name}-${day.date}`" 
-          class="text-center h-8 flex items-center justify-center"
+          class="text-center h-16 flex items-center justify-start flex flex-col"
           :class="{ 
-            'bg-blue-500 text-white rounded-full': isToday(month, day),
             'text-gray-400': !day.isCurrentMonth,
-            'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth && !isSelected(month, day),
-            'bg-blue-200 text-white rounded-full': isSelected(month, day) && !isToday(month, day),
-            'bg-blue-300 text-white rounded-full': isInRange(month, day) && !isToday(month, day)
           }"
           @mousedown="startSelection(month, day)"
           @mouseover="updateSelection(month, day)"
           @mouseup="endSelection"
         >
+          <div class="w-8 h-8 flex items-center justify-center rounded-full  font-medium mb-1" 
+          :class="{            
+            'bg-blue-500 text-white': isToday(month, day),
+            'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth && !isSelected(month, day),
+            'bg-blue-200 text-white ': isSelected(month, day) && !isToday(month, day),
+            'bg-blue-300 text-white': isInRange(month, day) && !isToday(month, day)}">
           {{ day.isCurrentMonth?day.date:'' }}
+        </div>
+        <div class="task-badge mt-1 px-1 py-0.5 bg-purple-100 text-purple-800 rounded">
+          <div  v-for="task in getTasksForDate(day)" >{{ task.title }}</div>
+        </div>
         </div>
       </div>
     </div>
@@ -60,6 +66,10 @@ const props = defineProps({
   currentDate: {
     type: Date,
     default: () => new Date()
+  },
+  tasks: {
+    type: Array,
+    default: () => []
   }
 });
 
@@ -77,6 +87,19 @@ const endDate = ref(null);
 const currentRowStore = useCurrentRowStore();
 
 const visibleMonths = computed(() => allMonths.value);
+
+const getTasksForDate = (day) => {
+  if (!props.tasks || props.tasks.length === 0) return [];
+ 
+  return props.tasks.filter(task => {
+    const yes=  task.start && day.value>=task.start&&day.value<=task.end;
+    if(yes){
+      console.log(yes)
+      return yes;
+    }
+
+  });
+};
 
 const scrollToDate = (date) => {
   if (!date) return;
@@ -138,16 +161,25 @@ const getMonthDays = (year, monthIndex) => {
 
   const days = [];
   const prevMonthLastDay = new Date(year, monthIndex, 0).getDate();
+  const prevMonth = monthIndex === 0 ? 11 : monthIndex - 1;
+  const prevYear = monthIndex === 0 ? year - 1 : year;
+
   for (let i = 0; i < firstDayIndex; i++) {
-    days.push({ date: prevMonthLastDay - firstDayIndex + i + 1, isCurrentMonth: false });
+    const day = prevMonthLastDay - firstDayIndex + i + 1;
+    const value = `${prevYear}${String(prevMonth + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
+    days.push({ date: prevMonthLastDay - firstDayIndex + i + 1, isCurrentMonth: false,value });
   }
   for (let i = 1; i <= lastDay.getDate(); i++) {
-    days.push({ date: i, isCurrentMonth: true });
+    const value = `${year}${String(monthIndex + 1).padStart(2, '0')}${String(i).padStart(2, '0')}`;
+    days.push({ date: i, isCurrentMonth: true,value });
   }
   const totalDays = 42;
   let nextMonthDay = 1;
+  const nextYear = monthIndex === 11 ? year + 1 : year;
+  const nextMonth = monthIndex === 11 ? 0 : monthIndex + 1;
   while (days.length < totalDays) {
-    days.push({ date: nextMonthDay++, isCurrentMonth: false });
+    const value = `${nextYear}${String(nextMonth + 1).padStart(2, '0')}${String(nextMonthDay).padStart(2, '0')}`;
+    days.push({ date: nextMonthDay++, isCurrentMonth: false,value });
   }
   return days;
 };
