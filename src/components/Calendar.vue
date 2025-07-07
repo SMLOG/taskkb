@@ -325,6 +325,7 @@ watch(
     if (newStartDate && newStartDate !== startDate.value) {
       startDate.value = newStartDate;
       endDate.value = newEndDate;
+      scrollToDate(newEndDate);
       scrollToDate(newStartDate);
     }
   },
