@@ -18,7 +18,7 @@
 
             <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
               <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef" :class="{'!bg-pink-100':!saved}">
-                💾  {{ savingRef ? "..." : "" }}{{ !saved?"Unsaved changes. Click here to save.":"Save" }}
+                💾  <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Save</span><span v-else>Unsaved changes. Click here to save.</span>
               </button>
               <button @click="openConfig" class="btn-secondary">
                 ⚙ Config
