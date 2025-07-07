@@ -66,23 +66,43 @@ export function getPreviousWeekDate(date) {
  * @param {Date|string} date2 - Second date (Date object or string in valid format)
  * @returns {number} Number of days between the two dates (always positive)
  */
-export function getDaysBetweenDates(date1, date2) {
-    // Convert inputs to Date objects if they aren't already
-    const d1 = new Date(date1);
-    const d2 = new Date(date2);
-    
-    // Calculate difference in milliseconds
-    const timeDiff = Math.abs(d2.getTime() - d1.getTime());
-    
-    // Convert milliseconds to days
-    const daysDiff = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-    
-    return daysDiff+1;
+function getDaysBetweenDates(date1, date2, isExcludeWeekend) {
+  // Convert inputs to Date objects if they aren't already
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  
+  // Swap dates if d1 is after d2 to ensure proper iteration
+  const start = d1 < d2 ? new Date(d1) : new Date(d2);
+  const end = d1 < d2 ? new Date(d2) : new Date(d1);
+  
+  // Reset time parts to avoid timezone issues when comparing days
+  start.setHours(0, 0, 0, 0);
+  end.setHours(0, 0, 0, 0);
+  
+  if (!isExcludeWeekend) {
+      // Calculate difference in milliseconds
+      const timeDiff = Math.abs(end.getTime() - start.getTime());
+      // Convert milliseconds to days and add 1 to include both start and end dates
+      return Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1;
+  } else {
+      let count = 0;
+      const current = new Date(start);
+      
+      while (current <= end) {
+          const day = current.getDay(); // 0 = Sunday, 6 = Saturday
+          if (day !== 0 && day !== 6) {
+              count++;
+          }
+          current.setDate(current.getDate() + 1);
+      }
+      
+      return count;
+  }
 }
 export function calcDaysBetween(weeks, d1, d2, exclusiveHolidayWeekend = false) {
     // Handle Date objects directly
     if (d1 instanceof Date || d2 instanceof Date) {
-        return getDaysBetweenDates(d1, d2);
+        return getDaysBetweenDates(d1, d2,exclusiveHolidayWeekend);
     }
 
     // Validate input objects
@@ -133,9 +153,12 @@ export function calcDaysBetween(weeks, d1, d2, exclusiveHolidayWeekend = false) 
 
 
 export function getDateInfo(targetDate, startDate) {
-  // Convert inputs to Date objects if they aren't already
+  // Create new Date objects and set time to 00:00:00 to ignore hours, minutes, seconds
   const target = new Date(targetDate);
+  target.setHours(0, 0, 0, 0);
+  
   const start = new Date(startDate);
+  start.setHours(0, 0, 0, 0);
   
   // Calculate numeric date representation (YYYYMMDD)
   const n = getDateAsInteger(target);

@@ -4,9 +4,9 @@
             <div :style="{ width: 1 / days * 100 + '%' }" class="relative">
                 <div v-if="row._tl && row._tl.end" :style="{
                     width: (calculateDaysBetweenDates(row._tl.end, row._tl.start,false)) * 100 + '%',
-                    marginLeft: (calculateDaysBetweenDates2(row._tl.start, firstDay?.date,false,row) -1 ) * 100 + '%'
+                    marginLeft: (calculateDaysBetweenDates(row._tl.start, firstDay?.date,false,row) -1 ) * 100 + '%'
                 }" class="plantime"
-                    :class="{ dragMode: dragMode }">{{calculateDaysBetweenDates(row._tl.end,row._tl.start, true)}}d
+                    :class="{ dragMode: dragMode }">{{calculateDaysBetweenDates2(row._tl.end,row._tl.start, true)}}d
                 </div>
                 <div v-if="selectStartRef && selectStartRef.row == row" @dblclick="dragMode = !dragMode" :style="{
                     width: getCacWidth(),
