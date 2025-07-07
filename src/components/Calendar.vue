@@ -79,10 +79,10 @@ const endDate = ref(null);
 
 const currentRowStore = useCurrentRowStore();
 watch(
-  () => currentRowStore.currentRow, // Use a getter function for deep watching
+  () => [currentRowStore.currentRow,currentRowStore.currentRow?._tl?.start,currentRowStore.currentRow?._tl?.end], // Use a getter function for deep watching
   (newValue) => {
-    startDate.value = newValue?._tl?.start;
-    endDate.value = newValue?._tl?.end;
+    startDate.value = newValue[0]?._tl?.start;
+    endDate.value = newValue[0]?._tl?.end;
   },
   { immediate: true }
 );
@@ -131,10 +131,19 @@ const isSelected = (month, day) => {
 
 const isInRange = (month, day) => {
   if (!day.isCurrentMonth || !startDate.value || !endDate.value) return false;
+
+  // Create date for the given day, ignoring time
   const date = new Date(month.year, month.monthIndex, day.date);
-  const start = Math.min(startDate.value.getTime(), endDate.value.getTime());
-  const end = Math.max(startDate.value.getTime(), endDate.value.getTime());
-  return date.getTime() > start && date.getTime() < end;
+  date.setHours(0, 0, 0, 0); // Normalize to midnight
+
+  // Normalize start and end dates to midnight
+  const start = new Date(Math.min(startDate.value.getTime(), endDate.value.getTime()));
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(Math.max(startDate.value.getTime(), endDate.value.getTime()));
+  end.setHours(0, 0, 0, 0);
+
+  return date.getTime() >= start.getTime() && date.getTime() <= end.getTime();
 };
 
 const startSelection = (month, day) => {
