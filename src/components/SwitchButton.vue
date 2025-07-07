@@ -1,30 +1,42 @@
 <template>
-    <div class="inline-flex bg-gray-200 rounded-lg p-1 relative" role="group">
-      <!-- Sliding background -->
-      <div
-        class="absolute bg-white shadow-md rounded-md transition-all duration-300 ease-in-out"
-        :style="sliderStyle"
-      ></div>
-      <button
-        v-for="(option, index) in options"
-        :key="option.value"
-        @click="selectOption(option.value)"
-        :class="[
-          'px-6 py-2 rounded-md font-medium text-sm transition-colors duration-300 relative z-10',
-          'focus:outline-none ',
-          modelValue === option.value 
-            ? 'text-blue-600' 
-            : 'text-gray-600 hover:text-gray-800',
-          index === 0 ? 'rounded-r-none' : '',
-          index === options.length - 1 ? 'rounded-l-none' : '',
-          index !== 0 && index !== options.length - 1 ? 'rounded-none' : ''
-        ]"
-        ref="buttons"
-      >
-        {{ option.label }}
-      </button>
-    </div>
-  </template>
+  <div 
+    class="inline-flex rounded-lg p-1 relative group"
+    :class="{
+      'bg-gray-200 dark:bg-gray-700': true
+    }" 
+    role="group"
+  >
+    <!-- Sliding background -->
+    <div
+      class="absolute shadow-md rounded-md transition-all duration-300 ease-in-out"
+      :class="{
+        'bg-white dark:bg-gray-800': true,
+        'shadow-gray-300/50 dark:shadow-black/30': true
+      }"
+      :style="sliderStyle"
+    ></div>
+    
+    <button
+      v-for="(option, index) in options"
+      :key="option.value"
+      @click="selectOption(option.value)"
+      :class="[
+        'px-4 py-2 rounded-md font-medium text-sm transition-colors duration-300 relative z-10',
+        'focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+        'focus-visible:ring-blue-500 focus-visible:ring-offset-transparent',
+        modelValue === option.value 
+          ? 'text-blue-600 dark:text-blue-400' 
+          : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100',
+        index === 0 ? 'rounded-r-none' : '',
+        index === options.length - 1 ? 'rounded-l-none' : '',
+        index !== 0 && index !== options.length - 1 ? 'rounded-none' : ''
+      ]"
+      ref="buttons"
+    >
+      {{ option.label }}
+    </button>
+  </div>
+</template>
   
   <script setup>
   import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
