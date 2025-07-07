@@ -1,4 +1,7 @@
 <template>
+<div class="sticky top-0 w-full bg-white/90 backdrop-blur-sm py-3 px-4 border-b border-gray-100 shadow-sm">
+  <h2 class="text-xl font-semibold text-gray-800">Calendar</h2>
+</div>
   <div 
     class="calendar-container select-none"
     ref="calendarContainer"
