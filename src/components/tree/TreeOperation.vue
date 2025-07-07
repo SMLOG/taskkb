@@ -17,8 +17,8 @@
             </div>
 
             <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-              <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef">
-                💾 Save {{ savingRef ? "..." : "" }}
+              <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef" :class="{'!bg-pink-100':!saved}">
+                💾  {{ savingRef ? "..." : "" }}{{ !saved?"Unsaved changes. Click here to save.":"Save" }}
               </button>
               <button @click="openConfig" class="btn-secondary">
                 ⚙ Config
@@ -89,7 +89,7 @@ button {
 </style>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import { useTree } from '@/composables/useTree';
 import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
@@ -109,6 +109,8 @@ const viewOptions = ref([
   { value: 'calendar', label: 'Calendar' }
 ]);
 const route = useRoute();
+
+const saved = computed(()=>useAppStore().saved);
 
 const activeView = ref(viewOptions.value.filter(e=>e.value==route.fullPath.split('/')[1]).length>0?route.fullPath.split('/')[1]:'')
 
@@ -157,6 +159,16 @@ watch(
   },
   { immediate: true }
 );
+
+watch(
+  () => useAppStore().tabsDataMapRef,
+  (newValue,oldValue) => {
+      console.log('update ...');
+      useAppStore().setSaved(false);
+  },
+  { immediate: true,deep:true }
+);
+
 
 const tree = useTree();
 

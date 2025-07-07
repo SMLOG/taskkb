@@ -95,6 +95,8 @@ export const useAppStore = defineStore('app', () => {
       useRecentStore().addOrUpdateRemoveRecent(path.value);
 
       await setActiveTab(activeTabIndex);
+      setSaved(true);
+
 
     } catch (error) {
       console.error('Failed to initialize tabs data:', error);
@@ -132,7 +134,7 @@ export const useAppStore = defineStore('app', () => {
 
 
     console.log(`Saved data  attachment from ${orgPath && JSON.stringify(orgPath, 2)}  to ${path.value && JSON.stringify(path.value)}`);
-
+    setSaved(true);
 
 
 
@@ -312,6 +314,10 @@ export const useAppStore = defineStore('app', () => {
 
   }
 
+  const saved = ref(true);
+  function setSaved(b){
+    saved.value =b;
+  }
   return {
     initLoadTabsData,
     tabs, path,
@@ -328,6 +334,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj,getList
+    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj,getList,tabsDataMapRef,setSaved,saved
   };
 });
