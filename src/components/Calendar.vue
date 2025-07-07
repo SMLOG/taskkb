@@ -1,7 +1,18 @@
 <template>
-<div class="sticky top-0 w-full bg-white/90 backdrop-blur-sm py-3 px-4 border-b border-gray-100 shadow-sm">
-  <h2 class="text-xl font-semibold text-gray-800">Calendar</h2>
-</div>
+        <div class="sticky top-0 w-full header-gradient backdrop-blur-lg py-2 px-2 border-b border-white/20 shadow-sm ">
+            <div class="flex items-center justify-between">
+                <h2 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
+                    Calendar
+                </h2>
+                <div class="flex space-x-3" v-if="false">
+                    <button class="p-2 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            </div>
   <div 
     class="calendar-container select-none"
     ref="calendarContainer"
