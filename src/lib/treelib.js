@@ -212,9 +212,9 @@ export function filterChildDepths(depths) {
 }
 
 export function loopTree(tree, callback) {
-  if (tree.id) {
+ // if (tree.id) {
     callback(tree);
-  }
+  //}
   
   if (tree._childs && Array.isArray(tree._childs)) {
     tree._childs.forEach(child => loopTree(child, callback));

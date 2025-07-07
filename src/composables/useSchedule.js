@@ -60,7 +60,7 @@ export function useSchedule(el) {
   function handleMouseDown(event) {
     const rowEl = event.target.closest(".row");
     const cell = event.target.closest("div.col");
-
+    console.log('handleMouseDown')
     if (!rowEl && !cell) return;
 
     if (
@@ -69,6 +69,7 @@ export function useSchedule(el) {
     ) {
       document.activeElement.blur();
     }
+    console.log('handleMouseDown2')
 
     if (rowEl) {
       const { depth } = rowEl.dataset;
@@ -86,6 +87,7 @@ export function useSchedule(el) {
         !selectStartRef.value ||
         selectStartRef.value.row !== row
       ) {
+        console.log('handleMouseDown3')
 
         startRowSchedule(row, target, event);
 
