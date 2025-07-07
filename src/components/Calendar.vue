@@ -32,7 +32,7 @@
           {{ day.isCurrentMonth?day.date:'' }}
         </div>
         <div class="task-badge mt-1 px-1 py-0.5 bg-purple-100 text-purple-800 rounded">
-          <div  v-for="task in getTasksForDate(day)" >{{ task.title }}</div>
+          <div  v-if="getTasksForDate(day).length>0" >({{ getTasksForDate(day).length }})</div>
         </div>
         </div>
       </div>

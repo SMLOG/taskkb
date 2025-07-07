@@ -1,15 +1,23 @@
 <script setup>
-import { ref } from 'vue';
+import { ref,watch } from 'vue';
 import Calendar from './components/Calendar.vue';
 import TreeTimeline from './components/tree/TreeTimeline.vue';
 import { useAppStore } from './stores/appStore';
-
+import {formatDateToYyyyMMdd} from '@/lib/dataUtil'
 const currentDate = ref(new Date());
 
-const items = useAppStore().getList();
-const tasks = ref(items.map(e=>{
-    return {row:e,start:formatDateToYyyyMMdd(e?._tl.start),end:formatDateToYyyyMMdd(e?._tl.end),title:'a'}
-}));
+const tasks = ref([]);
+
+watch(
+  () => [useAppStore().treeRef],
+  (newValue) => {
+    const items = useAppStore().getList();
+    tasks.value = items.map(e=>{
+    return {row:e,start:formatDateToYyyyMMdd(e?._tl?.start),end:formatDateToYyyyMMdd(e?._tl?.end),title:'a'}
+})
+  },
+  { immediate: true,deep:true }
+);
 
 </script>
 

@@ -1,4 +1,4 @@
-function formatDateToYyyyMMdd(date) {
+export function formatDateToYyyyMMdd(date) {
     if (!(date instanceof Date) || isNaN(date)) {
         return null; // or throw new Error("Invalid date");
     }
