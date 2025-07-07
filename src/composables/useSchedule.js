@@ -369,7 +369,8 @@ export function useSchedule(el) {
     const plantime = rowEl.querySelector(".plantime");
     if (!plantime) return;
 
-    const mainContent = document.getElementById("mainContent");
+    const mainContent = el.value.closest(".absolute")|| document.getElementById("mainContent");
+
     if (!mainContent) return;
 
     // Get all measurements

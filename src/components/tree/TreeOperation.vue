@@ -102,13 +102,16 @@ import SwitchButton from '../SwitchButton.vue';
 import { useRoute, useRouter } from 'vue-router';
 import {selectDepths } from '@/composables/context';
 
-const activeView = ref('')
+
+
 const viewOptions = ref([
   { value: '', label: 'List' },
   { value: 'calendar', label: 'Calendar' }
 ]);
-
 const route = useRoute();
+
+const activeView = ref(viewOptions.value.filter(e=>e.value==route.fullPath.split('/')[1]).length>0?route.fullPath.split('/')[1]:'')
+
 const router = useRouter();
 
 const handleNavigation = (targetPath, oldPath) => {
@@ -116,6 +119,7 @@ const handleNavigation = (targetPath, oldPath) => {
   
   // Navigate if not on the target route
   const currentQuery = { ...route.query };
+  console.log(route.fullPath)
   let newPath =location.hash.replace(/^#/,'');
   
  
@@ -124,7 +128,7 @@ const handleNavigation = (targetPath, oldPath) => {
   
   // Ensure path starts with a single slash
   if (!oldPath && targetPath) {
-    newPath = targetPath+'/'+newPath.replace(/^\//, ''); // Added safeguard against double slashes
+    newPath = targetPath+'/'+newPath.replace('/'+targetPath+'/','').replace(/^\//, ''); // Added safeguard against double slashes
   }else if(!targetPath &&oldPath){
     newPath = newPath.replace('/'+oldPath+'/','')
   }
@@ -132,9 +136,8 @@ const handleNavigation = (targetPath, oldPath) => {
   // Ensure we don't end up with double slashes
   newPath = ('/'+newPath).replace(/\/+/g, '/').replace('//', '/');
 
-  activeView.value=viewOptions.value.filter(e=>e.value==newPath.split('/')[1]).length>0?newPath.split('/')[1]:''
   
-  
+  if(location.hash.indexOf(newPath)==-1)
   router.push({
     path: newPath,
     query: currentQuery, // Preserve query parameters
