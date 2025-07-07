@@ -137,7 +137,7 @@ const handleNavigation = (targetPath, oldPath) => {
   newPath = ('/'+newPath).replace(/\/+/g, '/').replace('//', '/');
 
   
-  if(location.hash.indexOf(newPath)==-1)
+  if(route.fullPath.indexOf(newPath)!==0)
   router.push({
     path: newPath,
     query: currentQuery, // Preserve query parameters
