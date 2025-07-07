@@ -23,7 +23,7 @@
           @mouseover="updateSelection(month, day)"
           @mouseup="endSelection"
         >
-          <div class="w-8 h-8 flex items-center justify-center rounded-full  font-medium mb-1" 
+          <div class="w-8 h-8 flex items-center justify-center rounded-full  font-medium mb-1 flex-shrink-0" 
           :class="{            
             'bg-blue-500 text-white': isToday(month, day),
             'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth && !isSelected(month, day),

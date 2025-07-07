@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia';
 import { nextTick, ref } from 'vue';
 import { getStorageBridge, getStorageBridgeByName } from '@/api/bridge';
-import { loopTree } from '@/lib/treelib';
+import { loopTree,treeToList } from '@/lib/treelib';
 import { weeksBetween } from '@/lib/schedule';
 import { useUserStore } from './userStore';
 import { useHashStore } from './hashStore';
 import { useRecentStore } from './recentsStore';
+
 
 export const useAppStore = defineStore('app', () => {
   // Tabs state
@@ -255,6 +256,9 @@ export const useAppStore = defineStore('app', () => {
 
 
   }
+  function getList(){
+   return treeToList(treeRef.value);
+  }
   function exportFileData() {
 
     if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
@@ -324,6 +328,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj
+    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj,getList
   };
 });

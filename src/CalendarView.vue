@@ -2,33 +2,14 @@
 import { ref } from 'vue';
 import Calendar from './components/Calendar.vue';
 import TreeTimeline from './components/tree/TreeTimeline.vue';
+import { useAppStore } from './stores/appStore';
 
 const currentDate = ref(new Date());
 
-const tasks = ref([
-  {
-    id: 1,
-    title: 'Team Meeting',
-    start: '20250715',
-    end: '20250715',
-    priority: 'high',
-    type: 'meeting'
-  },
-  {
-    id: 2,
-    title: 'Project Deadline',
-    startDate: '2023-06-20',
-    endDate: '2023-06-22',
-    priority: 'high',
-    type: 'deadline'
-  },
-  {
-    id: 3,
-    title: 'Code Review',
-    startDate: '2023-06-18',
-    priority: 'medium'
-  }
-]);
+const items = useAppStore().getList();
+const tasks = ref(items.map(e=>{
+    return {row:e,start:formatDateToYyyyMMdd(e?._tl.start),end:formatDateToYyyyMMdd(e?._tl.end),title:'a'}
+}));
 
 </script>
 

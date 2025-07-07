@@ -220,3 +220,26 @@ export function loopTree(tree, callback) {
     tree._childs.forEach(child => loopTree(child, callback));
   }
 }
+
+export function treeToList(tree) {
+  const result = [];
+  
+  function traverse(node) {
+      // Add current node to result
+      result.push(node);
+      
+      // If node has _childs and it's an array, traverse each child
+      if (node._childs && Array.isArray(node._childs)) {
+          node._childs.forEach(child => traverse(child));
+      }
+  }
+  
+  // Handle case where input is a single node or an array of nodes
+  if (Array.isArray(tree)) {
+      tree.forEach(node => traverse(node));
+  } else if (tree) {
+      traverse(tree);
+  }
+  
+  return result;
+}
