@@ -173,14 +173,14 @@ const getMonthDays = (year, monthIndex) => {
     const value = `${year}${String(monthIndex + 1).padStart(2, '0')}${String(i).padStart(2, '0')}`;
     days.push({ date: i, isCurrentMonth: true,value });
   }
-  const totalDays = 42;
+  /*  const totalDays = 42;
   let nextMonthDay = 1;
   const nextYear = monthIndex === 11 ? year + 1 : year;
   const nextMonth = monthIndex === 11 ? 0 : monthIndex + 1;
-  while (days.length < totalDays) {
+ while (days.length < totalDays) {
     const value = `${nextYear}${String(nextMonth + 1).padStart(2, '0')}${String(nextMonthDay).padStart(2, '0')}`;
     days.push({ date: nextMonthDay++, isCurrentMonth: false,value });
-  }
+  }*/
   return days;
 };
 
