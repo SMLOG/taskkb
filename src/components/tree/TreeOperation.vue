@@ -114,34 +114,41 @@ const activeView = ref(viewOptions.value.filter(e=>e.value==route.fullPath.split
 
 const router = useRouter();
 
-const handleNavigation = (targetPath, oldPath) => {
-
-  
-  // Navigate if not on the target route
+function handleNavigation (targetPath, oldPath) {
+  // Get current route information
   const currentQuery = { ...route.query };
-  console.log(route.fullPath)
-  let newPath =location.hash.replace(/^#/,'');
+  const currentFullPath = route.fullPath;
   
- 
-
+  // Get hash and clean it (remove leading # and normalize slashes)
+  let newPath = location.hash.replace(/^#/, '').replace(/\/+/g, '/');
   
-  
-  // Ensure path starts with a single slash
-  if (!oldPath && targetPath) {
-    newPath = targetPath+'/'+newPath.replace('/'+targetPath+'/','').replace(/^\//, ''); // Added safeguard against double slashes
-  }else if(!targetPath &&oldPath){
-    newPath = newPath.replace('/'+oldPath+'/','')
+  // Handle path construction based on parameters
+  if (targetPath && !oldPath) {
+    // Case 1: Adding targetPath to the path
+    newPath = `/${targetPath}/${newPath.replace(`/${targetPath}/`, '').replace(/^\//, '')}`;
+  } else if (!targetPath && oldPath) {
+    // Case 2: Removing oldPath from the path
+    newPath = `/${newPath.replace(`/${oldPath}/`, '').replace(/^\//, '')}`;
+  } else {
+    // Case 3: No changes needed to path structure
+    newPath = `/${newPath.replace(/^\//, '')}`;
   }
   
-  // Ensure we don't end up with double slashes
-  newPath = ('/'+newPath).replace(/\/+/g, '/').replace('//', '/');
-
+  // Final path normalization
+  newPath = newPath.replace(/\/+/g, '/').replace(/\/$/, ''); // Remove duplicate slashes and trailing slash
   
-  if(route.fullPath.indexOf(newPath)!==0)
-  router.push({
-    path: newPath,
-    query: currentQuery, // Preserve query parameters
-  });
+  // Only navigate if the new path is different from current
+  if (!currentFullPath.startsWith(newPath)) {
+    try {
+      router.push({
+        path: newPath,
+        query: currentQuery, // Preserve query parameters
+      });
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Optionally handle navigation errors (e.g., fallback to home)
+    }
+  }
 };
 watch(
   () => activeView.value,
