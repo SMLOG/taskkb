@@ -27,7 +27,7 @@
           @mouseover="updateSelection(month, day)"
           @mouseup="endSelection"
         >
-          {{ day.date }}
+          {{ day.isCurrentMonth?day.date:'' }}
         </div>
       </div>
     </div>
@@ -204,12 +204,15 @@ const endSelection = () => {
   if (startDate.value && endDate.value) {
     console.log('Selected range:', startDate.value, 'to', endDate.value);
     const currentRow = useCurrentRowStore().currentRow;
-    if (!currentRow?._tl) {
+    if(currentRow){
+      if (!currentRow?._tl) {
       currentRow._tl = { start: startDate.value, end: endDate.value };
     } else {
       currentRow._tl.start = startDate.value;
       currentRow._tl.end = endDate.value;
     }
+    }
+
   }
 };
 
@@ -304,16 +307,7 @@ const initializeMonths = () => {
   startIndex.value = bufferMonths;
 };
 
-// Watch for startDate changes
-watch(
-  () => startDate.value,
-  (newDate) => {
-    if (newDate) {
-      scrollToDate(newDate);
-    }
-  },
-  { deep: true }
-);
+
 
 // Watch for current row changes
 watch(
