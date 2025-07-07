@@ -21,7 +21,7 @@
     <div 
       v-for="(month, index) in visibleMonths" 
       :key="month.key"
-      class="month-container bg-white p-4 rounded shadow mb-4"
+      class="month-container p-4 rounded shadow mb-4"
     >
       <h2 class="text-lg font-bold mb-2">{{ month.name }} {{ month.year }}</h2>
       <div class="grid grid-cols-7 gap-1">
@@ -45,8 +45,8 @@
             'bg-blue-300 text-white': isInRange(month, day) && !isToday(month, day)}">
           {{ day.isCurrentMonth?day.date:'' }}
         </div>
-        <div class="task-badge mt-1 px-1 py-0.5 bg-purple-100 text-purple-800 rounded">
-          <div  v-if="getTasksForDate(day).length>0" >({{ getTasksForDate(day).length }})</div>
+        <div class="task-badge mt-1 px-1 py-0.5 bg-purple-100 text-purple-800 rounded text-[60%]"  v-if="getTasksForDate(day).length>0">
+          <div   >({{ getTasksForDate(day).length }})</div>
         </div>
         </div>
       </div>

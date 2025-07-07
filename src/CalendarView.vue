@@ -32,7 +32,7 @@ watch(
 
         <!-- Calendar Column -->
         <div class="w-80 h-full relative">
-            <div class="absolute inset-0 overflow-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 scrollbar-thumb-rounded">
+            <div class="absolute inset-0 overflow-hidden scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 scrollbar-thumb-rounded">
                 <Calendar :initial-year="2025" :initial-month="6" :current-date="currentDate" :tasks="tasks" />
             </div>
         </div>
