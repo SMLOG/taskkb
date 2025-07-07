@@ -38,10 +38,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, nextTick,watch } from 'vue';
+import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useCurrentRowStore } from '@/stores/currentRowStore';
-
-
 
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -76,19 +74,62 @@ const isDragging = ref(false);
 const startDate = ref(null);
 const endDate = ref(null);
 
-
 const currentRowStore = useCurrentRowStore();
-watch(
-  () => [currentRowStore.currentRow,currentRowStore.currentRow?._tl?.start,currentRowStore.currentRow?._tl?.end], // Use a getter function for deep watching
-  (newValue) => {
-    startDate.value = newValue[0]?._tl?.start;
-    endDate.value = newValue[0]?._tl?.end;
-  },
-  { immediate: true }
-);
-
 
 const visibleMonths = computed(() => allMonths.value);
+
+const scrollToDate = (date) => {
+  if (!date) return;
+  
+  // Check if we need to load more months
+  const dateYear = date.getFullYear();
+  const dateMonth = date.getMonth();
+  
+  const isDateBeforeFirstMonth = 
+    dateYear < allMonths.value[0].year || 
+    (dateYear === allMonths.value[0].year && dateMonth < allMonths.value[0].monthIndex);
+    
+  const isDateAfterLastMonth = 
+    dateYear > allMonths.value[allMonths.value.length - 1].year || 
+    (dateYear === allMonths.value[allMonths.value.length - 1].year && 
+     dateMonth > allMonths.value[allMonths.value.length - 1].monthIndex);
+
+  if (isDateBeforeFirstMonth) {
+    loadMoreMonths('past', () => scrollToDate(date));
+    return;
+  }
+  
+  if (isDateAfterLastMonth) {
+    loadMoreMonths('future', () => scrollToDate(date));
+    return;
+  }
+
+  // If we have the month, scroll to it
+  nextTick(() => {
+    const container = calendarContainer.value;
+    if (!container) return;
+
+    const targetMonthIndex = allMonths.value.findIndex(
+      month => month.year === dateYear && month.monthIndex === dateMonth
+    );
+
+    if (targetMonthIndex !== -1) {
+      const monthElements = container.children;
+      const targetElement = monthElements[targetMonthIndex];
+      
+      if (targetElement) {
+        const containerHeight = container.clientHeight;
+        const elementPosition = targetElement.offsetTop;
+        const scrollToPosition = elementPosition - (containerHeight / 3);
+        
+        container.scrollTo({
+          top: scrollToPosition,
+          behavior: 'smooth'
+        });
+      }
+    }
+  });
+};
 
 const getMonthDays = (year, monthIndex) => {
   const firstDay = new Date(year, monthIndex, 1);
@@ -134,7 +175,7 @@ const isInRange = (month, day) => {
 
   // Create date for the given day, ignoring time
   const date = new Date(month.year, month.monthIndex, day.date);
-  date.setHours(0, 0, 0, 0); // Normalize to midnight
+  date.setHours(0, 0, 0, 0);
 
   // Normalize start and end dates to midnight
   const start = new Date(Math.min(startDate.value.getTime(), endDate.value.getTime()));
@@ -150,7 +191,7 @@ const startSelection = (month, day) => {
   if (!day.isCurrentMonth) return;
   isDragging.value = true;
   startDate.value = new Date(month.year, month.monthIndex, day.date);
-  endDate.value = null; // Reset end date when starting a new selection
+  endDate.value = null;
 };
 
 const updateSelection = (month, day) => {
@@ -163,12 +204,12 @@ const endSelection = () => {
   if (startDate.value && endDate.value) {
     console.log('Selected range:', startDate.value, 'to', endDate.value);
     const currentRow = useCurrentRowStore().currentRow;
-    if(!currentRow?._tl)currentRow._tl={start:startDate.value,  end:endDate.value} 
-      else{
-        currentRow._tl.start= startDate.value;
-        currentRow._tl.end= endDate.value;
+    if (!currentRow?._tl) {
+      currentRow._tl = { start: startDate.value, end: endDate.value };
+    } else {
+      currentRow._tl.start = startDate.value;
+      currentRow._tl.end = endDate.value;
     }
-
   }
 };
 
@@ -182,7 +223,7 @@ const generateMonth = (year, monthIndex) => {
   };
 };
 
-const loadMoreMonths = (direction) => {
+const loadMoreMonths = (direction, callback) => {
   if (isLoadingMore.value) return;
   isLoadingMore.value = true;
   loading.value = true;
@@ -219,6 +260,8 @@ const loadMoreMonths = (direction) => {
 
     loading.value = false;
     isLoadingMore.value = false;
+    
+    if (callback) callback();
   }, 300);
 };
 
@@ -261,6 +304,33 @@ const initializeMonths = () => {
   startIndex.value = bufferMonths;
 };
 
+// Watch for startDate changes
+watch(
+  () => startDate.value,
+  (newDate) => {
+    if (newDate) {
+      scrollToDate(newDate);
+    }
+  },
+  { deep: true }
+);
+
+// Watch for current row changes
+watch(
+  () => [currentRowStore.currentRow, currentRowStore.currentRow?._tl?.start, currentRowStore.currentRow?._tl?.end],
+  (newValue) => {
+    const newStartDate = newValue[0]?._tl?.start;
+    const newEndDate = newValue[0]?._tl?.end;
+    
+    if (newStartDate && newStartDate !== startDate.value) {
+      startDate.value = newStartDate;
+      endDate.value = newEndDate;
+      scrollToDate(newStartDate);
+    }
+  },
+  { immediate: true }
+);
+
 onMounted(() => {
   initializeMonths();
 
@@ -273,9 +343,16 @@ onMounted(() => {
 
     if (currentMonthIndex !== -1) {
       const container = calendarContainer.value;
-      const monthElement = container.children[currentMonthIndex - startIndex.value];
+      const monthElement = container.children[currentMonthIndex];
       if (monthElement) {
-        monthElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const containerHeight = container.clientHeight;
+        const elementPosition = monthElement.offsetTop;
+        const scrollToPosition = elementPosition - (containerHeight / 3);
+        
+        container.scrollTo({
+          top: scrollToPosition,
+          behavior: 'smooth'
+        });
       }
     }
   });
@@ -299,10 +376,10 @@ onMounted(() => {
 }
 
 .bg-blue-200 {
-  background-color: #90cdf4; /* Lighter blue for start/end dates */
+  background-color: #90cdf4;
 }
 
 .bg-blue-300 {
-  background-color: #bee3f8; /* Even lighter blue for in-range dates */
+  background-color: #bee3f8;
 }
 </style>
