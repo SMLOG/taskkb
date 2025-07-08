@@ -12,7 +12,7 @@
         class="ml-1 font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
         Calendar
       </h2>
-      <button class="inline-flex rounded-lg p-1 relative group bg-gray-200 dark:bg-gray-700 ml-2" >Today</button>
+      <button class="inline-flex rounded-lg p-1 relative group bg-gray-200 dark:bg-gray-700 ml-2" @click="jump2Today">Today</button>
     </div>
       <div class="flex space-x-3">
         <button class="p-2 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
@@ -113,6 +113,9 @@ const getTasksForDate = (day) => {
   });
 };
 
+function jump2Today(){
+  scrollToDate(new Date());
+}
 const scrollToDate = (date) => {
   if (!date) return;
 
