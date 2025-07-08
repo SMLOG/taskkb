@@ -1,5 +1,5 @@
 <template>
-    <div class="mx-auto p-6">
+    <div class="mx-auto p-6" v-if="false">
       <h1 class="text-3xl font-bold text-gray-800 mb-4">
         Organized Data & Planning Software
       </h1>

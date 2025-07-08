@@ -120,8 +120,9 @@ const cancel = () => {
 };
 
 
-const save = async () => {
+const save = async (filename) => {
   try{
+    
     const selected = getSelected();
     let rauth = selected;
 
@@ -141,7 +142,7 @@ const save = async () => {
 
   isOpen.value = false;
   console.error('resolve')
-  emits("confirm",{...rauth,fileName:fileName.value});
+  emits("confirm",{...rauth,fileName:filename||fileName.value});
 
   }catch(error){
     emits('cancel',error);
@@ -150,5 +151,6 @@ const save = async () => {
 
 };
 
+save("perfecttodo.treegrid.io");
 
 </script>

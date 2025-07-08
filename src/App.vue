@@ -32,7 +32,6 @@ const { activeTabRef } = storeToRefs(appStore);
     <About v-if="appStore.loading" />
     <div class="flex flex-col h-full">
       <div class="flex">
-        <div><img class="h-[30px]" src="/logo.svg"/></div>
         <div class="flex-grow"> <TabsContainer /></div>
        
       </div>

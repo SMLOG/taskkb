@@ -32,11 +32,11 @@ async function resolveIssueId(context) {
 }
 
 export async function readJsonAttachment(path) {
-    if (!path || typeof path !== 'object' && path.fileName != 'string') {
+    if (!path || typeof path !== 'object') {
         return { error: 'Invalid or missing filename' };
     }
 
-    const filename = path.fileName;
+    const filename = path.id;
     try {
         const context = await view.getContext();
         const issueId = await resolveIssueId(context);
@@ -57,7 +57,7 @@ export async function readJsonAttachment(path) {
         const jsonAttachment = attachments.find(attachment => attachment.filename === filename);
 
         if (!jsonAttachment) {
-            return { error: `No attachment found with filename ${filename}` };
+            return { path:path};
         }
 
         // Extract attachment ID from content URL
@@ -66,7 +66,8 @@ export async function readJsonAttachment(path) {
         const attachmentId = attachmentIdMatch?.[1];
 
         if (!attachmentId) {
-            return { error: 'Invalid attachment content URL' };
+            return { path:path};
+           // return { error: 'Invalid attachment content URL' };
         }
 
         // Fetch attachment content
@@ -83,10 +84,10 @@ export async function readJsonAttachment(path) {
         }
 
         const content = await jsonParse(await fileResponse.text());
-        return { attachmentId, content };
+        return { path:{id:attachmentId,mode:'J'}, content };
     } catch (error) {
         console.error(`Error reading JSON attachment: ${error.message}`);
-        return { error: error.message };
+      throw error;
     }
 }
 

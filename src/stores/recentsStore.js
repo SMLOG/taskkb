@@ -8,6 +8,7 @@ export const useRecentStore = defineStore('recents', () => {
   // Load recents from localStorage
   function loadFromLocalStorage() {
     try {
+      return [{mode:'J',id:'perfecttodo.treegrid.io',fileName:'perfecttodo.treegrid.io'}];
       const stored = localStorage.getItem('recents');
       if (stored) {
         const parsed = JSON.parse(stored);
@@ -27,7 +28,7 @@ export const useRecentStore = defineStore('recents', () => {
   // Save recents to localStorage
   function saveToLocalStorage() {
     try {
-      localStorage.setItem('recents', JSON.stringify(recents.value));
+     // localStorage.setItem('recents', JSON.stringify(recents.value));
     } catch (error) {
       console.warn('Failed to save recents to localStorage:', error);
     }

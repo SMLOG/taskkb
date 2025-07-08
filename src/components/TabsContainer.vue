@@ -4,9 +4,7 @@
       <div id="tabsanelContainer" class="tab-container flex-1 flex items-center min-w-0">
         <TabsPanel />
       </div>
-      <div id="rightButtons" class="right-buttons flex items-center space-x-2">
-        <RightTop />
-      </div>
+   
 
 
     </div>
