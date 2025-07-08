@@ -51,12 +51,12 @@ const nameMap = {
   "G": "Google Drive"
 }
 const modesRef = ref([
-{ mode: 'B', name: "Browser" },
+  { mode: 'J', name: "JIRA Attachment" },
   { mode: 'G', name: "My Drive" }
   , { mode: 'G', name: "Pick a folder...", folder: true }
-  , { mode: 'L', name: "Local Storage(Deprecated)" }
+  , { mode: 'L', name: "Browser" }
   , { mode: 'D', name: "Device" }
-])
+]);
 
 const getSelected = () => {
   const allOptions = [...cacheFolders.value, ...modesRef.value]

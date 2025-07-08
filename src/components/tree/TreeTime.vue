@@ -5,16 +5,6 @@
                 <Cell :row="row" :col="col" :level="level" :cellIndex="cellIndex" :index="id" :depth="depth" ></Cell>
         </template>
         <ScheduleCol :row="row" :days="days" :firstDay="firstDay" :showSch="showSch" :weeks="weeksRef"  />
-        <div class="drag-handle" v-if="selectDepths.indexOf(depth) > -1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24">
-                <circle cx="6" cy="6" r="2" fill="currentColor"></circle>
-                <circle cx="12" cy="6" r="2" fill="currentColor"></circle>
-                <circle cx="18" cy="6" r="2" fill="currentColor"></circle>
-                <circle cx="6" cy="12" r="2" fill="currentColor"></circle>
-                <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
-                <circle cx="18" cy="12" r="2" fill="currentColor"></circle>
-              </svg>
-        </div>
     </div>
     <template v-if="row && row._childs && row._childs.length && !row._collapsed">
         <TreeTime v-for="(child, index) in row._childs" :depth="depth + '.' + index" :key="index" :row="child"
