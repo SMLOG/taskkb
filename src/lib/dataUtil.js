@@ -7,3 +7,11 @@ export function formatDateToYyyyMMdd(date) {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}${month}${day}`;
 }
+export function dateFromYYYYMMDD(yyyymmdd) {
+    const year = yyyymmdd.substring(0, 4);
+    const month = yyyymmdd.substring(4, 6);
+    const day = yyyymmdd.substring(6, 8);
+    
+    return new Date(year, month - 1, day);
+  }
+  

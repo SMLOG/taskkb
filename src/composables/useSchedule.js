@@ -203,6 +203,10 @@ export function useSchedule(el) {
     }
 }
 
+  function expandSchToDate(date){
+   const dateInfo = getDateInfo(date,getFirstDay());
+    autoExpanedWeeksIfNeed(dateInfo.i);
+  }
   function handleMouseMove(event) {
     const sch = event.target.closest(".sch");
     if (!sch||!selectStartRef.value) return;
@@ -279,17 +283,32 @@ export function useSchedule(el) {
   };
 
   function autoExpanedWeeksIfNeed(dateIndex) {
-    let weekIndex = parseInt((dateIndex + 1) / 7);
-
+    const appStore = useAppStore();
+  
+    if (dateIndex < 0) {
+      // Calculate the new start date by moving backward
+      const newStartDate = new Date(getFirstDay());
+      newStartDate.setDate(newStartDate.getDate() + dateIndex); // dateIndex is negative
+      
+      // Update the store with new start date and expanded week count
+      appStore.configRef.startDate = newStartDate;
+      const weeksToAdd = Math.ceil(Math.abs(dateIndex) / 7);
+      appStore.configRef.weekCount += weeksToAdd;
+      
+      // Regenerate all weeks with the new start date
+      weeksRef.value = generateWeeks(newStartDate, appStore.configRef.weekCount);
+      return;
+    }
+  
+    // Original logic for positive indices
+    const weekIndex = Math.floor(dateIndex / 7);
     if (weeksRef.value.length <= weekIndex) {
-      useAppStore().configRef.weekCount = weekIndex + 1;
-
+      appStore.configRef.weekCount = weekIndex + 1;
       weeksRef.value = generateWeeks(
-        useAppStore().configRef.startDate,
+        appStore.configRef.startDate,
         weekIndex + 1
       );
     }
-
 
   }
 
@@ -439,6 +458,6 @@ export function useSchedule(el) {
     selectStartRef,
     calculateDaysBetweenDates,
     moveType,
-    dragMode, calculateDaysBetweenDates2
+    dragMode, calculateDaysBetweenDates2,expandSchToDate
   };
 }

@@ -38,7 +38,7 @@
         <div v-for="day in month.days" :key="`${month.name}-${day.date}`"
           class="text-center h-16 flex items-center justify-start flex flex-col" :class="{
             'text-gray-400': !day.isCurrentMonth,
-          }" @mousedown="startSelection(month, day)" @mouseover="updateSelection(month, day)" @mouseup="endSelection">
+          }" @mousedown="startSelection(month, day)" @mouseover="updateSelection(month, day)" @mouseup="endSelection" @click="handleClickDate(day)">
           <div class="w-8 h-8 flex items-center justify-center rounded-full  font-medium mb-1 flex-shrink-0" :class="{
             'bg-blue-500 text-white': isToday(month, day),
             'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth && !isSelected(month, day),
@@ -63,7 +63,8 @@
 <script setup>
 import { ref, computed, onMounted, nextTick, watch } from 'vue';
 import { useCurrentRowStore } from '@/stores/currentRowStore';
-
+import {dateFromYYYYMMDD} from '@/lib/dataUtil';
+import { useSchedule } from '@/composables/useSchedule';
 const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
@@ -117,6 +118,12 @@ const getTasksForDate = (day) => {
 
   });
 };
+
+const  schedule = useSchedule();
+function handleClickDate(date){
+
+  schedule.expandSchToDate(dateFromYYYYMMDD(date.value))
+}
 
 function jump2Today() {
   scrollToDate(new Date());
