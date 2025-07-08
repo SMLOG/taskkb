@@ -1,54 +1,51 @@
 <template>
-        <div class="sticky top-0 w-full header-gradient backdrop-blur-lg py-2 px-2 border-b border-white/20 shadow-sm ">
-            <div class="flex items-center ">
-              <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" data-v-d3cca5a8=""><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" data-v-d3cca5a8=""></path></svg>
-                <h2 class="ml-1 font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
-                    Calendar
-                </h2>
-                <div class="flex space-x-3" v-if="false">
-                    <button class="p-2 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            </div>
-  <div 
-    class="calendar-container select-none"
-    ref="calendarContainer"
-    @scroll="handleScroll"
-  >
-    <div 
-      v-for="(month, index) in visibleMonths" 
-      :key="month.key"
-      class="month-container p-4 rounded shadow mb-4"
-    >
+  <div class="sticky top-0 w-full header-gradient backdrop-blur-lg py-2 px-2 border-b border-white/20 shadow-sm ">
+    <div class="flex items-center just-between">
+      <div class="flex flex-1">
+      <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg" data-v-d3cca5a8="">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" data-v-d3cca5a8="">
+        </path>
+      </svg>
+      <h2
+        class="ml-1 font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
+        Calendar
+      </h2>
+      <button class="inline-flex rounded-lg p-1 relative group bg-gray-200 dark:bg-gray-700 ml-2" >Today</button>
+    </div>
+      <div class="flex space-x-3">
+        <button class="p-2 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="calendar-container select-none" ref="calendarContainer" @scroll="handleScroll">
+    <div v-for="(month, index) in visibleMonths" :key="month.key" class="month-container p-4 rounded shadow mb-4">
       <h2 class="text-lg font-bold mb-2">{{ month.name }} {{ month.year }}</h2>
       <div class="grid grid-cols-7 gap-1">
         <div v-for="day in dayNames" :key="day" class="text-center font-semibold">{{ day }}</div>
-        <div 
-          v-for="day in month.days" 
-          :key="`${month.name}-${day.date}`" 
-          class="text-center h-16 flex items-center justify-start flex flex-col"
-          :class="{ 
+        <div v-for="day in month.days" :key="`${month.name}-${day.date}`"
+          class="text-center h-16 flex items-center justify-start flex flex-col" :class="{
             'text-gray-400': !day.isCurrentMonth,
-          }"
-          @mousedown="startSelection(month, day)"
-          @mouseover="updateSelection(month, day)"
-          @mouseup="endSelection"
-        >
-          <div class="w-8 h-8 flex items-center justify-center rounded-full  font-medium mb-1 flex-shrink-0" 
-          :class="{            
+          }" @mousedown="startSelection(month, day)" @mouseover="updateSelection(month, day)" @mouseup="endSelection">
+          <div class="w-8 h-8 flex items-center justify-center rounded-full  font-medium mb-1 flex-shrink-0" :class="{
             'bg-blue-500 text-white': isToday(month, day),
             'hover:bg-gray-100 cursor-pointer': day.isCurrentMonth && !isSelected(month, day),
             'bg-blue-200 text-white ': isSelected(month, day) && !isToday(month, day),
-            'bg-blue-300 text-white': isInRange(month, day) && !isToday(month, day)}">
-          {{ day.isCurrentMonth?day.date:'' }}
-        </div>
-        <div class="task-badge mt-1 px-1 py-0.5 bg-purple-100 text-purple-800 rounded text-[60%]"  v-if="getTasksForDate(day).length>0">
-          <div   >({{ getTasksForDate(day).length }})</div>
-        </div>
+            'bg-blue-300 text-white': isInRange(month, day) && !isToday(month, day)
+          }">
+            {{ day.isCurrentMonth ? day.date : '' }}
+          </div>
+          <div class="task-badge mt-1 px-1 py-0.5 bg-purple-100 text-purple-800 rounded text-[60%]"
+            v-if="getTasksForDate(day).length > 0">
+            <div>({{ getTasksForDate(day).length }})</div>
+          </div>
         </div>
       </div>
     </div>
@@ -105,10 +102,10 @@ const visibleMonths = computed(() => allMonths.value);
 
 const getTasksForDate = (day) => {
   if (!props.tasks || props.tasks.length === 0) return [];
- 
+
   return props.tasks.filter(task => {
-    const yes=  task.start && day.value>=task.start&&day.value<=task.end;
-    if(yes){
+    const yes = task.start && day.value >= task.start && day.value <= task.end;
+    if (yes) {
       console.log(yes)
       return yes;
     }
@@ -118,25 +115,25 @@ const getTasksForDate = (day) => {
 
 const scrollToDate = (date) => {
   if (!date) return;
-  
+
   // Check if we need to load more months
   const dateYear = date.getFullYear();
   const dateMonth = date.getMonth();
-  
-  const isDateBeforeFirstMonth = 
-    dateYear < allMonths.value[0].year || 
+
+  const isDateBeforeFirstMonth =
+    dateYear < allMonths.value[0].year ||
     (dateYear === allMonths.value[0].year && dateMonth < allMonths.value[0].monthIndex);
-    
-  const isDateAfterLastMonth = 
-    dateYear > allMonths.value[allMonths.value.length - 1].year || 
-    (dateYear === allMonths.value[allMonths.value.length - 1].year && 
-     dateMonth > allMonths.value[allMonths.value.length - 1].monthIndex);
+
+  const isDateAfterLastMonth =
+    dateYear > allMonths.value[allMonths.value.length - 1].year ||
+    (dateYear === allMonths.value[allMonths.value.length - 1].year &&
+      dateMonth > allMonths.value[allMonths.value.length - 1].monthIndex);
 
   if (isDateBeforeFirstMonth) {
     loadMoreMonths('past', () => scrollToDate(date));
     return;
   }
-  
+
   if (isDateAfterLastMonth) {
     loadMoreMonths('future', () => scrollToDate(date));
     return;
@@ -154,12 +151,12 @@ const scrollToDate = (date) => {
     if (targetMonthIndex !== -1) {
       const monthElements = container.children;
       const targetElement = monthElements[targetMonthIndex];
-      
+
       if (targetElement) {
         const containerHeight = container.clientHeight;
         const elementPosition = targetElement.offsetTop;
         const scrollToPosition = elementPosition - (containerHeight / 3);
-        
+
         container.scrollTo({
           top: scrollToPosition,
           behavior: 'smooth'
@@ -182,11 +179,11 @@ const getMonthDays = (year, monthIndex) => {
   for (let i = 0; i < firstDayIndex; i++) {
     const day = prevMonthLastDay - firstDayIndex + i + 1;
     const value = `${prevYear}${String(prevMonth + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`;
-    days.push({ date: prevMonthLastDay - firstDayIndex + i + 1, isCurrentMonth: false,value });
+    days.push({ date: prevMonthLastDay - firstDayIndex + i + 1, isCurrentMonth: false, value });
   }
   for (let i = 1; i <= lastDay.getDate(); i++) {
     const value = `${year}${String(monthIndex + 1).padStart(2, '0')}${String(i).padStart(2, '0')}`;
-    days.push({ date: i, isCurrentMonth: true,value });
+    days.push({ date: i, isCurrentMonth: true, value });
   }
   /*  const totalDays = 42;
   let nextMonthDay = 1;
@@ -251,13 +248,13 @@ const endSelection = () => {
   if (startDate.value && endDate.value) {
     console.log('Selected range:', startDate.value, 'to', endDate.value);
     const currentRow = useCurrentRowStore().currentRow;
-    if(currentRow){
+    if (currentRow) {
       if (!currentRow?._tl) {
-      currentRow._tl = { start: startDate.value, end: endDate.value };
-    } else {
-      currentRow._tl.start = startDate.value;
-      currentRow._tl.end = endDate.value;
-    }
+        currentRow._tl = { start: startDate.value, end: endDate.value };
+      } else {
+        currentRow._tl.start = startDate.value;
+        currentRow._tl.end = endDate.value;
+      }
     }
 
   }
@@ -310,7 +307,7 @@ const loadMoreMonths = (direction, callback) => {
 
     loading.value = false;
     isLoadingMore.value = false;
-    
+
     if (callback) callback();
   }, 300);
 };
@@ -362,7 +359,7 @@ watch(
   (newValue) => {
     const newStartDate = newValue[0]?._tl?.start;
     const newEndDate = newValue[0]?._tl?.end;
-    
+
     if (newStartDate && newStartDate !== startDate.value) {
       startDate.value = newStartDate;
       endDate.value = newEndDate;
@@ -390,7 +387,7 @@ onMounted(() => {
         const containerHeight = container.clientHeight;
         const elementPosition = monthElement.offsetTop;
         const scrollToPosition = elementPosition - (containerHeight / 3);
-        
+
         container.scrollTo({
           top: scrollToPosition,
           behavior: 'smooth'
