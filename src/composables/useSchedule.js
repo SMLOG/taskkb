@@ -1,5 +1,5 @@
 import { useAppStore } from "@/stores/appStore";
-import { ref, onBeforeUnmount, watch } from 'vue';
+import { ref, onBeforeUnmount, watch, nextTick } from 'vue';
 import {
   getRowFromDepth,
 } from "@/lib/treelib";
@@ -203,9 +203,12 @@ export function useSchedule(el) {
     }
 }
 
-  function expandSchToDate(date){
+  async function expandSchToDate(date){
    const dateInfo = getDateInfo(date,getFirstDay());
     autoExpanedWeeksIfNeed(dateInfo.i);
+    await nextTick();
+    jumpToDate(date);
+
   }
   function handleMouseMove(event) {
     const sch = event.target.closest(".sch");
@@ -310,6 +313,7 @@ export function useSchedule(el) {
       );
     }
 
+
   }
 
   const debouncedIncreaseWeeks = debounce((backwalk) => {
@@ -377,6 +381,49 @@ export function useSchedule(el) {
   function calculateDaysBetweenDates2(d1, d2, exclusiveHolidayWeeken, row) {
     return calcDaysBetween(weeksRef.value, d1, d2, exclusiveHolidayWeeken);
   };
+
+  function jumpToDate(date) {
+    // Get the target elements
+
+
+    const dateInfo = getDateInfo(date,getFirstDay());
+
+    const dayEl = document.querySelector('.header').querySelectorAll(".day")[dateInfo.i];
+    if (!dayEl) return;
+
+    const mainContent = dayEl.closest(".absolute")|| document.getElementById("mainContent");
+
+    if (!mainContent) return;
+
+    // Get all measurements
+    const containerRect = mainContent.getBoundingClientRect();
+    const elementRect = dayEl.getBoundingClientRect();
+    const containerScrollLeft = mainContent.scrollLeft;
+
+    // Calculate desired scroll position
+    const elementCenter = elementRect.left - containerRect.left + containerScrollLeft;
+    const containerCenter = containerRect.width / 2;
+    const scrollTo = elementCenter - containerCenter + (elementRect.width / 2);
+
+    // Apply boundaries
+    const maxScroll = mainContent.scrollWidth - containerRect.width;
+    const boundedScroll = Math.max(0, Math.min(scrollTo, maxScroll));
+
+    // Scroll with polyfill for smooth behavior
+    const scrollOptions = {
+      left: boundedScroll,
+      behavior: 'smooth'
+    };
+
+    if ('scrollBehavior' in document.documentElement.style) {
+      mainContent.scrollTo(scrollOptions);
+    } else {
+      // Fallback for browsers without smooth scroll
+      mainContent.scrollLeft = boundedScroll;
+    }
+
+
+  }
   function jumpToPlanTime(event) {
     // Get the target elements
     const schElement = event.target.closest(".sch");
