@@ -31,11 +31,12 @@ async function resolveIssueId(context) {
     return issueId;
 }
 
-export async function readJsonAttachment(filename) {
-    if (!filename || typeof filename !== 'string') {
+export async function readJsonAttachment(path) {
+    if (!path || typeof path !== 'object' && path.fileName != 'string') {
         return { error: 'Invalid or missing filename' };
     }
 
+    const filename = path.fileName;
     try {
         const context = await view.getContext();
         const issueId = await resolveIssueId(context);
@@ -89,10 +90,13 @@ export async function readJsonAttachment(filename) {
     }
 }
 
-export async function writeObjectToJsonAttachment(dataObject, filename, attachmentId) {
+export async function writeObjectToJsonAttachment(dataObject, path) {
     if (!dataObject || typeof dataObject !== 'object') {
         return { success: false, error: 'Invalid or missing data object' };
     }
+
+    const filename = path.fileName;
+
     if (!filename || typeof filename !== 'string') {
         return { success: false, error: 'Invalid or missing filename' };
     }
@@ -124,6 +128,7 @@ export async function writeObjectToJsonAttachment(dataObject, filename, attachme
             return { success: false, error: `Failed to upload attachment: ${response.status}` };
         }
 
+        const attachmentId = path.id;
         // Delete old attachment if provided
         console.info("delete attachment id ",attachmentId)
         if (attachmentId && !isNaN(parseInt(attachmentId))) {
@@ -138,7 +143,7 @@ export async function writeObjectToJsonAttachment(dataObject, filename, attachme
         }
 
         const result = await response.json();
-        return { success: true, attachmentId:result[0].id};
+        return { success: true, id:result[0].id};
     } catch (error) {
         console.error(`Error writing JSON attachment: ${error.message}`);
         return { success: false, error: error.message };

@@ -52,12 +52,13 @@ const {cacheFolders} = storeToRefs(useUserStore());
 const nameMap = {
   "G": "Google Drive"
 }
+
 const modesRef = ref([
   { mode: 'G', name: "My Drive" }
   , { mode: 'G', name: "Pick a folder...", folder: true }
   , { mode: 'L', name: "Browser" }
   , { mode: 'D', name: "Device" }
-])
+].concat(location.href.indexOf('atlassian')>-1)||true?[{mode:'J',name:"JIRA Attachment"}]:[])
 
 const getSelected = () => {
   const allOptions = [...cacheFolders.value, ...modesRef.value]
@@ -130,7 +131,7 @@ const save = async () => {
 
         }else{
 
-          const auth = await useDialog().globalAuthDlg.value.open(selected, nameMap[selected.mode]);
+          const auth = await useDialog().dialog().open(selected, nameMap[selected.mode]);
 
           rauth = {...selected,...auth};
           addOrUpdateAuthCacheList(rauth);

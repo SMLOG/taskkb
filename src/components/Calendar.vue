@@ -132,6 +132,8 @@ const scrollToDate = (date) => {
   if (!date) return;
 
   // Check if we need to load more months
+
+  if(allMonths.value.length==0)return;
   const dateYear = date.getFullYear();
   const dateMonth = date.getMonth();
 

@@ -293,7 +293,7 @@ const handleSave = async () => {
 
 const handleExport = () => {
   try {
-    const data = appStore.exportFile();
+    const data = appStore.exportFileData2();
     downloadJSON(data, appStore.path.fileName);
   } catch (error) {
     showNotification('Export Failed!', 'error');

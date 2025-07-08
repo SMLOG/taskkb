@@ -211,14 +211,22 @@ export function useSchedule(el) {
 
   }
   function handleMouseMove(event) {
-    const sch = event.target.closest(".sch");
-    if (!sch||!selectStartRef.value) return;
+    if (!selectStartRef.value) return;
 
+    const rowEl = event.target.closest(".row");
+    if(!rowEl && selectStartRef.value.row!==rowEl)return;
+    const sch = rowEl.querySelector(".sch");
 
+    if(!sch)return;
     const { left, width: totalWidth } = sch.getBoundingClientRect();
     const x = event.clientX - left;
-    const index = Math.floor((x / totalWidth) * useAppStore().configRef.weekCount * 7);
-    const dateInfo = weeksRef.value[Math.floor(index / 7)]?.dates[index % 7];
+    const dayWith  = totalWidth/ ( useAppStore().configRef.weekCount * 7);
+
+    const dayIndex = Math.floor(x /dayWith);
+    
+    autoExpanedWeeksIfNeed(dayIndex);
+
+    const dateInfo = weeksRef.value[Math.floor(dayIndex / 7)]?.dates[dayIndex % 7];
 
 
     //scrollToPlantime(x>0?'end':'start',selectStartRef.value.el.querySelector(".selectStartRef"));
@@ -226,7 +234,6 @@ export function useSchedule(el) {
     if (selectStartRef.value && dateInfo) {
       if (!selectStartRef.value.row._tl) {
         selectStartRef.value.end = dateInfo;
-        autoExpanedWeeksIfNeed(dateInfo.i)
         return;
       }
 

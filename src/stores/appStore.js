@@ -6,6 +6,9 @@ import { weeksBetween } from '@/lib/schedule';
 import { useUserStore } from './userStore';
 import { useHashStore } from './hashStore';
 import { useRecentStore } from './recentsStore';
+import Save from '@/components/dlg/Save.vue';
+import { showDialog } from '@/composables/useSystem';
+import { deepClone } from '@/lib/parse';
 
 
 export const useAppStore = defineStore('app', () => {
@@ -118,6 +121,12 @@ export const useAppStore = defineStore('app', () => {
 
 
   async function saveData() {
+
+    if(!path.value)
+    {
+      const newPath = await showDialog(Save);
+      updatePath( {...newPath,tabId:getCurrentTab().id});
+    }
     const alldata = exportFileData();
     const { writeObjectToJsonAttachment } = await getStorageBridgeByName(path.value.mode);
 
@@ -261,11 +270,24 @@ export const useAppStore = defineStore('app', () => {
   function getList(){
    return treeToList(treeRef.value);
   }
+
+  function exportFileData2() {
+
+     const copy = deepClone(tabsDataMapRef.value);
+    if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
+      const tab = tabs.value[activeTabRef.value];
+      copy[tab.id] = { config: configRef.value, data: treeRef.value }
+
+    }
+
+    let alldata = { tabs: tabs.value, activeTab: activeTabRef.value, datas: copy };
+    return alldata;
+
+  }
   function exportFileData() {
 
     if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
       const tab = tabs.value[activeTabRef.value];
-
       tabsDataMapRef.value[tab.id] = { config: configRef.value, data: treeRef.value }
 
     }
@@ -334,6 +356,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj,getList,tabsDataMapRef,setSaved,saved
+    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj,getList,tabsDataMapRef,setSaved,saved,exportFileData2
   };
 });
