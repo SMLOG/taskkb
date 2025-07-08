@@ -2,18 +2,23 @@
   <div class="sticky top-0 w-full header-gradient backdrop-blur-lg py-2 px-2 border-b border-white/20 shadow-sm ">
     <div class="flex items-center just-between">
       <div class="flex flex-1">
-      <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg" data-v-d3cca5a8="">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" data-v-d3cca5a8="">
-        </path>
-      </svg>
-      <h2
-        class="ml-1 font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
-        Calendar
-      </h2>
-      <button class="inline-flex rounded-lg p-1 relative group bg-gray-200 dark:bg-gray-700 ml-2" @click="jump2Today">Today</button>
-    </div>
+        <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg" data-v-d3cca5a8="">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+            data-v-d3cca5a8="">
+          </path>
+        </svg>
+        <h2
+          class="ml-1 font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tight">
+          Calendar
+        </h2>
+        <button class="inline-flex rounded-lg p-1 relative group bg-gray-200 dark:bg-gray-700 ml-2 
+         hover:bg-gray-300 dark:hover:bg-gray-600 
+         transition-colors duration-200 ease-in-out" @click="jump2Today">
+          Today
+        </button>
+      </div>
       <div class="flex space-x-3">
         <button class="p-2 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24"
@@ -113,7 +118,7 @@ const getTasksForDate = (day) => {
   });
 };
 
-function jump2Today(){
+function jump2Today() {
   scrollToDate(new Date());
 }
 const scrollToDate = (date) => {
