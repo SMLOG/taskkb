@@ -15,7 +15,14 @@
       @dragenter.prevent="handleDragEnter($event, index)"
       @dragover.prevent="handleDragOver($event, index)"
       @dragend="handleDragEnd"
-      :class="{'dragging': draggedIndex === index, 'drag-over': dragOverIndex === index}"
+      @touchstart="handleTouchStart($event, index)"
+      @touchmove="handleTouchMove"
+      @touchend="handleTouchEnd"
+      :class="{
+        'dragging': draggedIndex === index, 
+        'drag-over': dragOverIndex === index,
+        'touch-dragging': isTouchDragging && draggedIndex === index
+      }"
     />
     <slot></slot>
   </div>
@@ -24,18 +31,23 @@
 <script setup>
 import { useAppStore } from "@/stores/appStore";
 import Tab from '@/components/Tab.vue';
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 
 const appStore = useAppStore();
 const tabsContainer = ref(null);
 
 const draggedIndex = ref(null);
 const dragOverIndex = ref(null);
+const isTouchDragging = ref(false);
+const touchStartX = ref(0);
+const touchStartY = ref(0);
+const touchCurrentX = ref(0);
+const touchStartScrollLeft = ref(0);
+const tabElementWidth = ref(0);
 
 const handleDragStart = (e, index) => {
   draggedIndex.value = index;
   e.dataTransfer.effectAllowed = 'move';
-  // Set a custom drag image for better visual feedback
   setTimeout(() => {
     e.target.classList.add('dragging');
   }, 0);
@@ -58,6 +70,93 @@ const handleDragOver = (e, index) => {
 
 const handleDragEnd = (e) => {
   e.preventDefault();
+  completeDrop();
+  resetDragState();
+};
+
+// Touch event handlers
+const handleTouchStart = (e, index) => {
+  const touch = e.touches[0];
+  touchStartX.value = touch.clientX;
+  touchStartY.value = touch.clientY;
+  touchCurrentX.value = touch.clientX;
+  draggedIndex.value = index;
+  isTouchDragging.value = false; // Will be set to true after movement threshold
+  
+  // Get the tab element dimensions
+  const tabElement = e.currentTarget;
+  tabElementWidth.value = tabElement.offsetWidth;
+  
+  // Store initial scroll position
+  touchStartScrollLeft.value = tabsContainer.value.scrollLeft;
+  
+  // Prevent scroll during potential drag
+  tabsContainer.value.style.overflowX = 'hidden';
+  
+  // Add active class after a small delay
+  setTimeout(() => {
+    if (draggedIndex.value === index) {
+      tabElement.classList.add('touch-dragging');
+    }
+  }, 100);
+};
+
+const handleTouchMove = (e) => {
+  if (draggedIndex.value === null) return;
+  
+  const touch = e.touches[0];
+  touchCurrentX.value = touch.clientX;
+  
+  // Calculate movement distance
+  const deltaX = touch.clientX - touchStartX.value;
+  const deltaY = touch.clientY - touchStartY.value;
+  
+  // Check if movement exceeds threshold to start dragging
+  if (!isTouchDragging.value && (Math.abs(deltaX) > 10 || Math.abs(deltaY) > 10)) {
+    isTouchDragging.value = Math.abs(deltaX) > Math.abs(deltaY);
+  }
+  
+  if (isTouchDragging.value) {
+    e.preventDefault();
+    
+    // Move the tab horizontally
+    const tabElement = document.querySelector('.tab.touch-dragging');
+    if (tabElement) {
+      const dragOffset = deltaX;
+      tabElement.style.transform = `translateX(${dragOffset}px)`;
+      
+      // Calculate which tab we're hovering over
+      const containerRect = tabsContainer.value.getBoundingClientRect();
+      const touchX = touch.clientX - containerRect.left;
+      
+      // Find the index of the tab we're hovering over
+      let newDragOverIndex = null;
+      const tabs = Array.from(tabsContainer.value.querySelectorAll('.tab'));
+      let accumulatedWidth = 0;
+      
+      tabs.forEach((tab, index) => {
+        const tabWidth = tab.offsetWidth;
+        if (touchX >= accumulatedWidth && touchX < accumulatedWidth + tabWidth) {
+          newDragOverIndex = index;
+        }
+        accumulatedWidth += tabWidth;
+      });
+      
+      if (newDragOverIndex !== null && newDragOverIndex !== dragOverIndex.value) {
+        dragOverIndex.value = newDragOverIndex;
+      }
+    }
+  }
+};
+
+const handleTouchEnd = () => {
+  if (isTouchDragging.value) {
+    completeDrop();
+  }
+  resetDragState();
+};
+
+const completeDrop = () => {
   const dropIndex = dragOverIndex.value;
   
   if (draggedIndex.value !== null && dropIndex !== null && draggedIndex.value !== dropIndex) {
@@ -84,12 +183,31 @@ const handleDragEnd = (e) => {
       appStore.setActiveTab(appStore.activeTabRef + 1);
     }
   }
+};
+
+const resetDragState = () => {
+  // Reset all dragging styles
+  const draggingElements = document.querySelectorAll('.tab.dragging, .tab.touch-dragging');
+  draggingElements.forEach(el => {
+    el.classList.remove('dragging', 'touch-dragging');
+    el.style.transform = '';
+  });
   
-  // Reset drag state
+  // Reset state variables
   draggedIndex.value = null;
   dragOverIndex.value = null;
-  e.target.classList.remove('dragging');
+  isTouchDragging.value = false;
+  
+  // Restore container scrolling
+  if (tabsContainer.value) {
+    tabsContainer.value.style.overflowX = '';
+  }
 };
+
+// Clean up event listeners
+onUnmounted(() => {
+  resetDragState();
+});
 </script>
 
 <style scoped>
@@ -99,6 +217,7 @@ const handleDragEnd = (e) => {
   position: relative;
   transition: all 0.2s ease-in-out;
   user-select: none;
+  touch-action: pan-x; /* Allow horizontal touch movement */
 }
 
 .tab.active {
@@ -138,7 +257,14 @@ const handleDragEnd = (e) => {
 .tab.dragging {
   opacity: 0.5;
   transform: scale(0.95);
-  cursor:move;
+  cursor: move;
+}
+
+.tab.touch-dragging {
+  opacity: 0.9;
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.1s ease-out;
 }
 
 .tab.drag-over {
@@ -154,5 +280,19 @@ const handleDragEnd = (e) => {
   width: 4px;
   @apply bg-blue-500;
   z-index: 2;
+}
+
+/* For mobile devices */
+@media (pointer: coarse) {
+  .tab {
+    /* Increase touch target size */
+    padding: 8px 16px;
+  }
+  
+  .close-btn {
+    /* Make close button easier to tap */
+    padding: 8px;
+    margin-left: 8px;
+  }
 }
 </style>
