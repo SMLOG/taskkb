@@ -81,7 +81,7 @@
         </VueDraggable>
       </div>
 
-        <MiscConfig/>
+      <MiscConfig />
     </div>
 
     <!-- Confirmation Dialog -->
