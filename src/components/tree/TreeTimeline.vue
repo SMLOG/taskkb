@@ -62,6 +62,9 @@ import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
 import { weeksRef,moveType,isDragging } from '@/composables/context';
 import {useContextHandler} from  '@/composables/useContextHandler';
+import { useTree } from '@/composables/useTree';
+import { el } from 'date-fns/locale';
+
 const tableRef = ref(null);
 const thRefs = ref([]);
 
@@ -149,17 +152,22 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 const isDraging = computed(() => isDragging.value);
 
 
-const handleEnterKeyUp = (event) => {
+const handleEnterKeyUp = async (event) => {
   if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
     let cellEl = event.target.closest(".col");
     let curRowEl = event.target.closest(".row");
     
     let nextRowEl = curRowEl.nextElementSibling;
+
+    if(!nextRowEl){
+        useTree().insertNode({});
+        await nextTick();
+        nextRowEl = curRowEl.nextElementSibling;
+    }
     
     if (nextRowEl) {
       let cellIndex = Array.from(curRowEl.children).indexOf(cellEl);
       let nextCellEl = nextRowEl.children[cellIndex];
-      
       if (nextCellEl) {
         const dblClickEvent = new MouseEvent('dblclick', {
           bubbles: true,
@@ -169,6 +177,7 @@ const handleEnterKeyUp = (event) => {
         nextCellEl.querySelector('[contentEditable]').dispatchEvent(dblClickEvent);
       }
     }
+  
     return; 
   }
 };
