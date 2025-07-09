@@ -120,3 +120,27 @@ body * {
   inset: 0;
   width: 1px;
   z-index: 8;}
+
+
+
+  .sch {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  
+  .row .sch {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+  
+  .selectStartRef, .rightDrag, .leftDrag {
+    touch-action: none;
+  }
+  
+  /* Prevent zooming on double-tap */
+  @media (pointer: coarse) {
+    .sch {
+      touch-action: pan-x pan-y;
+    }
+  }
