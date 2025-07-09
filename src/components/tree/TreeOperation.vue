@@ -17,8 +17,8 @@
             </div>
 
             <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-              <button @click="saveData(0)" class="btn-secondary" :disabled="savingRef" :class="{'!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200':!saved}">
-                💾  <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Save</span><span v-else>Unsaved changes. Click here to save.</span>
+              <button   @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef" :class="{'!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200':!saved}">
+                💾  <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved changes. Click here to save.</span>
               </button>
               <button @click="openConfig" class="btn-secondary">
                 ⚙ Config
@@ -240,6 +240,10 @@ function download() {
 }
 
 async function saveData(bool) {
+
+  if(saved?.value)return;
+  if(savingRef.value) return;
+
   if (!bool) {
     try {
       savingRef.value = true;
