@@ -24,7 +24,7 @@ watch(
 <template>
     <div class="absolute inset-0  flex w-full h-full">
         <!-- TreeTimeline Column -->
-        <div class="flex-1 h-full relative">
+        <div class="flex-1 h-full relative bg-gray-100 dark:bg-gray-900 dark:border-gray-700 border-r border-gray-200">
             <div class="absolute inset-0 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-500 scrollbar-track-gray-200 scrollbar-thumb-rounded">
                 <TreeTimeline />
             </div>
