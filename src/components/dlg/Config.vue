@@ -37,26 +37,25 @@
                   placeholder="Column Name" />
               </div>
               <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
-                  <input type="checkbox" v-model="col.sticky"
-                    class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-                  Sticky
-                </label>
-                <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
-                  <input type="checkbox" v-model="col.show"
-                    class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-                  Show
-                </label>
+                <input type="checkbox" v-model="col.sticky"
+                  class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
+                Sticky
+              </label>
+              <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
+                <input type="checkbox" v-model="col.show"
+                  class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
+                Show
+              </label>
               <button class="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                 title="Click to delete this item." @click="showConfirmDelete(col, index)">
                 x
               </button>
-              <button
-                @click="toggleShowColumnDetail(col)"
+              <button @click="toggleShowColumnDetail(col)"
                 class="flex items-center justify-center w-10 h-10 text-red-500 hover:font-bold   rounded-full transition-colors duration-200 bg-blue-100"
-                style="border-radius: 50%;"
-                aria-label="Open dropdown menu" aria-haspopup="true" aria-expanded="false">
-                <svg class="w-5 h-5 transition-transform duration-200" focusable="false" viewBox="0 0 24 24" :class="{'rotate-180':showColumnsDetail.includes(col)}"
-                  xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                style="border-radius: 50%;" aria-label="Open dropdown menu" aria-haspopup="true" aria-expanded="false">
+                <svg class="w-5 h-5 transition-transform duration-200" focusable="false" viewBox="0 0 24 24"
+                  :class="{ 'rotate-180': showColumnsDetail.includes(col) }" xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true">
                   <path d="M16.59 8.59L12 13.17 7.41 8.59 6 10l6 6 6-6z"></path>
                 </svg>
               </button>
@@ -66,13 +65,13 @@
               <div class="flex" v-if="showColumnsDetail.includes(col)">
 
                 <div class="flex gap-2 flex-col flex-1">
-                <div v-if="col.cp === 'ColDropText'">
-                  <input v-model="col.options"
-                    class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-                    placeholder="Drop down options, separate by [,]" />
-                </div>
+                  <div v-if="col.cp === 'ColDropText'">
+                    <input v-model="col.options"
+                      class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                      placeholder="Drop down options, separate by [,]" />
+                  </div>
 
-              </div>
+                </div>
 
 
               </div>
@@ -82,32 +81,7 @@
         </VueDraggable>
       </div>
 
-      <!-- General Settings -->
-      <div
-        class="pt-2 border-t border-gray-200 dark:border-gray-700 flex gap-6 sticky!important bottom-0 bg-white dark:bg-gray-800">
-        <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
-          <input type="checkbox" v-model="config.showSch"
-            class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-          Show Schedule
-        </label>
-        <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
-          <input type="checkbox" v-model="config.icon"
-            class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
-          Emoji
-          <input v-if="config.icon" type="text" v-model="emojiInput" @input="validateEmoji" @blur="handleBlur"
-            class="w-16 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-            placeholder="😊" maxlength="4" aria-label="Enter an emoji" />
-          <span v-if="emojiError" class="text-red-500 dark:text-red-400 text-xs">{{ emojiError }}</span>
-        </label>
-
-        <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
-          <button
-            class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400"
-            @click="showDescription">
-            Description
-          </button>
-        </label>
-      </div>
+        <MiscConfig/>
     </div>
 
     <!-- Confirmation Dialog -->
@@ -125,6 +99,7 @@ import { VueDraggable } from "vue-draggable-plus";
 import { showDialog } from "@/composables/useSystem";
 import Description from "./Description.vue";
 import RemoveCol from "./RemoveCol.vue";
+import MiscConfig from './MiscConfig.vue';
 
 // Interfaces
 interface Column {
@@ -140,12 +115,7 @@ interface Column {
 
 const emit = defineEmits(["confirm", "cancel"]);
 
-// Reactive state
-const showConfirm = ref(false);
-const confirmColIndex = ref<number | null>(null);
-const confirmColName = ref<string>("");
-const emojiInput = ref<string>("");
-const emojiError = ref<string>("");
+
 
 const appStore = useAppStore();
 
@@ -155,71 +125,13 @@ const config = computed(() => appStore.configRef);
 
 const showColumnsDetail = ref([]);
 
-function toggleShowColumnDetail(col){
+function toggleShowColumnDetail(col) {
   let index = showColumnsDetail.value.indexOf(col);
-  if(index>-1)showColumnsDetail.value.splice(index,1);
+  if (index > -1) showColumnsDetail.value.splice(index, 1);
   else showColumnsDetail.value.push(col);
 }
 
-const showDescription = async () => {
-  await showDialog(Description);
-};
 
-// Emoji validation regex (basic, covers most common emojis)
-const emojiRegex =
-  /[\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2B50}\u{2B55}\u{FE00}-\u{FE0F}\u{1F1E6}-\u{1F1FF}]/u;
-// Debounced update function
-const debouncedUpdateEmoji = debounce((emoji: string) => {
-  appStore.updateTabEmoj(config.value.icon, emoji);
-}, 300);
-
-// Validate emoji input
-const validateEmoji = (event: Event) => {
-  const input = (event.target as HTMLInputElement).value;
-  emojiError.value = "";
-
-  if (input && !emojiRegex.test(input)) {
-    emojiError.value = "Please enter a valid emoji";
-    return;
-  }
-
-  emojiInput.value = input;
-  debouncedUpdateEmoji(input);
-};
-
-// Handle blur event to reset invalid emoji input
-const handleBlur = () => {
-  if (emojiInput.value && !emojiRegex.test(emojiInput.value)) {
-    emojiInput.value = "";
-    emojiError.value = "";
-    debouncedUpdateEmoji("");
-  }
-};
-
-// Sync emojiInput with config.emoji
-watch(
-  () => config.value.emoji,
-  (newEmoji) => {
-    emojiInput.value = newEmoji || "";
-  },
-  { immediate: true }
-);
-
-// Watch for config changes
-watch(
-  () => [config.value.icon, config.value.emoji],
-  () => {
-    if (!config.value.icon) {
-      emojiInput.value = "";
-      emojiError.value = "";
-      debouncedUpdateEmoji("");
-    } else if (config.value.emoji) {
-      emojiInput.value = config.value.emoji;
-      debouncedUpdateEmoji(config.value.emoji);
-    }
-  },
-  { immediate: true }
-);
 
 watch(
   () => cols.value,
@@ -265,9 +177,9 @@ const addCol = () => {
 };
 
 const showConfirmDelete = async (col: Column, index: number) => {
-  await showDialog(RemoveCol,{col});
+  await showDialog(RemoveCol, { col });
   let colIndex = cols.value.indexOf(col);
-  if(colIndex>-1)cols.value.splice(colIndex, 1);
+  if (colIndex > -1) cols.value.splice(colIndex, 1);
 };
 
 
