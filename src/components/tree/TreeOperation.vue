@@ -26,7 +26,7 @@
             </div>
 
             <div class="relative" @blur="showDropdown = false" ref="menuRef">
-              <button ref="moreButton" @mouseenter="handleShowDropdown" @focus="handleShowDropdown"
+              <button ref="moreButton" 
                 @click="handleShowDropdown" @mouseleave="handleMouseLeave" class="btn-secondary">
                 ⋮ Export
               </button>

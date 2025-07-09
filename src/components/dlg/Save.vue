@@ -51,12 +51,11 @@ const nameMap = {
   "G": "Google Drive"
 }
 const modesRef = ref([
-  { mode: 'J', name: "JIRA Attachment" },
   { mode: 'G', name: "My Drive" }
   , { mode: 'G', name: "Pick a folder...", folder: true }
   , { mode: 'L', name: "Browser" }
   , { mode: 'D', name: "Device" }
-]);
+].concat(location.href.indexOf('atlassian')>-1?[{mode:'J',name:"JIRA Attachment"}]:[]));
 
 const getSelected = () => {
   const allOptions = [...cacheFolders.value, ...modesRef.value]

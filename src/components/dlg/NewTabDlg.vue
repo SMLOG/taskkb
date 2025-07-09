@@ -54,7 +54,6 @@
       </button>
     </div>
   </div>
-  <SaveDialog ref="saveDialog" />
 
 </template>
 
@@ -64,10 +63,10 @@ import { useAppStore } from "@/stores/appStore";
 import { v4 as uuidv4 } from 'uuid';
 import sample from '@/assets/sample';
 import { loopTree } from '@/lib/treelib';
-import SaveDialog from '@/components/dlg/SaveDlg.vue';
 import { storeToRefs } from 'pinia';
+import { showDialog } from '@/composables/useSystem';
+import Save from './Save.vue';
 
-const saveDialog = ref(null);
 
 const appStore = useAppStore();
 const tabs = computed(() => appStore.tabs);
@@ -147,7 +146,7 @@ function loadFile(event) {
 const selectTemplate = async (event, template) => {
   if(!path.value?.mode){
     try{
-     path.value =  await saveDialog.value.open();
+     path.value =  await showDialog(Save);
 
     }catch(error){
       //closePopup();
