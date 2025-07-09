@@ -93,7 +93,7 @@
 
       <!-- General Settings -->
       <div
-        class="mt-3 pt-2 border-t border-gray-200 dark:border-gray-700 flex gap-6 sticky!important bottom-0 bg-white dark:bg-gray-800"
+        class="pt-2 border-t border-gray-200 dark:border-gray-700 flex gap-6 sticky!important bottom-0 bg-white dark:bg-gray-800"
       >
         <label
           class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300"
