@@ -5,7 +5,8 @@
       <div
         class="columns-resize-bar"
         ref="rbar"
-        @mousedown="startResize(col, key, $event);handleMouseDown(col, key, $event);"
+        @mousedown="startResize(col, key, $event); handleMouseDown(col, key, $event);"
+        @touchstart.passive="handleTouchStart(col, key, $event)"
       ></div>
     </template>
     <div
@@ -13,17 +14,20 @@
       v-if="state.resizeColumn"
       @mousemove.prevent="handleResize"
       @mouseup.prevent="resizeBarMouseUp"
+      @touchmove.prevent="handleTouchResize"
+      @touchend.prevent="resizeBarTouchEnd"
+      @touchcancel.prevent="resizeBarTouchEnd"
     ></div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, reactive,watch } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick, reactive, watch } from 'vue';
 import { useAppStore } from '@/stores/appStore';
-import { storeToRefs } from 'pinia'
-const appStore = useAppStore();
+import { storeToRefs } from 'pinia';
 
-const {activeTabRef} = storeToRefs(appStore);
+const appStore = useAppStore();
+const { activeTabRef } = storeToRefs(appStore);
 
 // Props
 const props = defineProps(['table', 'th', 'cols']);
@@ -87,7 +91,7 @@ const winResize = debounce(() => {
 }, 100);
 
 watch(
-  () => [activeTabRef?.value,props.cols],
+  () => [activeTabRef?.value, props.cols],
   () => {
     winResize();
   },
@@ -97,7 +101,7 @@ watch(
 const handleResize = (event) => {
   if (state.resizeColumn) {
     const i = state.resizeColumnIndex;
-    const width = state.resizeColumnWidth + event.x - state.resizeX;
+    const width = state.resizeColumnWidth + event.clientX - state.resizeX;
     state.resizeColumn.width = width;
     const th = props.th[i];
     rbar.value[i].style.left = `${th.offsetLeft + width - rbar.value[i].offsetWidth / 2}px`;
@@ -110,7 +114,7 @@ const handleResize = (event) => {
 const startResize = (col, colIndex, event) => {
   state.resizeColumn = col;
   state.resizeColumnIndex = colIndex;
-  state.resizeX = event.x;
+  state.resizeX = event.clientX;
   state.resizeColumnWidth = props.th[colIndex].offsetWidth;
   state.resizeLastColumnWidth = props.th[props.th.length - 1].offsetWidth;
 };
@@ -126,12 +130,92 @@ const scrollEventHandler = debounce(() => {
   reAdjustBars();
 }, 50);
 
+// Touch event handlers
+const handleTouchStart = (col, colIndex, event) => {
+  event.preventDefault();
+  const touch = event.touches[0];
+  const mouseEvent = {
+    clientX: touch.clientX,
+    clientY: touch.clientY,
+    preventDefault: () => {}
+  };
+  startResize(col, colIndex, mouseEvent);
+  handleMouseDown(col, colIndex, mouseEvent);
+};
+
+const handleTouchResize = (event) => {
+  if (state.resizeColumn) {
+    const touch = event.touches[0];
+    const mouseEvent = {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+      preventDefault: () => {}
+    };
+    handleResize(mouseEvent);
+  }
+};
+
+const resizeBarTouchEnd = () => {
+  resizeBarMouseUp();
+};
+
+// Double click/tap handling
+const mousedownCount = ref(0);
+let mousedownTimer = null;
+
+const handleMouseDown = (col, colIndex, event) => {
+  mousedownCount.value++;
+  
+  if (mousedownCount.value === 1) {
+    mousedownTimer = setTimeout(() => {
+      mousedownCount.value = 0;
+    }, 300);
+  } else if (mousedownCount.value === 2) {
+    clearTimeout(mousedownTimer);
+    mousedownCount.value = 0;
+    calColWidthAndResize(col, colIndex);
+  }
+};
+
+const calColWidthAndResize = (col, colIndex) => {
+  const th = props.th[colIndex];
+  const results = getFixedPositionWidths(`.row .col:nth-child(${colIndex+1})`);
+  const maxWidth = Math.max(...results.map(r => r.width));
+  col.width = maxWidth;
+  reAdjustBars();
+};
+
+function getFixedPositionWidths(selector) {
+  const originals = document.querySelectorAll(selector);
+  if (!originals.length) return null;
+
+  const widths = [];
+  originals.forEach((original, index) => {
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.top = '-9999px';
+    wrapper.style.left = '-9999px';
+    wrapper.style.visibility = 'hidden';
+    wrapper.style.display = 'inline-block';
+
+    const clone = original.cloneNode(true);
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    const width = wrapper.getBoundingClientRect().width;
+    widths.push({ index, width, element: original });
+
+    document.body.removeChild(wrapper);
+  });
+
+  return widths;
+}
+
 // Lifecycle hooks
 onMounted(() => {
   const table = props.table;
   const resizeObserver = new ResizeObserver((entries) => {
     for (const entry of entries) {
-      console.log(entry)
       document.documentElement.style.setProperty(
         '--table-height',
         `${table.offsetHeight}px`
@@ -156,87 +240,23 @@ onMounted(() => {
     mainContent.addEventListener('scroll', mainContentScrollHandler);
   }
 
-  // Store mainContentScrollHandler for cleanup
-  const cleanup = () => {
-    if (mainContent) {
-      mainContent.removeEventListener('scroll', mainContentScrollHandler);
-    }
-  };
-  onUnmounted(cleanup);
+
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', winResize);
-  window.removeEventListener('scroll', scrollEventHandler);
-});
-
-function getFixedPositionWidths(selector) {
-    const originals = document.querySelectorAll(selector);
-    if (!originals.length) return null;
-
-    // Store results for each element
-    const widths = [];
-
-    originals.forEach((original, index) => {
-        // 1. Create a fixed-position wrapper (hidden & off-screen)
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'fixed';
-        wrapper.style.top = '-9999px';
-        wrapper.style.left = '-9999px';
-        wrapper.style.visibility = 'hidden';
-        wrapper.style.display = 'inline-block';
-
-        // 2. Clone the current element (deep clone)
-        const clone = original.cloneNode(true);
-
-        wrapper.appendChild(clone);
-
-        // 4. Add wrapper to DOM (required for measurement)
-        document.body.appendChild(wrapper);
-
-        // 5. Get the wrapper's width (matching the clone's fixed width)
-        const width = wrapper.getBoundingClientRect().width;
-        widths.push({ index, width, element: original });
-
-        // 6. Clean up (remove wrapper)
-        document.body.removeChild(wrapper);
-    });
-
-    return widths;
-}
-
-const mousedownCount = ref(0);
-let mousedownTimer = null;
-
-const handleMouseDown = (col, colIndex, event) => {
-  mousedownCount.value++;
-  
-  if (mousedownCount.value === 1) {
-    // First click - wait to see if a second comes
-    mousedownTimer = setTimeout(() => {
-      // If no second click within timeout, treat as single click
-      mousedownCount.value = 0;
-    }, 300); // Adjust delay (ms) for double-click detection
-  } else if (mousedownCount.value === 2) {
-    // Double click detected!
-    clearTimeout(mousedownTimer);
-    mousedownCount.value = 0;
-    calColWidthAndResize(col, colIndex); // Your target function
-  }
-};
-
-
-const calColWidthAndResize = (col, colIndex) => {
-  const th = props.th[colIndex];
-  const results = getFixedPositionWidths(`.row .col:nth-child(${colIndex+1})`);
-  const maxWidth = Math.max(...results.map(r => r.width));
-  col.width = maxWidth;
-    reAdjustBars();
-
-};
+    if (mainContent) {
+      mainContent.removeEventListener('scroll', mainContentScrollHandler);
+    resizeObserver.unobserve(table);
+    window.removeEventListener('resize', winResize);
+    window.removeEventListener('scroll', scrollEventHandler);
+  }});
 </script>
 
 <style scoped>
+.vue-columns-resizable {
+  touch-action: none;
+}
+
 .resizable {
   position: relative;
   overflow: hidden;
