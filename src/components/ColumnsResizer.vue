@@ -45,6 +45,9 @@ const state = reactive({
 // Refs
 const justDiv = ref(null);
 const rbar = ref([]);
+const mainContent = ref(null);
+const mainContentScrollHandler = ref(null);
+const resizeObserver = ref(null);
 
 // Debounce utility
 const debounce = (fn, wait) => {
@@ -60,8 +63,8 @@ const reAdjustBars = () => {
   requestAnimationFrame(() => {
     let nextStickyLeft = 0;
     let lastSticky = -1;
-    const mainContent = document.querySelector('#mainContent');
-    const scrollLeft = mainContent ? mainContent.scrollLeft : 0;
+    const mainContentEl = document.querySelector('#mainContent');
+    const scrollLeft = mainContentEl ? mainContentEl.scrollLeft : 0;
 
     for (let i = 0; i < rbar.value.length; i++) {
       const th = props.th[i];
@@ -139,6 +142,11 @@ const handleTouchStart = (col, colIndex, event) => {
     clientY: touch.clientY,
     preventDefault: () => {}
   };
+  
+  // Add touch-active class
+  const bar = rbar.value[colIndex];
+  bar.classList.add('touch-active');
+  
   startResize(col, colIndex, mouseEvent);
   handleMouseDown(col, colIndex, mouseEvent);
 };
@@ -156,6 +164,12 @@ const handleTouchResize = (event) => {
 };
 
 const resizeBarTouchEnd = () => {
+  // Remove touch-active class from all bars with slight delay
+  setTimeout(() => {
+    rbar.value.forEach(bar => {
+      if (bar) bar.classList.remove('touch-active');
+    });
+  }, 200);
   resizeBarMouseUp();
 };
 
@@ -214,7 +228,7 @@ function getFixedPositionWidths(selector) {
 // Lifecycle hooks
 onMounted(() => {
   const table = props.table;
-  const resizeObserver = new ResizeObserver((entries) => {
+  resizeObserver.value = new ResizeObserver((entries) => {
     for (const entry of entries) {
       document.documentElement.style.setProperty(
         '--table-height',
@@ -222,34 +236,36 @@ onMounted(() => {
       );
     }
   });
-  resizeObserver.observe(table);
+  resizeObserver.value.observe(table);
 
   window.addEventListener('resize', winResize);
   winResize();
 
   window.addEventListener('scroll', scrollEventHandler);
-  const mainContent = document.querySelector('#mainContent');
-  const mainContentScrollHandler = () => {
+  mainContent.value = document.querySelector('#mainContent');
+  mainContentScrollHandler.value = () => {
     document.documentElement.style.setProperty(
       '--scroll-left',
-      `${mainContent.scrollLeft}px`
+      `${mainContent.value.scrollLeft}px`
     );
     scrollEventHandler();
   };
-  if (mainContent) {
-    mainContent.addEventListener('scroll', mainContentScrollHandler);
+  
+  if (mainContent.value) {
+    mainContent.value.addEventListener('scroll', mainContentScrollHandler.value);
   }
-
-
 });
 
 onUnmounted(() => {
-    if (mainContent) {
-      mainContent.removeEventListener('scroll', mainContentScrollHandler);
-    resizeObserver.unobserve(table);
-    window.removeEventListener('resize', winResize);
-    window.removeEventListener('scroll', scrollEventHandler);
-  }});
+  if (mainContent.value) {
+    mainContent.value.removeEventListener('scroll', mainContentScrollHandler.value);
+  }
+  if (resizeObserver.value) {
+    resizeObserver.value.unobserve(props.table);
+  }
+  window.removeEventListener('resize', winResize);
+  window.removeEventListener('scroll', scrollEventHandler);
+});
 </script>
 
 <style scoped>
@@ -291,9 +307,12 @@ onUnmounted(() => {
   width: 2px;
   cursor: col-resize;
   height: var(--table-height);
+  transition: background-color 0.1s ease;
 }
 
-.columns-resize-bar:hover {
+.columns-resize-bar:hover,
+.columns-resize-bar:active,
+.columns-resize-bar.touch-active {
   background-color: gray;
 }
 
