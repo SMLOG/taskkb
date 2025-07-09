@@ -46,15 +46,19 @@ const sortable = ref(null);
   );*/
 
 
+  const startingDrag = ref(false);
   const handleDragstart = (event) => {
     let interceptor = event.target.closest(".row");
     if (interceptor && isDraggable.value) {
       dragStartClientX.value = event.clientX;
     }
     interceptor.classList.add('dragging');
+    startingDrag.value = true;
   };
 
   const handleDrop = (event) => {
+
+    startingDrag.value=false;
     let interceptor = event.target.closest(".row");
     if (!interceptor) {
       return;
@@ -69,6 +73,9 @@ const sortable = ref(null);
   };
 
   function handleDragenter(e) {
+
+    if(!startingDrag.value)return;
+
     const target = e.target.closest('.row');
     if (!target) return;
     const { depth } = target.dataset;
