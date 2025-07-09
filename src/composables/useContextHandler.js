@@ -17,7 +17,7 @@ export function useContextHandler(elRef) {
   function handleStart(event) {
     // For touch events, prevent default to avoid scrolling and other browser behaviors
     if (event.type === 'touchstart') {
-      event.preventDefault();
+      //event.preventDefault();
       isTouchActive = true;
     }
     
@@ -73,7 +73,7 @@ export function useContextHandler(elRef) {
   function handleMove(event) {
     // For touch events, prevent default to avoid scrolling
     if (event.type === 'touchmove') {
-      event.preventDefault();
+     // event.preventDefault();
     }
     
     let target;

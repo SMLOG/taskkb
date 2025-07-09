@@ -83,6 +83,10 @@ export function useSchedule(el) {
   }
 
   function handleTouchStart(event) {
+
+    const schEl = event.target.closest(".sch");
+    if(!schEl) return;
+
     event.preventDefault();
     clearTimeout(pressTimer);
     
@@ -125,6 +129,8 @@ export function useSchedule(el) {
   }
 
   function handleTouchEnd(event) {
+    const schEl = event.target.closest(".sch");
+    if(!schEl) return;
     event.preventDefault();
     clearTimeout(pressTimer);
     
@@ -145,6 +151,7 @@ export function useSchedule(el) {
   }
 
   function handleMouseMove(event) {
+    
     if (!selectStartRef.value) return;
 
     const rowEl = event.target.closest(".row");
@@ -210,6 +217,8 @@ export function useSchedule(el) {
   }
 
   function handleTouchMove(event) {
+    const schEl = event.target.closest(".sch");
+    if(!schEl) return;
     event.preventDefault();
     const touch = event.touches[0];
     const target = document.elementFromPoint(touch.clientX, touch.clientY);
