@@ -152,14 +152,9 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 const isDraging = computed(() => isDragging.value);
 
 function handleTab(event) {
-      console.log('Tab key pressed!');
-      // Add your logic here
-      // event.preventDefault(); // Optionally prevent default behavior
-      event.preventDefault();
-
+    event.preventDefault();
     if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
     let cellEl = event.target.closest(".col");
-    
     let nextColEl = cellEl.nextElementSibling;
 
     if (nextColEl) {

@@ -23,7 +23,8 @@ const appStore = useAppStore();
 
 const { activeTabRef } = storeToRefs(appStore);
 
-
+const siteTitle = atob('UGVyZmVjdFRvZG8=');
+;
 
 </script>
 
@@ -31,8 +32,8 @@ const { activeTabRef } = storeToRefs(appStore);
   <main class="flex-grow relative">
     <About v-if="appStore.loading" />
     <div class="flex flex-col h-full">
-      <div class="flex">
-        <div><img class="h-[30px]" src="/logo.svg"/></div>
+      <div class="flex bg-blue-900 dark:bg-gray-800">
+        <div class="leading-8 font-bold mx-3 text-lg text-white">{{ siteTitle }}</div>
         <div class="flex-grow"> <TabsContainer /></div>
        
       </div>

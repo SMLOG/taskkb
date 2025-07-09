@@ -72,5 +72,6 @@ onMounted(async() => {
   width: 32px;
   height: 32px;
   margin-left: 8px;
+  color: white;
 }
 </style>
