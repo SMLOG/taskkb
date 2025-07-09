@@ -239,7 +239,7 @@ const moveCursorToEnd = (element) => {
   selection.addRange(range);
 };
 
-const handlerBlur = (event) => {
+const handlerBlur = async (event) => {
   const isClickInsideElement = container.value?.contains(event.target);
   if (!isClickInsideElement) {
     stopEditing();
@@ -265,9 +265,9 @@ const getValue = () => {
     : contentEditable.value?.innerHTML.replace(/<div.*?>(.*?)<\/div>/gi, '\n$1').replace(/\r/g, '\n');
 };
 
-const stopEditing = () => {
+const stopEditing = async () => {
   document.removeEventListener("click", handlerBlur);
-  nextTick(() => {
+  await nextTick();
       showDropdown.value = false;
       editing.value = false;
       editable.value = false;
@@ -276,7 +276,7 @@ const stopEditing = () => {
       if (newValue !== props.modelValue) {
         emit('change', newValue);
       }
-  });
+
 };
 
 const insertNewLine = (event) => {
@@ -302,15 +302,15 @@ const insertNewLine = (event) => {
   selection.addRange(newRange);
 };
 
-const handleEnterDown = (event) => {
+const handleEnterDown = async (event) => {
   if (event.key === 'Enter' && event.shiftKey) {
     event.preventDefault();
     insertNewLine(event);
     return false; 
   } else {
 
-    contentEditable.value?.blur();
-    editable.value=showDropdown.value=false;
+    //contentEditable.value?.blur();
+    //editable.value=showDropdown.value=false;
 
   const event = new KeyboardEvent('keyup', {
     key: "Enter",
@@ -320,6 +320,8 @@ const handleEnterDown = (event) => {
    contentEditable.value.dispatchEvent(event);
 
     emit('enter');
+    await stopEditing();
+
     return true; 
   }
 };
