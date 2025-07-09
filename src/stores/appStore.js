@@ -292,29 +292,34 @@ export const useAppStore = defineStore('app', () => {
 
     }
 
-    if (treeRef.value) {
-      let startTime = new Date().getTime();
-      let endTime = startTime;
-      const reCalStartAndCount = (row) => {
-        if (row._tl) {
-          if (row._tl?.start)
-            if (startTime === 0 || row._tl.start.getTime() < startTime) {
-              startTime = row._tl.start.getTime();
+    try{
+      if (treeRef.value) {
+        let startTime = new Date().getTime();
+        let endTime = startTime;
+        const reCalStartAndCount = (row) => {
+          if (row._tl) {
+            if (row._tl?.start)
+              if (startTime === 0 || row._tl.start.getTime() < startTime) {
+                startTime = row._tl.start.getTime();
+              }
+  
+            if (endTime === 0 || row._tl.end.getTime() > endTime) {
+              endTime = row._tl.end.getTime();
             }
-
-          if (endTime === 0 || row._tl.end.getTime() > endTime) {
-            endTime = row._tl.end.getTime();
           }
         }
+        loopTree(treeRef.value, reCalStartAndCount);
+  
+        let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
+  
+        configRef.value.startDate = new Date(startTime);
+        configRef.value.weekCount = weekCount;
+  
       }
-      loopTree(treeRef.value, reCalStartAndCount);
-
-      let weekCount = weeksBetween(new Date(startTime), new Date(endTime));
-
-      configRef.value.startDate = new Date(startTime);
-      configRef.value.weekCount = weekCount;
-
+    }catch(error){
+      console.error(error);
     }
+
 
 
     let alldata = { tabs: tabs.value, activeTab: activeTabRef.value, datas: tabsDataMapRef.value };
