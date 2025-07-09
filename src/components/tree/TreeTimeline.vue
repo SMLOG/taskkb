@@ -1,5 +1,5 @@
 <template>
-  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving,draging:isDraging }" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
+  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving,draging:isDraging }" @keydown.tab="handleTab" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
     <div
       ref="tableRef"
       style="display: grid; grid-template-columns: 1fr;"
@@ -151,6 +151,34 @@ const isHDragging = computed(() => moveType.value?.type === 'leftDrag' || moveTy
 const isMoving = computed(() => moveType.value?.type === 'move');
 const isDraging = computed(() => isDragging.value);
 
+function handleTab(event) {
+      console.log('Tab key pressed!');
+      // Add your logic here
+      // event.preventDefault(); // Optionally prevent default behavior
+      event.preventDefault();
+
+    if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
+    let cellEl = event.target.closest(".col");
+    
+    let nextColEl = cellEl.nextElementSibling;
+
+    if (nextColEl) {
+
+      if (nextColEl) {
+        const dblClickEvent = new MouseEvent('dblclick', {
+          bubbles: true,
+          cancelable: true,
+          view: window
+        });
+        nextColEl.querySelector('[contentEditable]').dispatchEvent(dblClickEvent);
+      }
+    }
+  
+    return; 
+  }
+
+      return false;
+ }
 
 const handleEnterKeyUp = async (event) => {
   if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
