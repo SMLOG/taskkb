@@ -8,7 +8,7 @@ import { useHashStore } from './hashStore';
 import { useRecentStore } from './recentsStore';
 import Save from '@/components/dlg/Save.vue';
 import { showDialog } from '@/composables/useSystem';
-import { deepClone } from '@/lib/parse';
+import Json from '@/lib/Json';
 
 
 export const useAppStore = defineStore('app', () => {
@@ -132,7 +132,7 @@ export const useAppStore = defineStore('app', () => {
 
     const result = await writeObjectToJsonAttachment(
       alldata, path.value, useUserStore().getUser());
-    let orgPath = JSON.parse(JSON.stringify(path.value));
+    let orgPath = Json.parse(Json.stringify(path.value));
     Object.assign(path.value, result);
 
     tabs.value.map(tab => tab.saved = true);
@@ -142,7 +142,7 @@ export const useAppStore = defineStore('app', () => {
 
 
 
-    console.log(`Saved data  attachment from ${orgPath && JSON.stringify(orgPath, 2)}  to ${path.value && JSON.stringify(path.value)}`);
+    console.log(`Saved data  attachment from ${orgPath && Json.stringify(orgPath, 2)}  to ${path.value && Json.stringify(path.value)}`);
     setSaved(true);
 
 
@@ -273,7 +273,7 @@ export const useAppStore = defineStore('app', () => {
 
   function exportFileData2() {
 
-     const copy = deepClone(tabsDataMapRef.value);
+     const copy =Json.deepClone(tabsDataMapRef.value);
     if (activeTabRef.value >= 0 && activeTabRef.value < tabs.value.length) {
       const tab = tabs.value[activeTabRef.value];
       copy[tab.id] = { config: configRef.value, data: treeRef.value }

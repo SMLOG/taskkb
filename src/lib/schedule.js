@@ -1,4 +1,4 @@
-import { jsonParse } from "./parse";
+import  Json  from "@/lib/Json";
 
 export function addDatePeriod(addPeriod) {
   if (addPeriod) {
@@ -12,7 +12,7 @@ export function addDatePeriod(addPeriod) {
   }
 }
 export function deepCopy(obj) {
-  return jsonParse(JSON.stringify(obj));
+  return Json.parse(Json.stringify(obj));
 }
 function findTheDateInWeeks(weeks, d) {
 

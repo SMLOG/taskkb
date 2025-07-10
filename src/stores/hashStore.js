@@ -4,7 +4,7 @@ import { useRoute } from 'vue-router'
 import { ref, watch } from 'vue'
 import { useAppStore } from '@/stores/appStore'
 import { useUserStore } from '@/stores/userStore'
-import { parseHash } from '@/lib/parse';
+import { parseHash } from '@/lib/Json';
 import {showDialog} from '@/composables/useSystem';
 import NoFoundDlg from '@/components/dlg/NoFoundDlg.vue'
 import Auth from '@/components/dlg/Auth.vue'

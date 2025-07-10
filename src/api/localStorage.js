@@ -1,4 +1,4 @@
-import { jsonParse } from '@/lib/parse';
+import Json from '@/lib/Json';
 import { pickFile as pf } from './localStoragePickfile';
 
 const typeCode = 'L';
@@ -19,7 +19,7 @@ export async function readJsonAttachment(path) {
             throw {code:404,error:`No data found with filename ${path.id}`};
         }
 
-        const content = jsonParse(storedData);
+        const content = Json.parse(storedData);
         return { content,path:{...path,fileName:path.id} };
   
 }
@@ -33,7 +33,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
     }
 
         const storageKey = `${path.fileName}`;
-        const jsonString = JSON.stringify(dataObject, null, 2);
+        const jsonString = Json.stringify(dataObject, null, 2);
         
         localStorage.setItem(storageKey, jsonString);
         return {...path,id:path.fileName };

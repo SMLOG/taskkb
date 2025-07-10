@@ -1,4 +1,4 @@
-import { jsonParse } from '@/lib/parse';
+import Json from '@/lib/Json';
 import { loadScript } from '@/lib/net';
 import base64js from 'base64-js';
 
@@ -311,7 +311,7 @@ export const writeFile = async (dataObj, path, auth) => {
     }
 
     const parentFolderId = path?.parent?.id;
-    const fileContent = JSON.stringify(dataObj, null, 2);
+    const fileContent = Json.stringify(dataObj, null, 2);
     const isUpdate = path?.id && path?.id.trim() !== '';
     const url = isUpdate
         ? `https://www.googleapis.com/upload/drive/v3/files/${path.id.trim()}?uploadType=multipart&fields=id&supportsAllDrives=true`
@@ -329,7 +329,7 @@ export const writeFile = async (dataObj, path, auth) => {
         `--${boundary}`,
         'Content-Type: application/json; charset=UTF-8',
         '',
-        JSON.stringify(metadata),
+        Json.stringify(metadata),
         `--${boundary}`,
         'Content-Type: application/json',
         'Content-Transfer-Encoding: base64',
@@ -409,7 +409,7 @@ export async function readJsonAttachment(path, auth) {
     }
 
     let result = await readFile(path, auth);
-    let content = result?.content ? jsonParse(result.content) : null;
+    let content = result?.content ? Json.parse(result.content) : null;
     let fileName = result?.metadata?.name;
     return { path: { ...path, fileName }, content };
 }

@@ -118,7 +118,7 @@ function loadFile(event) {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        let data = JSON.parse(e.target.result);
+        let data = Json.parse(e.target.result);
         if (data && data.data && data.config) {
           const newTabId = uuidv4();
 

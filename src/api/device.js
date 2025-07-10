@@ -1,4 +1,4 @@
-import { jsonParse } from '@/lib/parse';
+import { Json.parse } from '@/lib/parse';
 
 // Check if File System Access API is supported
 const isFileSystemAccessSupported = 'showOpenFilePicker' in window && 'showSaveFilePicker' in window;
@@ -86,7 +86,7 @@ export async function readJsonAttachment(path) {
 
   try {
     const text = await file.text();
-    const content = jsonParse(text);
+    const content = Json.parse(text);
     return { content, path: { ...path, fileName: path.id } };
   } catch (error) {
     throw { code: 404, error: `Failed to read or parse file ${path.id}: ${error.message}` };
@@ -102,7 +102,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
     throw new Error('Invalid or missing path');
   }
 
-  const jsonString = JSON.stringify(dataObject, null, 2);
+  const jsonString = Json.stringify(dataObject, null, 2);
 
   if (isFileSystemAccessSupported) {
     try {

@@ -37,7 +37,7 @@ export function deleteNode(rootTree, depth) {
 }
 
 function deepCopyObject(obj) {
-  return JSON.parse(JSON.stringify(obj));
+  return Json.parse(Json.stringify(obj));
 }
 export function copyNode(rootTree, depth) {
   let parentDepth = depth.replace(/\.\d+$/, '');

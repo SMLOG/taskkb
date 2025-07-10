@@ -69,7 +69,7 @@ const handleFileUpload = (event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        jsonData.value = JSON.parse(e.target.result);
+        jsonData.value = Json.parse(e.target.result);
         listSelectionVisible.value = true;
       } catch (err) {
         alert('Invalid JSON file');

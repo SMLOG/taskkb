@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import Json from '@/lib/Json';
 
 export const useUserStore = defineStore('user', () => {
   // State
@@ -12,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
     const savedState = sessionStorage.getItem('userStore');
     if (savedState) {
       try {
-        const parsedState = JSON.parse(savedState);
+        const parsedState = Json.parse(savedState);
         users.value = parsedState.users || [];
         curIndex.value = parsedState.curIndex ?? -1;
         cacheFolders.value = parsedState.cacheFolders || [];
@@ -31,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
           curIndex: curIndex.value,
           cacheFolders: cacheFolders.value,
         };
-        sessionStorage.setItem('userStore', JSON.stringify(state));
+        sessionStorage.setItem('userStore', Json.stringify(state));
       } catch (error) {
         console.error('Failed to save state to sessionStorage:', error);
       }

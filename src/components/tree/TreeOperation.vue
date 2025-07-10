@@ -86,13 +86,13 @@ import { useTree } from '@/composables/useTree';
 import Config from '@/components/dlg/Config.vue';
 import { useAppStore } from "@/stores/appStore";
 import { storeToRefs } from 'pinia'
-import { downloadJSON } from '@/lib/parse';
+import { downloadJSON } from '@/lib/Json';
 import { showNotification } from '@/composables/useSystem';
 import { showDialog } from '@/composables/useSystem';
 import FullscreenToggle from '../FullscreenToggle.vue';
 import SwitchContainer from './SwitchContainer.vue';
 import { selectDepths } from '@/composables/context';
-
+import Json from '@/lib/Json';
 const saved = computed(() => useAppStore().saved);
 const showSecondRow = ref(false);
 
@@ -163,7 +163,7 @@ const cleanTimeout = () => {
 }
 
 function download() {
-  let data = JSON.parse(JSON.stringify(treeRef.value));
+  let data = Json.parse(Json.stringify(treeRef.value));
   configRef.value.title = useAppStore().getCurrentTab().title;
   downloadJSON({ data, config: configRef.value, timestamp: new Date().getTime() }, useAppStore().getCurrentTab().title + ".json");
 }

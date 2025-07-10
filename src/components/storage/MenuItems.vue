@@ -75,7 +75,7 @@ import { getStorageBridgeByName } from '@/api/bridge';
 import { useUserStore } from '@/stores/userStore';
 import Config from '../dlg/Config.vue';
 import Rename from '../dlg/Rename.vue';
-import { downloadJSON } from '@/lib/parse';
+import { downloadJSON } from '@/lib/Json';
 import {showNotification,showDialog} from '@/composables/useSystem';
 import { useRecentStore } from '@/stores/recentsStore';
 

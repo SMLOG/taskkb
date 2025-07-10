@@ -1,4 +1,4 @@
-import { jsonParse } from '@/lib/parse';
+import { Json.parse } from '@/lib/parse';
 import { pickUrl } from './urlPickfile';
 
 // Check if File System Access API is supported
@@ -13,7 +13,7 @@ const SESSION_STORAGE_KEY = 'cachedFiles';
 // Function to load cached file names from sessionStorage
 const loadCachedFilesFromSessionStorage = () => {
   const cachedFiles = sessionStorage.getItem(SESSION_STORAGE_KEY);
-  return cachedFiles ? JSON.parse(cachedFiles) : [];
+  return cachedFiles ? Json.parse(cachedFiles) : [];
 };
 
 // Function to save file name to sessionStorage
@@ -21,7 +21,7 @@ const saveFileToSessionStorage = (fileName) => {
   const cachedFiles = loadCachedFilesFromSessionStorage();
   if (!cachedFiles.includes(fileName)) {
     cachedFiles.push(fileName);
-    sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(cachedFiles));
+    sessionStorage.setItem(SESSION_STORAGE_KEY, Json.stringify(cachedFiles));
   }
 };
 
@@ -61,7 +61,7 @@ export async function readJsonAttachment(path) {
         throw new Error(`Failed to fetch URL ${path.id}: ${response.statusText}`);
       }
       const text = await response.text();
-      const content = jsonParse(text);
+      const content = Json.parse(text);
       // Cache the URL data as a File object for consistency
       const fileName = new URL(path.id).pathname.split('/').pop() || 'url_data.json';
       const file = new File([text], fileName, { type: 'application/json' });
@@ -84,7 +84,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
     throw new Error('Invalid or missing path');
   }
 
-  const jsonString = JSON.stringify(dataObject, null, 2);
+  const jsonString = Json.stringify(dataObject, null, 2);
 
   if (isFileSystemAccessSupported) {
     try {

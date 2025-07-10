@@ -1,4 +1,4 @@
-import { jsonParse } from '@/lib/parse';
+import  Json  from '@/lib/Json';
 import { pickFile as pf } from './browserPickfile';
 
 const typeCode = 'B';
@@ -51,7 +51,7 @@ export async function readJsonAttachment(path) {
             if (!storedData) {
                 reject({ code: 404, error: `No data found with filename ${path.id}` });
             } else {
-                const content = jsonParse(storedData.data);
+                const content = Json.parse(storedData.data);
                 resolve({ content, path: { ...path, fileName: path.id } });
             }
         };
@@ -72,7 +72,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
         const transaction = db.transaction(['files'], 'readwrite');
         const store = transaction.objectStore('files');
 
-        const jsonString = JSON.stringify(dataObject, null, 2);
+        const jsonString = Json.stringify(dataObject, null, 2);
         const request = store.put({ id: path.fileName, data: jsonString });
 
         request.onerror = (event) => {

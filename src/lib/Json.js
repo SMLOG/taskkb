@@ -1,11 +1,6 @@
-export function jsonParse(jsonString){
-    return JSON.parse(jsonString, (key, value) => {
-        if (typeof value === "string"  && value.length ===24 && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.*Z$/.test(value)) {
-          return new Date(value);
-        }
-        return value;
-      });
-}
+import EnhancedJSON from './EnhancedJSON';
+
+
 export   const parseHash = (hash) => {
   let file = ''
   let tab = ''
@@ -31,11 +26,11 @@ export   const parseHash = (hash) => {
 }
 
 export function deepClone(obj) {
-  return jsonParse(JSON.stringify(obj));
+  return EnhancedJSON.parse(EnhancedJSON.stringify(obj));
 }
 
 export function downloadJSON(jsonData, filename = 'data.json') {
-  const jsonString = JSON.stringify(jsonData);
+  const jsonString = EnhancedJSON.stringify(jsonData);
   const encodedJsonString = encodeURIComponent(jsonString);
   const downloadLink = document.createElement("a");
   downloadLink.setAttribute("href", "data:application/json;charset=utf-8," + encodedJsonString);
@@ -44,3 +39,10 @@ export function downloadJSON(jsonData, filename = 'data.json') {
   downloadLink.click();
   document.body.removeChild(downloadLink);
 }
+export function stringify(obj){
+  return EnhancedJSON.stringify(obj);
+}
+export function parse(jsonString){
+  return  EnhancedJSON.parse(jsonString);
+}
+export default {parse,stringify,deepClone};

@@ -1,5 +1,5 @@
 import { view, requestJira } from '@forge/bridge';
-import { jsonParse } from '@/lib/parse';
+import { Json.parse } from '@/lib/parse';
 
 // Helper function to resolve issue ID from context
 async function resolveIssueId(context) {
@@ -82,7 +82,7 @@ export async function readJsonAttachment(path) {
             return { error: `Failed to fetch attachment content: ${fileResponse.status}` };
         }
 
-        const content = await jsonParse(await fileResponse.text());
+        const content = await Json.parse(await fileResponse.text());
         return { attachmentId, content };
     } catch (error) {
         console.error(`Error reading JSON attachment: ${error.message}`);
@@ -106,7 +106,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
         const issueId = await resolveIssueId(context);
 
         // Convert object to JSON string and create blob
-        const jsonString = JSON.stringify(dataObject, null, 2);
+        const jsonString = Json.stringify(dataObject, null, 2);
         const blob = new Blob([jsonString], { type: 'application/json' });
         const formData = new FormData();
         formData.append('file', blob, filename);

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, watch } from 'vue';
+import  Json  from '@/lib/Json';
 
 export const useRecentStore = defineStore('recents', () => {
   // Initialize recents from localStorage or empty array
@@ -10,7 +11,7 @@ export const useRecentStore = defineStore('recents', () => {
     try {
       const stored = localStorage.getItem('recents');
       if (stored) {
-        const parsed = JSON.parse(stored);
+        const parsed = Json.parse(stored);
         // Validate: ensure it's an array of objects with id and timestamp
         if (Array.isArray(parsed) && parsed.every(item => item && typeof item === 'object' && item.id && item.timestamp)) {
           // Sort by timestamp (newest first)
@@ -27,7 +28,7 @@ export const useRecentStore = defineStore('recents', () => {
   // Save recents to localStorage
   function saveToLocalStorage() {
     try {
-      localStorage.setItem('recents', JSON.stringify(recents.value));
+      localStorage.setItem('recents', Json.stringify(recents.value));
     } catch (error) {
       console.warn('Failed to save recents to localStorage:', error);
     }
