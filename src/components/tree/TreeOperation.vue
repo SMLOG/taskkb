@@ -4,26 +4,28 @@
     <div class="mx-auto px-1">
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <div class="flex just-between">
-          <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
-            <div class="flex flex-1 items-center gap-2 pr-2  border-gray-200 dark:border-gray-700 justify-between md:justify-start">
+          <div class="flex flex-col md:flex-row flex-wrap items-center gap-2 py-3 flex-1">
+            <!-- First Row (always visible) -->
+            <div class="flex flex-1 items-center gap-2 pr-2 border-gray-200 dark:border-gray-700 justify-between md:justify-start w-full">
               <button @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef"
                 :class="{ '!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200': !saved }">
                 💾 <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved
                   changes. Click here to save.</span>
               </button>
-              <button
-                class="p-2 md:hidden rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
+              
+              <!-- Toggle button for small screens -->
+              <button @click="toggleSecondRow" class="p-2 md:hidden rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                    d="M19 9l-7 7-7-7" :class="{'rotate-180': showSecondRow}" />
                 </svg>
               </button>
             </div>
 
-            <div id="more" class="max-sm:absolute max-sm:top-0 max-sm:-translate-y-full max-sm:flex max-sm:bg-gray-500 max-sm:inset-0 items-center">
-              <div class="flex gap-2">
-
+            <!-- Second Row (toggleable on small screens) -->
+            <div class="flex gap-2 w-full md:w-auto" :class="{'hidden md:flex': !showSecondRow, 'flex': showSecondRow}">
+              <div class="flex flex-wrap items-center gap-2">
                 <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
                   <button @click="addRow(1)" class="btn-secondary">
                     ＋{{ selectDepths.length > 0 ? selectDepths.length : '' }}
@@ -67,7 +69,7 @@
                   <FullscreenToggle />
                 </div>
               </div>
-              <div class=" gap-2 py-3">
+              <div class="gap-2 py-3">
                 <SwitchContainer />
               </div>
             </div>
@@ -92,6 +94,7 @@ import SwitchContainer from './SwitchContainer.vue';
 import { selectDepths } from '@/composables/context';
 
 const saved = computed(() => useAppStore().saved);
+const showSecondRow = ref(false);
 
 watch(
   () => useAppStore().tabsDataMapRef,
@@ -108,9 +111,6 @@ const openConfig = async () => {
   await showDialog(Config, null, { size: '2md' });
 }
 
-
-
-
 const { configRef, treeRef } = storeToRefs(useAppStore());
 
 const menuRef = ref(null);
@@ -121,6 +121,9 @@ const DROPDOWN_HEIGHT = 200;
 
 const savingRef = ref(false);
 
+const toggleSecondRow = () => {
+  showSecondRow.value = !showSecondRow.value;
+};
 
 const handleClickOutside = (event) => {
   if (menuRef.value && !menuRef.value.contains(event.target)) {
@@ -152,12 +155,11 @@ const timeout = ref(0);
 const handleMouseLeave = () => {
   timeout.value = setTimeout(() => {
     showDropdown.value = false;
-
   }, 200);
 }
+
 const cleanTimeout = () => {
   window.clearTimeout(timeout.value);
-
 }
 
 function download() {
@@ -167,7 +169,6 @@ function download() {
 }
 
 async function saveData(bool) {
-
   if (saved?.value) return;
   if (savingRef.value) return;
 
@@ -180,10 +181,8 @@ async function saveData(bool) {
       showNotification('Save Fail!', 'error');
     }
     savingRef.value = false;
-
   }
 }
-
 
 function deleteSelectedNodes() {
   if (confirm("Please confirm to delete it?")) {
@@ -246,8 +245,8 @@ function copyClipboard() {
     console.error('Could not copy text: ', err);
   });
 }
-
 </script>
+
 <style>
 @reference "@/assets/main.css";
 
