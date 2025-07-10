@@ -36,9 +36,7 @@ import RightTop from '@/components/storage/RightTop.vue';
   /* Maximum expansion */
 }
 
-.tab-container {
-  overflow: hidden;
-}
+
 
 @container (width < 50px) {
   .tab .close-btn {

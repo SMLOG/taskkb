@@ -18,12 +18,14 @@
       @touchstart="handleTouchStart($event, index)"
       @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
+      class="hidden md:block"
       :class="{
         'dragging': draggedIndex === index, 
         'drag-over': dragOverIndex === index,
         'touch-dragging': isTouchDragging && draggedIndex === index
       }"
     />
+    <MobileTabs/>
     <slot></slot>
   </div>
 </template>
@@ -32,6 +34,7 @@
 import { useAppStore } from "@/stores/appStore";
 import Tab from '@/components/Tab.vue';
 import { ref, onMounted, onUnmounted } from 'vue';
+import MobileTabs from "./mobileTabs.vue";
 
 const appStore = useAppStore();
 const tabsContainer = ref(null);
