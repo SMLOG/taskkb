@@ -5,7 +5,7 @@
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <div class="flex just-between">
           <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
-            <div class="flex items-center gap-2 pr-2  border-gray-200 dark:border-gray-700 sm:just-between">
+            <div class="flex flex-1 items-center gap-2 pr-2  border-gray-200 dark:border-gray-700 justify-between md:justify-start">
               <button @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef"
                 :class="{ '!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200': !saved }">
                 💾 <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved
@@ -21,7 +21,7 @@
               </button>
             </div>
 
-            <div id="more">
+            <div id="more" class="max-sm:absolute max-sm:top-0 max-sm:-translate-y-full max-sm:flex max-sm:bg-gray-500 max-sm:inset-0 items-center">
               <div class="flex gap-2">
 
                 <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
