@@ -1,9 +1,19 @@
 <template>
-  <div id="operation" class="bottom-0 left-0 z-7 bg-white dark:bg-gray-900 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]">
+  <div id="operation"
+    class="bottom-0 left-0 z-7 bg-white dark:bg-gray-900 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1),0_-2px_4px_-1px_rgba(0,0,0,0.06)]">
     <div class="mx-auto px-1">
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <div class="flex just-between">
           <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
+            <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
+              <button @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef"
+                :class="{ '!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200': !saved }">
+                💾 <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved
+                  changes. Click here to save.</span>
+              </button>
+ 
+            </div>
+            
             <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
               <button @click="addRow(1)" class="btn-secondary">
                 ＋{{ selectDepths.length > 0 ? selectDepths.length : '' }}
@@ -16,18 +26,10 @@
               </button>
             </div>
 
-            <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-              <button   @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef" :class="{'!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200':!saved}">
-                💾  <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved changes. Click here to save.</span>
-              </button>
-              <button @click="openConfig" class="btn-secondary">
-                ⚙ Config
-              </button>
-            </div>
+
 
             <div class="relative" @blur="showDropdown = false" ref="menuRef">
-              <button ref="moreButton" 
-                @click="handleShowDropdown" @mouseleave="handleMouseLeave" class="btn-secondary">
+              <button ref="moreButton" @click="handleShowDropdown" @mouseleave="handleMouseLeave" class="btn-secondary">
                 ⋮ Export
               </button>
               <div v-show="showDropdown" :class="[
@@ -49,7 +51,9 @@
                 </button>
               </div>
             </div>
-
+            <button @click="openConfig" class="btn-secondary">
+                ⚙ Config
+              </button>
             <div class="flex items-center gap-2">
               <FullscreenToggle />
             </div>
@@ -64,30 +68,6 @@
   </div>
 </template>
 
-<style>
-@reference "@/assets/main.css";
-
-button {
-  @apply px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200;
-}
-
-.btn-secondary {
-  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600;
-}
-
-.btn-info {
-  @apply bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600;
-}
-
-.btn-warning {
-  @apply bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600;
-}
-
-.btn-link {
-  @apply text-blue-600 hover:text-blue-800 hover:bg-gray-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-gray-700 no-underline;
-}
-</style>
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import { useTree } from '@/composables/useTree';
@@ -99,22 +79,18 @@ import { showNotification } from '@/composables/useSystem';
 import { showDialog } from '@/composables/useSystem';
 import FullscreenToggle from '../FullscreenToggle.vue';
 import SwitchContainer from './SwitchContainer.vue';
-import {selectDepths } from '@/composables/context';
+import { selectDepths } from '@/composables/context';
 
-
-
-const saved = computed(()=>useAppStore().saved);
-
+const saved = computed(() => useAppStore().saved);
 
 watch(
   () => useAppStore().tabsDataMapRef,
-  (newValue,oldValue) => {
-      console.log('update ...');
-      useAppStore().setSaved(false);
+  (newValue, oldValue) => {
+    console.log('update ...');
+    useAppStore().setSaved(false);
   },
-  { immediate: true,deep:true }
+  { immediate: true, deep: true }
 );
-
 
 const tree = useTree();
 
@@ -150,11 +126,6 @@ onBeforeUnmount(() => {
   document.removeEventListener('click', handleClickOutside);
 });
 
-
-
-
-
-
 const handleShowDropdown = () => {
   if (!moreButton.value) return;
 
@@ -187,8 +158,8 @@ function download() {
 
 async function saveData(bool) {
 
-  if(saved?.value)return;
-  if(savingRef.value) return;
+  if (saved?.value) return;
+  if (savingRef.value) return;
 
   if (!bool) {
     try {
@@ -267,3 +238,26 @@ function copyClipboard() {
 }
 
 </script>
+<style>
+@reference "@/assets/main.css";
+
+button {
+  @apply px-2 py-1 text-xs font-medium rounded-md transition-colors duration-200;
+}
+
+.btn-secondary {
+  @apply bg-gray-100 text-gray-700 hover:bg-gray-200 border border-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600;
+}
+
+.btn-info {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600;
+}
+
+.btn-warning {
+  @apply bg-purple-600 text-white hover:bg-purple-700 dark:bg-purple-500 dark:hover:bg-purple-600;
+}
+
+.btn-link {
+  @apply text-blue-600 hover:text-blue-800 hover:bg-gray-100 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-gray-700 no-underline;
+}
+</style>
