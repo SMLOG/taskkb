@@ -57,7 +57,6 @@ const emit = defineEmits(['click', 'removeTab', 'update:tab']);
 const isEditing = ref(false);
 const editedTitle = ref('');
 const inputWidth = ref(100);
-const emoji = ref('');
 const titleInput = ref(null);
 
 const startEditing = () => {
