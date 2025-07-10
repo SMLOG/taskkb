@@ -6,7 +6,7 @@
         <div class="flex just-between">
           <div class="flex flex-col md:flex-row flex-wrap items-center  flex-1">
             <!-- First Row (always visible) -->
-            <div class="flex flex-1 items-center gap-2 pr-2 border-gray-200 dark:border-gray-700 justify-between md:justify-start w-full">
+            <div class="flex flex-1 items-center gap-2  border-gray-200 dark:border-gray-700 justify-between md:justify-start w-full">
               <button @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef"
                 :class="{ '!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200': !saved }">
                 💾 <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved
@@ -14,7 +14,7 @@
               </button>
               
               <!-- Toggle button for small screens -->
-              <button @click="toggleSecondRow" :class="{'rotate-180': showSecondRow}" class="p-2 md:hidden rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
+              <button @click="toggleSecondRow" :class="{'rotate-180': showSecondRow}" class="md:hidden rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
