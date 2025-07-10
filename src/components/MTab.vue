@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="tab pr-6 pl-2 py-1.5 cursor-pointer font-medium rounded-md "
+    class="tab mx-2 px-2 py-1.5 cursor-pointer font-medium rounded-md "
     :class="{ 
       'active bg-gray-100 dark:bg-gray-700': isActive,
       'hover:bg-gray-50 dark:hover:bg-gray-800': !isActive
@@ -19,13 +19,13 @@
         {{ tab.title }}
       </span>
       <input 
-        v-else
+      v-else
         v-model="editedTitle"
         @blur="saveTitle"
         @keyup.enter="saveTitle"
         @keyup.esc="cancelEditing"
         ref="titleInput"
-        class="px-2 py-0.5 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        class="px-2 py-0.5 dark:text-white text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         type="text"
       />
     </div>
@@ -107,7 +107,5 @@ const cancelEditing = () => {
 .close-btn:hover {
   transform: translateY(-50%) scale(1);
 }
-input{
-  color:black;
-}
+
 </style>
