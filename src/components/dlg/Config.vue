@@ -18,12 +18,12 @@
       <div class="space-y-3 max-h-[60vh] overflow-y-auto">
         <VueDraggable ref="el" v-model="cols" :animation="150" ghostClass="ghost">
           <div v-for="(col, index) in cols" :key="col.id"
-            class="flex  gap-3 rounded-md p-3 mb-1 bg-gray-100 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex-col">
+            class="flex   rounded-md p-3 mb-1 bg-gray-100 dark:bg-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 flex-col">
             <div class="flex items-center ">
-              <div class="w-12 text-center text-gray-500 dark:text-gray-400">
+              <div class="text-center text-gray-500 dark:text-gray-400">
                 {{ index + 1 }}
               </div>
-              <div class="w-20">
+              <div class="mx-2 w-20">
                 <select v-model="col.cp"
                   class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400">
                   <option v-for="cp in cpList" :key="cp.type" :value="cp.type">
@@ -31,9 +31,9 @@
                   </option>
                 </select>
               </div>
-              <div class="min-w-[80px] flex-1">
+              <div class="min-w-[80px] flex-1 mx-2">
                 <input v-model="col.name"
-                  class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                  class="w-full rounded border-gray-300 dark:border-gray-600 bg-white  dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                   placeholder="Column Name" />
               </div>
               <label class="flex items-center gap-1 text-sm text-gray-800 dark:text-gray-300">
@@ -51,7 +51,7 @@
                 x
               </button>
               <button @click="toggleShowColumnDetail(col)"
-                class="flex items-center justify-center w-10 h-10 text-red-500 hover:font-bold   rounded-full transition-colors duration-200 bg-blue-100"
+                class="flex items-center justify-center w-8 h-8 text-red-500 hover:font-bold   rounded-full transition-colors duration-200 bg-blue-100"
                 style="border-radius: 50%;" aria-label="Open dropdown menu" aria-haspopup="true" aria-expanded="false">
                 <svg class="w-5 h-5 transition-transform duration-200" focusable="false" viewBox="0 0 24 24"
                   :class="{ 'rotate-180': showColumnsDetail.includes(col) }" xmlns="http://www.w3.org/2000/svg"
@@ -60,14 +60,14 @@
                 </svg>
               </button>
             </div>
-            <div>
+            <div class="mt-2">
 
               <div class="flex" v-if="showColumnsDetail.includes(col)">
 
                 <div class="flex gap-2 flex-col flex-1">
                   <div v-if="col.cp === 'ColDropText'">
                     <input v-model="col.options"
-                      class="w-full rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+                      class="w-full bg-white rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
                       placeholder="Drop down options, separate by [,]" />
                   </div>
 
