@@ -5,63 +5,73 @@
       <div class="flex flex-col sticky left-0 bottom-0 active">
         <div class="flex just-between">
           <div class="flex flex-wrap items-center gap-2 py-3 flex-1">
-            <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-2 pr-2  border-gray-200 dark:border-gray-700 sm:just-between">
               <button @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef"
                 :class="{ '!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200': !saved }">
                 💾 <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved
                   changes. Click here to save.</span>
               </button>
- 
-            </div>
-            
-            <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
-              <button @click="addRow(1)" class="btn-secondary">
-                ＋{{ selectDepths.length > 0 ? selectDepths.length : '' }}
-              </button>
-              <button v-if="selectDepths.length == 1" @click="copyNode" class="btn-secondary">
-                ⎘ Copy
-              </button>
-              <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-secondary">
-                ✕ Delete {{ selectDepths.length }}
+              <button
+                class="p-2 md:hidden rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24"
+                  stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
               </button>
             </div>
 
+            <div id="more">
+              <div class="flex gap-2">
 
-
-            <div class="relative" @blur="showDropdown = false" ref="menuRef">
-              <button ref="moreButton" @click="handleShowDropdown" @mouseleave="handleMouseLeave" class="btn-secondary">
-                ⋮ Export
-              </button>
-              <div v-show="showDropdown" :class="[
-                'absolute left-0 w-55 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
-                dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
-              ]" tabindex="-1" @mouseleave="showDropdown = false" @mouseenter="cleanTimeout">
-                <button @click="download" class="btn-link w-full text-left px-3 py-2">
-                  📤 Export(JSON)
+                <div class="flex items-center gap-2 pr-2 border-r border-gray-200 dark:border-gray-700">
+                  <button @click="addRow(1)" class="btn-secondary">
+                    ＋{{ selectDepths.length > 0 ? selectDepths.length : '' }}
+                  </button>
+                  <button v-if="selectDepths.length == 1" @click="copyNode" class="btn-secondary">
+                    ⎘ Copy
+                  </button>
+                  <button v-if="selectDepths.length" @click="deleteSelectedNodes()" class="btn-secondary">
+                    ✕ Delete {{ selectDepths.length }}
+                  </button>
+                </div>
+                <div class="relative" @blur="showDropdown = false" ref="menuRef">
+                  <button ref="moreButton" @click="handleShowDropdown" @mouseleave="handleMouseLeave"
+                    class="btn-secondary">
+                    ⋮ Export
+                  </button>
+                  <div v-show="showDropdown" :class="[
+                    'absolute left-0 w-55 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10',
+                    dropdownPosition === 'bottom' ? 'top-full mt-2' : 'bottom-full mb-2'
+                  ]" tabindex="-1" @mouseleave="showDropdown = false" @mouseenter="cleanTimeout">
+                    <button @click="download" class="btn-link w-full text-left px-3 py-2">
+                      📤 Export(JSON)
+                    </button>
+                    <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
+                      📊 Export <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> (CSV)
+                    </button>
+                    <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
+                      📝 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to
+                      Clipboard(Markdown)
+                    </button>
+                    <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
+                      📋 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to
+                      Clipboard(CSV)
+                    </button>
+                  </div>
+                </div>
+                <button @click="openConfig" class="btn-secondary">
+                  ⚙ Config
                 </button>
-                <button @click="exportCSV" class="btn-link w-full text-left px-3 py-2">
-                  📊 Export <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> (CSV)
-                </button>
-                <button @click="csvToMarkdown" class="btn-link w-full text-left px-3 py-2">
-                  📝 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to
-                  Clipboard(Markdown)
-                </button>
-                <button @click="copyClipboard" class="btn-link w-full text-left px-3 py-2">
-                  📋 Copy <span v-if="selectDepths.length">Selected({{ selectDepths.length }})</span> to Clipboard(CSV)
-                </button>
+                <div class="flex items-center gap-2">
+                  <FullscreenToggle />
+                </div>
+              </div>
+              <div class=" gap-2 py-3">
+                <SwitchContainer />
               </div>
             </div>
-            <button @click="openConfig" class="btn-secondary">
-                ⚙ Config
-              </button>
-            <div class="flex items-center gap-2">
-              <FullscreenToggle />
-            </div>
           </div>
-          <div class=" gap-2 py-3">
-            <SwitchContainer />
-          </div>
-
         </div>
       </div>
     </div>
