@@ -7,8 +7,6 @@
       <div id="rightButtons" class="right-buttons flex items-center space-x-2">
         <RightTop />
       </div>
-
-
     </div>
   </div>
 </template>

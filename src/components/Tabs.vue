@@ -18,7 +18,7 @@
       @touchstart="handleTouchStart($event, index)"
       @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
-      class="hidden md:block"
+      class="hidden md:flex"
       :class="{
         'dragging': draggedIndex === index, 
         'drag-over': dragOverIndex === index,
