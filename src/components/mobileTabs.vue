@@ -1,7 +1,7 @@
 <template>
-  <div class="relative mobile-tabs-toggle md:hidden">
-    <div @click="toggleMobileDropdown" class="flex items-center text-center px-4 py-2.5">
-      <div class="text-sm font-medium truncate max-w-[180px] text-gray-900 dark:text-white">
+  <div class="relative mobile-tabs-toggle md:hidden" ref="dropdownContainer">
+    <div @click.stop="toggleMobileDropdown" class="flex items-center text-center px-4 py-2.5">
+      <div class="text-sm font-medium truncate max-w-[180px] text-white">
         {{ activeTabTitle }}
       </div>
       <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-gray-900 dark:text-white" 
@@ -31,9 +31,10 @@
 <script setup>
 import { useAppStore } from "@/stores/appStore";
 import MTab from '@/components/MTab.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 
 const appStore = useAppStore();
+const dropdownContainer = ref(null);
 
 const showMobileDropdown = ref(false);
 
@@ -44,4 +45,18 @@ const activeTabTitle = computed(() => {
 const toggleMobileDropdown = () => {
   showMobileDropdown.value = !showMobileDropdown.value;
 };
+
+const handleClickOutside = (event) => {
+  if (dropdownContainer.value && !dropdownContainer.value.contains(event.target)) {
+    showMobileDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
 </script>
