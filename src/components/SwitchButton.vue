@@ -71,6 +71,7 @@
   
   const button = buttons.value[selectedIndex.value]
   const buttonRect = button.getBoundingClientRect()
+  if(!button.offsetParent)return;
   const containerRect = button.offsetParent.getBoundingClientRect()
   
   return {
