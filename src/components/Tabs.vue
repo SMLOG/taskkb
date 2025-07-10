@@ -235,7 +235,7 @@ onUnmounted(() => {
   @apply bg-gray-200 dark:bg-gray-700;
 }
 
-.tab:not(:last-child)::after {
+/*.tab:not(:last-child)::after {
   content: '';
   position: absolute;
   right: -1px;
@@ -244,7 +244,7 @@ onUnmounted(() => {
   width: 1px;
   @apply bg-gray-300 dark:bg-gray-600;
   z-index: 1;
-}
+}*/
 
 .close-btn {
   opacity: 0;

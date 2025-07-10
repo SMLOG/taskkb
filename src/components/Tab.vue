@@ -1,6 +1,6 @@
 <template>
   <div 
-    class="tab flex flex-1 items-center justify-between pr-4 pl-2 py-1 cursor-pointer text-sm font-medium relative [container-type:inline-size]" 
+    class="tab flex flex-1 items-center justify-between pr-4 pl-2 py-1 cursor-pointer text-sm font-medium relative [container-type:inline-size] tab mr-2 rounded-t" 
     :class="{ 'active': isActive }" 
     @click="$emit('click')"
     @dblclick="startEditing"
@@ -101,6 +101,7 @@ const updateInputWidth = () => {
 <style scoped>
 .tab {
   max-width: 200px;
+  border-bottom: 2px solid transparent;
 }
 .tab.active {
   font-weight: bold;
