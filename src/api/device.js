@@ -1,4 +1,4 @@
-import { Json.parse } from '@/lib/parse';
+import Json from '@/lib/Json';
 
 // Check if File System Access API is supported
 const isFileSystemAccessSupported = 'showOpenFilePicker' in window && 'showSaveFilePicker' in window;

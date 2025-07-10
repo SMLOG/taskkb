@@ -1,5 +1,5 @@
 import { view, requestJira } from '@forge/bridge';
-import { Json.parse } from '@/lib/parse';
+import Json from '@/lib/Json';
 
 // Helper function to resolve issue ID from context
 async function resolveIssueId(context) {

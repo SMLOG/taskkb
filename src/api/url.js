@@ -1,4 +1,4 @@
-import { Json.parse } from '@/lib/parse';
+import Json from '@/lib/Json';
 import { pickUrl } from './urlPickfile';
 
 // Check if File System Access API is supported
