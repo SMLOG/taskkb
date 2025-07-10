@@ -6,7 +6,7 @@
         ref="showMenu"
         @click="showDropDownMenuItems"
         aria-label="Open menu"
-        class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 transition-colors duration-200"
+        class="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100 transition-colors duration-200 text-white"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle data-v-8a269fda="" cx="4" cy="12" r="3" fill="currentColor"></circle>
