@@ -40,7 +40,7 @@ function handleNavigation(targetPath, oldPath) {
   } else {
     // Case 3: No changes needed to path structure
 
-    const regex = new RegExp(`^/${escapeRegExp(oldPath)}`);
+    const regex = new RegExp(`^/${escapeRegExp(oldPath||'')}/`);
 
 
     newPath = `/${newPath.replace(regex, targetPath)}`;
