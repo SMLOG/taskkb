@@ -1,14 +1,14 @@
 <template>
-    <div class="color-select">
-      <div
+    <div class="color-select select-none">
+      <button
         v-for="(color, index) in visibleColors"
         :key="index"
         :class="['color-option', { 'selected': color === selectedColor }]"
         :style="{ backgroundColor: color }"
-        @click="selectColor(color)"
-      ></div>
+        @click.prevent.stop="selectColor(color)"
+      ></button>
       <div>
-      <button v-if="showMoreButton" class="more-button" @click="toggleMoreColors">
+      <button @click.prevent.stop v-if="showMoreButton" class="more-button" @click="toggleMoreColors">
         {{ showMoreColors ? 'Less' : 'More' }}
       </button>
       <input
