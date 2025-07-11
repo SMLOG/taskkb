@@ -1,10 +1,10 @@
 <template>
       <!-- Main Card -->
-      <div v-if="depth !== ''" class="card grid min-h-[70px] bg-white rounded-lg shadow-sm border border-gray-200 mb-1 overflow-hidden" >
+      <div v-if="depth !== ''" class="card grid min-h-[70px] min-w-[200px] max-w-[500px] bg-white rounded-lg shadow-sm border border-gray-200 mb-1 overflow-hidden" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
 
             <div class="flex">
-            <div class="cell flex flex-1 px-1">
+            <div class="cell flex px-1">
               <b class="w-full"><component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component></b>
             </div>
 
@@ -15,7 +15,7 @@
             :cellIndex="cellIndex" 
             :index="id" 
             :depth="depth"
-            class="p-2 border-r border-gray-100 last:border-r-0"
+            class="p-2 border-r border-gray-100 last:border-r-0 flex-1"
           ></Cell>
         </div>
         </template>

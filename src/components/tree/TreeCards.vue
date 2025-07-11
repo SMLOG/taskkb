@@ -1,6 +1,6 @@
 <template>
   <div class="relative min-w-full">
-    <div
+    <div class="flex gap-3 m-3"
     >
       <TreeCard
         :row="treeRef"
