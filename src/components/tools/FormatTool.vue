@@ -140,11 +140,13 @@ const checkFormatting = () => {
 };
 
 let savedRange = null;
-const checkSelection = (event) => {
+const checkSelection = async (event) => {
+  await new Promise((resolve)=>setTimeout(resolve,200));
   const selection = window.getSelection();
   const selectedText = selection.toString().trim();
+  editor.value = getSelectionTarget()?.closest('[contentEditable]');
 
-  if (selectedText.length > 0) {
+  if (selectedText.length > 0&&editor.value) {
     const range = selection.getRangeAt(0);
     const boundingRect = range.getBoundingClientRect();
     
@@ -154,7 +156,6 @@ const checkSelection = (event) => {
     const formatting = checkFormatting();
     isBoldNow.value = formatting.bold;
     isItalicNow.value = formatting.italic;
-    editor.value = getSelectionTarget()?.closest('[contentEditable]');
     savedRange = saveSelection();
     
     setTimeout(() => {
@@ -213,6 +214,7 @@ const handleClickOutside = (event) => {
   if (formatTool.value && !formatTool.value.contains(event.target)) {
     isFormatToolVisible.value = false;
     showColorSelect.value = false;
+    editor.value =null;
   } 
 };
 
