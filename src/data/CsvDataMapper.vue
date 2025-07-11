@@ -1,6 +1,7 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 
+// Reactive state
 const csvData = ref([]);
 const selectedList = ref([]);
 const columnMappings = ref({});
@@ -20,29 +21,75 @@ const newColumnExpression = ref('value');
 const selectedColumn = ref(null);
 const hasHeaders = ref(true);
 const delimiter = ref(',');
+const parsingError = ref(null);
 
-// Simple CSV parser
+// Improved CSV parser that handles quoted fields and escaped quotes
 const parseCSV = (text, delimiter = ',') => {
-  const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-  if (lines.length === 0) return [];
-  
-  const headers = hasHeaders.value 
-    ? lines[0].split(delimiter).map(h => h.trim())
-    : lines[0].split(delimiter).map((_, i) => `Column ${i + 1}`);
-  
-  const startRow = hasHeaders.value ? 1 : 0;
-  const data = [];
-  
-  for (let i = startRow; i < lines.length; i++) {
-    const values = lines[i].split(delimiter);
-    const row = {};
-    headers.forEach((header, index) => {
-      row[header] = values[index] ? values[index].trim() : '';
-    });
-    data.push(row);
+  try {
+    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+    if (lines.length === 0) return [];
+    
+    const regex = new RegExp(`(?:^|${delimiter})(?:"([^"]*(?:""[^"]*)*)"|([^"${delimiter}\r\n]*))`, 'g');
+    
+    const parseLine = (line) => {
+      const values = [];
+      let match;
+      let position = 0;
+      
+      while ((match = regex.exec(line)) !== null) {
+        // Handle empty values between delimiters
+        if (match.index > position) {
+          const emptyCount = (match.index - position) / delimiter.length;
+          for (let i = 0; i < emptyCount; i++) {
+            values.push('');
+          }
+        }
+        position = regex.lastIndex;
+        
+        let value = match[1] !== undefined ? match[1] : match[2];
+        if (value === undefined) value = '';
+        
+        // Replace double quotes with single quotes
+        value = value.replace(/""/g, '"').trim();
+        values.push(value);
+      }
+      
+      // Handle trailing empty values
+      if (position < line.length) {
+        const remaining = line.slice(position);
+        const emptyCount = (remaining.split(delimiter).length - 1);
+        for (let i = 0; i < emptyCount; i++) {
+          values.push('');
+        }
+      }
+      
+      return values;
+    };
+
+    const headers = hasHeaders.value 
+      ? parseLine(lines[0]).map(h => h.trim())
+      : parseLine(lines[0]).map((_, i) => `Column ${i + 1}`);
+    
+    const startRow = hasHeaders.value ? 1 : 0;
+    const data = [];
+    
+    for (let i = startRow; i < lines.length; i++) {
+      const values = parseLine(lines[i]);
+      const row = {};
+      
+      headers.forEach((header, index) => {
+        row[header] = values[index] !== undefined ? values[index] : '';
+      });
+      
+      data.push(row);
+    }
+    
+    parsingError.value = null;
+    return data;
+  } catch (err) {
+    parsingError.value = err.message;
+    return [];
   }
-  
-  return data;
 };
 
 // Handle file upload
@@ -50,10 +97,17 @@ const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
+  parsingError.value = null;
   const reader = new FileReader();
   reader.onload = (e) => {
     try {
       const parsedData = parseCSV(e.target.result, delimiter.value);
+      
+      if (parsingError.value) {
+        alert(`CSV Parsing Error: ${parsingError.value}`);
+        return;
+      }
+      
       if (parsedData.length > 0) {
         csvData.value = parsedData;
         selectedList.value = parsedData;
@@ -63,6 +117,7 @@ const handleFileUpload = (event) => {
         columnNames.value = {};
         columnExpressions.value = {};
         columnWidths.value = {};
+        
         Object.keys(selectedList.value[0]).forEach(prop => {
           columnMappings.value[prop] = prop;
           columnNames.value[prop] = prop;
@@ -73,11 +128,18 @@ const handleFileUpload = (event) => {
         mappingSectionVisible.value = true;
         tableSectionVisible.value = true;
         listSelectionVisible.value = true;
+      } else {
+        alert('No valid data found in the CSV file');
       }
     } catch (err) {
-      alert('Error parsing CSV: ' + err.message);
+      alert('Error processing file: ' + err.message);
     }
   };
+  
+  reader.onerror = () => {
+    alert('Error reading file');
+  };
+  
   reader.readAsText(file);
 };
 
@@ -223,16 +285,6 @@ const stopResize = () => {
   document.removeEventListener('mouseup', stopResize);
 };
 
-// Update column name
-const updateColumnName = (prop, value) => {
-  columnNames.value = { ...columnNames.value, [prop]: value };
-};
-
-// Update column expression
-const updateColumnExpression = (prop, value) => {
-  columnExpressions.value = { ...columnExpressions.value, [prop]: value || 'value' };
-};
-
 // Evaluate expression safely
 const evaluateExpression = (expression, value, item, index, list) => {
   try {
@@ -242,15 +294,6 @@ const evaluateExpression = (expression, value, item, index, list) => {
     console.error('Expression error:', err);
     return `Error: ${err.message}`;
   }
-};
-
-// Generate table
-const generateTable = () => {
-  if (Object.keys(columnMappings.value).length === 0) {
-    alert('No columns are mapped. Please select a list to map columns.');
-    return;
-  }
-  tableSectionVisible.value = true;
 };
 
 const emit = defineEmits(["confirm", "cancel"]);
@@ -409,7 +452,7 @@ defineExpose({
                   </div>
 
                   <div class="pt-2 border-t">
-                    <button @click="generateTable"
+                    <button @click="tableSectionVisible = true"
                       class="w-full bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">
                       Refresh Table View
                     </button>
