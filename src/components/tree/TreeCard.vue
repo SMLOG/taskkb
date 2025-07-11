@@ -1,6 +1,6 @@
 <template>
     <!-- Main Card -->
-    <div v-if="depth !== ''" class="card min-h-[70px] min-w-[200px] max-w-[500px] bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div v-if="depth !== ''" class="card min-h-[70px] bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
       <template v-for="(col, cellIndex) in cols" :key="cellIndex">
         <div class="flex">
           <div class="cell flex px-1 p-2">
