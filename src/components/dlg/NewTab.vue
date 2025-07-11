@@ -13,9 +13,9 @@
       </svg>
     </button>
     <input type="file" ref="fileInput" @change="selectTemplate" accept=".json" class="hidden" />
-    <button @click="startImportFromJson"
+    <button   v-for="importer in importerList" :key="importer.name" @click="startImportFromJson(importer)"
       class="w-full flex items-center justify-between p-3 border rounded-lg hover:bg-white/30 dark:hover:bg-gray-700/50 transition border-white/30 dark:border-gray-600/50 bg-white/20 dark:bg-gray-800/20">
-      <span class="text-gray-800 dark:text-gray-200">Import from JSON file</span>
+      <span class="text-gray-800 dark:text-gray-200">Import from {{importer.name  }} file</span>
       <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
         viewBox="0 0 24 24" stroke="currentColor">
         <!-- JSON curly braces icon -->
@@ -71,6 +71,10 @@ import { loopTree } from '@/lib/treelib';
 import Json from '@/lib/Json';
 import { showDialog } from '@/composables/useSystem';
 import JsonDataMapper from '@/data/JsonDataMapper.vue';
+import CsvDataMapper from '@/data/CsvDataMapper.vue';
+
+const importList = [{name:"Json",file:JsonDataMapper},{name:"Csv",file:CsvDataMapper}];
+const importerList = ref(importList);
 
 
 const appStore = useAppStore();
@@ -95,8 +99,8 @@ const openFile = () => {
 
 };
 
-async function startImportFromJson() {
-  const { headers, rows } = await showDialog(JsonDataMapper, null, { size: '2md', backdrop: false });
+async function startImportFromJson(importer) {
+  const { headers, rows } = await showDialog(importList.filter(e=>e.name==importer.name)[0].file, null, { size: '2md', backdrop: false });
   if (headers && rows) {
     const newTabId = uuidv4();
     const tabName = `New Tab ${tabs.value.length + 1}`;

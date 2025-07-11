@@ -1,6 +1,5 @@
 <script setup>
 import { ref, computed } from 'vue';
-import Json from '@/lib/Json';
 
 const jsonData = ref({});
 const selectedList = ref([]);
