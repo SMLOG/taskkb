@@ -108,9 +108,6 @@ export default {
 </script>
 
 <style scoped>
-.color-selector-container {
-  width: 180px;
-}
 
 .color-grid {
   display: grid;
