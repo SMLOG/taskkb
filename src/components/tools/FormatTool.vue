@@ -73,7 +73,7 @@
           v-if="showColorSelect"
           v-model="fontColor" 
           @select="selectColor" 
-          class="color-selector absolute left-0 mt-1 z-999"
+          class="color-selector absolute left-0 mt-1 "
           @click.stop
         />
     </div>
