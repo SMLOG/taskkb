@@ -3,18 +3,18 @@
     <slot></slot>
   </div>
 
-  <div @mousedown.prevent id="formatTool" @click.prevent.stop
+  <div @mousedown.prevent ref="formatTool" @click.prevent.stop
     class="format-toolbar select-none fixed bg-white dark:bg-gray-800 shadow-md rounded-md p-1 z-999 flex items-center gap-1 border border-gray-200 dark:border-gray-700"
     v-show="isFormatToolVisible"
     :style="{ left: formatToolLeft, top: formatToolTop }" role="toolbar" aria-label="Text formatting toolbar">
-    <button  @click.prevent.stop="toggleFormat( 'bold',true)" class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
+    <button @click.prevent.stop="toggleFormat('bold', true)" class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
       :class="{ 'font-bold': isBoldNow, 'bg-gray-100 dark:bg-gray-700': isBoldNow }" aria-label="Toggle bold">
       {{ isBoldNow ? 'Unbold' : 'Bold' }}
     </button>
 
     <div class="relative select-none">
       <button class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded indicative-element"
-        ref="indicativeElement" @click.prevent.stop="showColorSelect=!showColorSelect" aria-haspopup="true"
+        ref="indicativeElement" @click.prevent.stop="showColorSelect = !showColorSelect" aria-haspopup="true"
         :aria-expanded="showColorSelect" aria-label="Text color">
         Color
         <span class="color-preview w-3 h-3 inline-block ml-1 border border-gray-300 dark:border-gray-600"
@@ -24,7 +24,7 @@
       <ColorSelector v-model="fontColor" @select="selectColor" class="color-selector" v-if="showColorSelect"/>
     </div>
 
-    <button  @click.prevent.stop="toggleFormat('foreColor')" class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
+    <button @click.prevent.stop="toggleFormat('foreColor')" class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
       aria-label="Remove text color">
       Remove Color
     </button>
@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import ColorSelector from '@/components/tools/ColorSelector.vue';
 
 const props = defineProps({
@@ -50,6 +50,7 @@ const showColorSelect = ref(false);
 const isBoldNow = ref(false);
 const indicativeElement = ref(null);
 const editor = ref(null);
+const formatTool = ref(null); // Reference to formatTool div
 
 // Save and restore selection
 const saveSelection = () => {
@@ -83,10 +84,8 @@ const isBold = () => {
   return computedStyle.fontWeight === 'bold' || parseInt(computedStyle.fontWeight) >= 700;
 };
 
-
-
 let savedRange;
-const checkSelection = () => {
+const checkSelection = (event) => {
   const selection = window.getSelection();
   const selectedText = selection.toString();
 
@@ -98,10 +97,14 @@ const checkSelection = () => {
     formatToolTop.value = boundingRect.bottom + 'px';
     isBoldNow.value = isBold();
     editor.value = getSelectionTarget()?.closest('[contentEditable]');
-     savedRange = saveSelection();
+    savedRange = saveSelection();
   } else {
-    isFormatToolVisible.value = false;
-    editor.value = null;
+    // Only hide if not clicking inside formatTool
+    if (!formatTool.value?.contains(event.target)) {
+      isFormatToolVisible.value = false;
+      showColorSelect.value = false; // Also hide color selector
+      editor.value = null;
+    }
   }
 };
 
@@ -114,20 +117,40 @@ const getSelectionTarget = () => {
     : range.commonAncestorContainer;
 };
 
-const toggleFormat = async ( command, value = null) => {
-
+const toggleFormat = async (command, value = null) => {
   editor.value?.focus();
   restoreSelection(savedRange);
-  if(!value){
+  if (!value) {
     document.execCommand('removeFormat', false, command);
-  }else{
+  } else {
     document.execCommand(command, false, value);
   }
-  isBoldNow.value = isBold(); 
+  isBoldNow.value = isBold();
   savedRange = saveSelection();
 };
 
 const selectColor = (color) => {
-  toggleFormat('foreColor',color);
+  toggleFormat('foreColor', color);
 };
+
+// Handle click outside
+const handleClickOutside = (event) => {
+  if (
+    isFormatToolVisible.value &&
+    formatTool.value &&
+    !formatTool.value.contains(event.target) 
+  ) {
+    isFormatToolVisible.value = false;
+    showColorSelect.value = false;
+    editor.value = null;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('mousedown', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('mousedown', handleClickOutside);
+});
 </script>
