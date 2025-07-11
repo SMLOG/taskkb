@@ -1,68 +1,74 @@
 <template>
-    <div class="card grid min-h-7" >
-      <template v-for="(col, cellIndex) in cols" :key="cellIndex">
- 
-                <Cell :row="row" :col="col" :level="level" :cellIndex="cellIndex" :index="id" :depth="depth" ></Cell>
+      <!-- Main Card -->
+      <div v-if="depth !== ''" class="card grid min-h-[70px] bg-white rounded-lg shadow-sm border border-gray-200 mb-1 overflow-hidden" >
+        <template v-for="(col, cellIndex) in cols" :key="cellIndex">
+
+            <div class="flex">
+            <div class="cell flex flex-1 px-1">
+              <b class="w-full"><component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component></b>
+            </div>
+
+          <Cell 
+            :row="row" 
+            :col="col" 
+            :level="level" 
+            :cellIndex="cellIndex" 
+            :index="id" 
+            :depth="depth"
+            class="p-2 border-r border-gray-100 last:border-r-0"
+          ></Cell>
+        </div>
         </template>
-    </div>
-    <template v-if="row && row._childs && row._childs.length && !row._collapsed">
-        <TreeCard v-for="(child, index) in row._childs" :depth="depth + '.' + index" :key="index" :row="child"
-            :cols="cols" :showSch="showSch" :days="days" :firstDay="firstDay" :level="level + 1" :id="(id ? id + '.' : '') + (index + 1)" :gridStyle="gridStyle" :weeks="weeksRef" />
-    </template>
-</template>
+      </div>
+  
+      <!-- Child Cards -->
+      <template v-if="row._childs?.length && !row._collapsed" class="ml-6 pl-2 border-l-2 border-gray-200">
+        <TreeCard 
+          v-for="(child, index) in row._childs" 
+          :key="index" 
+          :depth="depth + '.' + index" 
+          :row="child"
+          :cols="cols" 
+          :showSch="showSch" 
+          :days="days" 
+          :firstDay="firstDay" 
+          :level="level + 1" 
+          :id="(id ? id + '.' : '') + (index + 1)" 
+          :gridStyle="gridStyle" 
+          :weeks="weeksRef" 
+        />
+      </template>
+  </template>
+  
+  <script setup>
+  import { useTree } from '@/composables/useTree';
+  import { defineProps } from 'vue';
+  import TreeCard from '@/components/tree/TreeCard.vue';
+  import Cell from '@/components/tree/Cell.vue';
+  import { resolveComponent } from '@/components/cpList';
 
-<script setup>
-import { useTree } from '@/composables/useTree';
-import { defineProps } from 'vue';
-import TreeCard from '@/components/tree/TreeCard.vue';
-import Cell from '@/components/tree/Cell.vue';
-
-// Composable
-const {
- weeksRef
-} = useTree();
-
-// Define props
-const props = defineProps({
-    row: {
-        type: Object,
-        required: true,
-    },
-    cols: {
-        type: Array,
-        required: true,
-    },
-    depth: {
-        type: String,
-        required: true,
-    },
-    gridStyle: {
-        type: Object
-    },
-    level: {
-        type: Number,
-        required: true
-    },
-    id: {
-        type: String,
-        default: ''
-    },
-    weeks: {
-        type: Array,
-    },
-    days: {
-    },
-    firstDay: {
-    },
-    showSch: {
-        type: Boolean,
-        default: false
-    },  schReady: {
-    type: Boolean,
-  },
-});
-
-
-</script>
-
-<style src="@/components/tree/tree.css" scoped></style>
+  const { weeksRef } = useTree();
+  
+  const props = defineProps({
+    row: { type: Object, required: true },
+    cols: { type: Array, required: true },
+    depth: { type: String, required: true },
+    gridStyle: { type: Object },
+    level: { type: Number, required: true },
+    id: { type: String, default: '' },
+    weeks: { type: Array },
+    days: { type: Object },
+    firstDay: { type: Object },
+    showSch: { type: Boolean, default: false },
+    schReady: { type: Boolean },
+  });
+  </script>
+  
+  <style scoped>
+  .card {
+    display: grid;
+    grid-template-columns: repeat(var(--cols-count, 1), minmax(0, 1fr));
+  }
+  
+  /* You can keep your existing tree.css or replace with these Tailwind classes */
+  </style>
