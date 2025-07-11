@@ -1,13 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-const jsonData = ref({});
+const csvData = ref([]);
 const selectedList = ref([]);
 const columnMappings = ref({});
 const columnNames = ref({});
 const columnExpressions = ref({});
 const columnWidths = ref({});
-const listProperty = ref('');
 const mappingSectionVisible = ref(false);
 const tableSectionVisible = ref(false);
 const listSelectionVisible = ref(false);
@@ -19,116 +18,67 @@ const newColumnName = ref('');
 const columnToMap = ref('');
 const newColumnExpression = ref('value');
 const selectedColumn = ref(null);
+const hasHeaders = ref(true);
+const delimiter = ref(',');
 
-
-
-// Function to recursively find all array properties
-const findArrayProperties = (obj, prefix = '') => {
-  const arrayProps = [];
-  if (Array.isArray(obj)) {
-    arrayProps.push('root');
-    obj.forEach((item, index) => {
-      if (typeof item === 'object' && item !== null && !Array.isArray(item)) {
-        arrayProps.push(...findArrayProperties(item, `root[${index}]`));
-      }
+// Simple CSV parser
+const parseCSV = (text, delimiter = ',') => {
+  const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+  if (lines.length === 0) return [];
+  
+  const headers = hasHeaders.value 
+    ? lines[0].split(delimiter).map(h => h.trim())
+    : lines[0].split(delimiter).map((_, i) => `Column ${i + 1}`);
+  
+  const startRow = hasHeaders.value ? 1 : 0;
+  const data = [];
+  
+  for (let i = startRow; i < lines.length; i++) {
+    const values = lines[i].split(delimiter);
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] ? values[index].trim() : '';
     });
-  } else if (typeof obj === 'object' && obj !== null) {
-    Object.keys(obj).forEach(key => {
-      const fullKey = prefix ? `${prefix}.${key}` : key;
-      if (Array.isArray(obj[key])) {
-        arrayProps.push(fullKey);
-        if (obj[key].length > 0 && typeof obj[key][0] === 'object' && !Array.isArray(obj[key][0])) {
-          obj[key].forEach((item, index) => {
-            if (typeof item === 'object' && item !== null) {
-              arrayProps.push(...findArrayProperties(item, `${fullKey}[${index}]`));
-            }
-          });
-        }
-      } else if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-        arrayProps.push(...findArrayProperties(obj[key], fullKey));
-      }
-    });
+    data.push(row);
   }
-  return arrayProps;
+  
+  return data;
 };
-
-// Computed property for available list properties
-const listProperties = computed(() => {
-  return findArrayProperties(jsonData.value);
-});
-
-// Computed property for JSON object properties
-const jsonProperties = computed(() => {
-  return selectedList.value.length > 0 ? Object.keys(selectedList.value[0] || {}) : [];
-});
 
 // Handle file upload
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        jsonData.value = Json.parse(e.target.result);
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsedData = parseCSV(e.target.result, delimiter.value);
+      if (parsedData.length > 0) {
+        csvData.value = parsedData;
+        selectedList.value = parsedData;
+        
+        // Automatically map all properties to columns
+        columnMappings.value = {};
+        columnNames.value = {};
+        columnExpressions.value = {};
+        columnWidths.value = {};
+        Object.keys(selectedList.value[0]).forEach(prop => {
+          columnMappings.value[prop] = prop;
+          columnNames.value[prop] = prop;
+          columnExpressions.value[prop] = 'value';
+          columnWidths.value[prop] = '150px';
+        });
+        
+        mappingSectionVisible.value = true;
+        tableSectionVisible.value = true;
         listSelectionVisible.value = true;
-      } catch (err) {
-        alert('Invalid JSON file');
       }
-    };
-    reader.readAsText(file);
-  }
-};
-
-// Handle list property selection
-const handleListSelection = () => {
-  if (listProperty.value) {
-    let selected = jsonData.value;
-    if (listProperty.value === 'root') {
-      selected = jsonData.value;
-    } else {
-      const keys = listProperty.value.split('.').reduce((acc, key) => {
-        if (key.includes('[')) {
-          const [prop, index] = key.split('[');
-          acc.push(prop, parseInt(index.replace(']', '')));
-        } else {
-          acc.push(key);
-        }
-        return acc;
-      }, []);
-
-      try {
-        for (const key of keys) {
-          selected = selected[key];
-          if (!selected) {
-            alert('Invalid property path');
-            return;
-          }
-        }
-      } catch (err) {
-        alert('Error accessing selected property');
-        return;
-      }
+    } catch (err) {
+      alert('Error parsing CSV: ' + err.message);
     }
-
-    selectedList.value = selected;
-    if (!Array.isArray(selectedList.value) || selectedList.value.length === 0 || typeof selectedList.value[0] !== 'object' || Array.isArray(selectedList.value[0])) {
-      alert('Selected property must be an array of objects');
-      return;
-    }
-    // Automatically map all properties to columns
-    columnMappings.value = {};
-    columnNames.value = {};
-    columnExpressions.value = {};
-    columnWidths.value = {};
-    jsonProperties.value.forEach(prop => {
-      columnMappings.value[prop] = prop;
-      columnNames.value[prop] = prop;
-      columnExpressions.value[prop] = 'value';
-      columnWidths.value[prop] = '150px';
-    });
-    mappingSectionVisible.value = true;
-    tableSectionVisible.value = true;
-  }
+  };
+  reader.readAsText(file);
 };
 
 // Handle column header click to populate form
@@ -195,7 +145,6 @@ const removeMapping = (column) => {
     }
   }
 };
-
 
 // Column reordering handlers
 const dragStartColumn = (e, column) => {
@@ -308,7 +257,7 @@ const emit = defineEmits(["confirm", "cancel"]);
 
 function handleImport() {
   if (selectedList.value.length === 0) {
-    alert('No data selected. Please select a valid JSON array.');
+    alert('No data selected. Please select a valid CSV file.');
     return;
   }
 
@@ -336,21 +285,13 @@ function handleImport() {
     return rowData;
   });
 
-  // Log the data to console
-  console.log('----- TABLE HEADERS -----');
-  console.log(headers);
-  console.log('----- TABLE ROWS -----');
-  console.log(rows);
-  console.log('Total rows:', selectedList.value.length);
-
   emit('confirm', {
     headers: headers,
     rows: rows,
     totalRows: selectedList.value.length
   });
-
-
 }
+
 // Explicitly expose functions needed in template
 defineExpose({
   evaluateExpression
@@ -360,7 +301,7 @@ defineExpose({
 <template>
   <div class="h-[80vh] flex flex-col relative">
     <header class="text-left flex justify-between items-center">
-      <h1 class="text-3xl font-bold text-blue-600 mb-2 border-b">Import JSON List to create Tab</h1>
+      <h1 class="text-3xl font-bold text-blue-600 mb-2 border-b">Import CSV to create Tab</h1>
       <button @click="handleImport"
         class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors">Import</button>
     </header>
@@ -376,28 +317,35 @@ defineExpose({
                 <div class="space-y-4">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <span 
-                      class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
-                    >
-                      Upload JSON File
-                    </span>
-                    <input 
-                      type="file" 
-                      ref="fileInput"
-                      accept=".json" 
-                      @change="handleFileUpload" 
-                      class="hidden"
-                    >
-                  </label>
-                    </div>
+                      <span 
+                        class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
+                      >
+                        Upload CSV File
+                      </span>
+                      <input 
+                        type="file" 
+                        ref="fileInput"
+                        accept=".csv,.txt" 
+                        @change="handleFileUpload" 
+                        class="hidden"
+                      >
+                    </label>
+                  </div>
 
-                  <div v-if="listSelectionVisible">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
-                    <select v-model="listProperty" @change="handleListSelection"
-                      class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
-                      <option value="">Select a property</option>
-                      <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
-                    </select>
+                  <div class="space-y-2">
+                    <div class="flex items-center">
+                      <input type="checkbox" id="hasHeaders" v-model="hasHeaders" class="mr-2">
+                      <label for="hasHeaders" class="text-sm text-gray-700">First row contains headers</label>
+                    </div>
+                    <div>
+                      <label class="block text-xs font-medium text-gray-500 mb-1">Delimiter</label>
+                      <select v-model="delimiter" class="w-full rounded border-gray-300 border p-2 text-sm">
+                        <option value=",">Comma ( , )</option>
+                        <option value=";">Semicolon ( ; )</option>
+                        <option value="\t">Tab</option>
+                        <option value="|">Pipe ( | )</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -423,7 +371,7 @@ defineExpose({
                         <select v-model="columnToMap"
                           class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                           <option value="">Select property (optional)</option>
-                          <option v-for="prop in jsonProperties" :key="prop" :value="prop">{{ prop }}</option>
+                          <option v-for="prop in Object.keys(selectedList[0] || {})" :key="prop" :value="prop">{{ prop }}</option>
                         </select>
                       </div>
 
