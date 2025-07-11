@@ -1,12 +1,12 @@
 <template>
-  <div class="relative mobile-tabs-toggle md:hidden" ref="dropdownContainer">
+  <div class="relative mobile-tabs-toggle md:hidden drak:text-white" ref="dropdownContainer">
     <div @click.stop="toggleMobileDropdown" class="flex items-center text-center px-4 py-2.5">
       <div class="text-sm font-medium truncate max-w-[180px] text-white">
         {{ activeTabTitle }}
       </div>
-      <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-gray-900 dark:text-white" 
+      <svg class="w-4 h-4 ml-2 transition-transform duration-200 text-white" 
            :class="{ 'rotate-180': showMobileDropdown }"
-           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           fill="none" stroke="currentColor"  viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
       </svg>
     </div>
