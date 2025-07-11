@@ -40,4 +40,6 @@ const gridColumns = computed(() =>
 
 </script>
 
-<style src="@/components/tree/tree.css" scoped></style>
+<style>
+
+</style>

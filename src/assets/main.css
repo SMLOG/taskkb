@@ -144,3 +144,7 @@ body * {
       touch-action: pan-x pan-y;
     }
   }
+
+  .card .col .cell{
+    border-bottom:  1px dashed lightblue;
+  }
