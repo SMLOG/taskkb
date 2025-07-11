@@ -4,10 +4,10 @@
   </div>
 
   <div @mousedown.prevent id="formatTool"
-    class="format-toolbar fixed bg-white dark:bg-gray-800 shadow-md rounded-md p-1 flex items-center gap-1 border border-gray-200 dark:border-gray-700"
+    class="format-toolbar selection-none fixed bg-white dark:bg-gray-800 shadow-md rounded-md p-1 flex items-center gap-1 border border-gray-200 dark:border-gray-700"
     style="z-index: var(--vt-index-tooltip);" v-show="isFormatToolVisible"
     :style="{ left: formatToolLeft, top: formatToolTop }" role="toolbar" aria-label="Text formatting toolbar">
-    <button @mousedown.prevent  @click="applyBold" class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
+    <button @mousedown.prevent  @click="toggleFormat($event,'bold')" class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
       :class="{ 'font-bold': isBoldNow, 'bg-gray-100 dark:bg-gray-700': isBoldNow }" aria-label="Toggle bold">
       {{ isBoldNow ? 'Unbold' : 'Bold' }}
     </button>
@@ -98,6 +98,7 @@ const removeFontColor = () => {
 };
 
 
+const editor = ref(null);
 const checkSelection = () => {
   const selectedText = window.getSelection().toString();
   console.log(selectedText.trim())
@@ -109,20 +110,26 @@ const checkSelection = () => {
     formatToolLeft.value = boundingRect.right + 'px';
     formatToolTop.value = boundingRect.bottom + 'px';
     isBoldNow.value = isBold();
+
+    editor.value = getSelectionTarget().closest('[contentEditable]');
+
   } else {
     isFormatToolVisible.value = false;
   }
 };
 
-const applyBold = (event) => {
-  event.preventDefault();
+function getSelectionTarget() {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return null;
+    
+    const range = selection.getRangeAt(0);
+    return range.commonAncestorContainer.parentNode;
+}
 
-  if (isBold()) {
-    document.execCommand('bold');
-    isBoldNow.value = false;
-  } else {
-    document.execCommand('bold', false, null);
-    isBoldNow.value = true;
-  }
-};
+function toggleFormat(event,command, value = null) {
+      editor.value.focus();
+      document.execCommand(command, false, value);
+    }
+
+
 </script>
