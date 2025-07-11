@@ -23,82 +23,87 @@
     <!-- Bold Button -->
     <button 
       @click.stop="toggleFormat('bold', true)" 
-      class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center gap-1.5"
+      class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center justify-center w-9 h-8"
       :class="{ 
         'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white': isBoldNow,
         'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300': !isBoldNow
       }" 
       aria-label="Toggle bold"
       aria-pressed="isBoldNow"
+      title="Bold"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-      </svg>
-      <span class="text-xs font-medium">Bold</span>
+      <span class="text-sm font-bold">B</span>
+    </button>
+
+    <!-- Italic Button -->
+    <button 
+      @click.stop="toggleFormat('italic', true)" 
+      class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center justify-center w-9 h-8"
+      :class="{ 
+        'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white': isItalicNow,
+        'hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300': !isItalicNow
+      }" 
+      aria-label="Toggle italic"
+      aria-pressed="isItalicNow"
+      title="Italic"
+    >
+      <span class="text-sm italic">I</span>
     </button>
 
     <!-- Color Picker -->
     <div class="relative">
       <button 
-        class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300"
+        class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 h-8"
         ref="indicativeElement" 
         @click.stop="showColorSelect = !showColorSelect" 
         aria-haspopup="true"
         :aria-expanded="showColorSelect" 
         aria-label="Text color"
+        title="Text color"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
         </svg>
-        <span class="text-xs font-medium">Color</span>
         <span 
-          class="color-preview w-3 h-3 rounded-sm inline-block ml-1 border border-gray-300 dark:border-gray-600 transition-colors"
+          class="color-preview w-3 h-3 rounded-sm inline-block border border-gray-300 dark:border-gray-600 transition-colors"
           :style="{ backgroundColor: fontColor || 'transparent' }"
         ></span>
       </button>
 
-      <Transition name="fade">
         <ColorSelector 
           v-if="showColorSelect"
           v-model="fontColor" 
           @select="selectColor" 
-          class="color-selector absolute left-0 mt-1 z-10"
+          class="color-selector absolute left-0 mt-1 z-999"
           @click.stop
         />
-      </Transition>
     </div>
 
-    <!-- Remove Color Button -->
+    <!-- Remove Formatting Button -->
     <button 
-      @click.stop="toggleFormat('foreColor')" 
-      class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300"
-      aria-label="Remove text color"
+      @click.stop="removeFormatting" 
+      class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center justify-center w-9 h-8 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300"
+      aria-label="Remove formatting"
+      title="Clear formatting"
     >
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
       </svg>
-      <span class="text-xs font-medium">Remove</span>
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import ColorSelector from '@/components/tools/ColorSelector.vue';
-
-const props = defineProps({
-  editable: {
-    type: Boolean,
-    required: false,
-  },
-});
 
 const isFormatToolVisible = ref(false);
 const formatToolLeft = ref('0px');
 const formatToolTop = ref('0px');
-const fontColor = ref('#3B82F6'); // Default to Tailwind blue-500
+const fontColor = ref('#3B82F6');
 const showColorSelect = ref(false);
 const isBoldNow = ref(false);
+const isItalicNow = ref(false);
 const indicativeElement = ref(null);
 const editor = ref(null);
 const formatTool = ref(null);
@@ -117,10 +122,10 @@ const restoreSelection = (range) => {
   }
 };
 
-const isBold = () => {
+const checkFormatting = () => {
   const selection = window.getSelection();
   if (selection.rangeCount === 0 || selection.toString().length === 0) {
-    return false;
+    return { bold: false, italic: false };
   }
 
   const range = selection.getRangeAt(0);
@@ -129,7 +134,11 @@ const isBold = () => {
     parentElement = parentElement.parentElement;
   }
   const computedStyle = window.getComputedStyle(parentElement);
-  return computedStyle.fontWeight === 'bold' || parseInt(computedStyle.fontWeight) >= 700;
+  
+  return {
+    bold: computedStyle.fontWeight === 'bold' || parseInt(computedStyle.fontWeight) >= 700,
+    italic: computedStyle.fontStyle === 'italic'
+  };
 };
 
 let savedRange = null;
@@ -141,15 +150,15 @@ const checkSelection = (event) => {
     const range = selection.getRangeAt(0);
     const boundingRect = range.getBoundingClientRect();
     
-    // Position toolbar centered above selection
     formatToolLeft.value = `${boundingRect.left + window.scrollX + (boundingRect.width / 2)}px`;
-    formatToolTop.value = `${boundingRect.top + window.scrollY - 45}px`;
+    formatToolTop.value = `${boundingRect.top + window.scrollY - 40}px`;
     
-    isBoldNow.value = isBold();
+    const formatting = checkFormatting();
+    isBoldNow.value = formatting.bold;
+    isItalicNow.value = formatting.italic;
     editor.value = getSelectionTarget()?.closest('[contentEditable]');
     savedRange = saveSelection();
     
-    // Show with slight delay for smoother appearance
     setTimeout(() => {
       isFormatToolVisible.value = true;
     }, 50);
@@ -175,13 +184,23 @@ const toggleFormat = async (command, value = null) => {
   editor.value.focus();
   restoreSelection(savedRange);
   
-  if (!value) {
-    document.execCommand('removeFormat', false, command);
-  } else {
-    document.execCommand(command, false, value);
-  }
+  document.execCommand(command, false, value || '');
   
-  isBoldNow.value = isBold();
+  const formatting = checkFormatting();
+  isBoldNow.value = formatting.bold;
+  isItalicNow.value = formatting.italic;
+  savedRange = saveSelection();
+};
+
+const removeFormatting = () => {
+  if (!editor.value) return;
+  
+  editor.value.focus();
+  restoreSelection(savedRange);
+  document.execCommand('removeFormat', false, '');
+  
+  isBoldNow.value = false;
+  isItalicNow.value = false;
   savedRange = saveSelection();
 };
 
@@ -191,7 +210,6 @@ const selectColor = (color) => {
   showColorSelect.value = false;
 };
 
-// Close color picker when clicking outside
 const handleClickOutside = (event) => {
   if (formatTool.value && !formatTool.value.contains(event.target)) {
     isFormatToolVisible.value = false;
@@ -225,6 +243,7 @@ onUnmounted(() => {
 
 .format-button {
   transition: all 0.15s ease;
+  min-width: 2.25rem;
 }
 
 .format-button:active {
@@ -233,9 +252,15 @@ onUnmounted(() => {
 
 .format-toolbar {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 0.25rem;
+  gap: 0.25rem;
 }
 
 .dark .format-toolbar {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.color-preview {
+  margin-left: 0.25rem;
 }
 </style>
