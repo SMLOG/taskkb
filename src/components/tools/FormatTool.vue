@@ -1,21 +1,66 @@
 <template>
-  <div @mouseup="checkSelection" >
+  <div 
+    @mouseup="checkSelection"
+    class="selection-container"
+  >
     <slot></slot>
   </div>
-  <div id="formatTool" class="fixed bg-white dark:bg-black" style="z-index: var(--vt-index-tooltip);" v-show="isFormatToolVisible" :style="{ left: formatToolLeft, top: formatToolTop }">
-    <button @click="applyBold">{{ isBoldNow ? 'Un' : '' }}Bold</button>
-    <button class="indicative-element" ref="indicativeElement" @click.prevent.stop="toggleColorSelect" style="color:">
-      Color
+  
+  <div 
+    id="formatTool" 
+    class="format-toolbar fixed bg-white dark:bg-gray-800 shadow-md rounded-md p-1 flex items-center gap-1 border border-gray-200 dark:border-gray-700" 
+    style="z-index: var(--vt-index-tooltip);" 
+    v-show="isFormatToolVisible" 
+    :style="{ left: formatToolLeft, top: formatToolTop }"
+    role="toolbar"
+    aria-label="Text formatting toolbar"
+  >
+    <button 
+      @click="applyBold"
+      class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
+      :class="{ 'font-bold': isBoldNow, 'bg-gray-100 dark:bg-gray-700': isBoldNow }"
+      aria-label="Toggle bold"
+    >
+      {{ isBoldNow ? 'Unbold' : 'Bold' }}
     </button>
-    <button @click="removeFontColor">-Color</button>
-    <div>
-      <ColorSelector v-model="fontColor" @select="selectColor" style="user-select: none;" v-if="showColorSelect" :position="colorSelectPosition"></ColorSelector>
+    
+    <div class="relative">
+      <button 
+        class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded indicative-element"
+        ref="indicativeElement" 
+        @click.prevent.stop="toggleColorSelect"
+        aria-haspopup="true"
+        :aria-expanded="showColorSelect"
+        aria-label="Text color"
+      >
+        Color
+        <span 
+          class="color-preview w-3 h-3 inline-block ml-1 border border-gray-300 dark:border-gray-600"
+          :style="{ backgroundColor: fontColor || 'transparent' }"
+        ></span>
+      </button>
+      
+      <ColorSelector 
+        v-model="fontColor" 
+        @select="selectColor" 
+        class="color-selector"
+        v-if="showColorSelect" 
+        :position="colorSelectPosition"
+      />
     </div>
+    
+    <button 
+      @click="removeFontColor"
+      class="format-button hover:bg-gray-100 dark:hover:bg-gray-700 px-2 py-1 rounded"
+      aria-label="Remove text color"
+    >
+      Remove Color
+    </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import ColorSelector from '@/components/tools/ColorSelector.vue';
 
 const props = defineProps({
@@ -79,19 +124,6 @@ const removeFontColor = () => {
   document.execCommand('removeFormat', false, 'foreColor');
 };
 
-const applyFontColor2 = () => {
-  const selection = window.getSelection();
-
-  const parentSpan = selection.anchorNode.parentElement;
-  if (parentSpan.tagName === 'SPAN') {
-    parentSpan.style.color = fontColor.value;
-  } else {
-    const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    span.style.color = fontColor.value;
-    range.surroundContents(span);
-  }
-};
 
 const checkSelection = () => {
   const selectedText = window.getSelection().toString();
