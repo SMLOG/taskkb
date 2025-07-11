@@ -97,6 +97,8 @@ export function useContextHandler(elRef) {
     }
 
     clearTimeout(enableDragTimeout.value);
+    clearTimeout(enableSelectionTimeout.value);
+    
   }
 
   function handleRangeSelection(rowEl) {
