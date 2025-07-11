@@ -8,14 +8,19 @@ import SwitchButton from '../SwitchButton.vue';
 import { useRoute, useRouter } from 'vue-router';
 
 const viewOptions = ref([
-  { value: '', label: 'List' },
-  { value: 'calendar', label: 'Calendar' }
+{ value: '', label: 'List' },
+{ value: 'cards', label: 'Card' },
+{ value: 'calendar', label: 'Calendar' }
 ]);
 const route = useRoute();
 
 const activeView = ref(viewOptions.value.filter(e => e.value == route.fullPath.split('/')[1]).length > 0 ? route.fullPath.split('/')[1] : '')
 
 const router = useRouter();
+
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escapes special characters
+}
 
 function handleNavigation(targetPath, oldPath) {
   // Get current route information
@@ -34,7 +39,11 @@ function handleNavigation(targetPath, oldPath) {
     newPath = `/${newPath.replace(`/${oldPath}/`, '').replace(/^\//, '')}`;
   } else {
     // Case 3: No changes needed to path structure
-    newPath = `/${newPath.replace(/^\//, '')}`;
+
+    const regex = new RegExp(`^/${escapeRegExp(oldPath)}`);
+
+
+    newPath = `/${newPath.replace(regex, targetPath)}`;
   }
 
   // Final path normalization
