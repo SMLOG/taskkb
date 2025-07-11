@@ -1,6 +1,6 @@
 <template>
     <!-- Main Card -->
-    <div v-if="depth !== ''" class="card min-h-[70px] bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div v-if="depth !== ''" class="card min-h-[70px] bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-lg">
       <template v-for="(col, cellIndex) in cols" :key="cellIndex">
         <div class="flex">
           <div class="cell flex px-1 p-2">
@@ -39,35 +39,48 @@
         :weeks="weeksRef" 
       />
     </template>
-  </template>
-  
-  <script setup>
-  import { useTree } from '@/composables/useTree';
-  import { defineProps } from 'vue';
-  import TreeCard from '@/components/tree/TreeCard.vue';
-  import Cell from '@/components/tree/Cell.vue';
-  import { resolveComponent } from '@/components/cpList';
-  
-  const { weeksRef } = useTree();
-  
-  const props = defineProps({
-    row: { type: Object, required: true },
-    cols: { type: Array, required: true },
-    depth: { type: String, required: true },
-    gridStyle: { type: Object },
-    level: { type: Number, required: true },
-    id: { type: String, default: '' },
-    weeks: { type: Array },
-    days: { type: Object },
-    firstDay: { type: Object },
-    showSch: { type: Boolean, default: false },
-    schReady: { type: Boolean },
-  });
-  </script>
-  
-  <style scoped>
-  .card {
-    display: grid;
-    grid-template-columns: repeat(var(--cols-count, 1), minmax(0, 1fr));
-  }
-  </style>
+</template>
+
+<script setup>
+import { useTree } from '@/composables/useTree';
+import { defineProps } from 'vue';
+import TreeCard from '@/components/tree/TreeCard.vue';
+import Cell from '@/components/tree/Cell.vue';
+import { resolveComponent } from '@/components/cpList';
+
+const { weeksRef } = useTree();
+
+const props = defineProps({
+  row: { type: Object, required: true },
+  cols: { type: Array, required: true },
+  depth: { type: String, required: true },
+  gridStyle: { type: Object },
+  level: { type: Number, required: true },
+  id: { type: String, default: '' },
+  weeks: { type: Array },
+  days: { type: Object },
+  firstDay: { type: Object },
+  showSch: { type: Boolean, default: false },
+  schReady: { type: Boolean },
+});
+</script>
+
+<style scoped>
+.card {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-count, 1), minmax(0, 1fr));
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.25), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.25);
+}
+</style>
