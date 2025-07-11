@@ -54,7 +54,6 @@
     <div class="relative">
       <button 
         class="format-button transition-colors duration-150 px-3 py-1.5 rounded-md flex items-center gap-1.5 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-gray-700 dark:text-gray-300 h-8"
-        ref="indicativeElement" 
         @click.stop="showColorSelect = !showColorSelect" 
         aria-haspopup="true"
         :aria-expanded="showColorSelect" 
@@ -94,7 +93,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, nextTick } from 'vue';
 import ColorSelector from '@/components/tools/ColorSelector.vue';
 
 const isFormatToolVisible = ref(false);
@@ -104,7 +103,6 @@ const fontColor = ref('#3B82F6');
 const showColorSelect = ref(false);
 const isBoldNow = ref(false);
 const isItalicNow = ref(false);
-const indicativeElement = ref(null);
 const editor = ref(null);
 const formatTool = ref(null);
 
@@ -204,9 +202,10 @@ const removeFormatting = () => {
   savedRange = saveSelection();
 };
 
-const selectColor = (color) => {
+const selectColor = async (color) => {
   fontColor.value = color;
-  toggleFormat('foreColor', color);
+  await toggleFormat('foreColor', color);
+  await nextTick();
   showColorSelect.value = false;
 };
 
@@ -214,9 +213,7 @@ const handleClickOutside = (event) => {
   if (formatTool.value && !formatTool.value.contains(event.target)) {
     isFormatToolVisible.value = false;
     showColorSelect.value = false;
-  } else if (showColorSelect.value && indicativeElement.value && !indicativeElement.value.contains(event.target)) {
-    showColorSelect.value = false;
-  }
+  } 
 };
 
 onMounted(() => {
