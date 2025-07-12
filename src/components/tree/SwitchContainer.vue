@@ -1,73 +1,89 @@
 <template>
-  <SwitchButton v-model="activeView" :options="viewOptions" />
+  <SwitchButton 
+    v-model="activeView" 
+    :options="viewOptions" 
+    class="view-switcher"
+  />
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
-import SwitchButton from '../SwitchButton.vue';
+import { ref, watch, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import SwitchButton from '../SwitchButton.vue';
 
-const viewOptions = ref([
-{ value: '', label: 'List' },
-{ value: 'cards', label: 'Card' },
-{ value: 'calendar', label: 'Calendar' }
-]);
+// Constants
+const VIEW_OPTIONS = [
+  { value: '', label: 'List' },
+  { value: 'cards', label: 'Card' },
+  { value: 'calendar', label: 'Calendar' }
+];
+
 const route = useRoute();
-
-const activeView = ref(viewOptions.value.filter(e => e.value == route.fullPath.split('/')[1]).length > 0 ? route.fullPath.split('/')[1] : '')
-
 const router = useRouter();
 
-function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Escapes special characters
+// Reactive state
+const viewOptions = ref(VIEW_OPTIONS);
+const activeView = ref('');
+
+// Computed
+const currentViewFromRoute = computed(() => {
+  const firstPathSegment = route.fullPath.split('/')[1]?.toLowerCase() || '';
+  return VIEW_OPTIONS.some(opt => opt.value === firstPathSegment) 
+    ? firstPathSegment 
+    : '';
+});
+
+// Methods
+function normalizePath(path) {
+  return path
+    .replace(/^#/, '')              // Remove hash prefix
+    .replace(/\/+/g, '/')           // Collapse multiple slashes
+    .replace(/\/$/, '')             // Remove trailing slash
+    .replace(/^\//, '') || '';      // Remove leading slash
+}
+
+function buildNewPath(targetPath, oldPath, currentPath) {
+  let newPath = currentPath;
+  
+  // Remove old path if it exists
+  if (oldPath) {
+    newPath = newPath.replace(new RegExp(`^/?${oldPath}/?`), '');
+  }
+  
+  // Add new path if it exists
+  if (targetPath) {
+    newPath = `/${targetPath}/${newPath}`.replace(/\/+/g, '/');
+  } else {
+    newPath = `/${newPath}`.replace(/\/+/g, '/');
+  }
+  
+  return newPath.replace(/\/$/, '');
 }
 
 function handleNavigation(targetPath, oldPath) {
-  // Get current route information
   const currentQuery = { ...route.query };
-  const currentFullPath = route.fullPath;
-
-  // Get hash and clean it (remove leading # and normalize slashes)
-  let newPath = location.hash.replace(/^#/, '').replace(/\/+/g, '/');
-
-  // Handle path construction based on parameters
-  if (targetPath && !oldPath) {
-    // Case 1: Adding targetPath to the path
-    newPath = `/${targetPath}/${newPath.replace(`/${targetPath}/`, '').replace(/^\//, '')}`;
-  } else if (!targetPath && oldPath) {
-    // Case 2: Removing oldPath from the path
-    newPath = `/${newPath.replace(`/${oldPath}/`, '').replace(/^\//, '')}`;
-  } else {
-    // Case 3: No changes needed to path structure
-
-    const regex = new RegExp(`^${escapeRegExp('/'+oldPath+'/'||'')}`);
-
-
-    newPath = `/${newPath.replace(regex, targetPath+'/')}`;
+  const currentPath = normalizePath(location.hash);
+  
+  const newPath = buildNewPath(targetPath, oldPath, currentPath);
+  
+  // Only navigate if the path actually changed
+  if (newPath !== route.path) {
+    router.push({
+      path: newPath,
+      query: currentQuery // Preserve query parameters
+    }).catch(err => {
+      console.error('Navigation error:', err);
+      // Optionally redirect to a safe fallback
+    });
   }
+}
 
-  // Final path normalization
-  newPath = newPath.replace(/\/+/g, '/').replace(/\/$/, ''); // Remove duplicate slashes and trailing slash
+// Watchers
+watch(currentViewFromRoute, (newVal) => {
+  activeView.value = newVal;
+}, { immediate: true });
 
-  // Only navigate if the new path is different from current
-  if (!currentFullPath.startsWith(newPath)) {
-    try {
-      router.push({
-        path: newPath,
-        query: currentQuery, // Preserve query parameters
-      });
-    } catch (error) {
-      console.error('Navigation error:', error);
-      // Optionally handle navigation errors (e.g., fallback to home)
-    }
-  }
-};
-watch(
-  () => activeView.value,
-  (newValue, oldValue) => {
-    handleNavigation(newValue, oldValue);
-  },
-  { immediate: true }
-);
-
+watch(activeView, (newValue, oldValue) => {
+  handleNavigation(newValue, oldValue);
+});
 </script>
