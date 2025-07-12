@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue';
+import Papa from 'papaparse';
 
 // Reactive state
 const csvData = ref([]);
@@ -28,94 +29,27 @@ const activeTab = ref('file'); // 'file' or 'text'
 const csvText = ref('');
 const textareaError = ref(null);
 
-// Improved CSV parser that handles quoted fields and escaped quotes
-const parseCSV = (text, delimiter = ',') => {
-  try {
-    const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
-    if (lines.length === 0) return [];
-    
-    const regex = new RegExp(`(?:^|${delimiter})(?:"([^"]*(?:""[^"]*)*)"|([^"${delimiter}\r\n]*))`, 'g');
-    
-    const parseLine = (line) => {
-      const values = [];
-      let match;
-      let position = 0;
-      
-      while ((match = regex.exec(line)) !== null) {
-        // Handle empty values between delimiters
-        if (match.index > position) {
-          const emptyCount = (match.index - position) / delimiter.length;
-          for (let i = 0; i < emptyCount; i++) {
-            values.push('');
-          }
-        }
-        position = regex.lastIndex;
-        
-        let value = match[1] !== undefined ? match[1] : match[2];
-        if (value === undefined) value = '';
-        
-        // Replace double quotes with single quotes
-        value = value.replace(/""/g, '"').trim();
-        values.push(value);
-      }
-      
-      // Handle trailing empty values
-      if (position < line.length) {
-        const remaining = line.slice(position);
-        const emptyCount = (remaining.split(delimiter).length - 1);
-        for (let i = 0; i < emptyCount; i++) {
-          values.push('');
-        }
-      }
-      
-      return values;
-    };
-
-    const headers = hasHeaders.value 
-      ? parseLine(lines[0]).map(h => h.trim())
-      : parseLine(lines[0]).map((_, i) => `Column ${i + 1}`);
-    
-    const startRow = hasHeaders.value ? 1 : 0;
-    const data = [];
-    
-    for (let i = startRow; i < lines.length; i++) {
-      const values = parseLine(lines[i]);
-      const row = {};
-      
-      headers.forEach((header, index) => {
-        row[header] = values[index] !== undefined ? values[index] : '';
-      });
-      
-      data.push(row);
-    }
-    
-    parsingError.value = null;
-    return data;
-  } catch (err) {
-    parsingError.value = err.message;
-    return [];
-  }
-};
-
-// Handle file upload
+// Handle file upload using PapaParse
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (!file) return;
 
   parsingError.value = null;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const parsedData = parseCSV(e.target.result, delimiter.value);
-      
-      if (parsingError.value) {
+  
+  Papa.parse(file, {
+    header: hasHeaders.value,
+    delimiter: delimiter.value,
+    skipEmptyLines: true,
+    complete: (results) => {
+      if (results.errors.length > 0) {
+        parsingError.value = results.errors.map(e => e.message).join(', ');
         alert(`CSV Parsing Error: ${parsingError.value}`);
         return;
       }
       
-      if (parsedData.length > 0) {
-        csvData.value = parsedData;
-        selectedList.value = parsedData;
+      if (results.data.length > 0) {
+        csvData.value = results.data;
+        selectedList.value = results.data;
         
         // Automatically map all properties to columns
         columnMappings.value = {};
@@ -123,7 +57,11 @@ const handleFileUpload = (event) => {
         columnExpressions.value = {};
         columnWidths.value = {};
         
-        Object.keys(selectedList.value[0]).forEach(prop => {
+        const firstRow = results.data[0];
+        const columns = hasHeaders.value ? Object.keys(firstRow) : 
+          Array.from({length: firstRow ? Object.keys(firstRow).length : 0}, (_, i) => `Column ${i + 1}`);
+        
+        columns.forEach(prop => {
           columnMappings.value[prop] = prop;
           columnNames.value[prop] = prop;
           columnExpressions.value[prop] = 'value';
@@ -136,38 +74,39 @@ const handleFileUpload = (event) => {
       } else {
         alert('No valid data found in the CSV file');
       }
-    } catch (err) {
-      alert('Error processing file: ' + err.message);
+    },
+    error: (error) => {
+      parsingError.value = error.message;
+      alert('Error processing file: ' + error.message);
     }
-  };
-  
-  reader.onerror = () => {
-    alert('Error reading file');
-  };
-  
-  reader.readAsText(file);
+  });
 };
 
-// Handle text input
+// Handle text input using PapaParse
 const handleTextInput = () => {
   try {
     if (!csvText.value.trim()) {
       parsingError.value = null;
+      textareaError.value = null;
       csvData.value = [];
       return;
     }
     
-    const parsedData = parseCSV(csvText.value, delimiter.value);
+    const results = Papa.parse(csvText.value, {
+      header: hasHeaders.value,
+      delimiter: delimiter.value,
+      skipEmptyLines: true
+    });
     
-    if (parsingError.value) {
-      textareaError.value = `CSV Parsing Error: ${parsingError.value}`;
+    if (results.errors.length > 0) {
+      textareaError.value = results.errors.map(e => e.message).join(', ');
       return;
     }
     
-    if (parsedData.length > 0) {
+    if (results.data.length > 0) {
       textareaError.value = null;
-      csvData.value = parsedData;
-      selectedList.value = parsedData;
+      csvData.value = results.data;
+      selectedList.value = results.data;
       
       // Automatically map all properties to columns
       columnMappings.value = {};
@@ -175,7 +114,11 @@ const handleTextInput = () => {
       columnExpressions.value = {};
       columnWidths.value = {};
       
-      Object.keys(selectedList.value[0]).forEach(prop => {
+      const firstRow = results.data[0];
+      const columns = hasHeaders.value ? Object.keys(firstRow) : 
+        Array.from({length: firstRow ? Object.keys(firstRow).length : 0}, (_, i) => `Column ${i + 1}`);
+      
+      columns.forEach(prop => {
         columnMappings.value[prop] = prop;
         columnNames.value[prop] = prop;
         columnExpressions.value[prop] = 'value';
