@@ -404,9 +404,9 @@ defineExpose({
         <div class="flex flex-col lg:flex-row gap-6 h-full">
           <!-- Left Sidebar - Controls -->
           <div class="lg:w-80 flex flex-col gap-6 relative">
-            <div class="lg:absolute inset-0 lg:overflow-y-auto">
+            <div class="lg:absolute inset-0 lg:overflow-y-auto bg-gray-50 p-5 rounded-lg shadow">
               <!-- Data Input Card -->
-              <div class="bg-gray-50 p-5 rounded-lg shadow">
+              <div >
                 <div class="space-y-4">
                   <!-- Tabs Navigation -->
                   <div class="flex border-b">
@@ -455,7 +455,6 @@ defineExpose({
                   <!-- Text Input Tab -->
                   <div v-if="activeTab === 'text'" class="space-y-4">
                     <div>
-                      <label class="block text-sm font-medium text-gray-700 mb-2">Paste CSV Data</label>
                       <textarea
                         v-model="csvText"
                         @input="handleTextInput"
