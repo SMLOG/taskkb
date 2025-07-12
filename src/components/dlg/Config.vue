@@ -7,11 +7,18 @@
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
           Columns Configuration
         </h3>
+        <div class="flex items-center space-x-2">
+         <button
+          class="rounded bg-blue-500 px-3 py-1.5 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+          @click="addCol">
+          + Add Group
+        </button>
         <button
           class="rounded bg-blue-500 px-3 py-1.5 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
           @click="addCol">
           + Add Column
         </button>
+      </div>
       </div>
 
       <!-- Columns List -->
@@ -51,7 +58,7 @@
                 x
               </button>
               <button @click="toggleShowColumnDetail(col)"
-                class="flex items-center justify-center w-8 h-8 text-red-500 hover:font-bold   rounded-full transition-colors duration-200 bg-blue-100"
+                class="flex items-center justify-center w-8 h-8 text-red-500 hover:font-bold rounded-full transition-colors duration-200 bg-blue-100"
                 style="border-radius: 50%;" aria-label="Open dropdown menu" aria-haspopup="true" aria-expanded="false">
                 <svg class="w-5 h-5 transition-transform duration-200" focusable="false" viewBox="0 0 24 24"
                   :class="{ 'rotate-180': showColumnsDetail.includes(col) }" xmlns="http://www.w3.org/2000/svg"
