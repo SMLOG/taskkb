@@ -6,7 +6,7 @@
         <div class="flex just-between">
           <div class="flex flex-col md:flex-row flex-wrap items-center  flex-1">
             <!-- First Row (always visible) -->
-            <div class="flex flex-1 items-center gap-2  border-gray-200 dark:border-gray-700 justify-between md:justify-start w-full">
+            <div class="flex flex-1 items-center gap-2  border-gray-200 dark:border-gray-700 justify-between md:justify-end w-full md:mr-2">
               <button @click="saveData(0)" class="btn-secondary" :disabled="saved || savingRef"
                 :class="{ '!bg-red-100 !text-red-700 !dark:bg-red-900 !dark:text-red-200': !saved }">
                 💾 <span v-if="savingRef">Saving...</span> <span v-else-if="saved">Saved</span><span v-else>Unsaved
