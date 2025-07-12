@@ -193,36 +193,37 @@ const handleMouseDown = (col, colIndex, event) => {
 
 const calColWidthAndResize = (col, colIndex) => {
   const th = props.th[colIndex];
-  const results = getFixedPositionWidths(`.row .col:nth-child(${colIndex+1})`);
-  const maxWidth = Math.max(...results.map(r => r.width));
-  col.width = maxWidth;
+  const maxWidth = getMaxWidth(`.row .col:nth-child(${colIndex+1})`);
+  col.width = maxWidth+1;
   reAdjustBars();
 };
 
-function getFixedPositionWidths(selector) {
+function getMaxWidth(selector) {
   const originals = document.querySelectorAll(selector);
   if (!originals.length) return null;
 
-  const widths = [];
-  originals.forEach((original, index) => {
     const wrapper = document.createElement('div');
     wrapper.style.position = 'fixed';
     wrapper.style.top = '-9999px';
     wrapper.style.left = '-9999px';
     wrapper.style.visibility = 'hidden';
-    wrapper.style.display = 'inline-block';
-
-    const clone = original.cloneNode(true);
-    wrapper.appendChild(clone);
+    wrapper.style.display = 'block';
     document.body.appendChild(wrapper);
 
-    const width = wrapper.getBoundingClientRect().width;
-    widths.push({ index, width, element: original });
+    originals.forEach((original, index) => {
 
-    document.body.removeChild(wrapper);
+  let newDiv = document.createElement('div');
+    const clone = original.cloneNode(true);
+    newDiv.appendChild(clone);
+    wrapper.appendChild(newDiv);
+
+
   });
+   const width = wrapper.getBoundingClientRect().width;
 
-  return widths;
+   document.body.removeChild(wrapper);
+
+  return width;
 }
 
 // Lifecycle hooks
