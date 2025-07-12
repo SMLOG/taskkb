@@ -194,7 +194,7 @@ const handleMouseDown = (col, colIndex, event) => {
 const calColWidthAndResize = (col, colIndex) => {
   const th = props.th[colIndex];
   const maxWidth = getMaxWidth(`.row .col:nth-child(${colIndex+1})`);
-  col.width = maxWidth+1;
+  col.width = maxWidth+8;
   reAdjustBars();
 };
 
