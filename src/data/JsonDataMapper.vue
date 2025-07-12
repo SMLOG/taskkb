@@ -20,8 +20,8 @@ const newColumnName = ref('');
 const columnToMap = ref('');
 const newColumnExpression = ref('value');
 const selectedColumn = ref(null);
-
-
+const jsonText = ref('');
+const activeTab = ref('file'); // 'file' or 'text'
 
 // Function to recursively find all array properties
 const findArrayProperties = (obj, prefix = '') => {
@@ -77,6 +77,20 @@ const handleFileUpload = (event) => {
       }
     };
     reader.readAsText(file);
+  }
+};
+
+// Handle JSON text input
+const handleJsonTextSubmit = () => {
+  try {
+    if (!jsonText.value.trim()) {
+      alert('Please enter JSON data');
+      return;
+    }
+    jsonData.value = Json.parse(jsonText.value);
+    listSelectionVisible.value = true;
+  } catch (err) {
+    alert('Invalid JSON: ' + err.message);
   }
 };
 
@@ -196,7 +210,6 @@ const removeMapping = (column) => {
     }
   }
 };
-
 
 // Column reordering handlers
 const dragStartColumn = (e, column) => {
@@ -349,9 +362,8 @@ function handleImport() {
     rows: rows,
     totalRows: selectedList.value.length
   });
-
-
 }
+
 // Explicitly expose functions needed in template
 defineExpose({
   evaluateExpression
@@ -375,32 +387,79 @@ defineExpose({
               <!-- Data Input Card -->
               <div class="bg-gray-50 p-5 rounded-lg shadow">
                 <div class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                    <span 
-                      class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
-                    >
-                      Upload JSON File
-                    </span>
-                    <input 
-                      type="file" 
-                      ref="fileInput"
-                      accept=".json" 
-                      @change="handleFileUpload" 
-                      class="hidden"
-                    >
-                  </label>
-                    </div>
+                  <!-- Tabs for input method -->
+                  <div class="border-b border-gray-200">
+                    <nav class="-mb-px flex space-x-4">
+                      <button
+                        @click="activeTab = 'file'"
+                        :class="{
+                          'border-blue-500 text-blue-600': activeTab === 'file',
+                          'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'file'
+                        }"
+                        class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                      >
+                        Upload File
+                      </button>
+                      <button
+                        @click="activeTab = 'text'"
+                        :class="{
+                          'border-blue-500 text-blue-600': activeTab === 'text',
+                          'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'text'
+                        }"
+                        class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm"
+                      >
+                        Paste JSON
+                      </button>
+                    </nav>
+                  </div>
 
-                  <div v-if="listSelectionVisible">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
-                    <select v-model="listProperty" @change="handleListSelection"
-                      class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
-                      <option value="">Select a property</option>
-                      <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
-                    </select>
+                  <!-- File Upload Tab -->
+                  <div v-if="activeTab === 'file'">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                      <span 
+                        class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
+                      >
+                        Upload JSON File
+                      </span>
+                      <input 
+                        type="file" 
+                        ref="fileInput"
+                        accept=".json" 
+                        @change="handleFileUpload" 
+                        class="hidden"
+                      >
+                    </label>
+                  </div>
+
+                  <!-- Text Input Tab -->
+                  <div v-if="activeTab === 'text'" class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700">Paste JSON Data</label>
+                    <textarea
+                      v-model="jsonText"
+                      class="w-full h-40 p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                      placeholder='Paste your JSON data here, e.g.:
+[
+  {"id": 1, "name": "John"},
+  {"id": 2, "name": "Jane"}
+]'
+                    ></textarea>
+                    <button
+                      @click="handleJsonTextSubmit"
+                      class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors"
+                    >
+                      Parse JSON
+                    </button>
                   </div>
                 </div>
+              </div>
+
+              <div v-if="listSelectionVisible">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Data Array</label>
+                <select v-model="listProperty" @change="handleListSelection"
+                  class="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50 p-2 border">
+                  <option value="">Select a property</option>
+                  <option v-for="prop in listProperties" :key="prop" :value="prop">{{ prop }}</option>
+                </select>
               </div>
 
               <!-- Column Management Card -->
