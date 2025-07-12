@@ -23,6 +23,11 @@ const hasHeaders = ref(true);
 const delimiter = ref(',');
 const parsingError = ref(null);
 
+// New state for tabs and text input
+const activeTab = ref('file'); // 'file' or 'text'
+const csvText = ref('');
+const textareaError = ref(null);
+
 // Improved CSV parser that handles quoted fields and escaped quotes
 const parseCSV = (text, delimiter = ',') => {
   try {
@@ -141,6 +146,51 @@ const handleFileUpload = (event) => {
   };
   
   reader.readAsText(file);
+};
+
+// Handle text input
+const handleTextInput = () => {
+  try {
+    if (!csvText.value.trim()) {
+      parsingError.value = null;
+      csvData.value = [];
+      return;
+    }
+    
+    const parsedData = parseCSV(csvText.value, delimiter.value);
+    
+    if (parsingError.value) {
+      textareaError.value = `CSV Parsing Error: ${parsingError.value}`;
+      return;
+    }
+    
+    if (parsedData.length > 0) {
+      textareaError.value = null;
+      csvData.value = parsedData;
+      selectedList.value = parsedData;
+      
+      // Automatically map all properties to columns
+      columnMappings.value = {};
+      columnNames.value = {};
+      columnExpressions.value = {};
+      columnWidths.value = {};
+      
+      Object.keys(selectedList.value[0]).forEach(prop => {
+        columnMappings.value[prop] = prop;
+        columnNames.value[prop] = prop;
+        columnExpressions.value[prop] = 'value';
+        columnWidths.value[prop] = '150px';
+      });
+      
+      mappingSectionVisible.value = true;
+      tableSectionVisible.value = true;
+      listSelectionVisible.value = true;
+    } else {
+      textareaError.value = 'No valid data found in the CSV text';
+    }
+  } catch (err) {
+    textareaError.value = 'Error processing text: ' + err.message;
+  }
 };
 
 // Handle column header click to populate form
@@ -300,7 +350,7 @@ const emit = defineEmits(["confirm", "cancel"]);
 
 function handleImport() {
   if (selectedList.value.length === 0) {
-    alert('No data selected. Please select a valid CSV file.');
+    alert('No data selected. Please select a valid CSV file or paste CSV data.');
     return;
   }
 
@@ -358,24 +408,65 @@ defineExpose({
               <!-- Data Input Card -->
               <div class="bg-gray-50 p-5 rounded-lg shadow">
                 <div class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                      <span 
-                        class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
-                      >
-                        Upload CSV File
-                      </span>
-                      <input 
-                        type="file" 
-                        ref="fileInput"
-                        accept=".csv,.txt" 
-                        @change="handleFileUpload" 
-                        class="hidden"
-                      >
-                    </label>
+                  <!-- Tabs Navigation -->
+                  <div class="flex border-b">
+                    <button 
+                      @click="activeTab = 'file'"
+                      :class="{
+                        'border-blue-500 text-blue-600': activeTab === 'file',
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'file'
+                      }"
+                      class="py-2 px-4 inline-flex items-center text-sm font-medium border-b-2"
+                    >
+                      Upload File
+                    </button>
+                    <button 
+                      @click="activeTab = 'text'"
+                      :class="{
+                        'border-blue-500 text-blue-600': activeTab === 'text',
+                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'text'
+                      }"
+                      class="py-2 px-4 inline-flex items-center text-sm font-medium border-b-2"
+                    >
+                      Paste Text
+                    </button>
                   </div>
 
-                  <div class="space-y-2">
+                  <!-- File Upload Tab -->
+                  <div v-if="activeTab === 'file'" class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">
+                        <span 
+                          class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
+                        >
+                          Upload CSV File
+                        </span>
+                        <input 
+                          type="file" 
+                          ref="fileInput"
+                          accept=".csv,.txt" 
+                          @change="handleFileUpload" 
+                          class="hidden"
+                        >
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Text Input Tab -->
+                  <div v-if="activeTab === 'text'" class="space-y-4">
+                    <div>
+                      <label class="block text-sm font-medium text-gray-700 mb-2">Paste CSV Data</label>
+                      <textarea
+                        v-model="csvText"
+                        @input="handleTextInput"
+                        class="w-full h-40 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                        placeholder="Paste your CSV data here..."
+                      ></textarea>
+                      <p v-if="textareaError" class="text-red-500 text-sm mt-1">{{ textareaError }}</p>
+                    </div>
+                  </div>
+
+                  <div class="space-y-2 pt-2 border-t">
                     <div class="flex items-center">
                       <input type="checkbox" id="hasHeaders" v-model="hasHeaders" class="mr-2">
                       <label for="hasHeaders" class="text-sm text-gray-700">First row contains headers</label>
