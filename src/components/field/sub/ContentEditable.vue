@@ -93,12 +93,27 @@ const sanitizePaste = (e) => {
   document.execCommand('insertText', false, text);
 };
 
+function convertUrlsToLinks(text) {
+  // Regular expression to match valid URLs and domains with common TLDs
+  const urlRegex = /(\b(https?:\/\/|www\.)?[a-zA-Z0-9-]+\.(com|org|net|edu|gov|io|co|info|biz|me|ai|app|dev|tech|online|site)(?:\/[^\s<>"']*)*\b)/gi;
+  
+  return text.replace(urlRegex, (url) => {
+    // Add https:// if no protocol is present
+    const href = url.match(/^(https?:\/\/)/i) ? url : `https://${url}`;
+    return `<a href="${href}" target="_blank" >${url}</a>`;
+  });
+}
+
+
 const convertMarkdownToHtml = (markdown) => {
   const tempElement = document.createElement("div");
+  let content = convertUrlsToLinks(markdown);
+
   try{
-  tempElement.innerHTML = marked.parse(markdown);
+
+  tempElement.innerHTML = marked.parse(content);
   }catch(e){
- tempElement.innerHTML =markdown;
+ tempElement.innerHTML =content;
   }
   const links = tempElement.getElementsByTagName('a');
   for (let i = 0; i < links.length; i++) {
