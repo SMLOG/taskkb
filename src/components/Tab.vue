@@ -5,7 +5,7 @@
     @click="$emit('click')"
     @dblclick="startEditing"
   >
-    <span v-if="tab.emoji" class="flex-none mr-1">{{ tab.emoji }}</span>
+    <span v-if="tab.icon" class="flex-none mr-1">{{ tab.emoji||'' }}</span>
     <span 
       v-if="!isEditing" 
       :class="`truncate flex-1 max-w-[${isActive ? 260 : 130}px]`"

@@ -8,13 +8,13 @@
           Show Schedule
         </label>
         <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
-          <input type="checkbox" v-model="config.icon"
+          <input type="checkbox" v-model="curTab.icon"
             class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
           Enable Emoji
           <button
             class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400"
             @click="pickEmoji">
-            {{ config.emoji || 'Pick Emoji' }}
+            {{ curTab.emoji || 'Pick Emoji' }}
           </button>
 
         </label>
@@ -37,11 +37,10 @@ import Description from "./Description.vue";
 
 const emit = defineEmits(["confirm", "cancel"]);
 
-const emojiInput = ref<string>("");
-
 const appStore = useAppStore();
 
 const config = computed(() => appStore.configRef);
+const curTab = computed(() => appStore.getCurrentTab());
 
 
 
@@ -50,7 +49,7 @@ async function pickEmoji() {
 
   const selectEmoj = await showDialog(await import('@/components/dlg/EmojPicker.vue'));
   if (selectEmoj) {
-    config.value.emoji = selectEmoj.i  }
+    curTab.value.emoji = selectEmoj.i  }
 
 }
 
@@ -59,13 +58,6 @@ const showDescription = async () => {
 };
 
 
-watch(
-  () => config.value.emoji,
-  (newEmoji) => {
-    emojiInput.value = newEmoji || "";
-  },
-  { immediate: true }
-);
 
 </script>
 

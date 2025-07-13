@@ -333,13 +333,6 @@ export const useAppStore = defineStore('app', () => {
     //initLoadTabsData();
   }
 
-  function updateTabEmoj(icon,emj){
-    if(icon){
-      configRef.value.emoji = emj;
-    } 
-    getCurrentTab().emoji = icon?emj:false;
-
-  }
 
   const saved = ref(true);
   function setSaved(b){
@@ -361,6 +354,6 @@ export const useAppStore = defineStore('app', () => {
     loadActiveTab,
     getCurrentTab,
     importToNewTab, loadFile, loading,
-    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,updateTabEmoj,getList,tabsDataMapRef,setSaved,saved,exportFileData2
+    resetPath, updatePath, newFile, redirect,exportFile: exportFileData,getList,tabsDataMapRef,setSaved,saved,exportFileData2
   };
 });
