@@ -94,15 +94,16 @@ const sanitizePaste = (e) => {
 };
 
 function convertUrlsToLinks(text) {
-  // Regular expression to match URLs, domains, and subdomains with common TLDs
-  const urlRegex = /(\b(https?:\/\/|www\.)?([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.(com|org|net|edu|gov|io|co|info|biz|me|ai|app|dev|tech|online|site)(?:\/[^\s<>"']*)*\b)/gi;
-  
+  // Regular expression to match URLs, domains, and subdomains with a broader range of TLDs
+  const urlRegex = /(\b(https?:\/\/|www\.)?([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}(?:\/[^\s<>"']*)*\b)/gi;
+
   return text.replace(urlRegex, (url) => {
     // Add https:// if no protocol is present
     const href = url.match(/^(https?:\/\/)/i) ? url : `https://${url}`;
     return `<a href="${href}" target="_blank">${url}</a>`;
   });
 }
+
 
 
 const convertMarkdownToHtml = (markdown) => {
