@@ -28,8 +28,8 @@ export function useTree() {
       let lastDepth = selectDepths[selectDepths.length - 1];
       selectDepths.forEach(() => appendNodeNextTo(rootObj, lastDepth, node));
     } else {
-      if (!parentNode._childs) parentNode._childs = [];
-      parentNode._childs.push(node);
+      if (!parentNode.rows) parentNode.rows = [];
+      parentNode.rows.push(node);
     }
   };
   const delSelectedNode = () => {
@@ -61,7 +61,7 @@ export function useTree() {
       }
     } else {
 
-      for (let item of rootObj._childs) {
+      for (let item of rootObj.rows) {
         items.push(...getRows(item, 0, ++j));
       }
 

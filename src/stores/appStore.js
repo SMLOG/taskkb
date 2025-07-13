@@ -164,7 +164,7 @@ export const useAppStore = defineStore('app', () => {
     // Define default tab data structure
     const defaultTabData = {
       config: { cols: [], title },
-      data: { children: [] } // Renamed _childs to children for clarity
+      data: { children: [] } // Renamed rows to children for clarity
     };
 
     // Add tab and its data to respective stores
@@ -234,7 +234,7 @@ export const useAppStore = defineStore('app', () => {
 
       if (index < 0) {
         if (tabs.value.length === 0) {
-          treeRef.value = { _childs: [] };
+          treeRef.value = { rows: [] };
           configRef.value = { cols: [] };
         }
       }

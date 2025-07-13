@@ -119,7 +119,7 @@ async function startImportFromJson(importer) {
         }))
       },
       data: {
-        _childs: rows.map((row, rowIndex) => {
+        rows: rows.map((row, rowIndex) => {
           const newRow = { id: uuidv4() };
           headers.forEach((cell, cellIndex) => {
             newRow[`c${cellIndex + 1}`] = "" + row[cell.id];

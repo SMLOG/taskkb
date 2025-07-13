@@ -7,7 +7,7 @@ export function getRowFromDepth(root, depth) {
   let index = 0;
   while (stack.length > 0) {
     index = stack.shift()
-    obj = obj._childs[parseInt(index)];
+    obj = obj.rows[parseInt(index)];
   }
   return obj;
 }
@@ -17,7 +17,7 @@ export function getParentDepth(depth){
 export function appendNodeNextTo(rootTree,depth,node){
       let parent  = getParentNode(rootTree, depth);
       
-      let parentChilds = parent._childs;
+      let parentChilds = parent.rows;
          let index = parseInt(depth.split('.').pop());
          let newNode  = deepCopyObject(node);
          newNode.id = uuidv4();
@@ -32,7 +32,7 @@ export function getParentNode(rootTree, depth) {
 export function deleteNode(rootTree, depth) {
   let parentNode = getParentNode(rootTree, depth);
   let index = parseInt(depth.split('.').pop());
-  return parentNode._childs.splice(index, 1);
+  return parentNode.rows.splice(index, 1);
 
 }
 
@@ -42,7 +42,7 @@ function deepCopyObject(obj) {
 export function copyNode(rootTree, depth) {
   let parentDepth = depth.replace(/\.\d+$/, '');
   let parentNode = getRowFromDepth(rootTree, parentDepth);
-  let parentChilds = parentNode._childs;
+  let parentChilds = parentNode.rows;
   let index = parseInt(depth.split('.').pop());
   parentChilds.splice(index, 0, deepCopyObject(parentChilds[index]));
 
@@ -50,8 +50,8 @@ export function copyNode(rootTree, depth) {
 
 function removeChildNodes(tree, nodesArray) {
   // Input validation
-  if (!tree || typeof tree !== 'object' || !Array.isArray(tree._childs)) {
-      throw new TypeError('Tree must be an object with a _childs array');
+  if (!tree || typeof tree !== 'object' || !Array.isArray(tree.rows)) {
+      throw new TypeError('Tree must be an object with a rows array');
   }
   if (!Array.isArray(nodesArray)) {
       throw new TypeError('nodesArray must be an array');
@@ -66,10 +66,10 @@ function removeChildNodes(tree, nodesArray) {
 
   // Helper function to find parents by traversing the tree
   function findParents(currentNode, parent = null) {
-      if (!currentNode || !Array.isArray(currentNode._childs)) return;
+      if (!currentNode || !Array.isArray(currentNode.rows)) return;
 
       // Map each child to its parent
-      currentNode._childs.forEach(child => {
+      currentNode.rows.forEach(child => {
           if (nodesToRemove.has(child)) {
               parentMap.set(child, currentNode);
           }
@@ -80,13 +80,13 @@ function removeChildNodes(tree, nodesArray) {
   // Find parents for all nodes in nodesToRemove
   findParents(tree);
 
-  // Remove nodes from their parents' _childs arrays
+  // Remove nodes from their parents' rows arrays
   for (const node of nodesToRemove) {
       const parent = parentMap.get(node);
-      if (parent && Array.isArray(parent._childs)) {
-          const initialLength = parent._childs.length;
-          parent._childs = parent._childs.filter(child => child !== node);
-          removedCount += initialLength - parent._childs.length;
+      if (parent && Array.isArray(parent.rows)) {
+          const initialLength = parent.rows.length;
+          parent.rows = parent.rows.filter(child => child !== node);
+          removedCount += initialLength - parent.rows.length;
       }
   }
 
@@ -113,10 +113,10 @@ function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = fals
   if (isBrother) {
     // Helper function to find the parent of targetParent and its index
     function findParentAndIndex(currentNode, target) {
-      if (!currentNode._childs) return null;
-      const index = currentNode._childs.indexOf(target);
+      if (!currentNode.rows) return null;
+      const index = currentNode.rows.indexOf(target);
       if (index !== -1) return { parent: currentNode, index };
-      for (let child of currentNode._childs) {
+      for (let child of currentNode.rows) {
         const found = findParentAndIndex(child, target);
         if (found) return found;
       }
@@ -131,43 +131,43 @@ function relocateTreeNodes(nodesToMove, targetParent, treeRoot, isBrother = fals
     targetIndex = result.index;
   }
 
-  // Ensure _childs property exists on newParent
-  if (!newParent._childs) {
-    newParent._childs = [];
+  // Ensure rows property exists on newParent
+  if (!newParent.rows) {
+    newParent.rows = [];
   }
 
-  // Helper function to remove a node from its parent's _childs
+  // Helper function to remove a node from its parent's rows
   function removeNodeFromParent(node, currentNode) {
-    if (!currentNode._childs) return false;
+    if (!currentNode.rows) return false;
     
-    const index = currentNode._childs.indexOf(node);
+    const index = currentNode.rows.indexOf(node);
     if (index !== -1) {
-      currentNode._childs.splice(index, 1);
+      currentNode.rows.splice(index, 1);
       return true;
     }
     
     // Recursively search in children
-    return currentNode._childs.some(child => removeNodeFromParent(node, child));
+    return currentNode.rows.some(child => removeNodeFromParent(node, child));
   }
 
   // Process each node to move
   nodesToMove.forEach(node => {
     if (!node) return; // Skip invalid nodes
     
-    // Remove node from its current parent's _childs
+    // Remove node from its current parent's rows
     if (node !== treeRoot) { // Avoid removing root if it's in nodesToMove
       removeNodeFromParent(node, treeRoot);
     }
     
-    // Add node to newParent's _childs
-    if (!newParent._childs.includes(node)) {
+    // Add node to newParent's rows
+    if (!newParent.rows.includes(node)) {
       if (isBrother && targetIndex !== -1) {
         // Insert after targetParent
-        newParent._childs.splice(targetIndex + 1, 0, node);
+        newParent.rows.splice(targetIndex + 1, 0, node);
         targetIndex++; // Increment index to maintain order for subsequent insertions
       } else {
         // Add as child or at end if not a brother
-        newParent._childs.push(node);
+        newParent.rows.push(node);
       }
     }
   });
@@ -187,9 +187,9 @@ export function moveNode(rootTree, selectDepths, selectDetphEnd, event, dragStar
 export function getRows(rootRow,level,depth) {
   let list = [];
   list.push({level:level,row:rootRow,depth:depth});
-  if (rootRow._childs) {
-    for (let i=0;i<rootRow._childs.length;i++) {
-      let  row =rootRow._childs[i]
+  if (rootRow.rows) {
+    for (let i=0;i<rootRow.rows.length;i++) {
+      let  row =rootRow.rows[i]
       list.push(...getRows(row,level+1,depth+"."+(i+1)));
     }
   }
@@ -216,8 +216,8 @@ export function loopTree(tree, callback) {
     callback(tree);
   //}
   
-  if (tree._childs && Array.isArray(tree._childs)) {
-    tree._childs.forEach(child => loopTree(child, callback));
+  if (tree.rows && Array.isArray(tree.rows)) {
+    tree.rows.forEach(child => loopTree(child, callback));
   }
 }
 
@@ -228,9 +228,9 @@ export function treeToList(tree) {
       // Add current node to result
       result.push(node);
       
-      // If node has _childs and it's an array, traverse each child
-      if (node._childs && Array.isArray(node._childs)) {
-          node._childs.forEach(child => traverse(child));
+      // If node has rows and it's an array, traverse each child
+      if (node.rows && Array.isArray(node.rows)) {
+          node.rows.forEach(child => traverse(child));
       }
   }
   

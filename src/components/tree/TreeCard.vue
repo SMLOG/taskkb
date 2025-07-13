@@ -23,9 +23,9 @@
     </div>
   
     <!-- Child Cards -->
-    <template v-if="row._childs?.length && !row._collapsed" class="ml-6 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
+    <template v-if="row.rows?.length && !row._collapsed" class="ml-6 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
       <TreeCard 
-        v-for="(child, index) in row._childs" 
+        v-for="(child, index) in row.rows" 
         :key="index" 
         :depth="depth + '.' + index" 
         :row="child"

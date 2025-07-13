@@ -106,7 +106,7 @@
         "description": "Project plan/Project Tracker"
       },
       "data": {
-        "_childs": [
+        "rows": [
           {
             "_id": "",
             "id": "e72a903d-d000-4798-93eb-03010eb75680",
@@ -168,7 +168,7 @@
         "description": "TODO list"
       },
       "data": {
-        "_childs": [
+        "rows": [
           {
             "id": "e1f81cad-6f91-4ff6-9b0c-8ac0f4e00b25"
           },
@@ -277,7 +277,7 @@
         "emoji": "⚡"
       },
       "data": {
-        "_childs": [
+        "rows": [
           {
             "id": "720f9e7d-2202-4a64-b6fa-2743f81aa934",
             "c1": "",

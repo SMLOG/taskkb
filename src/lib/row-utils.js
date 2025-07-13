@@ -8,8 +8,8 @@ export function loopToSetDate(row) {
       peroid.end.date = new Date(peroid.end.date);
     }
   }
-  if (row._childs) {
-    for (let ch of row._childs) {
+  if (row.rows) {
+    for (let ch of row.rows) {
       loopToSetDate(ch);
     }
   }
