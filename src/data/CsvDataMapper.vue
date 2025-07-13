@@ -415,10 +415,10 @@ defineExpose({
                     </div>
                     <div>
                       <label class="block text-xs font-medium text-gray-500 mb-1">Delimiter</label>
-                      <select v-model="delimiter" class="w-full rounded border-gray-300 border p-2 text-sm">
+                      <select v-model="delimiter" class="w-full rounded border-gray-300 border p-2 text-sm"   @change="handleTextInput">
                         <option value=",">Comma ( , )</option>
                         <option value=";">Semicolon ( ; )</option>
-                        <option value="\t">Tab</option>
+                        <option :value="'\t'">Tab</option>
                         <option value="|">Pipe ( | )</option>
                       </select>
                     </div>
