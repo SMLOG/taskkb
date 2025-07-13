@@ -35,7 +35,7 @@ const handleFileUpload = (event) => {
   if (!file) return;
 
   parsingError.value = null;
-  
+
   Papa.parse(file, {
     header: hasHeaders.value,
     delimiter: delimiter.value,
@@ -46,28 +46,28 @@ const handleFileUpload = (event) => {
         alert(`CSV Parsing Error: ${parsingError.value}`);
         return;
       }
-      
+
       if (results.data.length > 0) {
         csvData.value = results.data;
         selectedList.value = results.data;
-        
+
         // Automatically map all properties to columns
         columnMappings.value = {};
         columnNames.value = {};
         columnExpressions.value = {};
         columnWidths.value = {};
-        
+
         const firstRow = results.data[0];
-        const columns = hasHeaders.value ? Object.keys(firstRow) : 
-          Array.from({length: firstRow ? Object.keys(firstRow).length : 0}, (_, i) => `Column ${i + 1}`);
-        
+        const columns = hasHeaders.value ? Object.keys(firstRow) :
+          Array.from({ length: firstRow ? Object.keys(firstRow).length : 0 }, (_, i) => `Column ${i + 1}`);
+
         columns.forEach(prop => {
           columnMappings.value[prop] = prop;
           columnNames.value[prop] = prop;
           columnExpressions.value[prop] = 'value';
           columnWidths.value[prop] = '150px';
         });
-        
+
         mappingSectionVisible.value = true;
         tableSectionVisible.value = true;
         listSelectionVisible.value = true;
@@ -91,40 +91,40 @@ const handleTextInput = () => {
       csvData.value = [];
       return;
     }
-    
+
     const results = Papa.parse(csvText.value, {
       header: hasHeaders.value,
       delimiter: delimiter.value,
       skipEmptyLines: true
     });
-    
+
     if (results.errors.length > 0) {
       textareaError.value = results.errors.map(e => e.message).join(', ');
       return;
     }
-    
+
     if (results.data.length > 0) {
       textareaError.value = null;
       csvData.value = results.data;
       selectedList.value = results.data;
-      
+
       // Automatically map all properties to columns
       columnMappings.value = {};
       columnNames.value = {};
       columnExpressions.value = {};
       columnWidths.value = {};
-      
+
       const firstRow = results.data[0];
-      const columns = hasHeaders.value ? Object.keys(firstRow) : 
-        Array.from({length: firstRow ? Object.keys(firstRow).length : 0}, (_, i) => `Column ${i + 1}`);
-      
+      const columns = hasHeaders.value ? Object.keys(firstRow) :
+        Array.from({ length: firstRow ? Object.keys(firstRow).length : 0 }, (_, i) => `Column ${i + 1}`);
+
       columns.forEach(prop => {
         columnMappings.value[prop] = prop;
         columnNames.value[prop] = prop;
         columnExpressions.value[prop] = 'value';
         columnWidths.value[prop] = '150px';
       });
-      
+
       mappingSectionVisible.value = true;
       tableSectionVisible.value = true;
       listSelectionVisible.value = true;
@@ -349,28 +349,20 @@ defineExpose({
           <div class="lg:w-80 flex flex-col gap-6 relative">
             <div class="lg:absolute inset-0 lg:overflow-y-auto bg-gray-50 p-5 rounded-lg shadow">
               <!-- Data Input Card -->
-              <div >
+              <div>
                 <div class="space-y-4">
                   <!-- Tabs Navigation -->
                   <div class="flex border-b">
-                    <button 
-                      @click="activeTab = 'file'"
-                      :class="{
-                        'border-blue-500 text-blue-600': activeTab === 'file',
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'file'
-                      }"
-                      class="py-2 px-4 inline-flex items-center text-sm font-medium border-b-2"
-                    >
+                    <button @click="activeTab = 'file'" :class="{
+                      'border-blue-500 text-blue-600': activeTab === 'file',
+                      'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'file'
+                    }" class="py-2 px-4 inline-flex items-center text-sm font-medium border-b-2">
                       Upload File
                     </button>
-                    <button 
-                      @click="activeTab = 'text'"
-                      :class="{
-                        'border-blue-500 text-blue-600': activeTab === 'text',
-                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'text'
-                      }"
-                      class="py-2 px-4 inline-flex items-center text-sm font-medium border-b-2"
-                    >
+                    <button @click="activeTab = 'text'" :class="{
+                      'border-blue-500 text-blue-600': activeTab === 'text',
+                      'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300': activeTab !== 'text'
+                    }" class="py-2 px-4 inline-flex items-center text-sm font-medium border-b-2">
                       Paste Text
                     </button>
                   </div>
@@ -379,18 +371,11 @@ defineExpose({
                   <div v-if="activeTab === 'file'" class="space-y-4">
                     <div>
                       <label class="block text-sm font-medium text-gray-700 mb-2">
-                        <span 
-                          class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer"
-                        >
+                        <span
+                          class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors cursor-pointer">
                           Upload CSV File
                         </span>
-                        <input 
-                          type="file" 
-                          ref="fileInput"
-                          accept=".csv,.txt" 
-                          @change="handleFileUpload" 
-                          class="hidden"
-                        >
+                        <input type="file" ref="fileInput" accept=".csv,.txt" @change="handleFileUpload" class="hidden">
                       </label>
                     </div>
                   </div>
@@ -398,12 +383,9 @@ defineExpose({
                   <!-- Text Input Tab -->
                   <div v-if="activeTab === 'text'" class="space-y-4">
                     <div>
-                      <textarea
-                        v-model="csvText"
-                        @input="handleTextInput"
+                      <textarea v-model="csvText" @input="handleTextInput"
                         class="w-full h-40 p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Paste your CSV data here..."
-                      ></textarea>
+                        placeholder="Paste your CSV data here..."></textarea>
                       <p v-if="textareaError" class="text-red-500 text-sm mt-1">{{ textareaError }}</p>
                     </div>
                   </div>
@@ -415,7 +397,8 @@ defineExpose({
                     </div>
                     <div>
                       <label class="block text-xs font-medium text-gray-500 mb-1">Delimiter</label>
-                      <select v-model="delimiter" class="w-full rounded border-gray-300 border p-2 text-sm"   @change="handleTextInput">
+                      <select v-model="delimiter" class="w-full rounded border-gray-300 border p-2 text-sm"
+                        @change="handleTextInput">
                         <option value=",">Comma ( , )</option>
                         <option value=";">Semicolon ( ; )</option>
                         <option :value="'\t'">Tab</option>
@@ -447,7 +430,8 @@ defineExpose({
                         <select v-model="columnToMap"
                           class="w-full rounded border-gray-300 border p-2 text-sm focus:ring-blue-500 focus:border-blue-500">
                           <option value="">Select property (optional)</option>
-                          <option v-for="prop in Object.keys(selectedList[0] || {})" :key="prop" :value="prop">{{ prop }}</option>
+                          <option v-for="prop in Object.keys(selectedList[0] || {})" :key="prop" :value="prop">{{ prop
+                            }}</option>
                         </select>
                       </div>
 
