@@ -6,9 +6,7 @@ export  async function showNotification(message, type) {
   return useDialog().notification().open({ message, type });
 
 }
-export  async function showDialog(component,params,dlgOption) {
-  return useDialog().dialog().open(component,params,dlgOption);
+export  async function showDialog(component,props,dlgOption) {
+  return useDialog().dialog().open(component?.default||component,props,dlgOption);
 
 }
-
-

@@ -11,10 +11,12 @@
           <input type="checkbox" v-model="config.icon"
             class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400" />
           Emoji
-          <input v-if="config.icon" type="text" v-model="emojiInput" @input="validateEmoji" @blur="handleBlur"
-            class="w-16 rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100 text-sm py-1.5 focus:border-blue-500 focus:ring-blue-500 dark:focus:border-blue-400 dark:focus:ring-blue-400"
-            placeholder="😊" maxlength="4" aria-label="Enter an emoji" />
-          <span v-if="emojiError" class="text-red-500 dark:text-red-400 text-xs">{{ emojiError }}</span>
+          <button
+            class="rounded border-gray-300 dark:border-gray-600 dark:bg-gray-800 text-blue-500 focus:ring-blue-500 dark:focus:ring-blue-400"
+            @click="pickEmoji">
+            {{ config.emoji || 'Pick Emoji' }}
+          </button>
+
         </label>
 
         <label class="flex items-center gap-2 text-sm text-gray-800 dark:text-gray-300">
@@ -33,6 +35,7 @@ import { useAppStore } from "@/stores/appStore";
 import { debounce } from "lodash";
 import { showDialog } from "@/composables/useSystem";
 import Description from "./Description.vue";
+//import EmojiPicker from '@/components/dlg/EmojPicker.vue';
 
 const emit = defineEmits(["confirm", "cancel"]);
 
@@ -44,6 +47,15 @@ const appStore = useAppStore();
 const config = computed(() => appStore.configRef);
 
 
+
+async function pickEmoji() {
+
+
+  const selectEmoj = await showDialog(await import('@/components/dlg/EmojPicker.vue'));
+  if (selectEmoj) {
+    config.value.emoji = selectEmoj.i  }
+
+}
 
 const showDescription = async () => {
   await showDialog(Description);
