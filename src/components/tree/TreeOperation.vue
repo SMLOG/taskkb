@@ -97,7 +97,7 @@ const saved = computed(() => useAppStore().saved);
 const showSecondRow = ref(false);
 
 watch(
-  () => useAppStore().tabsDataMapRef,
+  () => [useAppStore().tabsDataMapRef,useAppStore().tabs],
   (newValue, oldValue) => {
     console.log('update ...');
     useAppStore().setSaved(false);
