@@ -15,3 +15,9 @@ const onSelectEmoji=(emoji) => {
 };
 
 </script>
+
+<style scoped>
+.v3-emoji-picker{
+  width: 100%;
+}
+</style>
