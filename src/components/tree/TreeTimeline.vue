@@ -7,7 +7,7 @@
       <div class="  border-t bg-white dark:bg-black flex">
         <div class="flex">
           <TreeColumn :columns="rootCols" :col-style="colStyle" :cell-class="cellClass"
-            :resolve-component="resolveComponent" />
+            :resolve-component="resolveComponent" :i="0" />
         </div>
         <div class="flex">
           <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch"

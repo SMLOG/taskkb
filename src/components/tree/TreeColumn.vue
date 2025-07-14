@@ -1,18 +1,18 @@
 <template>
-  <div v-for="(col, index) in columns" :key="col.key || index" :style="{
+  <div :class="{col:i===0}" v-for="(col, index) in columns" :key="col.key || index" :style="{
       ...colStyle(col, index),
       width:getWith(col)
     }">
-    <div v-if="col.show"  :class="cellClass(col)">
+    <div v-if="col.show"  :class="cellClass(col)" >
       <div class="cell flex flex-1 px-1">
         <b class="w-full">
           <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)" />
         </b>
       </div>
     </div>
-    <div class="flex" :style="{width:getWith(col)}">
+    <div v-if="col.children?.length && index > 0" class="flex" :class="{bordert:index>0}" :style="{width:getWith(col)}">
       <TreeColumn v-if="col.children && col.children.length > 0" :columns="col.children" :col-style="colStyle"
-        :cell-class="cellClass" :resolve-component="resolveComponent" />
+        :cell-class="cellClass" :resolve-component="resolveComponent" :index="i+1" />
     </div>
   </div>
 </template>
@@ -22,6 +22,7 @@ import { defineProps } from 'vue';
 
 const props = defineProps({
   columns: Array,
+  i: Number,
   colStyle: Function,
   cellClass: Function,
   resolveComponent: Function,
@@ -40,3 +41,18 @@ const getColspan = (col) => {
   return col.children.reduce((total, child) => total + getColspan(child), 0);
 };
 </script>
+
+<style lang="css" scoped>
+ .col:first-child {
+    border-left-style: var(--tw-border-style);
+    border-left-width: 1px;
+}
+.col
+ {
+    border-right-style: var(--tw-border-style);
+    border-right-width: 1px;
+}
+.bordert{
+  border-top: 1px solid #ccc;
+}
+</style>

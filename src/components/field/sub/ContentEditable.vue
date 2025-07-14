@@ -240,8 +240,8 @@ function truncateText(modelValue){
   if(showMoreLess.value){
     return html+"<span class='show less'>(Less)</span>"
   }
-
-  return truncateHTMLWithLinks(html,100);
+  return html;
+  //return truncateHTMLWithLinks(html,100);
 }
 
 
