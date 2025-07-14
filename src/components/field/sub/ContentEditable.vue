@@ -89,8 +89,8 @@ watch(showDropdown, (bool) => {
 // Methods
 const sanitizePaste = (e) => {
   e.preventDefault();
-  const text = e.clipboardData.getData('text/plain');
-  document.execCommand('insertText', false, text);
+  const text = e.clipboardData.getData('text/html');
+  document.execCommand('insertHTML', false, text);
 };
 
 function convertUrlsToLinks(text) {
@@ -241,7 +241,7 @@ function truncateText(modelValue){
     return html+"<span class='show less'>(Less)</span>"
   }
 
-  return truncateHTMLWithLinks(html,100);
+  return truncateHTMLWithLinks(html,10000);
 }
 
 
