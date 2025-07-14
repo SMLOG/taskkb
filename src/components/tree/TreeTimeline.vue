@@ -12,7 +12,21 @@
         :cols="cols"
         :showSch="configRef?.showSch"
       />
-      <div class="row header border-t bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
+      <div  class="  border-t bg-white dark:bg-black flex"  >
+        <div class="flex">
+        <TreeColumn
+        :columns="rootCols"
+        :col-style="colStyle"
+        :cell-class="cellClass"
+        :resolve-component="resolveComponent"
+      />
+    </div>
+    <div class="flex">
+      <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch" :selectStartRef="selectStartRef" :config="configRef" />
+    </div>
+    <div></div>
+    </div>
+      <div   class="row header border-t bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
           <div
             class="col"
@@ -30,6 +44,7 @@
         </template>
         <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch" :selectStartRef="selectStartRef" :config="configRef" />
       </div>
+ 
       <TreeTime
         :row="treeRef"
         :depth="''"
@@ -62,8 +77,7 @@ import { useRowDrag } from '@/composables/useRowDrag';
 import { weeksRef,moveType,isDragging } from '@/composables/context';
 import {useContextHandler} from  '@/composables/useContextHandler';
 import { useTree } from '@/composables/useTree';
-import { el } from 'date-fns/locale';
-
+import TreeColumn from './TreeColumn.vue';
 const tableRef = ref(null);
 const thRefs = ref([]);
 
@@ -140,8 +154,32 @@ onBeforeUnmount(() => {
 });
 
 
+const getLeafColumns = (columns) => {
+  const result = [];
+  
+  const traverse = (cols) => {
+    cols.forEach(col => {
+      if (col.children && col.children.length > 0) {
+        // If column has children, recursively process them
+        traverse(col.children);
+      } else if (col.show !== false) {
+        // Only add if it's a leaf node (no children) and show is not false
+        result.push(col);
+      }
+    });
+  };
+  
+  if (columns) {
+    traverse(columns);
+  }
+  
+  return result;
+};
+
+
 const days = computed(() => (weeksRef.value ? weeksRef.value.length * 7 : 0));
-const cols = computed(() => configRef.value?.cols?.filter((col) => col.show) ?? []);
+const cols = computed(() => (getLeafColumns(configRef.value?.cols) ?? [])?.filter((col) => col.show) ?? []);
+const rootCols = computed(() => (configRef.value?.cols ?? [])?.filter((col) => col.show) ?? []);
 
 const gridColumns = computed(() =>
   cols.value.length > 0 ? cols.value.map((col) => `${col.width}px`).join(' ') + ' 1fr' : '1fr'
