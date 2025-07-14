@@ -1,69 +1,45 @@
 <template>
-  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving,draging:isDraging }" @keydown.tab="handleTab" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef>-1">
-    <div
-      ref="tableRef"
-      style="display: grid; grid-template-columns: 1fr;"
-    >
-      <ColumnsResizer
-        :th="thRefs"
-        v-if="thRefs.length"
-        data="rbar"
-        :table="tableRef"
-        :cols="cols"
-        :showSch="configRef?.showSch"
-      />
-      <div  class="  border-t bg-white dark:bg-black flex"  >
+  <div class="table-container relative min-w-full" :class="{ drag: isHDragging, move: isMoving, draging: isDraging }"
+    @keydown.tab="handleTab" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef > -1">
+    <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;">
+      <ColumnsResizer :th="thRefs" v-if="thRefs.length" data="rbar" :table="tableRef" :cols="cols"
+        :showSch="configRef?.showSch" />
+      <div class="  border-t bg-white dark:bg-black flex">
         <div class="flex">
-        <TreeColumn
-        :columns="rootCols"
-        :col-style="colStyle"
-        :cell-class="cellClass"
-        :resolve-component="resolveComponent"
-      />
-    </div>
-    <div class="flex">
-      <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch" :selectStartRef="selectStartRef" :config="configRef" />
-    </div>
-    <div></div>
-    </div>
-      <div   class="row header border-t bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
+          <TreeColumn :columns="rootCols" :col-style="colStyle" :cell-class="cellClass"
+            :resolve-component="resolveComponent" />
+        </div>
+        <div class="flex">
+          <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch"
+            :selectStartRef="selectStartRef" :config="configRef" />
+        </div>
+        <div></div>
+      </div>
+      <div class="row header border-t bg-white dark:bg-black" :style="{ gridTemplateColumns: gridColumns }">
         <template v-for="(col, key) in cols" :key="key">
-          <div
-            class="col"
-            ref="thRefs"
-            :style="colStyle(col, key)"
-            :data-row="0"
-            :data-col="key + 1"
-            :class="cellClass(col)"
-            v-if="col.show"
-          >
+          <div class="col" ref="thRefs" :style="colStyle(col, key)" :data-row="0" :data-col="key + 1"
+            :class="cellClass(col)" v-if="col.show">
             <div class="cell flex flex-1 px-1">
-              <b class="w-full"><component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component></b>
+              <b class="w-full">
+                <component :is="resolveComponent(col.cp)" :col="col" v-if="resolveComponent(col.cp)"></component>
+              </b>
             </div>
           </div>
         </template>
-        <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch" :selectStartRef="selectStartRef" :config="configRef" />
+        <WeekHeader v-if="schReadyRef" :weeks="weeksRef" :schReady="schReadyRef" :showSch="configRef?.showSch"
+          :selectStartRef="selectStartRef" :config="configRef" />
       </div>
- 
-      <TreeTime
-        :row="treeRef"
-        :depth="''"
-        :showSch="configRef?.showSch"
-        :weeks="weeksRef"
-        :days="days"
-        :firstDay="firstDay"
-        :level="0"
-        :cols="cols"
-        :gridStyle="{ gridTemplateColumns: gridColumns }"
-        :schReady="schReadyRef"
-        v-if="treeRef"
-      ></TreeTime>
+
+      <TreeTime :row="treeRef" :depth="''" :showSch="configRef?.showSch" :weeks="weeksRef" :days="days"
+        :firstDay="firstDay" :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns }"
+        :schReady="schReadyRef" v-if="treeRef">
+      </TreeTime>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount,nextTick } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import ColumnsResizer from '@/components/ColumnsResizer.vue';
 import TreeTime from '@/components/tree/TreeTime.vue';
 import WeekHeader from '@/components/tree/WeekHeader.vue'; // Import the new component
@@ -74,8 +50,8 @@ import { resolveComponent } from '@/components/cpList';
 import { storeToRefs } from 'pinia';
 import { debounce } from 'lodash';
 import { useRowDrag } from '@/composables/useRowDrag';
-import { weeksRef,moveType,isDragging } from '@/composables/context';
-import {useContextHandler} from  '@/composables/useContextHandler';
+import { weeksRef, moveType, isDragging } from '@/composables/context';
+import { useContextHandler } from '@/composables/useContextHandler';
 import { useTree } from '@/composables/useTree';
 import TreeColumn from './TreeColumn.vue';
 const tableRef = ref(null);
@@ -85,22 +61,22 @@ const appStore = useAppStore();
 
 
 const cellClass = (col) => {
-    return {
-      sticky: col.sticky,
-    };
+  return {
+    sticky: col.sticky,
   };
+};
 
 const {
- selectStartRef
+  selectStartRef
 } = useSchedule(tableRef);
 
-useRowDrag(tableRef,{selectedClass:'selected',filter:'.header',multiDrag:true,});
+useRowDrag(tableRef, { selectedClass: 'selected', filter: '.header', multiDrag: true, });
 useContextHandler(tableRef);
 
 
 
 
-const { configRef, treeRef, activeTabRef,schReadyRef } = storeToRefs(appStore);
+const { configRef, treeRef, activeTabRef, schReadyRef } = storeToRefs(appStore);
 
 const colStyle = (col, index) => ({
   left: col.sticky ? `var(--sticky-left-${index})` : 'auto',
@@ -117,28 +93,28 @@ const updateWeeks = () => {
   }
   weeksRef.value.length = 0;
   weeksRef.value.push(...generateWeeks(configRef.value.startDate, configRef.value.weekCount));
-  firstDay.value =weeksRef.value?.[0]?.dates?.[0] ?? null;
+  firstDay.value = weeksRef.value?.[0]?.dates?.[0] ?? null;
 };
 
 const debouncedUpdateWeeks = debounce(updateWeeks, 300);
 
 watch(
-  () => [configRef.value?.startDate,configRef.value?.weekCount],
+  () => [configRef.value?.startDate, configRef.value?.weekCount],
   () => {
-   if( configRef.value?.startDate )
-    debouncedUpdateWeeks();
+    if (configRef.value?.startDate)
+      debouncedUpdateWeeks();
   },
   { immediate: true }
 );
 
 watch(
-  () => [activeTabRef.value,configRef.value?.showSch],
+  () => [activeTabRef.value, configRef.value?.showSch],
   () => {
-    if(configRef.value?.showSch)updateWeeks();
-      selectStartRef.value=null
-      nextTick(()=>{
-        schReadyRef.value=true;
-      })
+    if (configRef.value?.showSch) updateWeeks();
+    selectStartRef.value = null
+    nextTick(() => {
+      schReadyRef.value = true;
+    })
 
   },
   { immediate: true }
@@ -146,7 +122,7 @@ watch(
 
 onMounted(() => {
   appStore.loadActiveTab();
-  
+
 });
 
 onBeforeUnmount(() => {
@@ -156,7 +132,7 @@ onBeforeUnmount(() => {
 
 const getLeafColumns = (columns) => {
   const result = [];
-  
+
   const traverse = (cols) => {
     cols.forEach(col => {
       if (col.children && col.children.length > 0) {
@@ -168,11 +144,11 @@ const getLeafColumns = (columns) => {
       }
     });
   };
-  
+
   if (columns) {
     traverse(columns);
   }
-  
+
   return result;
 };
 
@@ -189,8 +165,8 @@ const isMoving = computed(() => moveType.value?.type === 'move');
 const isDraging = computed(() => isDragging.value);
 
 function handleTab(event) {
-    event.preventDefault();
-    if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
+  event.preventDefault();
+  if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
     let cellEl = event.target.closest(".col");
     let nextColEl = cellEl.nextElementSibling;
 
@@ -205,26 +181,26 @@ function handleTab(event) {
         nextColEl.querySelector('[contentEditable]').dispatchEvent(dblClickEvent);
       }
     }
-  
-    return; 
+
+    return;
   }
 
-      return false;
- }
+  return false;
+}
 
 const handleEnterKeyUp = async (event) => {
   if (event.target.tagName === 'DIV' && event.target.contentEditable === 'true') {
     let cellEl = event.target.closest(".col");
     let curRowEl = event.target.closest(".row");
-    
+
     let nextRowEl = curRowEl.nextElementSibling;
 
-    if(!nextRowEl){
-        useTree().insertNode({});
-        await nextTick();
-        nextRowEl = curRowEl.nextElementSibling;
+    if (!nextRowEl) {
+      useTree().insertNode({});
+      await nextTick();
+      nextRowEl = curRowEl.nextElementSibling;
     }
-    
+
     if (nextRowEl) {
       let cellIndex = Array.from(curRowEl.children).indexOf(cellEl);
       let nextCellEl = nextRowEl.children[cellIndex];
@@ -237,8 +213,8 @@ const handleEnterKeyUp = async (event) => {
         nextCellEl.querySelector('[contentEditable]').dispatchEvent(dblClickEvent);
       }
     }
-  
-    return; 
+
+    return;
   }
 };
 </script>
