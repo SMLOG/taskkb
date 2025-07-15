@@ -229,4 +229,15 @@ input[type="text"] {
     opacity: 1;
   }
 }
+.sortable-chosen{
+  position: relative;
+}
+.sortable-chosen::after{
+  content: '';
+  position: absolute;
+  height: 100%;
+  width: 2px;
+  top:0;left: 0;
+  background-color: gray;
+}
 </style>

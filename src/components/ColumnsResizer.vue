@@ -76,8 +76,14 @@ const reAdjustBars = () => {
           `--sticky-left-${i}`,
           `${nextStickyLeft}px`
         );
+
        
         nextStickyLeft += getOffsetWith(i);
+
+        if(nextStickyLeft>left){
+          bar.style.left = `${nextStickyLeft+scrollLeft}px`;
+
+        }
       }
     }
   });
@@ -110,7 +116,20 @@ const handleMousemove = (event) => {
     const width = state.resizeColumnWidth + event.clientX - state.resizeX;
     state.resizeColumn.width = width;
     const offsetLeft = getOffsetLeft(i)
-    rbar.value[i].style.left = `${offsetLeft + width - rbar.value[i].offsetWidth / 2}px`;
+    const mainContentEl = document.querySelector('#mainContent');
+    const scrollLeft = mainContentEl ? mainContentEl.scrollLeft : 0;
+
+    if (props.cols[i].sticky) {
+      const left = parseFloat(document.documentElement.style.getPropertyValue(`--sticky-left-${i}`));
+      const stickyBarLeft = left+getOffsetWith(i);
+      if(stickyBarLeft<(offsetLeft + scrollLeft )){
+        rbar.value[i].style.left = `${offsetLeft + scrollLeft + width - rbar.value[i].offsetWidth / 2}px`;
+        return;
+      }
+    }
+      rbar.value[i].style.left = `${offsetLeft  + width - rbar.value[i].offsetWidth / 2}px`;
+  
+
 
   }
 };
