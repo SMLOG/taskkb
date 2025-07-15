@@ -62,7 +62,6 @@ const debounce = (fn, wait) => {
 const reAdjustBars = () => {
   requestAnimationFrame(() => {
     let nextStickyLeft = 0;
-    let lastSticky = -1;
     const mainContentEl = document.querySelector('#mainContent');
     const scrollLeft = mainContentEl ? mainContentEl.scrollLeft : 0;
 
@@ -110,6 +109,20 @@ function getOffsetLeft(i){
 function getOffsetWith(i){
  return  props.cols[i].width;
 }
+function getStickLeft(i){
+  let nextStickyLeft= 0;
+ 
+  let k=0;
+  for(let j=0;j< props.cols.length;j++){
+    if(j>=i)break;
+   if(!props.cols[j].sticky)continue;
+   
+   nextStickyLeft += getOffsetWith(j);
+ 
+  }
+
+return nextStickyLeft;
+}
 const handleMousemove = (event) => {
   if (state.resizeColumn) {
     const i = state.resizeColumnIndex;
@@ -120,7 +133,8 @@ const handleMousemove = (event) => {
     const scrollLeft = mainContentEl ? mainContentEl.scrollLeft : 0;
 
     if (props.cols[i].sticky) {
-      const left = parseFloat(document.documentElement.style.getPropertyValue(`--sticky-left-${i}`));
+     
+      const left =  getStickLeft(i);
       const stickyBarLeft = left+getOffsetWith(i);
       rbar.value[i].style.left = `${Math.max(offsetLeft + scrollLeft ,stickyBarLeft+scrollLeft ) - rbar.value[i].offsetWidth / 2 }px`;
       return;
