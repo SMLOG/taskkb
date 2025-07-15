@@ -7,12 +7,14 @@ import StartDate from '@/components/field/StartDate.vue';
 import ColSeq from '@/components/field/ColSeq.vue';
 import ColCheck from '@/components/field/ColCheck.vue';
 import Col3Check from '@/components/field/Col3Check.vue';
+import EndDate from '@/components/field/EndDate.vue';
 const componentMap = {
   ColTitle,
   ColDropText,
   ColDate,
   ColSeq,
   StartDate,
+  EndDate,
   ColCheck,
   Col3Check
 };
@@ -26,7 +28,8 @@ export const cpList = ref([
   { type: 'ColTitle', name: "Title" },
   { type: 'ColDropText', name: "Text" },
   { type: 'ColDate', name: "Date" },
-  { type: 'StartDate', name: "Start date" },
+  { type: 'StartDate', name: "Start date(Timeline)" },
+  { type: 'EndDate', name: "End date(Timeline)" },
   { type: 'ColCheck', name: "CheckBox" },
   { type: 'Col3Check', name: "checkBox(fail,checked,emtpy)" }
 ]);
