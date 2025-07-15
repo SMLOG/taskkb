@@ -80,10 +80,10 @@ const reAdjustBars = () => {
        
         nextStickyLeft += getOffsetWith(i);
 
-        if(nextStickyLeft>left){
-          bar.style.left = `${nextStickyLeft+scrollLeft}px`;
+       // if(nextStickyLeft<left){
+          bar.style.left = `${Math.max(nextStickyLeft+scrollLeft,left)}px`;
 
-        }
+       // }
       }
     }
   });
@@ -122,10 +122,10 @@ const handleMousemove = (event) => {
     if (props.cols[i].sticky) {
       const left = parseFloat(document.documentElement.style.getPropertyValue(`--sticky-left-${i}`));
       const stickyBarLeft = left+getOffsetWith(i);
-      if(stickyBarLeft<(offsetLeft + scrollLeft )){
-        rbar.value[i].style.left = `${offsetLeft + scrollLeft + width - rbar.value[i].offsetWidth / 2}px`;
-        return;
-      }
+      rbar.value[i].style.left = `${Math.max(offsetLeft + scrollLeft ,stickyBarLeft+scrollLeft ) - rbar.value[i].offsetWidth / 2 }px`;
+      return;
+
+   
     }
       rbar.value[i].style.left = `${offsetLeft  + width - rbar.value[i].offsetWidth / 2}px`;
   
