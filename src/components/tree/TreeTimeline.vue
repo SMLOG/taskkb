@@ -3,7 +3,7 @@
     @keydown.tab="handleTab" @keyup.enter="handleEnterKeyUp" v-if="activeTabRef > -1">
     <div ref="tableRef" style="display: grid; grid-template-columns: 1fr;">
       <ColumnsResizer  data="rbar" :table="tableRef" :cols="cols" :showSch="configRef?.showSch" />
-      <div class="row header border-t bg-white dark:bg-black" style="top:0">
+      <div class="row header border-t bg-white dark:bg-black z-999" style="top:0">
         <div class="flex">
           <TreeColumn :columns="rootCols" :col-style="colStyle" :cell-class="cellClass"
             :resolve-component="resolveComponent" :i="0" />

@@ -1,8 +1,8 @@
 <template>
-  <div :class="{col:i===0}" v-for="(col, index) in columns" :key="col.key || index" :style="{
+  <div :class="{col:i===0,bordert:i}" v-for="(col, index) in columns" :key="col.key || index" :style="{
       ...colStyle(col, index),
       width:getWith(col)
-    }">
+    }" >
     <div v-if="col.show"  :class="cellClass(col)" >
       <div class="cell flex flex-1 px-1">
         <b class="w-full">
@@ -10,7 +10,7 @@
         </b>
       </div>
     </div>
-    <div v-if="col.children?.length && index > 0" class="flex" :class="{bordert:index>0}" :style="{width:getWith(col)}">
+    <div v-if="col.children?.length " class="flex" :class="{bordert:i}" :style="{width:getWith(col)}">
       <TreeColumn v-if="col.children && col.children.length > 0" :columns="col.children" :col-style="colStyle"
         :cell-class="cellClass" :resolve-component="resolveComponent" :i="i+1" />
     </div>
@@ -55,4 +55,5 @@ const getColspan = (col) => {
 .bordert{
   border-top: 1px solid #ccc;
 }
+
 </style>
