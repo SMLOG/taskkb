@@ -226,8 +226,7 @@ function getMaxWidth(selector) {
   return width;
 }
 
-// Lifecycle hooks
-onMounted(() => {
+watch(()=>props.table,()=>{
   const table = props.table;
   resizeObserver.value = new ResizeObserver((entries) => {
     for (const entry of entries) {
@@ -238,6 +237,10 @@ onMounted(() => {
     }
   });
   resizeObserver.value.observe(table);
+});
+// Lifecycle hooks
+onMounted(() => {
+
 
   window.addEventListener('resize', winResize);
   winResize();

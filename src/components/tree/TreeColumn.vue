@@ -12,7 +12,7 @@
     </div>
     <div v-if="col.children?.length && index > 0" class="flex" :class="{bordert:index>0}" :style="{width:getWith(col)}">
       <TreeColumn v-if="col.children && col.children.length > 0" :columns="col.children" :col-style="colStyle"
-        :cell-class="cellClass" :resolve-component="resolveComponent" :index="i+1" />
+        :cell-class="cellClass" :resolve-component="resolveComponent" :i="i+1" />
     </div>
   </div>
 </template>
