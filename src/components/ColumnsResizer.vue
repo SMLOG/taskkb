@@ -12,9 +12,9 @@
     <div
       class="overlay"
       v-if="state.resizeColumn"
-      @mousemove.prevent="handleResize"
+      @mousemove.prevent="handleMousemove"
       @mouseup.prevent="resizeBarMouseUp"
-      @touchmove.prevent="handleTouchResize"
+      @touchmove.prevent="handleTouchMove"
       @touchend.prevent="resizeBarTouchEnd"
       @touchcancel.prevent="resizeBarTouchEnd"
     ></div>
@@ -30,7 +30,7 @@ const appStore = useAppStore();
 const { activeTabRef } = storeToRefs(appStore);
 
 // Props
-const props = defineProps(['table', 'th', 'cols']);
+const props = defineProps(['table',  'cols']);
 
 // Reactive state
 const state = reactive({
@@ -67,20 +67,17 @@ const reAdjustBars = () => {
     const scrollLeft = mainContentEl ? mainContentEl.scrollLeft : 0;
 
     for (let i = 0; i < rbar.value.length; i++) {
-      const th = props.th[i];
       const bar = rbar.value[i];
-      const left = th.offsetLeft + th.offsetWidth - bar.offsetWidth / 2;
+      const left = getOffsetLeft(i) + getOffsetWith(i)- bar.offsetWidth / 2;
       bar.style.left = `${left}px`;
 
-      if (th.classList.contains('sticky')) {
+      if (props.cols[i].sticky) {
         document.documentElement.style.setProperty(
           `--sticky-left-${i}`,
           `${nextStickyLeft}px`
         );
-        if (th.getBoundingClientRect().x === nextStickyLeft && scrollLeft > 0) {
-          lastSticky = i;
-        }
-        nextStickyLeft += th.offsetWidth;
+       
+        nextStickyLeft += getOffsetWith(i);
       }
     }
   });
@@ -101,16 +98,20 @@ watch(
   { immediate: true }
 );
 
-const handleResize = (event) => {
+function getOffsetLeft(i){
+ return  props.cols.filter((c,index)=>index<i).reduce((total,c)=>total+c.width,0)
+}
+function getOffsetWith(i){
+ return  props.cols[i].width;
+}
+const handleMousemove = (event) => {
   if (state.resizeColumn) {
     const i = state.resizeColumnIndex;
     const width = state.resizeColumnWidth + event.clientX - state.resizeX;
     state.resizeColumn.width = width;
-    const th = props.th[i];
-    rbar.value[i].style.left = `${th.offsetLeft + width - rbar.value[i].offsetWidth / 2}px`;
-    if (th.classList.contains('sticky')) {
-      winResize();
-    }
+    const offsetLeft = getOffsetLeft(i)
+    rbar.value[i].style.left = `${offsetLeft + width - rbar.value[i].offsetWidth / 2}px`;
+
   }
 };
 
@@ -118,8 +119,8 @@ const startResize = (col, colIndex, event) => {
   state.resizeColumn = col;
   state.resizeColumnIndex = colIndex;
   state.resizeX = event.clientX;
-  state.resizeColumnWidth = props.th[colIndex].offsetWidth;
-  state.resizeLastColumnWidth = props.th[props.th.length - 1].offsetWidth;
+  state.resizeColumnWidth = getOffsetWith(colIndex);
+  state.resizeLastColumnWidth = getOffsetWith(props.cols.length - 1); 
 };
 
 const resizeBarMouseUp = () => {
@@ -151,7 +152,7 @@ const handleTouchStart = (col, colIndex, event) => {
   handleMouseDown(col, colIndex, mouseEvent);
 };
 
-const handleTouchResize = (event) => {
+const handleTouchMove = (event) => {
   if (state.resizeColumn) {
     const touch = event.touches[0];
     const mouseEvent = {
@@ -159,7 +160,7 @@ const handleTouchResize = (event) => {
       clientY: touch.clientY,
       preventDefault: () => {}
     };
-    handleResize(mouseEvent);
+    handleMousemove(mouseEvent);
   }
 };
 
@@ -192,7 +193,6 @@ const handleMouseDown = (col, colIndex, event) => {
 };
 
 const calColWidthAndResize = (col, colIndex) => {
-  const th = props.th[colIndex];
   const maxWidth = getMaxWidth(`.row .col:nth-child(${colIndex+1})`);
   col.width = maxWidth+8;
   reAdjustBars();
