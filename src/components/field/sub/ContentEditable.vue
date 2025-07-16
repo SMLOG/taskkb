@@ -61,7 +61,6 @@ const props = defineProps({
     required: false,
   },
   dropdownItems: {
-    type: Array,
     default: () => [],
   },
 });

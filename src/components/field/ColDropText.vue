@@ -2,7 +2,7 @@
   <div v-if="row" class="h-full flex flex-1">
     <ContentEditable 
       v-model="row['c' + col.fn]" 
-      :dropdownItems="col.options && col.options.split(',')" 
+      :dropdownItems="col.options" 
       @change="change" 
     />
   </div>
