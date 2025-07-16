@@ -22,11 +22,35 @@ async function pick(){
       fileCache.set(fileId, { file, handle: fileHandle }); // Cache both File and handle
       return [file,fileHandle,fileId];
 }
+
+async function createNewFile(path) {
+  const fileHandle = await window.showSaveFilePicker({
+      types: [
+          {
+              description: 'JSON Files',
+              accept: { '*/*': ['.json', '.treegridio'] },
+          },
+      ],
+      suggestedName: path.fileName // Default file name
+  });
+  
+  // Create an empty file by writing an empty string
+  const writable = await fileHandle.createWritable();
+  await writable.write(''); // Write empty content
+  await writable.close();
+  
+  const file = await fileHandle.getFile();
+  const fileId = file.name; // Use file name as unique ID
+  fileCache.set(fileId, { file, handle: fileHandle }); // Cache both File and handle
+  return [file, fileHandle, fileId];
+}
+
 // Function to pick a file using File System Access API or fallback to input element
-export const pickFile = async () => {
+export const pickFile = async (path) => {
   if (isFileSystemAccessSupported) {
     try {
-          const[file,fileHandle,fileId,] = await pick();
+          
+          const [file,fileHandle,fileId,] = path?await createNewFile(path):await pick();
       return { mode: 'D', file: { handle: fileHandle, name: file.name, id: fileId } };
     } catch (error) {
       if (error.name === 'AbortError') {
@@ -110,7 +134,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
       const cached = fileCache.get(path.fileName);
       let fileHandle = cached?.handle;
       if (!fileHandle) {
-        const ret = await pickFile();
+        const ret = await pickFile(path);
         if (!ret) {
           throw new Error(`No file handle available for ${path.fileName}. Cannot overwrite file.`);
         }
