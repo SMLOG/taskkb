@@ -1,5 +1,5 @@
 <template>
-  <div @mouseup="checkSelection" class="selection-container">
+  <div @mouseup="checkSelection" class="selection-container min-h-full">
     <slot></slot>
   </div>
 

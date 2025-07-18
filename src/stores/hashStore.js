@@ -66,10 +66,11 @@ export const useHashStore = defineStore('hash', () => {
     window.location.hash = window.location.hash.replace(/\/([A-Z])-([^/]+)\/([^/?]+)/g, '');
   }
 
+  const modules =  ['cards','code','calendar'];
   function updatePath(path) {
     let newHash;
     let sp = window.location.hash.split('?');
-    let base = ['cards','calendar'].includes(route.path.split('/')[1] )?`/${route.path.split('/')[1]}/`:'/';
+    let base =modules.includes(route.path.split('/')[1] )?`/${route.path.split('/')[1]}/`:'/';
 
 
     if(path ===null ){
@@ -87,7 +88,7 @@ export const useHashStore = defineStore('hash', () => {
 
   function redirect(path) {
 
-    let base = ['cards','calendar'].includes(route.path.split('/')[1] )?`/${route.path.split('/')[1]}/`:'/';
+    let base =modules.includes(route.path.split('/')[1] )?`/${route.path.split('/')[1]}/`:'/';
 
 
     let newHash;

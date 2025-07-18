@@ -211,13 +211,13 @@ export function filterChildDepths(depths) {
   });
 }
 
-export function loopTree(tree, callback) {
+export function loopTree(tree, callback,parent=null) {
  // if (tree.id) {
-    callback(tree);
+    callback(tree,parent);
   //}
   
   if (tree.rows && Array.isArray(tree.rows)) {
-    tree.rows.forEach(child => loopTree(child, callback));
+    tree.rows.forEach(child => loopTree(child, callback,tree));
   }
 }
 
