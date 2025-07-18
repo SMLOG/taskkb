@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@forge/bridge": "^5.0.0",
+    "@monaco-editor/loader": "^1.5.0",
     "@popperjs/core": "^2.11.8",
     "@tinymce/tinymce-vue": "^6.1.0",
     "@vuepic/vue-datepicker": "^7.4.1",
@@ -20,6 +21,8 @@
     "jquery": "^3.7.1",
     "marked": "^12.0.2",
     "marked-highlight": "^2.1.1",
+    "monaco-editor": "^0.52.2",
+    "monaco-editor-vue3": "^0.1.10",
     "papaparse": "^5.5.3",
     "pinia": "^2.1.7",
     "sortablejs": "^1.15.6",
