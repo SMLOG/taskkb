@@ -7,7 +7,9 @@
         <ScheduleCol :row="row" :days="days" :firstDay="firstDay" :showSch="showSch" :weeks="weeksRef"  />
     </div>
     <template v-if="row && row.rows && row.rows.length && !row._collapsed">
-        <TreeTime v-for="(child, index) in row.rows" :depth="depth + '.' + index" :key="index" :row="child"
+        <TreeTime v-for="(child, index) in row.rows" :depth="depth + '.' + index" :key="index" 
+        :row="child"
+        :parent="row"
             :cols="cols" :showSch="showSch" :days="days" :firstDay="firstDay" :level="level + 1" :id="(id ? id + '.' : '') + (index + 1)" :gridStyle="gridStyle" :weeks="weeksRef" />
     </template>
 </template>
@@ -25,6 +27,7 @@ import {isDraggable,selectDepths,weeksRef} from "@/composables/context";
 
 // Define props
 const props = defineProps({
+    parent:{type:Object,required:false},
     row: {
         type: Object,
         required: true,
@@ -68,7 +71,7 @@ const props = defineProps({
 const currentRowStore = useCurrentRowStore()
 
 function handleClick(){
-    currentRowStore.setCurrentRow(props.row);
+    currentRowStore.setCurrentRow(props.parent,props.row);
 }
 function isCurrentRow(){
     return   currentRowStore.isCurrentRow(props.row);

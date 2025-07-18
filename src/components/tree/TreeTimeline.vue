@@ -29,7 +29,7 @@
           :selectStartRef="selectStartRef" :config="configRef" />
       </div>
 
-      <TreeTime :row="treeRef" :depth="''" :showSch="configRef?.showSch" :weeks="weeksRef" :days="days"
+      <TreeTime :row="treeRef" :parent="null" :depth="''" :showSch="configRef?.showSch" :weeks="weeksRef" :days="days"
         :firstDay="firstDay" :level="0" :cols="cols" :gridStyle="{ gridTemplateColumns: gridColumns }"
         :schReady="schReadyRef" v-if="treeRef">
       </TreeTime>
