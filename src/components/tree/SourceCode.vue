@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="flex h-full">
     <MonacoEditor 
       v-model="code"
       language="typescript"
