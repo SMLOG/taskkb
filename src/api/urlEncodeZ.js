@@ -65,7 +65,7 @@ export async function writeObjectToJsonAttachment(dataObject, path) {
   if (!dataObject || typeof dataObject !== 'object') {
     throw new Error('Invalid or missing data object');
   }
-  if (!path || typeof path !== 'object' || !path.fileName) {
+  if (!path || typeof path !== 'object' ) {
     throw new Error('Invalid or missing path');
   }
 
