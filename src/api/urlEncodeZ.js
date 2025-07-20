@@ -51,8 +51,7 @@ export async function readJsonAttachment(path) {
       const text = await  decodeAndDecompress(path.id);
       const content = Json.parse(text);
       // Cache the URL data as a File object for consistency
-      const fileName = '';
-      return { content, path: { ...path, fileName } };
+      return { content, path: { ...path } };
     } catch (error) {
       throw { code: 404, error: `Failed to read or parse URL ${path.id}: ${error.message}` };
     }
