@@ -2,12 +2,6 @@
   <div class="flex h-full">
     <MonacoEditor 
       v-model="code"
-      language="typescript"
-      theme="vs-light"
-      :options="{
-        minimap: { enabled: true },
-        fontSize: 16
-      }"
       @change="handleChange"
     />
   </div>

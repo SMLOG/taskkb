@@ -14,19 +14,7 @@
 import { ref, computed, onMounted } from 'vue'
 
 const props = defineProps({
-  modelValue: String,
-  language: {
-    type: String,
-    default: 'javascript'
-  },
-  theme: {
-    type: String,
-    default: 'vs-dark'
-  },
-  options: {
-    type: Object,
-    default: () => ({})
-  }
+  modelValue: String
 })
 
 const emit = defineEmits(['update:modelValue', 'change'])
@@ -48,23 +36,6 @@ const textareaStyle = computed(() => {
     tabSize: 2 // For better code indentation
   }
 
-  // Apply dark theme if selected
-  if (props.theme === 'vs-dark') {
-    styles.backgroundColor = '#1e1e1e'
-    styles.color = '#d4d4d4'
-    styles.caretColor = '#ffffff' // Cursor color
-  } else {
-    styles.backgroundColor = '#ffffff'
-    styles.color = '#000000'
-  }
-
-  // Apply any additional options
-  if (props.options.fontSize) {
-    styles.fontSize = `${props.options.fontSize}px`
-  }
-  if (props.options.tabSize) {
-    styles.tabSize = props.options.tabSize
-  }
 
   return styles
 })
