@@ -23,6 +23,9 @@ export async function getStorageBridgeByName(mode) {
         case "U": {
             return await import('@/api/url');
         }
+          case "Z": {
+            return await import('@/api/urlEncodeZ');
+        }
     }
 
 

@@ -1,9 +1,13 @@
 <template>
-  <div class="flex h-full">
+  <div class="flex h-full flex-col">
+    <div class="flex  flex-grow">
     <MonacoEditor 
       v-model="code"
       @change="handleChange"
     />
+    </div>
+
+    <div>Source</div>
   </div>
 </template>
 
@@ -24,7 +28,7 @@ const handleChange = (value) => {
 
 watch(treeRef, (newTree) => {
   if (newTree) {
-   code.value = jsonToMarkdown(newTree)
+   code.value = jsonToMarkdown(newTree).trim()
   }
 }, { immediate: true })
 </script>

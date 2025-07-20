@@ -15,14 +15,14 @@ export function jsonToMarkdown(json, level = 0) {
       if( json.rows instanceof Array)
         for(const value of json.rows) {
           if (typeof value === 'object' && value !== null) {
-             markdown += '\n\n'+jsonToMarkdown(value, level + 1)
+             markdown += '\n'+jsonToMarkdown(value, level + 1)
           }
         }
       
 
     }
     
-    return markdown.trim();
+    return markdown;
   }
   
  export function markdownToJson(markdown) {

@@ -55,6 +55,7 @@ const modesRef = ref([
   , { mode: 'G', name: "Pick a folder...", folder: true }
   , { mode: 'L', name: "Browser" }
   , { mode: 'D', name: "Device" }
+  , { mode: 'Z', name: "Url-Encoder" }
 ].concat(location.href.indexOf('atlassian')>-1?[{mode:'J',name:"JIRA Attachment"}]:[]));
 
 const getSelected = () => {
