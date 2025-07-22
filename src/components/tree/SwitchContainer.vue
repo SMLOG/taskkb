@@ -22,7 +22,7 @@ const activeView = computed({
   set: (value) => viewStore.setActiveView(value)
 });
 
-const viewOptions = computed(() => viewStore.viewOptions);
+const viewOptions = computed(() => viewStore.viewOptions.filter(opt => opt.show !== false));
 
 // Computed
 const currentViewFromRoute = computed(() => {

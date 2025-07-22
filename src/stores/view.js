@@ -8,6 +8,7 @@ export const useViewStore = defineStore('view', () => {
   // Constants
   const VIEW_OPTIONS = [
     { value: '', label: 'List' },
+    { value: 'code', label: 'Source Code',show:false },
     { value: 'cards', label: 'Card' },
     { value: 'calendar', label: 'Calendar' }
   ];
