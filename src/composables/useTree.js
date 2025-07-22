@@ -20,10 +20,10 @@ import {
 
 export function useTree() {
 
-  const insertNode = (node) => {
+  const insertNode = (node,curRow) => {
     let rootObj = useAppStore().treeRef;
     node.id = uuidv4();
-    let parentNode = rootObj;
+    let parentNode = curRow||rootObj;
     if (selectDepths.length) {
       let lastDepth = selectDepths[selectDepths.length - 1];
       selectDepths.forEach(() => appendNodeNextTo(rootObj, lastDepth, node));

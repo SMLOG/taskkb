@@ -1,4 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
+import Json from '@/lib/Json';
+
 export function getRowFromDepth(root, depth) {
   if (depth == undefined) return;
   const stack = depth.split('.');

@@ -93,6 +93,8 @@ import FullscreenToggle from '../FullscreenToggle.vue';
 import SwitchContainer from './SwitchContainer.vue';
 import { selectDepths } from '@/composables/context';
 import Json from '@/lib/Json';
+import { useCurrentRowStore } from '@/stores/currentRowStore'
+
 const saved = computed(() => useAppStore().saved);
 const showSecondRow = ref(false);
 
@@ -191,8 +193,10 @@ function deleteSelectedNodes() {
   }
 }
 
-function addRow(num) {
-  tree.insertNode({});
+function addRow() {
+  
+  tree.insertNode({},useCurrentRowStore().currentRow);
+
 }
 
 function copyNode() {
