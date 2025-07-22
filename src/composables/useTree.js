@@ -20,16 +20,17 @@ import {
 
 export function useTree() {
 
-  const insertNode = (node,curRow) => {
+  const insertNode = (node,current) => {
     let rootObj = useAppStore().treeRef;
     node.id = uuidv4();
-    let parentNode = curRow||rootObj;
     if (selectDepths.length) {
       let lastDepth = selectDepths[selectDepths.length - 1];
       selectDepths.forEach(() => appendNodeNextTo(rootObj, lastDepth, node));
     } else {
-      if (!parentNode.rows) parentNode.rows = [];
-      parentNode.rows.push(node);
+     // if (!parentNode.rows) parentNode.rows = [];
+     // parentNode.rows.push(node);
+    let curDepth = current?.depth;
+     appendNodeNextTo(rootObj, curDepth, node)
     }
   };
   const delSelectedNode = () => {

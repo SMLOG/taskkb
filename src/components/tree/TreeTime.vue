@@ -71,7 +71,7 @@ const props = defineProps({
 const currentRowStore = useCurrentRowStore()
 
 function handleClick(){
-    currentRowStore.setCurrentRow(props.parent,props.row);
+    currentRowStore.setCurrentRow(props.parent,props.row,props.depth);
 }
 function isCurrentRow(){
     return   currentRowStore.isCurrentRow(props.row);

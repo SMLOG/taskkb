@@ -195,7 +195,7 @@ function deleteSelectedNodes() {
 
 function addRow() {
   
-  tree.insertNode({},useCurrentRowStore().currentRow);
+  tree.insertNode({},useCurrentRowStore().getCurrent());
 
 }
 

@@ -6,15 +6,16 @@ export const useCurrentRowStore = defineStore('currentRow', () => {
   // State
   const currentRow = ref(null)
   const currentRowParent = ref(null)
-  
+  const currentDepth = ref(null)
   // Getters
   const hasCurrentRow = computed(() => currentRow.value !== null)
   const currentRowId = computed(() => currentRow.value?.id || null)
   
   // Actions
-  function setCurrentRow(parent,row) {
+  function setCurrentRow(parent,row,depth) {
     currentRow.value = row
     currentRowParent.value = parent;
+    currentDepth.value = depth;
   }
   
   function clearCurrentRow() {
@@ -25,10 +26,11 @@ export const useCurrentRowStore = defineStore('currentRow', () => {
   function isCurrentRow(row){
    return currentRow.value !== null && row===currentRow.value
   }
-  function getCurrent(){
-    return [currentRowParent.value,currentRow.value];
-  }
+
   
+  function getCurrent(){
+    return {parent:currentRowParent.value,row:currentRow.value,depth:currentDepth.value};
+  }
   return {
     currentRow,
     hasCurrentRow,
