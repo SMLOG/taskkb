@@ -17,7 +17,7 @@
 import { computed, watch, onMounted } from 'vue';
 import { useAppStore } from '@/stores/appStore';
 import { storeToRefs } from 'pinia';
-import TreeCard from './TreeCard.vue';
+import TreeCard from '@/components/tree/TreeCard.vue';
 
 
 const appStore = useAppStore();

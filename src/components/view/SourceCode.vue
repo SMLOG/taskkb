@@ -13,7 +13,7 @@
 
 <script setup>
 import { ref, watch } from 'vue'
-import MonacoEditor from './MonacoEditor.vue'
+import MonacoEditor from '@/components/tree/MonacoEditor.vue'
 import {jsonToMarkdown} from '@/lib/jsonMark';
 import { storeToRefs } from 'pinia';
 import { useAppStore } from '@/stores/appStore';

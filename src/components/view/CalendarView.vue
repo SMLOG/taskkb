@@ -1,8 +1,8 @@
 <script setup>
 import { ref,watch } from 'vue';
-import Calendar from './components/Calendar.vue';
-import TreeTimeline from './components/tree/TreeTimeline.vue';
-import { useAppStore } from './stores/appStore';
+import Calendar from '@/components/Calendar.vue';
+import TreeTimeline from '@/components/view/TreeTimeline.vue';
+import { useAppStore } from '@/stores/appStore';
 import {formatDateToYyyyMMdd} from '@/lib/dataUtil'
 const currentDate = ref(new Date());
 

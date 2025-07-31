@@ -52,7 +52,7 @@ import { useRowDrag } from '@/composables/useRowDrag';
 import { weeksRef, moveType, isDragging } from '@/composables/context';
 import { useContextHandler } from '@/composables/useContextHandler';
 import { useTree } from '@/composables/useTree';
-import TreeColumn from './TreeColumn.vue';
+import TreeColumn from '@/components/tree/TreeColumn.vue';
 const tableRef = ref(null);
 const thRefs = ref([]);
 
