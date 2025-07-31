@@ -5,7 +5,7 @@ export function jsonToMarkdown(json, level = 0) {
     if (typeof json === 'object' && json !== null) {
       if( level>0)
       for (const [key, value] of Object.entries(json)) {
-        if (typeof value === 'object' && value !== null) {
+        if (typeof value === 'object' && value !== null &&!(value instanceof Date || value instanceof  Number)) {
           if(key==='rows')continue;
           markdown += `${indent}- **${key}**:\n${jsonToMarkdown(value, level + 1)}`;
         } else {
