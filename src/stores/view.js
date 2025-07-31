@@ -1,17 +1,20 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 
+export const VIEW_OPTIONS = [
+  { value: '', label: 'List' },
+  { value: 'plan', label: 'Plan' },
+  { value: 'code', label: 'Source Code',show:false },
+  { value: 'cards', label: 'Card' },
+  { value: 'calendar', label: 'Calendar' }
+];
+
 export const useViewStore = defineStore('view', () => {
   // State
   const activeView = ref(localStorage.getItem('preferredView') || '');
   
   // Constants
-  const VIEW_OPTIONS = [
-    { value: '', label: 'List' },
-    { value: 'code', label: 'Source Code',show:false },
-    { value: 'cards', label: 'Card' },
-    { value: 'calendar', label: 'Calendar' }
-  ];
+
   
   // Getters
   const viewOptions = computed(() => VIEW_OPTIONS);

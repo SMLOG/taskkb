@@ -8,6 +8,7 @@ import { parseHash } from '@/lib/Json';
 import {showDialog} from '@/composables/useSystem';
 import NoFoundDlg from '@/components/dlg/NoFoundDlg.vue'
 import Auth from '@/components/dlg/Auth.vue'
+import { VIEW_OPTIONS } from './view';
 
 
 export const useHashStore = defineStore('hash', () => {
@@ -66,7 +67,9 @@ export const useHashStore = defineStore('hash', () => {
     window.location.hash = window.location.hash.replace(/\/([A-Z])-([^/]+)\/([^/?]+)/g, '');
   }
 
-  const modules =  ['cards','code','calendar'];
+  //const modules =  ['cards','code','calendar'];
+  const modules =  VIEW_OPTIONS.map(e=>e.value).filter(e=>e);
+
   function updatePath(path) {
     let newHash;
     let sp = window.location.hash.split('?');
