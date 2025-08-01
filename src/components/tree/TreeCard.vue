@@ -1,6 +1,8 @@
 <template>
     <!-- Main Card -->
-    <div v-if="depth !== ''" class="card min-h-[70px] bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-lg">
+     <div class="m-2">
+    <div    :class="depth !== ''?`card min-h-[70px] bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden transition-all duration-200 hover:shadow-lg`:''">
+     <div v-if="depth !== ''"  class="m-2">
       <template v-for="(col, cellIndex) in cols" :key="cellIndex">
         <div class="flex">
           <div class="cell flex px-1 p-2">
@@ -15,15 +17,14 @@
             :level="level" 
             :cellIndex="cellIndex" 
             :index="id" 
-            :depth="depth"
+            :depth="depth"  
             class="p-2 border-r border-gray-100 dark:border-gray-700 last:border-r-0 flex-1"
           ></Cell>
         </div>
-      </template>
+      </template> 
     </div>
-  
-    <!-- Child Cards -->
-    <template v-if="row.rows?.length && !row._collapsed" class="ml-6 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
+        <!-- Child Cards -->
+        <template v-if="row.rows?.length && !row._collapsed" class="ml-6 pl-2 border-l-2 border-gray-200 dark:border-gray-700">
       <TreeCard 
         v-for="(child, index) in row.rows" 
         :key="index" 
@@ -39,6 +40,9 @@
         :weeks="weeksRef" 
       />
     </template>
+    </div>
+  
+  </div>
 </template>
 
 <script setup>
