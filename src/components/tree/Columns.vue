@@ -1,5 +1,5 @@
 <template>
-    <div class="row grid min-h-7" :data-weeks="1" @mousedown="handleClick" :class="{ cur:isCurrentRow(),selected: selectDepths.indexOf(depth) > -1 ,nochilds:!row.rows||!row.rows.length,collapsed:row._collapsed,hasChild: row.rows && row.rows.length}" :data-depth="depth" :data-level="level" v-if="depth !== ''"
+    <div class="row grid min-h-7" :data-weeks="1" @mousedown="handleClick" :class="{ cur:isCurrentRow(),selected: selectDepths.indexOf(depth) > -1 ,nochilds:!row.rows||!row.rows.length,collapsed:row._collapsed,hasChild: row.rows && row.rows.length,isNode:!row.rows||!row.rows.length}" :data-depth="depth" :data-level="level" v-if="depth !== ''"
         :draggable="isDraggable" :style="gridStyle" >
         <template v-for="(col, cellIndex) in cols" :key="cellIndex">
                 <Cell :row="row" :col="col" :level="level" :cellIndex="cellIndex" :index="id" :depth="depth" ></Cell>
