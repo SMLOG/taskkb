@@ -2,8 +2,10 @@
   <div v-if="row" class="h-full flex flex-1">
     <div  class="flex h-full flex-1">
       <div   class="h-full mr-2 z-1 flex">
-        <div v-for="p in level-1" :style="{ width:  15 + 'px' }"  class="h-full"></div>
-        <div @click="()=>clickRow(row)" class="collapse-section h-full"></div>
+        <div v-for="p in level-1" :style="{ width:  15 + 'px' }"  class="h-full place"></div>
+        <div @click="()=>clickRow(row)" class=" h-full " style="width: 15px;text-align: center;">
+          <span class="collapse-section"></span>
+        </div>
       </div>
       <div class="flex-1">
       <ContentEditable v-model="row['c' + col.fn]"></ContentEditable></div>
@@ -68,6 +70,18 @@ const props = defineProps({
   margin-left: 3px;
 }
 
+.place{
+  position: relative;
+}
+.place::after{
+  content: '';
+    left: 50%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-left: 1px solid #eee;
+    z-index: 999;
+}
 
 
 .id {
