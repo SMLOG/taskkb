@@ -92,9 +92,7 @@
 
 }
 
-.row .col:first-child{
-  @apply border-l;
-}
+
 
 .sticky {
   position: sticky;
