@@ -1,5 +1,5 @@
 <template>
-  <div v-if="row" class="etype num block flex-1" :draggable="isDrag"><span :class="{major:index.length==1}">{{ index }}</span></div>
+  <div v-if="row" class="etype num block flex-1" :draggable="isDrag"><span :class="{major:index.indexOf('.')==-1}">{{ index }}</span></div>
   <div v-else>#</div>
 </template>
 
@@ -31,9 +31,11 @@ defineProps({
     display: inline-block;
     border-radius: 100%;
     text-align: center;
-    line-height: 1em;
-    line-height: 1.2em;
-    width: 1.2em;
+    line-height: 1.8em;
+    width: 1.8em;
     color: white;
+}
+.num::after{
+  content: "";
 }
 </style>

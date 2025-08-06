@@ -1,10 +1,12 @@
 <template>
   <div v-if="row" class="h-full flex flex-1">
     <div  class="flex h-full flex-1">
-      <div   :style="{ paddingLeft: ((level-1) * 15) + 'px' }" class="h-full mr-2 z-1">
-        <span @click="()=>clickRow(row)" class="collapse-section"></span>
+      <div   class="h-full mr-2 z-1 flex">
+        <div v-for="p in level-1" :style="{ width:  15 + 'px' }"  class="h-full"></div>
+        <div @click="()=>clickRow(row)" class="collapse-section h-full"></div>
       </div>
-      <ContentEditable v-model="row['c' + col.fn]"></ContentEditable>
+      <div class="flex-1">
+      <ContentEditable v-model="row['c' + col.fn]"></ContentEditable></div>
     </div>
   </div>
   <div v-else>
