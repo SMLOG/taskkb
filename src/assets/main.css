@@ -105,19 +105,18 @@ body * {
  .pt{
 position: relative;
 }
- .pt::after{
+ /*.pt::after{
   content: '';
   position: absolute;
   top: 1em;
   left: -7.5px;
   right: 7.5px;
-  /* width: 7.5px; */
   border-bottom: 1px solid green;
   z-index: 999;
   margin-top:2px;
-}
+}*/
 
-.row.cur,.row.cur .sticky, .row.cur > *,.selected .col,.row.selected,.selected > *,.selected .col,.row.selected .sticky{
+.row.cur,.row.cur .sticky, .row.cur > *,.selected .col,.row.selected,.selected > *,.selected .col,.row.selected .sticky,  .row.cur .col:nth-child(-n+2) {
   @apply bg-blue-50 dark:bg-gray-700	;
 }
 
