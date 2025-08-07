@@ -116,8 +116,11 @@ position: relative;
   margin-top:2px;
 }*/
 
-.row.cur,.row.cur .sticky, .row.cur > *,.selected .col,.row.selected,.selected > *,.selected .col,.row.selected .sticky,  .row.cur .col:nth-child(-n+2) {
+.row.cur,.row.cur .sticky, .row.cur > *,.selected .col,.row.selected,.selected > *,.selected .col,.row.selected .sticky {
   @apply bg-blue-50 dark:bg-gray-700	;
+}
+.row.cur .col:nth-child(-n+2){
+  background-color: lightskyblue;
 }
 
 
