@@ -112,7 +112,7 @@ position: relative;
   left: -7.5px;
   right: 7.5px;
   /* width: 7.5px; */
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid green;
   z-index: 999;
   margin-top:2px;
 }
@@ -161,4 +161,10 @@ position: relative;
 
   .card .col .cell{
     @apply border-b border-dashed border-gray-200 dark:border-gray-800
+  }
+
+  .row .col:nth-child(-n+2) {
+    /* Your styles here */
+    background-color: lightblue;
+    border-color: transparent;
   }

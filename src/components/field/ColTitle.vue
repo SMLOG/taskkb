@@ -77,9 +77,9 @@ const props = defineProps({
   content: '';
     left: 50%;
     position: absolute;
-    top: 0;
-    bottom: 0;
-    border-left: 1px solid #eee;
+    top: -1px;
+    bottom: -1px;
+    border-left: 1px solid green;
     z-index: 999;
 }
 
