@@ -1,10 +1,10 @@
 <template>
   <div>
-    <div class="container mx-auto p-0 pb-0 min-w-full select-none flex just-between">
-      <div id="tabsanelContainer" class="tab-container flex-1 flex items-center min-w-0">
+    <div class="container mx-auto p-0 pb-0 w-full select-none flex flex-col sm:flex-row justify-between">
+      <div id="tabsanelContainer" class="tab-container w-full sm:w-auto sm:flex-1 flex items-center min-w-0">
         <TabsPanel />
       </div>
-      <div id="rightButtons" class="right-buttons flex items-center space-x-2">
+      <div id="rightButtons" class="right-buttons flex items-center justify-end sm:justify-center space-x-2 mt-2 sm:mt-0">
         <RightTop />
       </div>
     </div>

@@ -56,6 +56,7 @@ const siteTitle = atob('UGVyZmVjdFRvZG8=');
   <Notification ref="notification" />
   <CtrlSave />
 
+
 </template>
 
 <style scoped>

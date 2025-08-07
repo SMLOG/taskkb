@@ -3,7 +3,7 @@
     <div  class="flex h-full flex-1">
       <div   class="h-full mr-2 z-1 flex">
         <div v-for="p in level-1" :style="{ width:  15 + 'px' }"  class="h-full place"></div>
-        <div @click="()=>clickRow(row)" class="h-full pt" style="width: 15px;text-align: center;">
+        <div @click="()=>clickRow(row)" class="h-full" :class="{pt:level>1}" style="width: 15px;text-align: center;">
           <span class="collapse-section"></span>
         </div>
       </div>

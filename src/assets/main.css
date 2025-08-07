@@ -102,10 +102,10 @@ body * {
 .hasChild .collapse-section::after{
   content: "-";
 }
-.nochilds .pt{
+ .pt{
 position: relative;
 }
-.nochilds .pt::after{
+ .pt::after{
   content: '';
   position: absolute;
   top: 1em;
